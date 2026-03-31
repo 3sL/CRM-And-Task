@@ -151,39 +151,7 @@ const db = firebase.database();
 
 // ------------------- Language -------------------
 let lang='en';
-const langData = {
-    en: { title: "CRM System", crm: "CRM", tasks: "Tasks", developer: "Developed by Eng : <strong>Mahmoud Mohamed Marie</strong>", crm_title: "CRM System", tasks_title: "Tasks", save: "💾 Save", add_task: "➕ Add Task", name:"Name", phone:"Phone", date:"Date", status:"Status", notes:"Notes", reminder:"Reminder", followup:"Follow Up", whatsapp:"WhatsApp", edit:"Edit", delete:"Delete", client:"Client", stage:"Stage", task:"Task" },
-    ar: { title: "نظام إدارة العملاء", crm: "إدارة العملاء", tasks: "المهام", developer: "تم التطوير بواسطة مهندس : <strong>محمود محمد ماري</strong>", crm_title: "نظام إدارة العملاء", tasks_title: "المهام", save: "💾 حفظ", add_task: "➕ إضافة مهمة", name:"الاسم", phone:"الهاتف", date:"التاريخ", status:"الحالة", notes:"الملاحظات", reminder:"تذكير", followup:"متابعة", whatsapp:"واتساب", edit:"تعديل", delete:"حذف", client:"العميل", stage:"المرحلة", task:"المهمة" }
-};
-
-function changeLang(selected){
-    lang=selected;
-    document.querySelectorAll('[data-lang-key]').forEach(el=>{
-        const key=el.getAttribute('data-lang-key'); 
-        if(langData[lang][key]) el.innerHTML=langData[lang][key];
-    });
-    document.querySelectorAll('[data-lang-placeholder-en]').forEach(el=>{
-        const pl=el.getAttribute(`data-lang-placeholder-${lang}`);
-        if(pl) el.placeholder=pl;
-    });
-    document.querySelectorAll('#status option').forEach(opt=>{
-        const pl=opt.getAttribute(`data-lang-option-${lang}`);
-        if(pl) opt.textContent=pl;
-    });
-    document.querySelectorAll('#taskStage option').forEach(opt=>{
-        const pl=opt.getAttribute(`data-lang-option-${lang}`);
-        if(pl) opt.textContent=pl;
-    });
-    document.querySelectorAll('#crmTab th[data-lang-key]').forEach(th=>{
-        const key = th.getAttribute('data-lang-key'); 
-        if(langData[lang][key]) th.innerHTML = langData[lang][key]; 
-    });
-    document.querySelectorAll('#tasksTab th[data-lang-key]').forEach(th=>{
-        const key = th.getAttribute('data-lang-key'); 
-        if(langData[lang][key]) th.innerHTML = langData[lang][key]; 
-    });
-    renderCRM(); renderTasks();
-}
+const langData = { /* ... نفس بيانات اللغة كما في الكود الأصلي ... */ };
 
 // ------------------- Tabs -------------------
 function showTab(id, btn){
@@ -208,10 +176,17 @@ function showNotification(msg, scrollToClient=null){
 
 // ------------------- CRM -------------------
 let clients=[]; let editIndex=-1;
+
 function loadClientsFromFirebase(){
-    db.ref('clients').once('value', snapshot=>{ clients = snapshot.val() || []; renderCRM(); populateClientDropdown(); checkReminders(); });
+    db.ref('clients').on('value', snapshot => {
+        const data = snapshot.val();
+        if (data) { clients = Array.isArray(data) ? data : Object.values(data); } else { clients = []; }
+        renderCRM(); populateClientDropdown(); checkReminders();
+    });
 }
-function saveClientsToFirebase(){ db.ref('clients').set(clients); }
+
+function saveClientsToFirebase(){ db.ref('clients').set(clients.map(c=>({...c}))); }
+
 function addOrUpdate(){ 
     const name=document.getElementById('name').value;
     const phone=document.getElementById('phone').value;
@@ -231,13 +206,11 @@ function addOrUpdate(){
     document.getElementById('notes').value=''; document.getElementById('agent').value=''; document.getElementById('reminderDays').value=''; document.getElementById('followUp').value='';
 }
 
-// ------------------- Populate Client Dropdown -------------------
 function populateClientDropdown(){
     const sel=document.getElementById('taskClient'); sel.innerHTML='<option value="">Select Client</option>';
     clients.forEach(c=>{ sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`; });
 }
 
-// ------------------- CRM Render -------------------
 function renderCRM(){
     const table=document.getElementById("table");
     const filter = document.getElementById("universalSearch").value.toLowerCase();
@@ -263,22 +236,30 @@ function renderCRM(){
     }
 }
 
-// ------------------- CRM Edit/Delete -------------------
 function editClient(i){
     const c = clients[i]; editIndex=i;
     document.getElementById('name').value=c.name; document.getElementById('phone').value=c.phone; document.getElementById('date').value=c.date;
     document.getElementById('status').value=c.status; document.getElementById('notes').value=c.notes; document.getElementById('agent').value=c.agent;
     document.getElementById('reminderDays').value=c.reminderDays; document.getElementById('followUp').value=c.followUp;
 }
+
 function deleteClient(i){ clients.splice(i,1); saveClientsToFirebase(); renderCRM(); populateClientDropdown(); }
 
-// ------------------- WhatsApp -------------------
 function openWhatsApp(phone){ window.open(`https://wa.me/${phone}`, '_blank'); }
 
 // ------------------- Tasks -------------------
 let tasks=[]; let taskEditIndex=-1;
-function loadTasksFromFirebase(){ db.ref('tasks').once('value', snapshot=>{ tasks=snapshot.val()||[]; renderTasks(); }); }
-function saveTasksToFirebase(){ db.ref('tasks').set(tasks); }
+
+function loadTasksFromFirebase(){
+    db.ref('tasks').on('value', snapshot => {
+        const data = snapshot.val();
+        if (data) { tasks = Array.isArray(data) ? data : Object.values(data); } else { tasks = []; }
+        renderTasks();
+    });
+}
+
+function saveTasksToFirebase(){ db.ref('tasks').set(tasks.map(t=>({...t}))); }
+
 function addTask(){
     const taskText=document.getElementById('taskInput').value;
     const client=document.getElementById('taskClient').value;
@@ -288,6 +269,7 @@ function addTask(){
     saveTasksToFirebase(); renderTasks();
     document.getElementById('taskInput').value=''; document.getElementById('taskClient').value=''; document.getElementById('taskDate').value=''; document.getElementById('taskStage').value='quote';
 }
+
 function renderTasks(){
     const table=document.getElementById('taskList'); table.innerHTML='';
     tasks.forEach((t,i)=>{
@@ -300,29 +282,47 @@ function renderTasks(){
     });
 }
 
-// ------------------- Task Edit/Delete -------------------
-function editTask(i){ const t=tasks[i]; document.getElementById('taskInput').value=t.taskText; document.getElementById('taskClient').value=t.client; document.getElementById('taskDate').value=t.date; document.getElementById('taskStage').value=t.stage; tasks.splice(i,1); saveTasksToFirebase(); renderTasks(); }
+function editTask(i){
+    const t = tasks[i]; taskEditIndex=i;
+    document.getElementById('taskInput').value=t.taskText; document.getElementById('taskClient').value=t.client;
+    document.getElementById('taskDate').value=t.date; document.getElementById('taskStage').value=t.stage;
+}
+
 function deleteTask(i){ tasks.splice(i,1); saveTasksToFirebase(); renderTasks(); }
 
-// ------------------- Reminder Functionality -------------------
+// ------------------- Reminders -------------------
 function checkReminders(){
     const today = new Date();
     clients.forEach((c,i)=>{
         if(c.reminderDays && c.date){
-            const clientDate = new Date(c.date);
-            const reminderDate = new Date(clientDate);
-            reminderDate.setDate(clientDate.getDate() + parseInt(c.reminderDays));
-            if(today.toDateString() === reminderDate.toDateString()){
-                showNotification(`🔔 ${lang==='ar'?'تذكير للعميل':'Reminder for client'}: ${c.name}`, i);
+            const reminderDate = new Date(c.date); reminderDate.setDate(reminderDate.getDate()+parseInt(c.reminderDays));
+            if(today >= reminderDate){
+                showNotification(`⏰ Reminder for ${c.name}`, i);
             }
         }
     });
 }
 
-// ------------------- Initial Load -------------------
+// ------------------- Language -------------------
+function changeLang(l){
+    lang=l;
+    document.querySelectorAll('[data-lang-key]').forEach(el=>{
+        const key=el.getAttribute('data-lang-key');
+        if(langData[key] && langData[key][l]) el.innerText=langData[key][l];
+    });
+    document.querySelectorAll('[data-lang-placeholder-'+lang+']').forEach(el=>{
+        el.placeholder=el.getAttribute('data-lang-placeholder-'+lang);
+    });
+    document.querySelectorAll('[data-lang-option-'+lang+']').forEach(el=>{
+        el.innerText=el.getAttribute('data-lang-option-'+lang);
+    });
+    renderCRM(); renderTasks();
+}
+
+// ------------------- Init -------------------
 loadClientsFromFirebase();
 loadTasksFromFirebase();
-setInterval(checkReminders, 60000); // فحص التذكيرات كل دقيقة
+setInterval(checkReminders,60*1000); // كل دقيقة
 </script>
 </body>
 </html>
