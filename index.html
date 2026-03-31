@@ -48,8 +48,16 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 .stage-bank { background:#6f42c1; }
 
 /* ------------------- Logo ------------------- */
-.logo-container { text-align:center; margin-bottom:20px; }
-.logo-container img { max-width:150px; display:inline-block; border-radius:12px; }
+.logo-container { 
+    text-align:center; 
+    margin-bottom:20px; 
+}
+.logo-container img {
+    max-width: 100%; /* يسمح للوجو بالتمدد داخل الـcontainer */
+    height: auto;    /* يحافظ على نسبة العرض إلى الارتفاع */
+    display: inline-block;
+    border-radius: 12px;
+}
 
 /* ------------------- Tasks List ------------------- */
 #taskList li { background:#f9f9f9; padding:12px; margin-bottom:8px; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.05); list-style:none; }
