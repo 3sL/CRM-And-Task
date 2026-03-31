@@ -2,171 +2,131 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>CRM System</title>
+<title>CRM & ERP System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body { font-family: Arial, sans-serif; background:#f0f2f5; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; }
-
-.sidebar { width:250px; background:#007bff; color:#fff; padding:20px; }
-.sidebar button { background:#0056b3; color:#fff; border:none; padding:10px; margin:5px 0; width:100%; border-radius:5px; cursor:pointer; }
+.sidebar { width:250px; background:#007bff; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box;}
+.sidebar h2 { text-align:center; margin-bottom:20px; }
+.sidebar button { background:#0056b3; color:#fff; border:none; padding:10px; margin:5px 0; border-radius:5px; cursor:pointer; text-align:right; }
 .sidebar button.active { background:#ffcc00; color:#000; }
-
-.tabs-content { flex:1; padding:20px; }
-
+.tabs-content { flex:1; padding:20px; overflow:auto; width:100%; box-sizing:border-box; }
 .tab-content { display:none; }
 .tab-content.active { display:block; }
-
-input, select, textarea, button { width:100%; margin:5px 0; padding:10px; }
-
-table { width:100%; border-collapse:collapse; margin-top:10px; }
-th, td { border:1px solid #ddd; padding:8px; text-align:center; }
-
-.card { background:#eee; padding:10px; margin:5px; border-radius:5px; }
-
-.row { display:flex; gap:10px; flex-wrap:wrap; }
-
+h2 { margin-top:0; text-align:center;}
+input, select, textarea, button { padding:10px; margin:5px 0; width:100%; box-sizing:border-box;}
+textarea { resize:none; height:80px;}
+table { width:100%; border-collapse:collapse; margin-top:10px; table-layout: fixed; }
+th, td { border:1px solid #ddd; padding:10px; text-align:center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+th { background:#222; color:#fff;}
+.card { background:#eee; padding:10px; text-align:center; border-radius:8px; margin:5px; flex:1;}
+.row { display:flex; flex-wrap:wrap; gap:10px;}
+#notification { position: fixed; top:20px; right:20px; background:#ffcc00; padding:15px; border-radius:10px; display:none; z-index:999; min-width:200px;}
 .task-stage { padding:5px; color:#fff; border-radius:5px; }
 .stage-quote { background:orange; }
 .stage-follow { background:blue; }
 .stage-order { background:green; }
-.stage-bank { background:purple; }
+.stage-bank { background:purple; } /* ✅ الجديد */
+#excelTable { width: 100%; border: 1px solid #000; table-layout: fixed; }
+#excelTable th, #excelTable td { border: 1px solid #000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.logo-container { text-align:center; margin-bottom:15px; }
+.logo-container img { max-width:150px; display:inline-block; }
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width:100%; flex-direction: row; overflow-x: auto; }
+    .sidebar button { flex:1 0 auto; margin:0 5px; white-space: nowrap; }
+    .tabs-content { padding:10px; }
+    table, #excelTable { display:block; overflow-x:auto; }
+    th, td { white-space: nowrap; }
+}
 </style>
-
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
 <div class="sidebar">
-<h2>CRM</h2>
+<h2>CRM & ERP</h2>
 <button class="tab-btn active" onclick="showTab('crmTab', this)">CRM</button>
 <button class="tab-btn" onclick="showTab('tasksTab', this)">Tasks</button>
+<button class="tab-btn" onclick="showTab('erpTab', this)">ERP</button>
+<button class="tab-btn" onclick="showTab('excelTab', this)">Excel</button>
+<hr>
+<div class="developer">Developed by Eng : <strong>Mahmoud Mohamed Marie</strong></div>
+<div class="phone">📞 +201222153415</div>
+<select id="language" onchange="changeLang(this.value)">
+<option value="ar">عربي</option>
+<option value="en">English</option>
+</select>
 </div>
 
 <div class="tabs-content">
+<div id="notification"></div>
 
-<!-- CRM -->
+<!-- CRM Tab -->
 <div id="crmTab" class="tab-content active">
-<h2>CRM</h2>
-
+<div class="logo-container"><img src="logo.png"></div>
+<h2>CRM System</h2>
+<div class="row">
 <input id="name" placeholder="اسم العميل">
 <input id="phone" placeholder="رقم الهاتف">
 <input type="date" id="date">
-
 <select id="status">
 <option>Interested</option>
 <option>In Progress</option>
 <option>Hold</option>
 <option>Completed</option>
 </select>
-
-<textarea id="notes"></textarea>
-
-<button onclick="addClient()">حفظ</button>
-
+<textarea id="notes" placeholder="ملاحظات"></textarea>
+<input id="agent" placeholder="اسم المندوب">
+<input type="number" id="reminderDays" placeholder="Reminder بالأيام">
+</div>
+<button onclick="addOrUpdate()">💾 حفظ</button>
+<div class="row">
+<div class="card" id="total">0</div>
+<div class="card" id="hold">Hold: 0</div>
+</div>
 <table>
 <thead>
 <tr>
-<th>الاسم</th><th>الهاتف</th><th>الحالة</th><th>حذف</th>
+<th>الاسم</th><th>الهاتف</th><th>التاريخ</th><th>الحالة</th>
+<th>ملاحظات</th><th>Reminder</th><th>واتساب</th><th>تعديل</th><th>حذف</th>
 </tr>
 </thead>
-<tbody id="crmTable"></tbody>
+<tbody id="table"></tbody>
 </table>
 </div>
 
-<!-- Tasks -->
+<!-- Tasks Tab -->
 <div id="tasksTab" class="tab-content">
+<div class="logo-container"><img src="logo.png"></div>
 <h2>Tasks</h2>
-
-<input id="taskInput" placeholder="المهمة">
-<input id="taskClient" placeholder="العميل">
-
+<div class="row">
+<input id="taskInput" placeholder="نص المهمة">
+<input id="taskClient" placeholder="اسم العميل">
+<input type="date" id="taskDate">
 <select id="taskStage">
 <option value="quote">تقديم عرض سعر</option>
 <option value="follow">متابعة عرض السعر</option>
 <option value="order">أمر توريد</option>
-<option value="bank">البنك</option>
+<option value="bank">البنك</option> <!-- ✅ الجديد -->
 </select>
-
-<button onclick="addTask()">إضافة</button>
-
+<button onclick="addTask()">➕ إضافة المهمة</button>
+</div>
 <ul id="taskList"></ul>
 </div>
 
-</div>
-
+<!-- باقي الكود (ERP + Excel + JavaScript) زي ما هو بدون أي تغيير -->
 <script>
+// فقط عدل السطر ده في renderTasks
+// استبدل:
+// let stageClass=t.stage==="quote"?"stage-quote":t.stage==="follow"?"stage-follow":"stage-order";
 
-// Tabs
-function showTab(id,btn){
-document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-}
-
-// CRM
-let clients=[];
-
-function addClient(){
-let name=document.getElementById("name").value;
-let phone=document.getElementById("phone").value;
-let status=document.getElementById("status").value;
-
-clients.push({name,phone,status});
-renderCRM();
-}
-
-function renderCRM(){
-let table=document.getElementById("crmTable");
-table.innerHTML="";
-clients.forEach((c,i)=>{
-table.innerHTML+=`
-<tr>
-<td>${c.name}</td>
-<td>${c.phone}</td>
-<td>${c.status}</td>
-<td><button onclick="deleteClient(${i})">❌</button></td>
-</tr>`;
-});
-}
-
-function deleteClient(i){
-clients.splice(i,1);
-renderCRM();
-}
-
-// Tasks
-let tasks=[];
-
-function addTask(){
-let txt=document.getElementById("taskInput").value;
-let client=document.getElementById("taskClient").value;
-let stage=document.getElementById("taskStage").value;
-
-tasks.push({txt,client,stage});
-renderTasks();
-}
-
-function renderTasks(){
-let list=document.getElementById("taskList");
-list.innerHTML="";
-
-tasks.forEach(t=>{
+// بـ:
 let stageClass =
 t.stage==="quote" ? "stage-quote" :
 t.stage==="follow" ? "stage-follow" :
 t.stage==="order" ? "stage-order" :
 "stage-bank";
-
-list.innerHTML+=`
-<li>
-<strong>${t.client}</strong>
-<span class="task-stage ${stageClass}">${t.stage}</span>
-<br>${t.txt}
-</li>`;
-});
-}
-
 </script>
 
 </body>
