@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>CRM & ERP System</title>
+<title>CRM System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body { font-family: Arial, sans-serif; background:#f0f2f5; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; }
@@ -27,8 +27,6 @@ th { background:#222; color:#fff;}
 .stage-follow { background:blue; }
 .stage-order { background:green; }
 .stage-bank { background:purple; }
-#excelTable { width: 100%; border: 1px solid #000; table-layout: fixed; }
-#excelTable th, #excelTable td { border: 1px solid #000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .logo-container { text-align:center; margin-bottom:15px; }
 .logo-container img { max-width:150px; display:inline-block; }
 @media (max-width: 768px) {
@@ -36,20 +34,17 @@ th { background:#222; color:#fff;}
     .sidebar { width:100%; flex-direction: row; overflow-x: auto; }
     .sidebar button { flex:1 0 auto; margin:0 5px; white-space: nowrap; }
     .tabs-content { padding:10px; }
-    table, #excelTable { display:block; overflow-x:auto; }
+    table { display:block; overflow-x:auto; }
     th, td { white-space: nowrap; }
 }
 </style>
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
 <div class="sidebar">
-<h2>CRM & ERP</h2>
+<h2>CRM System</h2>
 <button class="tab-btn active" onclick="showTab('crmTab', this)">CRM</button>
 <button class="tab-btn" onclick="showTab('tasksTab', this)">Tasks</button>
-<button class="tab-btn" onclick="showTab('erpTab', this)">ERP</button>
-<button class="tab-btn" onclick="showTab('excelTab', this)">Excel</button>
 <hr>
 <div class="developer">Developed by Eng : <strong>Mahmoud Mohamed Marie</strong></div>
 <div class="phone">📞 +201222153415</div>
@@ -115,50 +110,6 @@ th { background:#222; color:#fff;}
 <ul id="taskList"></ul>
 </div>
 
-<!-- ERP Tab -->
-<div id="erpTab" class="tab-content">
-<div class="logo-container"><img src="logo.png" alt="شعار الشركة"></div>
-<h2>ERP System</h2>
-<div class="row">
-<select id="erpAccount"><option value="">اختر العميل</option></select>
-<select id="erpType">
-<option value="عهدة">عهدة</option>
-<option value="خزنة">خزنة</option>
-<option value="بنوك">بنوك</option>
-<option value="تأخيرات">تأخيرات</option>
-<option value="غرامات">غرامات</option>
-<option value="خصومات">خصومات</option>
-<option value="أخرى">أخرى</option>
-</select>
-<input type="number" id="erpDebit" placeholder="مدين">
-<input type="number" id="erpCredit" placeholder="دائن">
-<button onclick="addERP()">💾 إضافة القيد</button>
-</div>
-<div style="overflow-x:auto;">
-<table id="erpTable">
-<thead>
-<tr><th>الحساب</th><th>النوع</th><th>مدين</th><th>دائن</th></tr>
-</thead>
-<tbody></tbody>
-<tfoot>
-<tr><th>الإجمالي</th><th>-</th><th id="totalDebit">0</th><th id="totalCredit">0</th></tr>
-</tfoot>
-</table>
-</div>
-</div>
-
-<!-- Excel Tab -->
-<div id="excelTab" class="tab-content">
-<div class="logo-container"><img src="logo.png" alt="شعار الشركة"></div>
-<h2>Excel Upload & Edit</h2>
-<input type="file" id="excelFile" onchange="handleFile(event)">
-<button onclick="exportExcelFile()">📊 تصدير Excel</button>
-<button onclick="saveExcelData()">💾 حفظ داخل البرنامج</button>
-<div style="overflow-x:auto;">
-<table id="excelTable"></table>
-</div>
-</div>
-
 </div>
 
 <script>
@@ -198,7 +149,6 @@ showNotification("✏️ تم تعديل العميل");
 editIndex=-1;
 }
 localStorage.setItem("clients",JSON.stringify(clients));
-updateERPAccounts();
 nameEl.value=""; phoneEl.value=""; dateEl.value=""; notesEl.value="";
 renderCRM();
 }
@@ -242,22 +192,10 @@ function deleteClient(i){
 clients.splice(i,1);
 localStorage.setItem("clients",JSON.stringify(clients));
 renderCRM();
-updateERPAccounts();
 showNotification("❌ تم حذف العميل");
 }
 function openWhatsApp(phone){window.open(`https://wa.me/${phone}`,'_blank');}
 renderCRM();
-function updateERPAccounts(){
-const sel=document.getElementById("erpAccount");
-sel.innerHTML='<option value="">اختر العميل</option>';
-clients.forEach(c=>{
-const opt=document.createElement("option");
-opt.value=c.name;
-opt.text=c.name;
-sel.appendChild(opt);
-});
-}
-updateERPAccounts();
 
 // Tasks
 let tasks=JSON.parse(localStorage.getItem("tasks")||"[]");
