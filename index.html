@@ -201,72 +201,60 @@ th {
 /* ------------------- Responsive ------------------- */
 @media (max-width: 768px) {
   body {
-    flex-direction: column;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 10px !important;
   }
   .sidebar {
-    width:100%;
-    flex-direction: row;
-    overflow-x: auto;
+    width: 100% !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
   }
   .sidebar button {
-    flex:1 0 auto;
-    margin:0 5px;
-    white-space: nowrap;
+    flex: 1 1 45% !important;
+    margin: 5px 5px !important;
+    min-width: 120px !important;
+    white-space: normal !important;
+    font-size: 1em !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
   }
-  .tabs-content {
-    padding:15px;
+  input, select, textarea, button {
+    width: 100% !important;
+    font-size: 1em !important;
+    padding: 12px !important;
+    margin: 8px 0 !important;
+    box-sizing: border-box !important;
   }
+  textarea { height: 80px !important; }
   table {
-    display:block;
-    width:100%;
-    overflow-x:auto;
-    white-space:nowrap;
-    -webkit-overflow-scrolling: touch;
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
   }
-  th, td {
-    white-space: nowrap;
-    font-size: 0.9em;
-    padding:8px;
+  th, td { padding: 8px !important; font-size: 0.85em !important; }
+  h2, .logo-container { text-align: center !important; }
+  #notification {
+    top: auto !important;
+    bottom: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: calc(100% - 20px) !important;
+    border-radius: 10px !important;
+    font-size: 0.9em !important;
   }
+  .tabs-content { width: 100% !important; padding: 15px !important; }
 }
 /* ------------------- Animations ------------------- */
 @keyframes fadeIn {
   from {opacity:0;}
   to {opacity:1;}
-}
-
-/* ------------------- إضافات لتحسين عرض الموبايل بدون حذف أي شيء ------------------- */
-@media (max-width: 768px) {
-  body {
-    padding-top: env(safe-area-inset-top);
-  }
-  .sidebar {
-    width: 100% !important;
-    flex-direction: column !important;
-    overflow-x: visible !important;
-    padding: 10px 15px !important;
-    box-sizing: border-box !important;
-  }
-  .sidebar h2 {
-    font-size: 1.2em !important;
-    margin-bottom: 10px !important;
-    white-space: normal !important;
-    text-align: center !important;
-  }
-  .sidebar button {
-    flex: none !important;
-    margin: 5px 0 !important;
-    width: 100% !important;
-  }
-  .sidebar select {
-    margin-top: 10px !important;
-    width: 100% !important;
-  }
-  input[type="date"] {
-    width: 100% !important;
-    padding: 12px !important;
-    box-sizing: border-box !important;
-  }
 }
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -325,7 +313,7 @@ th {
       <tbody id="table"></tbody>
     </table>
   </div>
-  <!-- Tasks Tab -->
+    <!-- Tasks Tab -->
   <div id="tasksTab" class="tab-content">
     <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
     <h2 data-lang-key="tasks_title">Tasks</h2>
@@ -353,6 +341,7 @@ th {
     </table>
   </div>
 </div>
+
 <script>
 // ------------------- Firebase -------------------
 const firebaseConfig = {
@@ -371,7 +360,32 @@ const db = firebase.database();
 // ------------------- Language -------------------
 let lang='en';
 const langData = {
-  /* ... نفس بيانات اللغة كما في الكود الأصلي ... */
+  en: {
+    title: "CRM System & Tasks For Utopia Trading And Export",
+    crm: "CRM", tasks: "Tasks",
+    developer: "Developed by Eng : Mahmoud Mohamed Marie",
+    crm_title: "CRM System",
+    tasks_title: "Tasks",
+    save: "💾 Save",
+    add_task: "➕ Add Task",
+    name: "Name", phone: "Phone", date: "Date", status: "Status",
+    notes: "Notes", reminder: "Reminder", followup: "Follow Up",
+    whatsapp: "WhatsApp", edit: "Edit", delete: "Delete",
+    client: "Client", stage: "Stage", task: "Task"
+  },
+  ar: {
+    title: "نظام إدارة العملاء والمهام لشركة يوتوبيا للتجارة والتصدير",
+    crm: "إدارة العملاء", tasks: "المهام",
+    developer: "تم التطوير بواسطة مهندس : محمود محمد مارى",
+    crm_title: "نظام إدارة العملاء",
+    tasks_title: "المهام",
+    save: "💾 حفظ",
+    add_task: "➕ إضافة مهمة",
+    name: "الاسم", phone: "رقم الهاتف", date: "التاريخ", status: "الحالة",
+    notes: "ملاحظات", reminder: "تذكير", followup: "متابعة",
+    whatsapp: "واتساب", edit: "تعديل", delete: "حذف",
+    client: "العميل", stage: "المرحلة", task: "المهمة"
+  }
 };
 
 // ------------------- Tabs -------------------
@@ -393,14 +407,11 @@ function showNotification(msg, scrollToClient=null){
       if(row) row.scrollIntoView({behavior:'smooth', block:'center'});
     }
   };
-  setTimeout(()=>{
-    notif.style.display='none';
-  },4000);
+  setTimeout(()=>{ notif.style.display='none'; },4000);
 }
 
 // ------------------- CRM -------------------
-let clients=[];
-let editIndex=-1;
+let clients=[]; let editIndex=-1;
 
 function loadClientsFromFirebase(){
   db.ref('clients').on('value', snapshot => {
@@ -411,15 +422,11 @@ function loadClientsFromFirebase(){
     checkReminders();
   });
 }
-
 function saveClientsToFirebase(){
   const updates = {};
-  clients.forEach((c, i) => {
-    updates[i] = {...c};
-  });
+  clients.forEach((c,i)=>{ updates[i] = {...c}; });
   db.ref('clients').set(updates);
 }
-
 function addOrUpdate(){
   const name=document.getElementById('name').value;
   const phone=document.getElementById('phone').value;
@@ -430,219 +437,138 @@ function addOrUpdate(){
   const reminderDays=document.getElementById('reminderDays').value;
   const followUp=document.getElementById('followUp').value;
 
-  if(editIndex>-1){
-    clients[editIndex]={name, phone, date, status, notes, agent, reminderDays, followUp};
-    editIndex=-1;
-  } else {
-    clients.push({name, phone, date, status, notes, agent, reminderDays, followUp});
-  }
+  if(editIndex>-1){ clients[editIndex]={name, phone, date, status, notes, agent, reminderDays, followUp}; editIndex=-1; }
+  else{ clients.push({name, phone, date, status, notes, agent, reminderDays, followUp}); }
 
-  saveClientsToFirebase();
-  renderCRM();
-  populateClientDropdown();
-
-  document.getElementById('name').value='';
-  document.getElementById('phone').value='';
-  document.getElementById('date').value='';
-  document.getElementById('status').value='Interested';
-  document.getElementById('notes').value='';
-  document.getElementById('agent').value='';
-  document.getElementById('reminderDays').value='';
-  document.getElementById('followUp').value='';
+  saveClientsToFirebase(); renderCRM(); populateClientDropdown();
+  document.getElementById('name').value=''; document.getElementById('phone').value='';
+  document.getElementById('date').value=''; document.getElementById('status').value='Interested';
+  document.getElementById('notes').value=''; document.getElementById('agent').value='';
+  document.getElementById('reminderDays').value=''; document.getElementById('followUp').value='';
 }
-
 function populateClientDropdown(){
-  const sel=document.getElementById('taskClient');
-  sel.innerHTML='<option value="">Select Client</option>';
-  clients.forEach(c=>{
-    sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`;
-  });
+  const sel=document.getElementById('taskClient'); sel.innerHTML='<option value="">Select Client</option>';
+  clients.forEach(c=>{ sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`; });
 }
-
 function renderCRM(){
   const table=document.getElementById("table");
-  const filter = document.getElementById("universalSearch").value.toLowerCase();
-  table.innerHTML="";
-  let holdCount=0;
-  let holdNames=[];
-
+  const filter=document.getElementById("universalSearch").value.toLowerCase();
+  table.innerHTML=""; let holdCount=0; let holdNames=[];
   clients.forEach((c,i)=>{
-    let combinedText = `${c.name} ${c.phone} ${c.date} ${c.status} ${c.notes} ${c.followUp}`.toLowerCase();
+    let combinedText=`${c.name} ${c.phone} ${c.date} ${c.status} ${c.notes} ${c.followUp}`.toLowerCase();
     if(filter && !combinedText.includes(filter)) return;
-    if(c.status==="Hold"){
-      holdCount++;
-      holdNames.push(c.name);
-    }
-    const rowColor = c.status==="Hold" ? "style='background:#fff3cd'" : "";
+    if(c.status==="Hold"){ holdCount++; holdNames.push(c.name); }
+    const rowColor=c.status==="Hold" ? "style='background:#fff3cd'" : "";
     table.innerHTML+=
     `<tr id="clientRow-${i}" ${rowColor}>
       <td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td>
-      <td>${c.notes}</td><td>${c.reminderDays || '-'}</td><td>${c.followUp || '-'}</td>
+      <td>${c.notes}</td><td>${c.reminderDays||'-'}</td><td>${c.followUp||'-'}</td>
       <td><button onclick="openWhatsApp('${c.phone}')">📱</button></td>
       <td><button onclick="editClient(${i})">✏️</button></td>
       <td><button onclick="deleteClient(${i})">❌</button></td>
     </tr>`;
   });
-
   document.getElementById("total").innerText=(lang==='ar'?'الإجمالي: ':'Total: ')+clients.length;
   document.getElementById("hold").innerText=(lang==='ar'?'قيد الانتظار: ':'Hold: ')+holdCount;
-}
-
-function openWhatsApp(phone){
-  const url = `https://wa.me/${phone}`;
-  window.open(url,"_blank");
-}
-
-function editClient(index){
-  const c = clients[index];
-  document.getElementById('name').value=c.name;
-  document.getElementById('phone').value=c.phone;
-  document.getElementById('date').value=c.date;
-  document.getElementById('status').value=c.status;
-  document.getElementById('notes').value=c.notes;
-  document.getElementById('agent').value=c.agent;
-  document.getElementById('reminderDays').value=c.reminderDays;
-  document.getElementById('followUp').value=c.followUp;
-  editIndex=index;
-}
-
-// ------------------- Delete Client -------------------
-function deleteClient(index){
-  if(confirm('هل أنت متأكد من حذف هذا العميل؟')){
-    clients.splice(index,1);
-    saveClientsToFirebase();
-    renderCRM();
-    populateClientDropdown();
+  if(holdCount>0){
+    showNotification(`⚠️ ${lang==='ar'?'العملاء قيد الانتظار: ':'Clients on Hold: '}${holdNames.join(', ')}`);
   }
 }
+function editClient(i){
+  const c=clients[i]; editIndex=i;
+  document.getElementById('name').value=c.name; document.getElementById('phone').value=c.phone;
+  document.getElementById('date').value=c.date; document.getElementById('status').value=c.status;
+  document.getElementById('notes').value=c.notes; document.getElementById('agent').value=c.agent;
+  document.getElementById('reminderDays').value=c.reminderDays; document.getElementById('followUp').value=c.followUp;
+}
+function deleteClient(i){ clients.splice(i,1); saveClientsToFirebase(); renderCRM(); populateClientDropdown(); }
+function openWhatsApp(phone){ window.open(`https://wa.me/${phone}`,'_blank'); }
 
 // ------------------- Tasks -------------------
-let tasks=[];
-let taskEditIndex=-1;
-
-function loadTasksFromFirebase(){
-  db.ref('tasks').on('value', snapshot => {
-    const data = snapshot.val();
-    tasks = data ? Object.values(data) : [];
-    renderTasks();
-  });
-}
-
-function saveTasksToFirebase(){
-  const updates = {};
-  tasks.forEach((t,i)=>{
-    updates[i] = {...t};
-  });
-  db.ref('tasks').set(updates);
-}
-
+let tasks=[]; let taskEditIndex=-1;
+function loadTasksFromFirebase(){ db.ref('tasks').on('value', snapshot => {
+  const data=snapshot.val(); tasks=data ? Object.values(data) : []; renderTasks();
+}); }
+function saveTasksToFirebase(){ const updates={}; tasks.forEach((t,i)=>{ updates[i]={...t}; }); db.ref('tasks').set(updates); }
 function addTask(){
-  const taskText=document.getElementById('taskInput').value.trim();
+  const text=document.getElementById('taskInput').value;
   const client=document.getElementById('taskClient').value;
   const date=document.getElementById('taskDate').value;
   const stage=document.getElementById('taskStage').value;
-
-  if(taskText && client && date){
-    if(taskEditIndex>-1){
-      tasks[taskEditIndex]={taskText, client, date, stage};
-      taskEditIndex=-1;
-    } else {
-      tasks.push({taskText, client, date, stage});
-    }
-    saveTasksToFirebase();
-    renderTasks();
-    document.getElementById('taskInput').value='';
-    document.getElementById('taskClient').value='';
-    document.getElementById('taskDate').value='';
-    document.getElementById('taskStage').value='quote';
-  } else {
-    alert('Please fill all Task fields');
-  }
+  if(taskEditIndex>-1){ tasks[taskEditIndex]={text, client, date, stage}; taskEditIndex=-1; }
+  else{ tasks.push({text, client, date, stage}); }
+  saveTasksToFirebase(); renderTasks();
+  document.getElementById('taskInput').value=''; document.getElementById('taskClient').value='';
+  document.getElementById('taskDate').value=''; document.getElementById('taskStage').value='quote';
 }
-
 function renderTasks(){
-  const list=document.getElementById('taskList');
-  list.innerHTML='';
+  const tbody=document.getElementById('taskList'); tbody.innerHTML='';
   tasks.forEach((t,i)=>{
-    list.innerHTML+=
+    let stageClass='';
+    switch(t.stage){
+      case 'quote': stageClass='stage-quote'; break;
+      case 'follow': stageClass='stage-follow'; break;
+      case 'order': stageClass='stage-order'; break;
+      case 'bank': stageClass='stage-bank'; break;
+    }
+    tbody.innerHTML+=
     `<tr>
       <td>${t.client}</td>
       <td>${t.date}</td>
-      <td><span class="task-stage stage-${t.stage}">${t.stage}</span></td>
-      <td>${t.taskText}</td>
+      <td><span class="task-stage ${stageClass}">${t.stage}</span></td>
+      <td>${t.text}</td>
       <td><button onclick="editTask(${i})">✏️</button></td>
       <td><button onclick="deleteTask(${i})">❌</button></td>
     </tr>`;
   });
 }
-
-function editTask(index){
-  const t = tasks[index];
-  document.getElementById('taskInput').value = t.taskText;
-  document.getElementById('taskClient').value = t.client;
-  document.getElementById('taskDate').value = t.date;
-  document.getElementById('taskStage').value = t.stage;
-  taskEditIndex = index;
+function editTask(i){
+  const t=tasks[i]; taskEditIndex=i;
+  document.getElementById('taskInput').value=t.text;
+  document.getElementById('taskClient').value=t.client;
+  document.getElementById('taskDate').value=t.date;
+  document.getElementById('taskStage').value=t.stage;
 }
+function deleteTask(i){ tasks.splice(i,1); saveTasksToFirebase(); renderTasks(); }
 
-function deleteTask(index){
-  if(confirm('هل أنت متأكد من حذف هذه المهمة؟')){
-    tasks.splice(index,1);
-    saveTasksToFirebase();
-    renderTasks();
-  }
-}
-
-// ------------------- Reminder Checks -------------------
+// ------------------- Reminders -------------------
 function checkReminders(){
-  const now = new Date();
-  clients.forEach((c,i)=>{
-    if(c.reminderDays){
-      const clientDate = new Date(c.date);
-      const diffDays = Math.floor((now - clientDate)/(1000*60*60*24));
-      if(diffDays >= c.reminderDays){
-        showNotification(`Reminder for ${c.name}`, i);
-      }
-    }
+  const today=new Date();
+  clients.forEach(c=>{
+    if(!c.reminderDays) return;
+    const clientDate=new Date(c.date);
+    const reminderDate=new Date(clientDate);
+    reminderDate.setDate(reminderDate.getDate()+Number(c.reminderDays));
+    if(today>=reminderDate){ showNotification(`Reminder: ${c.name} (${c.status})`); }
   });
 }
 
-// ------------------- Language Handling -------------------
-function changeLang(language){
-  lang = language;
+// ------------------- Language -------------------
+function changeLang(selectedLang){
+  lang=selectedLang;
   document.querySelectorAll('[data-lang-key]').forEach(el=>{
-    const key = el.getAttribute('data-lang-key');
-    if(langData[lang] && langData[lang][key]){
-      el.textContent = langData[lang][key];
-    }
+    const key=el.getAttribute('data-lang-key');
+    if(langData[lang] && langData[lang][key]) el.innerText=langData[lang][key];
   });
   document.querySelectorAll('input, textarea, select').forEach(el=>{
-    const plEn = el.getAttribute('data-lang-placeholder-en');
-    const plAr = el.getAttribute('data-lang-placeholder-ar');
-    if(plEn && plAr){
-      el.placeholder = (lang==='ar') ? plAr : plEn;
-    }
-    const optEn = el.querySelector('option[data-lang-option-en]');
-    if(optEn){
-      el.querySelectorAll('option').forEach(opt=>{
-        const key = opt.getAttribute('data-lang-option-en');
-        const arText = opt.getAttribute('data-lang-option-ar');
-        if(key && arText){
-          opt.textContent = (lang==='ar') ? arText : key;
-        }
+    const plEn=el.getAttribute('data-lang-placeholder-en');
+    const plAr=el.getAttribute('data-lang-placeholder-ar');
+    if(plEn && plAr) el.placeholder = lang==='ar'?plAr:plEn;
+    if(el.tagName==='SELECT'){
+      Array.from(el.options).forEach(option=>{
+        const optEn=option.getAttribute('data-lang-option-en');
+        const optAr=option.getAttribute('data-lang-option-ar');
+        if(optEn && optAr) option.text = lang==='ar'?optAr:optEn;
       });
     }
   });
-  renderCRM();
-  renderTasks();
 }
 
-// ------------------- Initial Load -------------------
-window.onload = () => {
+// ------------------- Initialization -------------------
+window.onload = ()=>{
   loadClientsFromFirebase();
   loadTasksFromFirebase();
-  changeLang('en');
-  setInterval(checkReminders, 3600000); // Check every hour
+  changeLang('en'); // default
 };
 </script>
 </body>
