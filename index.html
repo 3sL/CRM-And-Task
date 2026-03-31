@@ -141,7 +141,7 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
     <table>
       <thead>
         <tr>
-          <th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Edit</th><th>Delete</th>
+          <th data-lang-key="client">Client</th><th data-lang-key="date">Date</th><th data-lang-key="stage">Stage</th><th data-lang-key="task">Task</th><th data-lang-key="edit">Edit</th><th data-lang-key="delete">Delete</th>
         </tr>
       </thead>
       <tbody id="taskList"></tbody>
@@ -157,22 +157,83 @@ const db = firebase.database();
 
 // ------------------- Language -------------------
 let lang='en';
-const langData={/* existing langData */};
-function changeLang(selected){/* existing function */}
+const langData = {
+  en: {
+    title: "CRM System", crm: "CRM", tasks: "Tasks", developer: "Developed by Eng : <strong>Mahmoud Mohamed Marie</strong>",
+    crm_title: "CRM System", tasks_title: "Tasks", save: "💾 Save", add_task: "➕ Add Task",
+    name:"Name", phone:"Phone", date:"Date", status:"Status", notes:"Notes", reminder:"Reminder", followup:"Follow Up",
+    whatsapp:"WhatsApp", edit:"Edit", delete:"Delete", client:"Client", stage:"Stage", task:"Task"
+  },
+  ar: {
+    title: "نظام إدارة العملاء", crm: "إدارة العملاء", tasks: "المهام", developer: "تم التطوير بواسطة مهندس : <strong>محمود محمد ماري</strong>",
+    crm_title: "نظام إدارة العملاء", tasks_title: "المهام", save: "💾 حفظ", add_task: "➕ إضافة مهمة",
+    name:"الاسم", phone:"الهاتف", date:"التاريخ", status:"الحالة", notes:"الملاحظات", reminder:"تذكير", followup:"متابعة",
+    whatsapp:"واتساب", edit:"تعديل", delete:"حذف", client:"العميل", stage:"المرحلة", task:"المهمة"
+  }
+};
+
+function changeLang(selected){
+  lang=selected;
+  document.querySelectorAll('[data-lang-key]').forEach(el=>{
+    const key=el.getAttribute('data-lang-key');
+    if(langData[lang][key]) el.innerHTML=langData[lang][key];
+  });
+  document.querySelectorAll('[data-lang-placeholder-en]').forEach(el=>{
+    const pl=el.getAttribute(`data-lang-placeholder-${lang}`);
+    if(pl) el.placeholder=pl;
+  });
+  document.querySelectorAll('#status option').forEach(opt=>{
+    const pl=opt.getAttribute(`data-lang-option-${lang}`);
+    if(pl) opt.textContent=pl;
+  });
+  document.querySelectorAll('#taskStage option').forEach(opt=>{
+    const pl=opt.getAttribute(`data-lang-option-${lang}`);
+    if(pl) opt.textContent=pl;
+  });
+  // Update CRM table headers
+  document.querySelectorAll('#crmTab th[data-lang-key]').forEach(th=>{
+    const key = th.getAttribute('data-lang-key');
+    if(langData[lang][key]) th.innerHTML = langData[lang][key];
+  });
+  // Update Tasks table headers
+  document.querySelectorAll('#tasksTab th[data-lang-key]').forEach(th=>{
+    const key = th.getAttribute('data-lang-key');
+    if(langData[lang][key]) th.innerHTML = langData[lang][key];
+  });
+  // Update current CRM rows if needed
+  renderCRM();
+  renderTasks(); // function to update tasks table dynamically
+}
 
 // ------------------- Tabs -------------------
-function showTab(id, btn){/* existing function */}
+function showTab(id, btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
 
 // ------------------- Notifications -------------------
-function showNotification(msg){/* existing function */}
+function showNotification(msg){
+  const notif=document.getElementById('notification');
+  notif.innerHTML=msg;
+  notif.style.display='block';
+  setTimeout(()=>{ notif.style.display='none'; },4000);
+}
 
 // ------------------- CRM -------------------
 let clients=[]; let editIndex=-1;
-function loadClientsFromFirebase(){ db.ref('clients').once('value', snapshot=>{ clients = snapshot.val() || []; renderCRM(); populateClientDropdown(); }); }
+function loadClientsFromFirebase(){
+  db.ref('clients').once('value', snapshot=>{
+    clients = snapshot.val() || [];
+    renderCRM();
+    populateClientDropdown();
+  });
+}
 function saveClientsToFirebase(){ db.ref('clients').set(clients); }
-function addOrUpdate(){/* existing function */}
+function addOrUpdate(){ /* existing function */ }
 
-// ------------------- Updated renderCRM with universal search -------------------
+// ------------------- CRM Render -------------------
 function renderCRM(){
   const table=document.getElementById("table");
   const filter = document.getElementById("universalSearch").value.toLowerCase();
@@ -191,13 +252,34 @@ function renderCRM(){
       <td><button onclick="deleteClient(${i})">❌</button></td>
     </tr>`;
   });
-  document.getElementById("total").innerText="Total: "+clients.length;
-  document.getElementById("hold").innerText="Hold: "+holdCount;
-  if(holdCount>0){showNotification(`⚠️ There are ${holdCount} clients on Hold: ${holdNames.join(", ")}`);}
+  document.getElementById("total").innerText=(lang==='ar'?'الإجمالي: ':'Total: ')+clients.length;
+  document.getElementById("hold").innerText=(lang==='ar'?'قيد الانتظار: ':'Hold: ')+holdCount;
+  if(holdCount>0){showNotification(`⚠️ ${lang==='ar'?'هناك':'There are'} ${holdCount} ${lang==='ar'?'عملاء في الانتظار':'clients on Hold'}: ${holdNames.join(", ")}`);}
 }
 
-// ------------------- Tasks & Other Functions -------------------
-/* Keep all your existing tasks, edit/delete, WhatsApp, client dropdown functions as-is */
+// ------------------- Tasks -------------------
+let tasks=[];
+function loadTasksFromFirebase(){
+  db.ref('tasks').once('value', snapshot=>{
+    tasks = snapshot.val() || [];
+    renderTasks();
+  });
+}
+function renderTasks(){
+  const table = document.getElementById('taskList');
+  table.innerHTML='';
+  tasks.forEach((t,i)=>{
+    const stageLabels = { quote:'Quote', follow:'Follow Up', order:'Order', bank:'Bank'};
+    const stageLabelsAR = { quote:'تقديم عرض سعر', follow:'متابعة عرض السعر', order:'أمر توريد', bank:'البنك'};
+    const stage = lang==='ar'?stageLabelsAR[t.stage]:stageLabels[t.stage];
+    const clientName = t.client;
+    table.innerHTML+=`<tr>
+      <td>${clientName}</td><td>${t.date}</td><td>${stage}</td><td>${t.text}</td>
+      <td><button onclick="editTask(${i})">✏️</button></td>
+      <td><button onclick="deleteTask(${i})">❌</button></td>
+    </tr>`;
+  });
+}
 
 // ------------------- Init -------------------
 loadClientsFromFirebase();
