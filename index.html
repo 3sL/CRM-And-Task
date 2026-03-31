@@ -5,38 +5,67 @@
 <title>CRM System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body { font-family: Arial, sans-serif; background:#f0f2f5; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; }
-.sidebar { width:250px; background:#007bff; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box;}
-.sidebar h2 { text-align:center; margin-bottom:20px; }
-.sidebar button { background:#0056b3; color:#fff; border:none; padding:10px; margin:5px 0; border-radius:5px; cursor:pointer; text-align:right; }
-.sidebar button.active { background:#ffcc00; color:#000; }
-.tabs-content { flex:1; padding:20px; overflow:auto; width:100%; box-sizing:border-box; }
-.tab-content { display:none; }
+/* ------------------- General ------------------- */
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f6fa; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; color:#333; }
+h2 { margin-top:0; text-align:center; }
+
+/* ------------------- Sidebar ------------------- */
+.sidebar { width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; transition: all 0.3s ease; }
+.sidebar h2 { font-size:1.5em; margin-bottom:20px; color:#ffcc00; }
+.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; transition: all 0.2s ease; }
+.sidebar button:hover { background:#3f3f6b; }
+.sidebar button.active { background:#ffcc00; color:#1e1e2f; }
+.sidebar select { padding:10px; border-radius:8px; border:none; margin-top:10px; }
+
+/* ------------------- Tabs ------------------- */
+.tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; }
+.tab-content { display:none; animation:fadeIn 0.3s ease; }
 .tab-content.active { display:block; }
-h2 { margin-top:0; text-align:center;}
-input, select, textarea, button { padding:10px; margin:5px 0; width:100%; box-sizing:border-box;}
-textarea { resize:none; height:80px;}
-table { width:100%; border-collapse:collapse; margin-top:10px; table-layout: fixed; }
-th, td { border:1px solid #ddd; padding:10px; text-align:center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-th { background:#222; color:#fff;}
-.card { background:#eee; padding:10px; text-align:center; border-radius:8px; margin:5px; flex:1;}
-.row { display:flex; flex-wrap:wrap; gap:10px;}
-#notification { position: fixed; top:20px; right:20px; background:#ffcc00; padding:15px; border-radius:10px; display:none; z-index:999; min-width:200px;}
-.task-stage { padding:5px; color:#fff; border-radius:5px; }
-.stage-quote { background:orange; }
-.stage-follow { background:blue; }
-.stage-order { background:green; }
-.stage-bank { background:purple; }
-.logo-container { text-align:center; margin-bottom:15px; }
-.logo-container img { max-width:150px; display:inline-block; }
+
+/* ------------------- Inputs & Buttons ------------------- */
+input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none; }
+textarea { resize:none; height:80px; }
+button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:bold; transition:0.2s; }
+button:hover { background:#0056b3; }
+
+/* ------------------- Cards ------------------- */
+.card { background:#fff; padding:15px; text-align:center; border-radius:12px; margin:5px; flex:1; box-shadow:0 4px 6px rgba(0,0,0,0.1); font-weight:bold; }
+.row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
+
+/* ------------------- Table ------------------- */
+table { width:100%; border-collapse:collapse; margin-top:15px; table-layout: fixed; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
+
+/* ------------------- Notifications ------------------- */
+#notification { position: fixed; top:20px; right:20px; background:#ffcc00; color:#1e1e2f; padding:15px 20px; border-radius:12px; display:none; z-index:999; min-width:220px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.2); }
+
+/* ------------------- Task Stages ------------------- */
+.task-stage { padding:5px 10px; color:#fff; border-radius:12px; font-weight:bold; font-size:0.9em; }
+.stage-quote { background:#ff7f50; }
+.stage-follow { background:#1e90ff; }
+.stage-order { background:#28a745; }
+.stage-bank { background:#6f42c1; }
+
+/* ------------------- Logo ------------------- */
+.logo-container { text-align:center; margin-bottom:20px; }
+.logo-container img { max-width:150px; display:inline-block; border-radius:12px; }
+
+/* ------------------- Tasks List ------------------- */
+#taskList li { background:#f9f9f9; padding:12px; margin-bottom:8px; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.05); list-style:none; }
+
+/* ------------------- Responsive ------------------- */
 @media (max-width: 768px) {
     body { flex-direction: column; }
     .sidebar { width:100%; flex-direction: row; overflow-x: auto; }
     .sidebar button { flex:1 0 auto; margin:0 5px; white-space: nowrap; }
-    .tabs-content { padding:10px; }
+    .tabs-content { padding:15px; }
     table { display:block; overflow-x:auto; }
     th, td { white-space: nowrap; }
 }
+
+/* ------------------- Animations ------------------- */
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
 </style>
 </head>
 <body>
@@ -113,7 +142,7 @@ th { background:#222; color:#fff;}
 </div>
 
 <script>
-// Tabs
+// ---------- Tabs ----------
 function showTab(id, btn){
 document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
 document.getElementById(id).classList.add('active');
@@ -121,7 +150,7 @@ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 }
 
-// Notification
+// ---------- Notification ----------
 function showNotification(msg){
 const n=document.getElementById("notification");
 n.innerText=msg;
@@ -129,7 +158,7 @@ n.style.display="block";
 setTimeout(()=>n.style.display="none",3000);
 }
 
-// CRM
+// ---------- CRM ----------
 let clients=JSON.parse(localStorage.getItem("clients")||"[]");
 let editIndex=-1;
 function addOrUpdate(){
@@ -197,7 +226,7 @@ showNotification("❌ تم حذف العميل");
 function openWhatsApp(phone){window.open(`https://wa.me/${phone}`,'_blank');}
 renderCRM();
 
-// Tasks
+// ---------- Tasks ----------
 let tasks=JSON.parse(localStorage.getItem("tasks")||"[]");
 function addTask(){
 const txt=document.getElementById("taskInput").value;
