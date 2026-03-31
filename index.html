@@ -1,284 +1,171 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>CRM Full - Firestore Ready</title>
+<title>CRM System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body { font-family: Arial; background:#f0f2f5; padding:20px;}
-.container { max-width:1000px; margin:auto; background:#fff; padding:20px; border-radius:10px;}
-input, select, textarea, button { padding:10px; margin:5px; width:100%; }
-.row { display:flex; gap:10px; }
-.row > * { flex:1; }
-table { width:100%; margin-top:20px; border-collapse: collapse;}
-th, td { padding:10px; border:1px solid #ddd; text-align:center;}
-th { background:#222; color:#fff;}
-.stats { display:flex; gap:10px; margin-top:10px;}
-.card { flex:1; background:#eee; padding:10px; text-align:center; border-radius:8px; }
-button { cursor:pointer; }
-</style>
-</head>
+body { font-family: Arial, sans-serif; background:#f0f2f5; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; }
 
+.sidebar { width:250px; background:#007bff; color:#fff; padding:20px; }
+.sidebar button { background:#0056b3; color:#fff; border:none; padding:10px; margin:5px 0; width:100%; border-radius:5px; cursor:pointer; }
+.sidebar button.active { background:#ffcc00; color:#000; }
+
+.tabs-content { flex:1; padding:20px; }
+
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+input, select, textarea, button { width:100%; margin:5px 0; padding:10px; }
+
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+th, td { border:1px solid #ddd; padding:8px; text-align:center; }
+
+.card { background:#eee; padding:10px; margin:5px; border-radius:5px; }
+
+.row { display:flex; gap:10px; flex-wrap:wrap; }
+
+.task-stage { padding:5px; color:#fff; border-radius:5px; }
+.stage-quote { background:orange; }
+.stage-follow { background:blue; }
+.stage-order { background:green; }
+.stage-bank { background:purple; }
+</style>
+
+</head>
 <body>
 
-<div class="container">
-
-<div style="text-align:center; margin-bottom:10px;">
-  <img src="logo.png" alt="Company Logo" style="height:80px;">
+<div class="sidebar">
+<h2>CRM</h2>
+<button class="tab-btn active" onclick="showTab('crmTab', this)">CRM</button>
+<button class="tab-btn" onclick="showTab('tasksTab', this)">Tasks</button>
 </div>
 
-<div style="text-align:right; margin-bottom:15px;">
-  Developed by: <strong>Mahmoud Mohamed Marie</strong> 👋<br>
-  Phone: <strong>01222153415</strong>
-</div>
+<div class="tabs-content">
 
-<h2>📊 CRM Customer Management For Utopia Trading</h2>
+<!-- CRM -->
+<div id="crmTab" class="tab-content active">
+<h2>CRM</h2>
 
-<div class="row">
-<input type="text" id="name" placeholder="Customer Name">
-<input type="text" id="phone" placeholder="Phone Number">
+<input id="name" placeholder="اسم العميل">
+<input id="phone" placeholder="رقم الهاتف">
 <input type="date" id="date">
-</div>
 
-<div class="row">
 <select id="status">
-<option value="Interested">Interested</option>
-<option value="In Progress">In Progress</option>
-<option value="Completed">Completed</option>
+<option>Interested</option>
+<option>In Progress</option>
+<option>Hold</option>
+<option>Completed</option>
 </select>
-<input type="text" id="notes" placeholder="Notes">
-</div>
 
-<button onclick="addOrUpdate()">💾 Save</button>
+<textarea id="notes"></textarea>
 
-<hr>
-
-<div class="row">
-<input type="text" id="search" placeholder="🔍 Search..." onkeyup="render()">
-<select id="filter" onchange="render()">
-<option value="">All Statuses</option>
-<option value="Interested">Interested</option>
-<option value="In Progress">In Progress</option>
-<option value="Completed">Completed</option>
-</select>
-</div>
-
-<div class="stats">
-<div class="card" id="total"></div>
-<div class="card" id="interested"></div>
-<div class="card" id="working"></div>
-<div class="card" id="done"></div>
-</div>
+<button onclick="addClient()">حفظ</button>
 
 <table>
 <thead>
 <tr>
-<th>Name</th>
-<th>Phone</th>
-<th>Date</th>
-<th>Status</th>
-<th>Notes</th>
-<th>Actions</th>
+<th>الاسم</th><th>الهاتف</th><th>الحالة</th><th>حذف</th>
 </tr>
 </thead>
-<tbody id="table"></tbody>
+<tbody id="crmTable"></tbody>
 </table>
+</div>
+
+<!-- Tasks -->
+<div id="tasksTab" class="tab-content">
+<h2>Tasks</h2>
+
+<input id="taskInput" placeholder="المهمة">
+<input id="taskClient" placeholder="العميل">
+
+<select id="taskStage">
+<option value="quote">تقديم عرض سعر</option>
+<option value="follow">متابعة عرض السعر</option>
+<option value="order">أمر توريد</option>
+<option value="bank">البنك</option>
+</select>
+
+<button onclick="addTask()">إضافة</button>
+
+<ul id="taskList"></ul>
+</div>
 
 </div>
 
-<script type="module">
+<script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-
-// =======================
-// Firebase Config
-// =======================
-const firebaseConfig = {
-  apiKey: "AIzaSyBug4T4JIrLRCv6dNm7vdSFMD-KFC6mI0g",
-  authDomain: "crm-app-7733a.firebaseapp.com",
-  projectId: "crm-app-7733a",
-  storageBucket: "crm-app-7733a.firebasestorage.app",
-  messagingSenderId: "87718820034",
-  appId: "1:87718820034:web:fe6127bb92917ab4c2235b"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const clientsCol = collection(db, "clients");
-
-let editId = null;
-
-
-// =======================
-// Add / Update
-// =======================
-async function addOrUpdate() {
-
-  const client = {
-    name: nameInput.value.trim(),
-    phone: phoneInput.value.trim(),
-    date: dateInput.value,
-    status: statusInput.value,
-    notes: notesInput.value.trim()
-  };
-
-  if (!client.name || !client.phone) {
-    alert("❗ Please enter name and phone");
-    return;
-  }
-
-  try {
-    if (editId) {
-      await updateDoc(doc(db, "clients", editId), client);
-      alert("✅ Updated successfully");
-      editId = null;
-    } else {
-      await addDoc(clientsCol, client);
-      alert("✅ Added successfully");
-    }
-
-    clearForm();
-    render();
-
-  } catch (e) {
-    console.error(e);
-    alert("❌ Error saving data");
-  }
+// Tabs
+function showTab(id,btn){
+document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
 }
 
+// CRM
+let clients=[];
 
-// =======================
-// Delete
-// =======================
-async function deleteClient(id) {
-  if (confirm("Delete this client?")) {
-    await deleteDoc(doc(db, "clients", id));
-    render();
-  }
+function addClient(){
+let name=document.getElementById("name").value;
+let phone=document.getElementById("phone").value;
+let status=document.getElementById("status").value;
+
+clients.push({name,phone,status});
+renderCRM();
 }
 
-
-// =======================
-// Edit (محسن)
-// =======================
-async function editClient(id) {
-
-  const docRef = doc(db, "clients", id);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    const c = docSnap.data();
-
-    nameInput.value = c.name;
-    phoneInput.value = c.phone;
-    dateInput.value = c.date;
-    statusInput.value = c.status;
-    notesInput.value = c.notes;
-
-    editId = id;
-  }
+function renderCRM(){
+let table=document.getElementById("crmTable");
+table.innerHTML="";
+clients.forEach((c,i)=>{
+table.innerHTML+=`
+<tr>
+<td>${c.name}</td>
+<td>${c.phone}</td>
+<td>${c.status}</td>
+<td><button onclick="deleteClient(${i})">❌</button></td>
+</tr>`;
+});
 }
 
-
-// =======================
-// Clear
-// =======================
-function clearForm() {
-  nameInput.value = "";
-  phoneInput.value = "";
-  dateInput.value = "";
-  notesInput.value = "";
-  editId = null;
+function deleteClient(i){
+clients.splice(i,1);
+renderCRM();
 }
 
+// Tasks
+let tasks=[];
 
-// =======================
-// Render
-// =======================
-async function render() {
+function addTask(){
+let txt=document.getElementById("taskInput").value;
+let client=document.getElementById("taskClient").value;
+let stage=document.getElementById("taskStage").value;
 
-  const search = document.getElementById("search").value.toLowerCase();
-  const filter = document.getElementById("filter").value;
-
-  const table = document.getElementById("table");
-  table.innerHTML = "";
-
-  let total = 0, interested = 0, working = 0, done = 0;
-
-  const snapshot = await getDocs(clientsCol);
-
-  snapshot.forEach(docSnap => {
-
-    const c = docSnap.data();
-    c.id = docSnap.id;
-
-    if (
-      (c.name.toLowerCase().includes(search) || c.phone.includes(search)) &&
-      (filter === "" || c.status === filter)
-    ) {
-
-      total++;
-
-      if (c.status === "Interested") interested++;
-      if (c.status === "In Progress") working++;
-      if (c.status === "Completed") done++;
-
-      table.innerHTML += `
-        <tr>
-          <td>${c.name}</td>
-          <td>${c.phone}</td>
-          <td>${c.date}</td>
-          <td>${c.status}</td>
-          <td>${c.notes}</td>
-          <td>
-            <button onclick="editClient('${c.id}')">✏️</button>
-            <button onclick="deleteClient('${c.id}')">❌</button>
-          </td>
-        </tr>
-      `;
-    }
-
-  });
-
-  document.getElementById("total").innerText = "👥 Total: " + total;
-  document.getElementById("interested").innerText = "🎯 Interested: " + interested;
-  document.getElementById("working").innerText = "🔧 In Progress: " + working;
-  document.getElementById("done").innerText = "✅ Completed: " + done;
+tasks.push({txt,client,stage});
+renderTasks();
 }
 
+function renderTasks(){
+let list=document.getElementById("taskList");
+list.innerHTML="";
 
-// =======================
-// Inputs
-// =======================
-const nameInput = document.getElementById("name");
-const phoneInput = document.getElementById("phone");
-const dateInput = document.getElementById("date");
-const statusInput = document.getElementById("status");
-const notesInput = document.getElementById("notes");
+tasks.forEach(t=>{
+let stageClass =
+t.stage==="quote" ? "stage-quote" :
+t.stage==="follow" ? "stage-follow" :
+t.stage==="order" ? "stage-order" :
+"stage-bank";
 
-
-// =======================
-// Fix buttons (IMPORTANT)
-// =======================
-window.addOrUpdate = addOrUpdate;
-window.editClient = editClient;
-window.deleteClient = deleteClient;
-
-
-// Initial load
-render();
+list.innerHTML+=`
+<li>
+<strong>${t.client}</strong>
+<span class="task-stage ${stageClass}">${t.stage}</span>
+<br>${t.txt}
+</li>`;
+});
+}
 
 </script>
 
