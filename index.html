@@ -12,10 +12,10 @@ h2 { margin-top:0; text-align:center; }
 /* ------------------- Sidebar ------------------- */
 .sidebar { width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; transition: all 0.3s ease; }
 .sidebar h2 { font-size:1.5em; margin-bottom:20px; color:#ffcc00; }
-.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; transition: all 0.2s ease; }
+.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:14px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; transition: all 0.2s ease; }
 .sidebar button:hover { background:#3f3f6b; }
 .sidebar button.active { background:#ffcc00; color:#1e1e2f; }
-.sidebar select { padding:10px; border-radius:8px; border:none; margin-top:10px; }
+.sidebar select { padding:12px; border-radius:8px; border:none; margin-top:10px; }
 
 /* ------------------- Tabs ------------------- */
 .tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; min-width:0; }
@@ -23,7 +23,7 @@ h2 { margin-top:0; text-align:center; }
 .tab-content.active { display:block; }
 
 /* ------------------- Inputs & Buttons ------------------- */
-input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none;}
+input, select, textarea, button { padding:14px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none; font-size:1em;}
 textarea { resize:none; height:80px; }
 button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:bold; transition:0.2s; }
 button:hover { background:#0056b3; }
@@ -48,16 +48,8 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 .stage-bank { background:#6f42c1; }
 
 /* ------------------- Logo ------------------- */
-.logo-container { 
-    text-align:center; 
-    margin-bottom:20px; 
-}
-.logo-container img {
-    max-width: 100%;
-    height: auto;
-    display: inline-block;
-    border-radius: 12px;
-}
+.logo-container { text-align:center; margin-bottom:20px; }
+.logo-container img { max-width: 100%; height: auto; display: inline-block; border-radius: 12px; }
 
 /* ------------------- Tasks List ------------------- */
 #taskList li { background:#f9f9f9; padding:12px; margin-bottom:8px; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.05); list-style:none; }
@@ -65,14 +57,12 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 /* ------------------- Responsive ------------------- */
 @media (max-width: 768px) {
     body { flex-direction: column; }
-    .sidebar { width:100%; flex-direction: row; overflow-x: auto; }
+    .sidebar { width:100%; flex-direction: row; overflow-x:auto; padding:10px; }
     .sidebar button { flex:1 0 auto; margin:0 5px; white-space: nowrap; }
     .tabs-content { padding:15px; }
     table { display:block; width:100%; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling: touch; }
     th, td { white-space: nowrap; font-size: 0.9em; padding:8px; }
 }
-
-/* ------------------- Animations ------------------- */
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
 </style>
 </head>
@@ -211,6 +201,7 @@ function addOrUpdate(){
     nameEl.value=""; phoneEl.value=""; dateEl.value=""; notesEl.value=""; followEl.value="";
     renderCRM(); populateClientDropdown();
 }
+
 function renderCRM(){
     const table=document.getElementById("table"); table.innerHTML="";
     let holdCount=0; let holdNames=[];
@@ -229,6 +220,7 @@ function renderCRM(){
     document.getElementById("hold").innerText="Hold: "+holdCount;
     if(holdCount>0){showNotification(`⚠️ There are ${holdCount} clients on Hold: ${holdNames.join(", ")}`);}
 }
+
 function editClient(i){
     const c=clients[i];
     document.getElementById("name").value=c.name; document.getElementById("phone").value=c.phone;
@@ -236,6 +228,7 @@ function editClient(i){
     document.getElementById("notes").value=c.notes; document.getElementById("followUp").value=c.followUp || '';
     editIndex=i; showNotification("✏️ Editing client");
 }
+
 function deleteClient(i){clients.splice(i,1); localStorage.setItem("clients",JSON.stringify(clients)); renderCRM(); populateClientDropdown(); showNotification("❌ Client deleted");}
 function openWhatsApp(phone){window.open(`https://wa.me/${phone}`,'_blank');}
 renderCRM();
@@ -269,7 +262,7 @@ function renderTasks(){
     tasks.forEach((t,i)=>{
         let stageClass = t.stage==="quote" ? "stage-quote" : t.stage==="follow" ? "stage-follow" : t.stage==="order" ? "stage-order" : "stage-bank";
         const row=document.createElement("tr");
-        row.draggable=true;
+        row.draggable = window.innerWidth>768; // Drag only on desktop
         row.innerHTML=`
             <td>${t.client}</td>
             <td>${t.date || '-'}</td>
@@ -278,60 +271,40 @@ function renderTasks(){
             <td><button onclick="editTask(${i})">✏️</button></td>
             <td><button onclick="deleteTask(${i})">❌</button></td>
         `;
-        // Drag Events
-        row.addEventListener('dragstart', (e)=>{ e.dataTransfer.setData('text/plain', i); });
-        row.addEventListener('dragover', (e)=>{ e.preventDefault(); row.style.background='#d3f4ff'; });
-        row.addEventListener('dragleave', (e)=>{ row.style.background=''; });
-        row.addEventListener('drop', (e)=>{
-            e.preventDefault();
-            const draggedIndex = e.dataTransfer.getData('text/plain');
-            const targetStage = t.stage;
-            tasks[draggedIndex].stage = targetStage;
-            localStorage.setItem("tasks", JSON.stringify(tasks));
-            renderTasks();
-            showNotification("✅ Task stage updated");
-        });
+        // Drag Events for desktop only
+        if(window.innerWidth>768){
+            row.addEventListener('dragstart', (e)=>{ e.dataTransfer.setData('text/plain', i); });
+            row.addEventListener('dragover', (e)=>{ e.preventDefault(); row.style.background='#d3f4ff'; });
+            row.addEventListener('dragleave', ()=>{ row.style.background=''; });
+            row.addEventListener('drop', (e)=>{
+                e.preventDefault(); const from = parseInt(e.dataTransfer.getData('text/plain'));
+                const to = i; [tasks[from],tasks[to]]=[tasks[to],tasks[from]];
+                localStorage.setItem("tasks",JSON.stringify(tasks)); renderTasks();
+            });
+        }
         list.appendChild(row);
     });
 }
 
 function editTask(i){
-    const t = tasks[i];
-    document.getElementById("taskInput").value = t.txt;
-    document.getElementById("taskClient").value = t.client;
-    document.getElementById("taskDate").value = t.date;
-    document.getElementById("taskStage").value = t.stage;
-    editTaskIndex = i;
+    const t=tasks[i];
+    document.getElementById("taskInput").value=t.txt;
+    document.getElementById("taskClient").value=t.client;
+    document.getElementById("taskDate").value=t.date;
+    document.getElementById("taskStage").value=t.stage;
+    editTaskIndex=i;
     showNotification("✏️ Editing task");
 }
+function deleteTask(i){tasks.splice(i,1); localStorage.setItem("tasks",JSON.stringify(tasks)); renderTasks(); showNotification("❌ Task deleted");}
 
-function deleteTask(i){
-    tasks.splice(i,1);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    renderTasks();
-    showNotification("❌ Task deleted");
-}
-
-// ------------------- Client Dropdown for Tasks -------------------
+// ------------------- Populate Clients in Task -------------------
 function populateClientDropdown(){
-    const dropdown=document.getElementById("taskClient");
-    dropdown.innerHTML='<option value="">Select Client</option>';
-    clients.forEach(c=>{ const opt=document.createElement("option"); opt.value=c.name; opt.text=c.name; dropdown.appendChild(opt); });
+    const select=document.getElementById("taskClient");
+    select.innerHTML='<option value="">Select Client</option>';
+    clients.forEach(c=>{select.innerHTML+=`<option value="${c.name}">${c.name}</option>`;});
 }
 populateClientDropdown();
-
-// ------------------- Hold Countdown -------------------
-setInterval(()=>{
-    let changed=false;
-    clients.forEach(c=>{
-        if(c.status==="Hold" && c.holdTime>0){c.holdTime--; changed=true;}
-        if(c.status==="Hold" && c.holdTime===0){showNotification(`⏳ Client ${c.name} Hold time ended`);}
-    });
-    if(changed){localStorage.setItem("clients",JSON.stringify(clients)); renderCRM();}
-},60000);
-
 renderTasks();
-changeLang('en');
 </script>
 </body>
 </html>
