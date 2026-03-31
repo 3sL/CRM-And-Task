@@ -182,9 +182,7 @@ function saveClientsToFirebase(){
   const ref = db.ref('clients');
   ref.remove().then(()=>{
     clients.forEach(c=>{
-      ref.push(c)
-        .then(()=>console.log("Client saved"))
-        .catch(err=>console.error(err));
+      ref.push(c);
     });
   });
 }
@@ -272,9 +270,7 @@ function saveTasksToFirebase(){
   const ref = db.ref('tasks');
   ref.remove().then(()=>{
     tasks.forEach(t=>{
-      ref.push(t)
-        .then(()=>console.log("Task saved"))
-        .catch(err=>console.error(err));
+      ref.push(t);
     });
   });
 }
@@ -365,6 +361,7 @@ function changeLang(selected){
   });
   document.querySelectorAll('[data-lang-placeholder-'+lang+']').forEach(el=>el.placeholder=el.getAttribute('data-lang-placeholder-'+lang));
   document.querySelectorAll('[data-lang-option-'+lang+']').forEach(el=>el.text=el.getAttribute('data-lang-option-'+lang));
+  renderCRM();
 }
 
 // ------------------- Init -------------------
