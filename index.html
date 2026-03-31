@@ -148,7 +148,14 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 </select>
 <button onclick="addTask()" data-lang-key="add_task">➕ Add Task</button>
 </div>
-<ul id="taskList"></ul>
+<table>
+<thead>
+<tr>
+<th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Edit</th><th>Delete</th>
+</tr>
+</thead>
+<tbody id="taskList"></tbody>
+</table>
 </div>
 
 </div>
@@ -234,28 +241,78 @@ function openWhatsApp(phone){window.open(`https://wa.me/${phone}`,'_blank');}
 renderCRM();
 
 // ------------------- Tasks -------------------
-let tasks=JSON.parse(localStorage.getItem("tasks")||"[]");
+let tasks=JSON.parse(localStorage.getItem("tasks")||"[]"); 
+let editTaskIndex=-1;
+
 function addTask(){
     const txt=document.getElementById("taskInput").value;
     const client=document.getElementById("taskClient").value;
     const date=document.getElementById("taskDate").value;
     const stage=document.getElementById("taskStage").value;
     if(!txt.trim() || !client.trim()) return alert("Enter task text and client");
-    tasks.push({txt,client,date,stage});
+    if(editTaskIndex===-1){
+        tasks.push({txt,client,date,stage});
+        showNotification("✅ Task added");
+    }else{
+        tasks[editTaskIndex]={txt,client,date,stage};
+        showNotification("✏️ Task updated");
+        editTaskIndex=-1;
+    }
     localStorage.setItem("tasks",JSON.stringify(tasks));
-    document.getElementById("taskInput").value=""; document.getElementById("taskDate").value="";
-    renderTasks(); showNotification("✅ Task added");
+    document.getElementById("taskInput").value=""; document.getElementById("taskDate").value=""; document.getElementById("taskClient").value="";
+    renderTasks();
 }
+
 function renderTasks(){
-    const list=document.getElementById("taskList"); list.innerHTML="";
-    tasks.forEach(t=>{
+    const list=document.getElementById("taskList"); 
+    list.innerHTML="";
+    tasks.forEach((t,i)=>{
         let stageClass = t.stage==="quote" ? "stage-quote" : t.stage==="follow" ? "stage-follow" : t.stage==="order" ? "stage-order" : "stage-bank";
-        list.innerHTML+=`<li><strong>${t.client}</strong> | ${t.date} | <span class="task-stage ${stageClass}">${t.stage}</span><br>${t.txt}</li>`;
+        const row=document.createElement("tr");
+        row.draggable=true;
+        row.innerHTML=`
+            <td>${t.client}</td>
+            <td>${t.date || '-'}</td>
+            <td class="task-stage ${stageClass}">${t.stage}</td>
+            <td>${t.txt}</td>
+            <td><button onclick="editTask(${i})">✏️</button></td>
+            <td><button onclick="deleteTask(${i})">❌</button></td>
+        `;
+        // Drag Events
+        row.addEventListener('dragstart', (e)=>{ e.dataTransfer.setData('text/plain', i); });
+        row.addEventListener('dragover', (e)=>{ e.preventDefault(); row.style.background='#d3f4ff'; });
+        row.addEventListener('dragleave', (e)=>{ row.style.background=''; });
+        row.addEventListener('drop', (e)=>{
+            e.preventDefault();
+            const draggedIndex = e.dataTransfer.getData('text/plain');
+            const targetStage = t.stage;
+            tasks[draggedIndex].stage = targetStage;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            renderTasks();
+            showNotification("✅ Task stage updated");
+        });
+        list.appendChild(row);
     });
 }
-renderTasks();
 
-// ------------------- Populate Task Client Dropdown -------------------
+function editTask(i){
+    const t = tasks[i];
+    document.getElementById("taskInput").value = t.txt;
+    document.getElementById("taskClient").value = t.client;
+    document.getElementById("taskDate").value = t.date;
+    document.getElementById("taskStage").value = t.stage;
+    editTaskIndex = i;
+    showNotification("✏️ Editing task");
+}
+
+function deleteTask(i){
+    tasks.splice(i,1);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    renderTasks();
+    showNotification("❌ Task deleted");
+}
+
+// ------------------- Client Dropdown for Tasks -------------------
 function populateClientDropdown(){
     const dropdown=document.getElementById("taskClient");
     dropdown.innerHTML='<option value="">Select Client</option>';
@@ -273,9 +330,8 @@ setInterval(()=>{
     if(changed){localStorage.setItem("clients",JSON.stringify(clients)); renderCRM();}
 },60000);
 
-// ------------------- Initialize -------------------
+renderTasks();
 changeLang('en');
 </script>
-
 </body>
 </html>
