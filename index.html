@@ -19,7 +19,7 @@ h2 { margin-top:0; text-align:center; }
 
 /* ------------------- Tabs ------------------- */
 .tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; min-width:0; }
-.tab-content { /* display:none;  -- الأصلي لديك في CSS مضاف بشكل آخر -- */ animation:fadeIn 0.3s ease; }
+.tab-content { animation:fadeIn 0.3s ease; display:none; }
 .tab-content.active { display:block; }
 
 /* ------------------- Inputs & Buttons ------------------- */
@@ -53,8 +53,8 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
     margin-bottom:20px; 
 }
 .logo-container img {
-    max-width: 100%; /* يسمح للوجو بالتمدد داخل الـcontainer */
-    height: auto;    /* يحافظ على نسبة العرض إلى الارتفاع */
+    max-width: 100%;
+    height: auto;
     display: inline-block;
     border-radius: 12px;
 }
@@ -68,20 +68,12 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
     .sidebar { width:100%; flex-direction: row; overflow-x: auto; }
     .sidebar button { flex:1 0 auto; margin:0 5px; white-space: nowrap; }
     .tabs-content { padding:15px; }
-    table { display:block; overflow-x:auto; }
-    th, td { white-space: nowrap; }
+    table { display:block; width:100%; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling: touch; }
+    th, td { white-space: nowrap; font-size: 0.9em; padding:8px; }
 }
 
 /* ------------------- Animations ------------------- */
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-
-/* ------------------- تعديل بسيط للحفاظ على فصل التبويبات ------------------- */
-.tab-content {
-  display: none;
-}
-.tab-content.active {
-  display: block;
-}
 </style>
 </head>
 <body>
@@ -276,10 +268,10 @@ setInterval(()=>{
     let changed=false;
     clients.forEach(c=>{
         if(c.status==="Hold" && c.holdTime>0){c.holdTime--; changed=true;}
-        if(c.status==="Hold" && c.holdTime===0){showNotification(`⚠️ Hold time ended for ${c.name}`);}
+        if(c.status==="Hold" && c.holdTime===0){showNotification(`⏳ Client ${c.name} Hold time ended`);}
     });
     if(changed){localStorage.setItem("clients",JSON.stringify(clients)); renderCRM();}
-},1000);
+},60000);
 
 // ------------------- Initialize -------------------
 changeLang('en');
