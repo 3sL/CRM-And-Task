@@ -168,9 +168,7 @@ function showNotification(msg){
   const notif=document.getElementById('notification');
   notif.innerHTML=msg;
   notif.style.display='block';
-  setTimeout(()=>{
-    notif.style.display='none';
-  },4000);
+  setTimeout(()=>{notif.style.display='none';},4000);
 }
 
 // --- Governorates List ---
@@ -189,7 +187,6 @@ populateGovernorates();
 
 // --- CRM Data ---
 let clients=[];let editIndex=-1;
-
 function loadClientsFromFirebase(){
   db.ref('clients').on('value',snapshot=>{
     clients=snapshot.val()?Object.values(snapshot.val()):[];
@@ -202,7 +199,6 @@ function saveClientsToFirebase(){
   clients.forEach((c,i)=>{updates[i]={...c};});
   db.ref('clients').set(updates);
 }
-
 function addOrUpdate(){
   const name=document.getElementById('name').value;
   const phone=document.getElementById('phone').value;
@@ -216,8 +212,7 @@ function addOrUpdate(){
   if(editIndex>-1){
     clients[editIndex]={name,phone,governorate,date,status,notes,agent,reminderDays,followUp};
     editIndex=-1;
-  }
-  else{
+  }else{
     clients.push({name,phone,governorate,date,status,notes,agent,reminderDays,followUp});
   }
   saveClientsToFirebase();
@@ -277,7 +272,6 @@ function editClient(i){
   document.getElementById('reminderDays').value=c.reminderDays;
   document.getElementById('followUp').value=c.followUp;
 }
-
 function deleteClient(i){
   if(confirm("Delete this client?")){
     clients.splice(i,1);
@@ -286,14 +280,11 @@ function deleteClient(i){
     populateClientDropdown();
   }
 }
-
 function openWhatsApp(phone){
   window.open("https://wa.me/"+phone,"_blank");
 }
-
-// --- New: Track Client ---
+// --- Track Client ---
 function trackClient(phone){
-  // مثال: فتح Google Maps مع رقم العميل (يمكن تعديل حسب بيانات التتبع الفعلية)
   window.open("https://www.google.com/maps/search/?api=1&query="+phone,"_blank");
 }
 
@@ -356,102 +347,56 @@ function renderTasks(){
 }
 function editTask(i){
   const t=tasks[i];
-  taskEditIndex=i;
-  document.getElementById('taskInput').value=t.taskText;
-  document.getElementById('taskClient').value=t.client;
-  document.getElementById('taskGovernorate').value=t.governorate;
-  document.getElementById('taskDate').value=t.date;
-  document.getElementById('taskStage').value=t.stage;
+   taskEditIndex = i;
+  document.getElementById('taskInput').value = t.taskText;
+  document.getElementById('taskClient').value = t.client;
+  document.getElementById('taskGovernorate').value = t.governorate;
+  document.getElementById('taskDate').value = t.date;
 }
-function deleteTask(i){
-  if(confirm("Delete this task?")){
-    tasks.splice(i,1);
+
+function deleteTask(i) {
+  if (confirm("Delete this task?")) {
+    tasks.splice(i, 1);
     saveTasksToFirebase();
     renderTasks();
   }
 }
 
-// --- Language change ---
-function changeLang(lang){
-  if(lang==="ar"){
-    document.body.dir="rtl";
-    document.getElementById('universalSearch').placeholder="ابحث في أي عمود...";
-    document.getElementById('name').placeholder="اسم العميل";
-    document.getElementById('phone').placeholder="الهاتف";
-    document.getElementById('date').placeholder="التاريخ";
-    document.getElementById('notes').placeholder="ملاحظات";
-    document.getElementById('agent').placeholder="اسم المندوب";
-    document.getElementById('reminderDays').placeholder="أيام التذكير";
-    document.getElementById('followUp').placeholder="متابعة";
-    document.getElementById('taskInput').placeholder="نص المهمة";
-    document.getElementById('taskClient').options[0].text="اختر العميل";
-    document.getElementById('taskGovernorate').options[0].text="اختر المحافظة";
-    document.getElementById('taskStage').options[0].text="عرض سعر";
-    document.getElementById('taskStage').options[1].text="متابعة";
-    document.getElementById('taskStage').options[2].text="طلب";
-    document.getElementById('taskStage').options[3].text="بنك";
-
-    const arabicGovernorates=["القاهرة","الإسكندرية","الجيزة","القليوبية","الغربية","الدقهلية","الشرقية","البحيرة","الفيوم","المنوفية","أسيوط","سوهاج","المنيا","بني سويف","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","الإسماعيلية","السويس","شمال سيناء","جنوب سيناء","بورسعيد","دمياط","كفر الشيخ","مطروح","قنا","حلوان","مرسى مطروح"];
-    const sel=document.getElementById('governorate');
-    const taskSel=document.getElementById('taskGovernorate');
-    sel.innerHTML='<option value="">اختر المحافظة</option>';
-    taskSel.innerHTML='<option value="">اختر المحافظة</option>';
-    arabicGovernorates.forEach(g=>{
-      sel.innerHTML+=`<option value="${g}">${g}</option>`;
-      taskSel.innerHTML+=`<option value="${g}">${g}</option>`;
-    });
-  }else{
-    document.body.dir="ltr";
-    document.getElementById('universalSearch').placeholder="Search Any Column...";
-    document.getElementById('name').placeholder="Client Name";
-    document.getElementById('phone').placeholder="Phone";
-    document.getElementById('date').placeholder="Date";
-    document.getElementById('notes').placeholder="Notes";
-    document.getElementById('agent').placeholder="Agent Name";
-    document.getElementById('reminderDays').placeholder="Reminder Days";
-    document.getElementById('followUp').placeholder="Follow Up";
-    document.getElementById('taskInput').placeholder="Task Text";
-    document.getElementById('taskClient').options[0].text="Select Client";
-    document.getElementById('taskGovernorate').options[0].text="Select Governorate";
-    document.getElementById('taskStage').options[0].text="Quote";
-    document.getElementById('taskStage').options[1].text="Follow Up";
-    document.getElementById('taskStage').options[2].text="Order";
-    document.getElementById('taskStage').options[3].text="Bank";
-
-    const sel=document.getElementById('governorate');
-    const taskSel=document.getElementById('taskGovernorate');
-    sel.innerHTML='<option value="">Select Governorate</option>';
-    taskSel.innerHTML='<option value="">Select Governorate</option>';
-    governorates.forEach(g=>{
-      sel.innerHTML+=`<option value="${g}">${g}</option>`;
-      taskSel.innerHTML+=`<option value="${g}">${g}</option>`;
-    });
+// --- Language Switch ---
+function changeLang(lang) {
+  if (lang === 'ar') {
+    document.body.dir = 'rtl';
+    document.body.style.fontFamily = 'Tahoma, Arial, sans-serif';
+  } else {
+    document.body.dir = 'ltr';
+    document.body.style.fontFamily = 'Arial, sans-serif';
   }
 }
 
-// --- PDF Export with Arabic support ---
-function exportPDFWithArabicSupport(){
-  const { jsPDF }=window.jspdf;
-  const doc=new jsPDF();
-  const amiriFont="AAEAAAASAQAABAAgR0RFRrRCsIIAAjWsAAACYkdQT1Oxz0CBAAIZ4AAAYEAAAAYGNtYXAAAAJjAAAD8AAAAGBnYXNwAAACfAAAARwAAAAYZnBnbQAAASwAAALMAAABkGhlYWQAAAQwAAAANgAAAAgaGhlYQAAARwAAAEMAAAANmhoZWEAAAEeAAABBQAAAAdkaG10AAABSAAABUwAAABsZG1vYQAABFQAAAV4AAABbm1heHAAAARcAAAB4wAAAAgbmFtZQAAAaAAAAYFAAAIAcG9zdAAAAbAAAAEHAAABAAEAAAABAACuAwAFAAIACwAAAAAAAAAAAAAAAAAAAABAAAC7AwAAAYABAAB2bWx1YwAABegAAAd6AAABpXRlcAAABugAAAUoAAAFoY3VtAAABvAAAAYsAAAQ8AAADIAAAAAAAyAAAEpAAAAAUAAAACAAQAAABAAAABAAAABAAAAAQAAAQAAABAAAABAAAABAAAABAAAABAAJBAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG5P4C7QAAAA==";
-  doc.addFileToVFS("Amiri-Regular.ttf",amiriFont);
-  doc.addFont("Amiri-Regular.ttf","Amiri","normal");
-  doc.setFont("Amiri");
-  doc.setFontSize(16);
-  doc.text("تقرير عملاء CRM",14,16);
-  const columns=["الاسم","الهاتف","المحافظة","التاريخ","الحالة","ملاحظات","التذكير","المتابعة"];
-  const rows=clients.map(c=>[c.name||"-",c.phone||"-",c.governorate||"-",c.date||"-",c.status||"-",c.notes||"-",c.reminderDays||"-",c.followUp||"-"]);
+// --- Export PDF with Arabic support ---
+function exportPDFWithArabicSupport() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFont("Amiri", "normal"); // خط Amiri يدعم العربي
+  doc.setFontSize(14);
+  doc.text("CRM Data", 105, 10, { align: "center" });
+
+  const data = clients.map(c => [
+    c.name, c.phone, c.governorate || "-", c.date, c.status, c.notes, c.reminderDays || "-", c.followUp || "-"
+  ]);
+
   doc.autoTable({
-    startY:25,
-    head:[columns],
-    body:rows,
-    styles:{font:"Amiri",fontSize:12},
-    headStyles:{fillColor:[0,121,184]},
+    head: [['Name','Phone','Governorate','Date','Status','Notes','Reminder','Follow Up']],
+    body: data,
+    startY: 20,
+    styles: { font: "Amiri", fontSize: 10, cellPadding: 2 },
+    headStyles: { fillColor: [30, 30, 47], textColor: [255, 204, 0] }
   });
-  doc.save("CRM_Report.pdf");
+
+  doc.save('CRM_Data.pdf');
 }
 
-// --- Initialize ---
+// --- Init ---
 loadClientsFromFirebase();
 loadTasksFromFirebase();
 </script>
