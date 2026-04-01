@@ -80,12 +80,7 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 <input id="phone" placeholder="Phone">
 <select id="governorate"></select>
 <input type="date" id="date">
-<select id="status">
-<option value="Interested">Interested</option>
-<option value="In Progress">In Progress</option>
-<option value="Hold">Hold</option>
-<option value="Completed">Completed</option>
-</select>
+<select id="status"></select>
 <textarea id="notes" placeholder="Notes"></textarea>
 <input id="agent" placeholder="Agent Name">
 <input type="number" id="reminderDays" placeholder="Reminder Days">
@@ -116,12 +111,7 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 <select id="taskClient"><option value="">Select Client</option></select>
 <select id="taskGovernorate"></select>
 <input type="date" id="taskDate">
-<select id="taskStage">
-<option value="quote">Quote</option>
-<option value="follow">Follow Up</option>
-<option value="order">Order</option>
-<option value="bank">Bank</option>
-</select>
+<select id="taskStage"></select>
 <button onclick="addTask()" id="addTaskBtn">➕ Add Task</button>
 </div>
 <table>
@@ -154,12 +144,11 @@ btn.classList.add('active');
 }
 
 // --- Notification ---
-function showNotification(msg,stage='quote'){
+function showNotification(msg){
 const notif=document.getElementById('notification');
 notif.innerHTML=msg;
 notif.style.display='block';
-const soundMap={quote:'notifSoundQuote',follow:'notifSoundFollow',order:'notifSoundOrder',bank:'notifSoundBank'};
-document.getElementById(soundMap[stage]||'notifSoundQuote').play();
+document.getElementById('notifSoundQuote').play();
 setTimeout(()=>{notif.style.display='none';},4000);
 }
 
@@ -183,10 +172,64 @@ function populateGovernorates(){
 }
 populateGovernorates();
 
-// --- Language Texts ---
+// --- Texts ---
 const texts={
-en:{title:"CRM System & Tasks For Utopia Trading And Export",crm:"CRM",tasks:"Tasks",dev:"Developed by Eng : ",search:"Search Any Column...",clientName:"Client Name",phone:"Phone",governorate:"Governorate",date:"Date",statusOptions:["Interested","In Progress","Hold","Completed"],notes:"Notes",agent:"Agent Name",reminder:"Reminder Days",follow:"Follow Up",save:"💾 Save",export:"📄 Export PDF",total:"Total",hold:"Hold",taskText:"Task Text",selectClient:"Select Client",addTask:"➕ Add Task"},
-ar:{title:"نظام إدارة العملاء والمهام لشركة يوتوبيا للتجارة والتصدير",crm:"نظام العملاء",tasks:"المهام",dev:"تم التطوير بواسطة : ",search:"ابحث في أي عمود...",clientName:"اسم العميل",phone:"الهاتف",governorate:"المحافظة",date:"التاريخ",statusOptions:["مهتم","قيد التنفيذ","معلق","مكتمل"],notes:"ملاحظات",agent:"اسم الموظف",reminder:"أيام التذكير",follow:"المتابعة",save:"💾 حفظ",export:"📄 تصدير PDF",total:"الإجمالي",hold:"معلق",taskText:"المهمة",selectClient:"اختر العميل",addTask:"➕ إضافة مهمة"}
+en:{
+title:"CRM System & Tasks For Utopia Trading And Export",
+crm:"CRM",
+tasks:"Tasks",
+dev:"Developed by Eng : ",
+search:"Search Any Column...",
+clientName:"Client Name",
+phone:"Phone",
+governorate:"Governorate",
+date:"Date",
+statusOptions:["Interested","In Progress","Hold","Completed"],
+notes:"Notes",
+agent:"Agent Name",
+reminder:"Reminder Days",
+follow:"Follow Up",
+save:"💾 Save",
+export:"📄 Export PDF",
+total:"Total",
+hold:"Hold",
+taskText:"Task Text",
+selectClient:"Select Client",
+addTask:"➕ Add Task",
+edit:"Edit",
+delete:"Delete",
+track:"Track",
+wa:"WhatsApp",
+taskStages:["Quote","Follow Up","Order","Bank"]
+},
+ar:{
+title:"نظام إدارة العملاء والمهام لشركة يوتوبيا للتجارة والتصدير",
+crm:"نظام العملاء",
+tasks:"المهام",
+dev:"تم التطوير بواسطة : ",
+search:"ابحث في أي عمود...",
+clientName:"اسم العميل",
+phone:"الهاتف",
+governorate:"المحافظة",
+date:"التاريخ",
+statusOptions:["مهتم","قيد التنفيذ","معلق","مكتمل"],
+notes:"ملاحظات",
+agent:"اسم الموظف",
+reminder:"أيام التذكير",
+follow:"المتابعة",
+save:"💾 حفظ",
+export:"📄 تصدير PDF",
+total:"الإجمالي",
+hold:"معلق",
+taskText:"المهمة",
+selectClient:"اختر العميل",
+addTask:"➕ إضافة مهمة",
+edit:"تعديل",
+delete:"حذف",
+track:"تتبع",
+wa:"واتساب",
+taskStages:["عرض سعر","متابعة","طلب","بنكي"]
+}
 };
 
 // --- Change Language ---
@@ -203,9 +246,9 @@ document.getElementById('name').placeholder=t.clientName;
 document.getElementById('phone').placeholder=t.phone;
 document.getElementById('governorate').options[0].text=t.governorate;
 populateGovernorates();
-for(let i=0;i<document.getElementById('status').options.length;i++){
-document.getElementById('status').options[i].text=t.statusOptions[i];
-}
+const statusSelect=document.getElementById('status');
+statusSelect.innerHTML='';
+t.statusOptions.forEach(s=>statusSelect.innerHTML+=`<option value="${s}">${s}</option>`);
 document.getElementById('notes').placeholder=t.notes;
 document.getElementById('agent').placeholder=t.agent;
 document.getElementById('reminderDays').placeholder=t.reminder;
@@ -217,14 +260,34 @@ document.getElementById('taskClient').options[0].text=t.selectClient;
 document.getElementById('addTaskBtn').innerText=t.addTask;
 document.getElementById('crmHeader').innerText=t.crm;
 document.getElementById('tasksHeader').innerText=t.tasks;
-renderCRM();
-renderTasks();
+
+// Update table headers
+document.getElementById('thName').innerText=t.clientName;
+document.getElementById('thPhone').innerText=t.phone;
+document.getElementById('thGovernorate').innerText=t.governorate;
+document.getElementById('thDate').innerText=t.date;
+document.getElementById('thStatus').innerText=t.statusOptions[0]; // Status header
+document.getElementById('thNotes').innerText=t.notes;
+document.getElementById('thReminder').innerText=t.reminder;
+document.getElementById('thFollowUp').innerText=t.follow;
+document.getElementById('thWhatsApp').innerText=t.wa;
+document.getElementById('thTrack').innerText=t.track;
+document.getElementById('thEdit').innerText=t.edit;
+document.getElementById('thDelete').innerText=t.delete;
+
+// Tasks table headers
+document.getElementById('thTaskClient').innerText=t.clientName;
+document.getElementById('thTaskGovernorate').innerText=t.governorate;
+document.getElementById('thTaskDate').innerText=t.date;
+document.getElementById('thTaskStage').innerText=t.taskStages[0]; 
+document.getElementById('thTaskText').innerText=t.taskText;
+document.getElementById('thTaskEdit').innerText=t.edit;
+document.getElementById('thTaskDelete').innerText=t.delete;
 }
 
-// --- CRUD & PDF Functions ---
+// --- CRM & Tasks Logic ---
 let clients=[],editIndex=-1,tasks=[],taskEditIndex=-1;
 
-// Load Clients
 function loadClientsFromFirebase(){
 db.ref('clients').on('value',snapshot=>{
 clients=snapshot.val()?Object.values(snapshot.val()):[];
@@ -233,146 +296,48 @@ populateClientDropdown();
 });
 }
 
-// Render CRM
 function renderCRM(){
 const table=document.getElementById('table');
 const search=document.getElementById('universalSearch').value.toLowerCase();
+const t=texts[document.documentElement.lang];
 table.innerHTML='';
 clients.forEach((c,i)=>{
 if(c.name.toLowerCase().includes(search) || c.phone.toLowerCase().includes(search) || c.notes.toLowerCase().includes(search)){
 const row=document.createElement('tr');
 row.innerHTML=`<td>${c.name}</td><td>${c.phone}</td><td>${c.governorate}</td><td>${c.date}</td><td>${c.status}</td><td>${c.notes}</td><td>${c.reminderDays}</td><td>${c.followUp}</td>
-<td><a href="https://wa.me/${c.phone}" target="_blank">WA</a></td>
-<td><button onclick="trackClient(${i})">Track</button></td>
-<td><button onclick="editClient(${i})">Edit</button></td>
-<td><button onclick="deleteClient(${i})">Delete</button></td>`;
+<td><a href="https://wa.me/${c.phone}" target="_blank">${t.wa}</a></td>
+<td><button onclick="trackClient(${i})">${t.track}</button></td>
+<td><button onclick="editClient(${i})">${t.edit}</button></td>
+<td><button onclick="deleteClient(${i})">${t.delete}</button></td>`;
 table.appendChild(row);
 }
 });
-document.getElementById('total').innerText=`${texts[document.documentElement.lang].total}: ${clients.length}`;
-const holdCount=clients.filter(c=>c.status===texts[document.documentElement.lang].statusOptions[2]).length;
-document.getElementById('hold').innerText=`${texts[document.documentElement.lang].hold}: ${holdCount}`;
+document.getElementById('total').innerText=`${t.total}: ${clients.length}`;
+const holdCount=clients.filter(c=>c.status===t.statusOptions[2]).length;
+document.getElementById('hold').innerText=`${t.hold}: ${holdCount}`;
 }
 
 // Add / Update Client
 function addOrUpdate(){
 const client={name:document.getElementById('name').value,phone:document.getElementById('phone').value,governorate:document.getElementById('governorate').value,date:document.getElementById('date').value,status:document.getElementById('status').value,notes:document.getElementById('notes').value,agent:document.getElementById('agent').value,reminderDays:document.getElementById('reminderDays').value,followUp:document.getElementById('followUp').value};
-if(editIndex===-1) clients.push(client); else clients[editIndex]=client;
+if(editIndex>-1){clients[editIndex]=client;editIndex=-1;}else{clients.push(client);}
 db.ref('clients').set(clients);
 renderCRM();
-populateClientDropdown();
-clearClientForm();
-showNotification('Saved Successfully');
+showNotification('Saved Successfully!');
 }
 
-// Edit Client
-function editClient(i){
-editIndex=i;
-const c=clients[i];
-document.getElementById('name').value=c.name;
-document.getElementById('phone').value=c.phone;
-document.getElementById('governorate').value=c.governorate;
-document.getElementById('date').value=c.date;
-document.getElementById('status').value=c.status;
-document.getElementById('notes').value=c.notes;
-document.getElementById('agent').value=c.agent;
-document.getElementById('reminderDays').value=c.reminderDays;
-document.getElementById('followUp').value=c.followUp;
-}
-
-// Delete Client
-function deleteClient(i){
-if(confirm('Are you sure?')){clients.splice(i,1);db.ref('clients').set(clients);renderCRM();populateClientDropdown();showNotification('Deleted Successfully');}
-}
-
-// Clear Form
-function clearClientForm(){
-document.getElementById('name').value='';
-document.getElementById('phone').value='';
-document.getElementById('governorate').value='';
-document.getElementById('date').value='';
-document.getElementById('status').selectedIndex=0;
-document.getElementById('notes').value='';
-document.getElementById('agent').value='';
-document.getElementById('reminderDays').value='';
-document.getElementById('followUp').value='';
-editIndex=-1;
-}
-
-// Populate Client Dropdown
-function populateClientDropdown(){
-const sel=document.getElementById('taskClient');
-sel.innerHTML=`<option value="">${texts[document.documentElement.lang].selectClient}</option>`;
-clients.forEach((c,i)=>{sel.innerHTML+=`<option value="${i}">${c.name}</option>`;});
-}
+// Edit/Delete Client
+function editClient(i){editIndex=i;const c=clients[i];document.getElementById('name').value=c.name;document.getElementById('phone').value=c.phone;document.getElementById('governorate').value=c.governorate;document.getElementById('date').value=c.date;document.getElementById('status').value=c.status;document.getElementById('notes').value=c.notes;document.getElementById('agent').value=c.agent;document.getElementById('reminderDays').value=c.reminderDays;document.getElementById('followUp').value=c.followUp;}
+function deleteClient(i){if(confirm('Confirm Delete?')){clients.splice(i,1);db.ref('clients').set(clients);renderCRM();}}
 
 // Tasks
-function addTask(){
-const idx=document.getElementById('taskClient').value;
-const clientName=idx!==""?clients[idx].name:"";
-const task={client:clientName,governorate:document.getElementById('taskGovernorate').value,date:document.getElementById('taskDate').value,stage:document.getElementById('taskStage').value,text:document.getElementById('taskInput').value};
-if(taskEditIndex===-1) tasks.push(task); else tasks[taskEditIndex]=task;
-db.ref('tasks').set(tasks);
-renderTasks();
-clearTaskForm();
-showNotification('Task Saved',task.stage);
-}
+function populateClientDropdown(){const sel=document.getElementById('taskClient');sel.innerHTML=`<option value="">${texts[document.documentElement.lang].selectClient}</option>`;clients.forEach(c=>{sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`;});}
+function addTask(){const task={client:document.getElementById('taskClient').value,governorate:document.getElementById('taskGovernorate').value,date:document.getElementById('taskDate').value,stage:document.getElementById('taskStage').value,text:document.getElementById('taskInput').value};tasks.push(task);renderTasks();showNotification('Task Added!');}
+function renderTasks(){const t=document.getElementById('taskList');const langTexts=texts[document.documentElement.lang];t.innerHTML='';tasks.forEach((tsk,i)=>{const row=document.createElement('tr');row.innerHTML=`<td>${tsk.client}</td><td>${tsk.governorate}</td><td>${tsk.date}</td><td>${tsk.stage}</td><td>${tsk.text}</td><td><button onclick="editTask(${i})">${langTexts.edit}</button></td><td><button onclick="deleteTask(${i})">${langTexts.delete}</button></td>`;t.appendChild(row);});}
 
-function clearTaskForm(){
-document.getElementById('taskInput').value='';
-document.getElementById('taskClient').selectedIndex=0;
-document.getElementById('taskGovernorate').selectedIndex=0;
-document.getElementById('taskDate').value='';
-document.getElementById('taskStage').selectedIndex=0;
-taskEditIndex=-1;
-}
-
-function renderTasks(){
-const tbody=document.getElementById('taskList');tbody.innerHTML='';
-tasks.forEach((t,i)=>{
-const row=document.createElement('tr');
-row.innerHTML=`<td>${t.client}</td><td>${t.governorate}</td><td>${t.date}</td><td><span class="task-stage stage-${t.stage}">${t.stage}</span></td><td>${t.text}</td>
-<td><button onclick="editTask(${i})">Edit</button></td>
-<td><button onclick="deleteTask(${i})">Delete</button></td>`;
-tbody.appendChild(row);
-});
-}
-
-function editTask(i){
-taskEditIndex=i;
-const t=tasks[i];
-document.getElementById('taskInput').value=t.text;
-document.getElementById('taskClient').value=clients.findIndex(c=>c.name===t.client);
-document.getElementById('taskGovernorate').value=t.governorate;
-document.getElementById('taskDate').value=t.date;
-document.getElementById('taskStage').value=t.stage;
-}
-
-function deleteTask(i){
-if(confirm('Are you sure?')){tasks.splice(i,1);db.ref('tasks').set(tasks);renderTasks();showNotification('Task Deleted');}
-}
-
-// Track Client (Google Maps)
-function trackClient(i){
-const c=clients[i];
-window.open(`https://www.google.com/maps/search/${c.governorate}`, '_blank');
-}
-
-// --- PDF Export ---
-function exportPDFWithArabicSupport(){
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
-doc.setFont("helvetica");
-doc.setFontSize(12);
-const data = clients.map(c=>[c.name,c.phone,c.governorate,c.date,c.status,c.notes,c.reminderDays,c.followUp]);
-doc.autoTable({head:[["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"]],body:data});
-doc.save('CRM.pdf');
-}
-
-// --- Initialize ---
+// Initialize
+changeLang('en'); // default
 loadClientsFromFirebase();
-populateGovernorates();
-changeLang('en');
 </script>
 </body>
 </html>
