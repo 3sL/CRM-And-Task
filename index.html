@@ -168,7 +168,9 @@ function showNotification(msg){
   const notif=document.getElementById('notification');
   notif.innerHTML=msg;
   notif.style.display='block';
-  setTimeout(()=>{notif.style.display='none';},4000);
+  setTimeout(()=>{
+    notif.style.display='none';
+  },4000);
 }
 
 // --- Governorates List ---
@@ -187,6 +189,7 @@ populateGovernorates();
 
 // --- CRM Data ---
 let clients=[];let editIndex=-1;
+
 function loadClientsFromFirebase(){
   db.ref('clients').on('value',snapshot=>{
     clients=snapshot.val()?Object.values(snapshot.val()):[];
@@ -199,6 +202,7 @@ function saveClientsToFirebase(){
   clients.forEach((c,i)=>{updates[i]={...c};});
   db.ref('clients').set(updates);
 }
+
 function addOrUpdate(){
   const name=document.getElementById('name').value;
   const phone=document.getElementById('phone').value;
@@ -212,7 +216,8 @@ function addOrUpdate(){
   if(editIndex>-1){
     clients[editIndex]={name,phone,governorate,date,status,notes,agent,reminderDays,followUp};
     editIndex=-1;
-  }else{
+  }
+  else{
     clients.push({name,phone,governorate,date,status,notes,agent,reminderDays,followUp});
   }
   saveClientsToFirebase();
@@ -272,6 +277,7 @@ function editClient(i){
   document.getElementById('reminderDays').value=c.reminderDays;
   document.getElementById('followUp').value=c.followUp;
 }
+
 function deleteClient(i){
   if(confirm("Delete this client?")){
     clients.splice(i,1);
@@ -280,11 +286,14 @@ function deleteClient(i){
     populateClientDropdown();
   }
 }
+
 function openWhatsApp(phone){
   window.open("https://wa.me/"+phone,"_blank");
 }
-// --- Track Client ---
+
+// --- New: Track Client ---
 function trackClient(phone){
+  // مثال: فتح Google Maps مع رقم العميل (يمكن تعديل حسب بيانات التتبع الفعلية)
   window.open("https://www.google.com/maps/search/?api=1&query="+phone,"_blank");
 }
 
@@ -347,58 +356,86 @@ function renderTasks(){
 }
 function editTask(i){
   const t=tasks[i];
-   taskEditIndex = i;
-  document.getElementById('taskInput').value = t.taskText;
-  document.getElementById('taskClient').value = t.client;
-  document.getElementById('taskGovernorate').value = t.governorate;
-  document.getElementById('taskDate').value = t.date;
+  taskEditIndex=i;
+  document.getElementById('taskInput').value=t.taskText;
+  document.getElementById('taskClient').value=t.client;
+  document.getElementById('taskGovernorate').value=t.governorate;
+  document.getElementById('taskDate').value=t.date;
+  document.getElementById('taskStage').value=t.stage;
 }
-
-function deleteTask(i) {
-  if (confirm("Delete this task?")) {
-    tasks.splice(i, 1);
+function deleteTask(i){
+  if(confirm("Delete this task?")){
+    tasks.splice(i,1);
     saveTasksToFirebase();
     renderTasks();
   }
 }
 
-// --- Language Switch ---
-function changeLang(lang) {
-  if (lang === 'ar') {
-    document.body.dir = 'rtl';
-    document.body.style.fontFamily = 'Tahoma, Arial, sans-serif';
-  } else {
-    document.body.dir = 'ltr';
-    document.body.style.fontFamily = 'Arial, sans-serif';
+// --- Export PDF with Arabic Support ---
+function exportPDFWithArabicSupport(){
+  import("https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js").then(jsPDFModule=>{
+    const { jsPDF } = jsPDFModule;
+    const doc = new jsPDF('l', 'pt', 'a4');
+    
+    // إضافة الخط العربي من Google Fonts (مثال: Amiri)
+    const fontUrl = "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/amiri-regular.ttf";
+
+    // لتحميل الخط (أسهل طريقة) يمكنك استخدام خطوط مبنية في jsPDF أو إدخال النص يدويًا بترتيب صحيح
+    // هنا سنستخدم النص العربي بشكل مباشر لكن مع دعم الخط العادي
+
+    const header = [["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"]];
+    const body = clients.map(c=>[
+      c.name, c.phone, c.governorate||"-", c.date, c.status, c.notes, c.reminderDays||"-", c.followUp||"-"
+    ]);
+
+    // لضمان عرض العربية بشكل صحيح، نستطيع تعكس النصوص العربية يدويًا باستخدام دالة صغيرة:
+    function reverseArabic(text){
+      if(!text) return "";
+      return text.split("").reverse().join("");
+    }
+
+    // نقوم بعكس الحقول العربية فقط (الاسم، المحافظة، الملاحظات، المتابعة)، الباقي إنجليزي أو أرقام
+    const bodyFixed = body.map(row=>[
+      reverseArabic(row[0]),
+      row[1],
+      reverseArabic(row[2]),
+      row[3],
+      row[4],
+      reverseArabic(row[5]),
+      row[6],
+      reverseArabic(row[7])
+    ]);
+
+    doc.autoTable({
+      head: [header[0].map(h=>reverseArabic(h))], // عكس عناوين الأعمدة العربية
+      body: bodyFixed,
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [30, 30, 47], textColor: 255, fontStyle: 'bold' },
+      theme: 'striped',
+      startY: 30
+    });
+    doc.save("crm_clients_report.pdf");
+  });
+}
+
+// --- Change Language ---
+function changeLang(lang){
+  if(lang==="ar"){
+    document.body.dir = "rtl";
+    document.body.lang = "ar";
+    document.body.style.fontFamily = "'Arial', 'Tahoma', 'Segoe UI', sans-serif";
+  }
+  else{
+    document.body.dir = "ltr";
+    document.body.lang = "en";
+    document.body.style.fontFamily = "'Arial', sans-serif";
   }
 }
 
-// --- Export PDF with Arabic support ---
-function exportPDFWithArabicSupport() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFont("Amiri", "normal"); // خط Amiri يدعم العربي
-  doc.setFontSize(14);
-  doc.text("CRM Data", 105, 10, { align: "center" });
-
-  const data = clients.map(c => [
-    c.name, c.phone, c.governorate || "-", c.date, c.status, c.notes, c.reminderDays || "-", c.followUp || "-"
-  ]);
-
-  doc.autoTable({
-    head: [['Name','Phone','Governorate','Date','Status','Notes','Reminder','Follow Up']],
-    body: data,
-    startY: 20,
-    styles: { font: "Amiri", fontSize: 10, cellPadding: 2 },
-    headStyles: { fillColor: [30, 30, 47], textColor: [255, 204, 0] }
-  });
-
-  doc.save('CRM_Data.pdf');
-}
-
-// --- Init ---
+// --- Initialization ---
 loadClientsFromFirebase();
 loadTasksFromFirebase();
+
 </script>
 </body>
 </html>
