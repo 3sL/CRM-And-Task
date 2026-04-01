@@ -262,65 +262,74 @@ doc.save("CRM_Report.pdf");
 
 // --- Language Switch ---
 function changeLang(lang){
-    if(lang==="ar"){
-        document.body.dir="rtl";
-        document.getElementById('universalSearch').placeholder="ابحث في أي عمود...";
-        document.getElementById('name').placeholder="اسم العميل";
-        document.getElementById('phone').placeholder="الهاتف";
-        document.getElementById('date').placeholder="التاريخ";
-        document.getElementById('notes').placeholder="ملاحظات";
-        document.getElementById('agent').placeholder="اسم المندوب";
-        document.getElementById('reminderDays').placeholder="أيام التذكير";
-        document.getElementById('followUp').placeholder="متابعة";
-        document.getElementById('taskInput').placeholder="نص المهمة";
-        document.getElementById('taskClient').options[0].text="اختر العميل";
-        document.getElementById('taskGovernorate').options[0].text="اختر المحافظة";
-        document.getElementById('taskStage').options[0].text="عرض سعر";
-        document.getElementById('taskStage').options[1].text="متابعة";
-        document.getElementById('taskStage').options[2].text="طلب";
-        document.getElementById('taskStage').options[3].text="بنك";
+if(lang==="ar"){
+document.body.dir="rtl";
+document.getElementById('universalSearch').placeholder="ابحث في أي عمود...";
+document.getElementById('name').placeholder="اسم العميل";
+document.getElementById('phone').placeholder="الهاتف";
+document.getElementById('date').placeholder="التاريخ";
+document.getElementById('notes').placeholder="ملاحظات";
+document.getElementById('agent').placeholder="اسم المندوب";
+document.getElementById('reminderDays').placeholder="أيام التذكير";
+document.getElementById('followUp').placeholder="متابعة";
+document.getElementById('taskInput').placeholder="نص المهمة";
+document.getElementById('taskClient').options[0].text="اختر العميل";
+document.getElementById('taskGovernorate').options[0].text="اختر المحافظة";
+document.getElementById('taskStage').options[0].text="عرض سعر";
+document.getElementById('taskStage').options[1].text="متابعة";
+document.getElementById('taskStage').options[2].text="طلب";
+document.getElementById('taskStage').options[3].text="بنك";
 
-        // --- تحويل أسماء المحافظات إلى عربي ---
-        const arabicGovernorates = ["القاهرة","الإسكندرية","الجيزة","القليوبية","الغربية","الدقهلية","الشرقية","البحيرة","الفيوم","المنوفية","أسيوط","سوهاج","المنيا","بني سويف","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","الإسماعيلية","السويس","شمال سيناء","جنوب سيناء","بورسعيد","دمياط","كفر الشيخ","مطروح","قنا","حلوان","مرسى مطروح"];
-        const sel = document.getElementById('governorate');
-        const taskSel = document.getElementById('taskGovernorate');
-        sel.innerHTML = '<option value="">اختر المحافظة</option>';
-        taskSel.innerHTML = '<option value="">اختر المحافظة</option>';
-        arabicGovernorates.forEach(g=>{
-            sel.innerHTML += `<option value="${g}">${g}</option>`;
-            taskSel.innerHTML += `<option value="${g}">${g}</option>`;
-        });
+// --- تحويل أسماء المحافظات إلى عربي ---
+const arabicGovernorates=["القاهرة","الإسكندرية","الجيزة","القليوبية","الغربية","الدقهلية","الشرقية","البحيرة","الفيوم","المنوفية","أسيوط","سوهاج","المنيا","بني سويف","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","الإسماعيلية","السويس","شمال سيناء","جنوب سيناء","بورسعيد","دمياط","كفر الشيخ","مطروح","قنا","حلوان","مرسى مطروح"];
+const sel=document.getElementById('governorate');
+const taskSel=document.getElementById('taskGovernorate');
+sel.innerHTML='<option value="">اختر المحافظة</option>';
+taskSel.innerHTML='<option value="">اختر المحافظة</option>';
+arabicGovernorates.forEach(g=>{
+sel.innerHTML+=`<option value="${g}">${g}</option>`;
+taskSel.innerHTML+=`<option value="${g}">${g}</option>`;
+});
 
-    } else {
-        document.body.dir="ltr";
-        document.getElementById('universalSearch').placeholder="Search Any Column...";
-        document.getElementById('name').placeholder="Client Name";
-        document.getElementById('phone').placeholder="Phone";
-        document.getElementById('date').placeholder="Date";
-        document.getElementById('notes').placeholder="Notes";
-        document.getElementById('agent').placeholder="Agent Name";
-        document.getElementById('reminderDays').placeholder="Reminder Days";
-        document.getElementById('followUp').placeholder="Follow Up";
-        document.getElementById('taskInput').placeholder="Task Text";
-        document.getElementById('taskClient').options[0].text="Select Client";
-        document.getElementById('taskGovernorate').options[0].text="Select Governorate";
-        document.getElementById('taskStage').options[0].text="Quote";
-        document.getElementById('taskStage').options[1].text="Follow Up";
-        document.getElementById('taskStage').options[2].text="Order";
-        document.getElementById('taskStage').options[3].text="Bank";
+// --- ضبط الألوان لتظهر بشكل صحيح ---
+sel.style.color="#000"; sel.style.background="#fff";
+taskSel.style.color="#000"; taskSel.style.background="#fff";
 
-        // --- إعادة المحافظات بالإنجليزي ---
-        const sel = document.getElementById('governorate');
-        const taskSel = document.getElementById('taskGovernorate');
-        sel.innerHTML = '<option value="">Select Governorate</option>';
-        taskSel.innerHTML = '<option value="">Select Governorate</option>';
-        governorates.forEach(g=>{
-            sel.innerHTML += `<option value="${g}">${g}</option>`;
-            taskSel.innerHTML += `<option value="${g}">${g}</option>`;
-        });
-    }
+}else{
+document.body.dir="ltr";
+document.getElementById('universalSearch').placeholder="Search Any Column...";
+document.getElementById('name').placeholder="Client Name";
+document.getElementById('phone').placeholder="Phone";
+document.getElementById('date').placeholder="Date";
+document.getElementById('notes').placeholder="Notes";
+document.getElementById('agent').placeholder="Agent Name";
+document.getElementById('reminderDays').placeholder="Reminder Days";
+document.getElementById('followUp').placeholder="Follow Up";
+document.getElementById('taskInput').placeholder="Task Text";
+document.getElementById('taskClient').options[0].text="Select Client";
+document.getElementById('taskGovernorate').options[0].text="Select Governorate";
+document.getElementById('taskStage').options[0].text="Quote";
+document.getElementById('taskStage').options[1].text="Follow Up";
+document.getElementById('taskStage').options[2].text="Order";
+document.getElementById('taskStage').options[3].text="Bank";
+
+// --- إعادة المحافظات بالإنجليزي ---
+sel=document.getElementById('governorate');
+taskSel=document.getElementById('taskGovernorate');
+sel.innerHTML='<option value="">Select Governorate</option>';
+taskSel.innerHTML='<option value="">Select Governorate</option>';
+governates.forEach(g=>{
+sel.innerHTML+=`<option value="${g}">${g}</option>`;
+taskSel.innerHTML+=`<option value="${g}">${g}</option>`;
+});
+
+// --- ضبط الألوان للتأكد ---
+sel.style.color="#000"; sel.style.background="#fff";
+taskSel.style.color="#000"; taskSel.style.background="#fff";
 }
-// --- Init ---
+}
+
+// --- Initialize ---
 loadClientsFromFirebase();
 loadTasksFromFirebase();
 </script>
