@@ -3,420 +3,438 @@
 <head>
 <meta charset="UTF-8">
 <title>CRM System & Tasks For Utopia Trading And Export</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-/* --- نسخ CSS الأصلي بالكامل بدون حذف --- */
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f6fa;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: row;
-  min-height: 100vh;
-  color: #333;
-  overflow-x: hidden;
-}
-h2 {
-  margin-top: 0;
-  text-align: center;
-}
-/* أضف باقي CSS الأصلي هنا كما هو */
-.sidebar {
-  width: 260px;
-  background: #0b79d0;
-  color: white;
-  padding: 20px;
-  box-sizing: border-box;
-}
-.sidebar h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-.tab-btn {
-  background: #0972c2;
-  color: white;
-  border: none;
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  text-align: left;
-}
-.tab-btn.active {
-  background: #064a7a;
-}
-.developer, .phone {
-  font-size: 12px;
-  margin-top: 15px;
-  text-align: center;
-}
-#language {
-  width: 100%;
-  padding: 5px;
-  margin-top: 15px;
-  font-size: 14px;
-}
-.tabs-content {
-  flex: 1;
-  padding: 20px;
-  box-sizing: border-box;
-  overflow-y: auto;
-}
-.logo-container img {
-  max-width: 120px;
-  display: block;
-  margin: 10px auto;
-}
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-.row input, .row select, .row textarea {
-  padding: 8px;
-  font-size: 14px;
-  flex-grow: 1;
-  min-width: 150px;
-  box-sizing: border-box;
-}
-button {
-  background: #0b79d0;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 14px;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-button:hover {
-  background: #064a7a;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 13px;
-}
-table, th, td {
-  border: 1px solid #ddd;
-}
-th, td {
-  padding: 7px 8px;
-  text-align: left;
-  vertical-align: middle;
-}
-th {
-  background: #0b79d0;
-  color: white;
-}
-.card {
-  background: #0b79d0;
-  color: white;
-  padding: 10px;
-  margin-right: 10px;
-  border-radius: 3px;
-  min-width: 80px;
-  text-align: center;
-}
-.tab-content {
-  display: none;
-}
-.tab-content.active {
-  display: block;
-}
-/* يمكنك إضافة المزيد من CSS الأصلي حسب ملفك */
+/* --- General Styles --- */
+body{font-family:Arial,sans-serif;background:#f5f6fa;margin:0;padding:0;display:flex;flex-direction:row;min-height:100vh;color:#333;overflow-x:hidden}
+h2{margin-top:0;text-align:center}
+/* --- Sidebar --- */
+.sidebar{width:250px;background:#1e1e2f;color:#fff;display:flex;flex-direction:column;padding:20px;box-sizing:border-box;transition:all 0.3s ease}
+.sidebar h2{font-size:1.5em;margin-bottom:20px;color:#ffcc00}
+.sidebar button{background:#2e2e4d;color:#fff;border:none;padding:12px;margin:5px 0;border-radius:12px;cursor:pointer;text-align:right;font-weight:bold;transition:all 0.2s ease}
+.sidebar button:hover{background:#3f3f6b}
+.sidebar button.active{background:#ffcc00;color:#1e1e2f}
+.sidebar select{padding:10px;border-radius:8px;border:none;margin-top:10px}
+/* --- Tabs --- */
+.tabs-content{flex:1;padding:25px;overflow:auto;width:100%;box-sizing:border-box;min-width:0}
+.tab-content{animation:fadeIn 0.3s ease;display:none}
+.tab-content.active{display:block}
+/* --- Inputs & Buttons --- */
+input,select,textarea,button{padding:12px;margin:5px 0;width:100%;box-sizing:border-box;border-radius:8px;border:1px solid #ccc;outline:none}
+textarea{resize:none;height:80px}
+button{background:#007bff;color:#fff;border:none;cursor:pointer;font-weight:bold;transition:0.2s}
+/* --- Cards --- */
+.card{background:#fff;padding:15px;text-align:center;border-radius:12px;margin:5px;flex:1;box-shadow:0 4px 6px rgba(0,0,0,0.1);font-weight:bold}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+/* --- Table --- */
+table{width:100%;border-collapse:collapse;margin-top:15px;table-layout: fixed;background:#fff;border-radius:12px;overflow-x:auto;display:block;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
+th,td{border-bottom:1px solid #eee;padding:12px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
+/* --- Notifications --- */
+#notification{position:fixed;top:20px;right:20px;background:#ffcc00;color:#1e1e2f;padding:15px 20px;border-radius:12px;display:none;z-index:999;min-width:220px;font-weight:bold;box-shadow:0 4px 8px rgba(0,0,0,0.2);cursor:pointer}
+/* --- Task Stages --- */
+.task-stage{padding:5px 10px;color:#fff;border-radius:12px;font-weight:bold;font-size:0.9em}
+.stage-quote{background:#ff7f50}
+.stage-follow{background:#1e90ff}
+.stage-order{background:#28a745}
+.stage-bank{background:#6f42c1}
+/* --- Logo --- */
+.logo-container{text-align:center;margin-bottom:20px}
+.logo-container img{max-width:100%;height:auto;display:inline-block;border-radius:12px}
+/* --- Responsive --- */
+@media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:10px}.sidebar h2{font-size:1em;margin-bottom:0;white-space:nowrap;flex:1 0 auto}.sidebar button{flex:1 0 auto;margin:0 5px;white-space:nowrap;font-size:0.9em;padding:8px}.sidebar select{width:auto;margin-left:10px;font-size:0.9em}.tabs-content{padding:10px;width:100%}table{width:100%;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}th,td{white-space:nowrap;font-size:0.8em;padding:6px}.row{flex-direction:column}input,select,textarea,button{font-size:0.9em}.card{flex:1 1 100%;margin-bottom:10px}.logo-container img{max-height:80px}}
+/* --- Animations --- */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
-
-<!-- مكتبات Firebase و jsPDF الأصلية -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-<!-- إضافة pdfmake لدعم PDF بالعربية -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
 </head>
 <body>
-
 <div class="sidebar">
-  <h2>CRM System & Tasks For Utopia Trading And Export</h2>
-  <button class="tab-btn active" onclick="showTab('crmTab', this)">CRM</button>
-  <button class="tab-btn" onclick="showTab('tasksTab', this)">Tasks</button>
-  <hr>
-  <div class="developer">Developed by Eng : <strong>Mahmoud Mohamed Marie</strong></div>
-  <div class="phone">📞 +201222153415</div>
-  <select id="language" onchange="changeLang(this.value)">
-    <option value="en">English</option>
-    <option value="ar">عربي</option>
-  </select>
+<h2>CRM System & Tasks For Utopia Trading And Export</h2>
+<button class="tab-btn active" onclick="showTab('crmTab', this)">CRM</button>
+<button class="tab-btn" onclick="showTab('tasksTab', this)">Tasks</button>
+<hr>
+<div class="developer">Developed by Eng : <strong>Mahmoud Mohamed Marie</strong></div>
+<div class="phone">📞 +201222153415</div>
+<select id="language" onchange="changeLang(this.value)">
+<option value="en">English</option>
+<option value="ar">عربي</option>
+</select>
 </div>
 
 <div class="tabs-content">
-  <div id="notification"></div>
+<div id="notification"></div>
 
-  <div id="crmTab" class="tab-content active">
-    <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
-    <h2>CRM System</h2>
+<!-- CRM Tab -->
+<div id="crmTab" class="tab-content active">
+<div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
+<h2>CRM System</h2>
 
-    <div class="row">
-      <input id="universalSearch" placeholder="Search Any Column..." oninput="renderCRM()">
-    </div>
-
-    <div class="row">
-      <input id="name" placeholder="Client Name">
-      <input id="phone" placeholder="Phone">
-      <select id="governorate"></select>
-      <input type="date" id="date">
-      <select id="status">
-        <option value="Interested">Interested</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Hold">Hold</option>
-        <option value="Completed">Completed</option>
-      </select>
-      <textarea id="notes" placeholder="Notes"></textarea>
-      <input id="agent" placeholder="Agent Name">
-      <input type="number" id="reminderDays" placeholder="Reminder Days">
-      <input type="text" id="followUp" placeholder="Follow Up">
-    </div>
-
-    <button onclick="addOrUpdate()">💾 Save</button>
-    <button onclick="exportPDFWithPdfmake()">📄 Export PDF</button>
-
-    <div class="row">
-      <div class="card" id="total">0</div>
-      <div class="card" id="hold">Hold: 0</div>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th><th>Phone</th><th>Governorate</th><th>Date</th><th>Status</th><th>Notes</th><th>Reminder</th><th>Follow Up</th><th>WhatsApp</th><th>Track</th><th>Edit</th><th>Delete</th>
-        </tr>
-      </thead>
-      <tbody id="table"></tbody>
-    </table>
-  </div>
-
-  <div id="tasksTab" class="tab-content">
-    <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
-    <h2>Tasks</h2>
-    <!-- محتوى المهام كما هو -->
-  </div>
+<div class="row">
+<input id="universalSearch" placeholder="Search Any Column..." oninput="renderCRM()">
 </div>
 
+<div class="row">
+<input id="name" placeholder="Client Name">
+<input id="phone" placeholder="Phone">
+<select id="governorate"></select>
+<input type="date" id="date">
+<select id="status">
+<option value="Interested">Interested</option>
+<option value="In Progress">In Progress</option>
+<option value="Hold">Hold</option>
+<option value="Completed">Completed</option>
+</select>
+<textarea id="notes" placeholder="Notes"></textarea>
+<input id="agent" placeholder="Agent Name">
+<input type="number" id="reminderDays" placeholder="Reminder Days">
+<input type="text" id="followUp" placeholder="Follow Up">
+</div>
+
+<button onclick="addOrUpdate()">💾 Save</button>
+<button onclick="exportPDFWithArabicSupport()">📄 Export PDF</button>
+
+<div class="row">
+<div class="card" id="total">0</div>
+<div class="card" id="hold">Hold: 0</div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Name</th><th>Phone</th><th>Governorate</th><th>Date</th><th>Status</th><th>Notes</th><th>Reminder</th><th>Follow Up</th><th>WhatsApp</th><th>Track</th><th>Edit</th><th>Delete</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
+</div>
+
+<!-- Tasks Tab -->
+<div id="tasksTab" class="tab-content">
+<div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
+<h2>Tasks</h2>
+
+<div class="row">
+<input id="taskInput" placeholder="Task Text">
+<select id="taskClient"><option value="">Select Client</option></select>
+<select id="taskGovernorate"></select>
+<input type="date" id="taskDate">
+<select id="taskStage">
+<option value="quote">Quote</option>
+<option value="follow">Follow Up</option>
+<option value="order">Order</option>
+<option value="bank">Bank</option>
+</select>
+<button onclick="addTask()">➕ Add Task</button>
+</div>
+
+<table>
+<thead>
+<tr><th>Client</th><th>Governorate</th><th>Date</th><th>Stage</th><th>Task</th><th>Edit</th><th>Delete</th></tr>
+</thead>
+<tbody id="taskList"></tbody>
+</table>
+</div>
+
+</div>
 <script>
-// === Firebase Initialization ===
+// --- Firebase ---
 const firebaseConfig = {
-  apiKey:"AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY",
-  authDomain:"crm-tasking.firebaseapp.com",
-  databaseURL:"https://crm-tasking-default-rtdb.firebaseio.com",
-  projectId:"crm-tasking",
-  storageBucket:"crm-tasking.appspot.com",
-  messagingSenderId:"368062369619",
-  appId:"1:368062369619:web:cd38383ab75ab473961ba6",
-  measurementId:"G-16FMSDWDJ6"
+apiKey:"AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY",
+authDomain:"crm-tasking.firebaseapp.com",
+databaseURL:"https://crm-tasking-default-rtdb.firebaseio.com",
+projectId:"crm-tasking",
+storageBucket:"crm-tasking.appspot.com",
+messagingSenderId:"368062369619",
+appId:"1:368062369619:web:cd38383ab75ab473961ba6",
+measurementId:"G-16FMSDWDJ6"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+const db=firebase.database();
 
-let clients = []; // مصفوفة العملاء
-let editingIndex = null;
-
-// --- عرض التبويبات ---
-function showTab(tabId, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
+// --- Tabs ---
+function showTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-// --- تغيير اللغة (مثال فقط) ---
-function changeLang(lang) {
-  if (lang === 'ar') {
-    document.body.dir = 'rtl';
-  } else {
-    document.body.dir = 'ltr';
-  }
-  // يمكن إضافة ترجمة للعناصر هنا حسب حاجتك
+// --- Notification ---
+function showNotification(msg){
+  const notif=document.getElementById('notification');
+  notif.innerHTML=msg;
+  notif.style.display='block';
+  setTimeout(()=>{
+    notif.style.display='none';
+  },4000);
 }
 
-// --- تحميل بيانات من Firebase ---
-function loadClients() {
-  db.ref('clients').on('value', snapshot => {
-    clients = [];
-    snapshot.forEach(childSnapshot => {
-      clients.push(childSnapshot.val());
-    });
+// --- Governorates List ---
+const governorates=["Cairo","Alexandria","Giza","Qalyubia","Gharbia","Dakahlia","Sharqia","Beheira","Fayoum","Menofia","Assiut","Sohag","Minya","Beni Suef","Luxor","Aswan","Red Sea","New Valley","Ismailia","Suez","North Sinai","South Sinai","Port Said","Damietta","Kafr El Sheikh","Matrouh","Qena","Helwan","Marsa Matrouh"];
+function populateGovernorates(){
+  const sel=document.getElementById('governorate');
+  const taskSel=document.getElementById('taskGovernorate');
+  sel.innerHTML='<option value="">Select Governorate</option>';
+  taskSel.innerHTML='<option value="">Select Governorate</option>';
+  governorates.forEach(g=>{
+    sel.innerHTML+=<option value="${g}">${g}</option>;
+    taskSel.innerHTML+=<option value="${g}">${g}</option>;
+  });
+}
+populateGovernorates();
+
+// --- CRM Data ---
+let clients=[];let editIndex=-1;
+
+function loadClientsFromFirebase(){
+  db.ref('clients').on('value',snapshot=>{
+    clients=snapshot.val()?Object.values(snapshot.val()):[];
     renderCRM();
+    populateClientDropdown();
   });
 }
-
-// --- عرض البيانات في الجدول ---
-function renderCRM() {
-  const tbody = document.getElementById('table');
-  const search = document.getElementById('universalSearch').value.toLowerCase();
-  tbody.innerHTML = '';
-  let total = 0;
-  let holdCount = 0;
-  clients.forEach((client, index) => {
-    // تصفية بحث
-    let rowText = Object.values(client).join(' ').toLowerCase();
-    if (!rowText.includes(search)) return;
-
-    const tr = document.createElement('tr');
-
-    // بيانات الجدول
-    tr.innerHTML = `
-      <td>${client.name || ''}</td>
-      <td>${client.phone || ''}</td>
-      <td>${client.governorate || ''}</td>
-      <td>${client.date || ''}</td>
-      <td>${client.status || ''}</td>
-      <td>${client.notes || ''}</td>
-      <td>${client.reminderDays || ''}</td>
-      <td>${client.followUp || ''}</td>
-      <td><button onclick="sendWhatsApp('${client.phone}')">WhatsApp</button></td>
-      <td><button onclick="trackClient(${index})">Track</button></td>
-      <td><button onclick="editClient(${index})">Edit</button></td>
-      <td><button onclick="deleteClient(${index})">Delete</button></td>
-    `;
-
-    tbody.appendChild(tr);
-
-    total++;
-    if(client.status === 'Hold') holdCount++;
-  });
-
-  document.getElementById('total').textContent = `Total: ${total}`;
-  document.getElementById('hold').textContent = `Hold: ${holdCount}`;
+function saveClientsToFirebase(){
+  const updates={};
+  clients.forEach((c,i)=>{updates[i]={...c};});
+  db.ref('clients').set(updates);
 }
 
-// --- أزرار ---
-function addOrUpdate() {
-  const name = document.getElementById('name').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const governorate = document.getElementById('governorate').value;
-  const date = document.getElementById('date').value;
-  const status = document.getElementById('status').value;
-  const notes = document.getElementById('notes').value.trim();
-  const agent = document.getElementById('agent').value.trim();
-  const reminderDays = document.getElementById('reminderDays').value;
-  const followUp = document.getElementById('followUp').value.trim();
-
-  if(!name || !phone) {
-    alert('Name and phone are required!');
-    return;
+function addOrUpdate(){
+  const name=document.getElementById('name').value;
+  const phone=document.getElementById('phone').value;
+  const governorate=document.getElementById('governorate').value;
+  const date=document.getElementById('date').value;
+  const status=document.getElementById('status').value;
+  const notes=document.getElementById('notes').value;
+  const agent=document.getElementById('agent').value;
+  const reminderDays=document.getElementById('reminderDays').value;
+  const followUp=document.getElementById('followUp').value;
+  if(editIndex>-1){
+    clients[editIndex]={name,phone,governorate,date,status,notes,agent,reminderDays,followUp};
+    editIndex=-1;
   }
-
-  const clientData = { name, phone, governorate, date, status, notes, agent, reminderDays, followUp };
-
-  if(editingIndex === null) {
-    clients.push(clientData);
-  } else {
-    clients[editingIndex] = clientData;
-    editingIndex = null;
+  else{
+    clients.push({name,phone,governorate,date,status,notes,agent,reminderDays,followUp});
   }
-
-  // حفظ في Firebase
-  db.ref('clients').set(clients);
-  clearInputs();
+  saveClientsToFirebase();
   renderCRM();
+  populateClientDropdown();
+  document.getElementById('name').value='';
+  document.getElementById('phone').value='';
+  document.getElementById('governorate').value='';
+  document.getElementById('date').value='';
+  document.getElementById('status').value='Interested';
+  document.getElementById('notes').value='';
+  document.getElementById('agent').value='';
+  document.getElementById('reminderDays').value='';
+  document.getElementById('followUp').value='';
 }
 
-function clearInputs() {
-  ['name', 'phone', 'governorate', 'date', 'status', 'notes', 'agent', 'reminderDays', 'followUp'].forEach(id => {
-    document.getElementById(id).value = '';
+// --- Render CRM with Track button ---
+function renderCRM(){
+  const table=document.getElementById("table");
+  const filter=document.getElementById("universalSearch").value.toLowerCase();
+  table.innerHTML="";
+  let holdCount=0;
+  clients.forEach((c,i)=>{
+    let combinedText=${c.name} ${c.phone} ${c.governorate} ${c.date} ${c.status} ${c.notes} ${c.followUp}.toLowerCase();
+    if(filter && !combinedText.includes(filter))return;
+    if(c.status==="Hold")holdCount++;
+    table.innerHTML+=`<tr>
+      <td>${c.name}</td>
+      <td>${c.phone}</td>
+      <td>${c.governorate||'-'}</td>
+      <td>${c.date}</td>
+      <td>${c.status}</td>
+      <td>${c.notes}</td>
+      <td>${c.reminderDays||'-'}</td>
+      <td>${c.followUp||'-'}</td>
+      <td><button onclick="openWhatsApp('${c.phone}')">📱</button></td>
+      <td><button onclick="trackClient('${c.phone}')">🛰️</button></td>
+      <td><button onclick="editClient(${i})">✏️</button></td>
+      <td><button onclick="deleteClient(${i})">❌</button></td>
+    </tr>`;
   });
+  document.getElementById("total").innerText="Total: "+clients.length;
+  document.getElementById("hold").innerText="Hold: "+holdCount;
 }
 
-function editClient(index) {
-  const c = clients[index];
-  ['name', 'phone', 'governorate', 'date', 'status', 'notes', 'agent', 'reminderDays', 'followUp'].forEach(id => {
-    document.getElementById(id).value = c[id] || '';
-  });
-  editingIndex = index;
+// --- Client Actions ---
+function editClient(i){
+  editIndex=i;
+  const c=clients[i];
+  document.getElementById('name').value=c.name;
+  document.getElementById('phone').value=c.phone;
+  document.getElementById('governorate').value=c.governorate;
+  document.getElementById('date').value=c.date;
+  document.getElementById('status').value=c.status;
+  document.getElementById('notes').value=c.notes;
+  document.getElementById('agent').value=c.agent;
+  document.getElementById('reminderDays').value=c.reminderDays;
+  document.getElementById('followUp').value=c.followUp;
 }
 
-function deleteClient(index) {
-  if(confirm('Are you sure to delete this client?')) {
-    clients.splice(index,1);
-    db.ref('clients').set(clients);
+function deleteClient(i){
+  if(confirm("Delete this client?")){
+    clients.splice(i,1);
+    saveClientsToFirebase();
     renderCRM();
+    populateClientDropdown();
   }
 }
 
-function sendWhatsApp(phone) {
-  if(!phone) return alert('Phone number missing!');
-  window.open(`https://wa.me/${phone}`, '_blank');
+function openWhatsApp(phone){
+  window.open("https://wa.me/"+phone,"_blank");
 }
 
-function trackClient(index) {
-  alert(`Tracking client: ${clients[index].name || ''}`);
-  // هنا يمكن تضيف تعقب الموقع الجغرافي
+// --- New: Track Client ---
+function trackClient(phone){
+  // مثال: فتح Google Maps مع رقم العميل (يمكن تعديل حسب بيانات التتبع الفعلية)
+  window.open("https://www.google.com/maps/search/?api=1&query="+phone,"_blank");
 }
 
-// --- ملء قائمة المحافظات (كمثال) ---
-const governorates = ["Cairo","Giza","Alexandria","Aswan","Luxor"];
-function fillGovernorates() {
-  const sel = document.getElementById('governorate');
-  sel.innerHTML = '<option value="">Select Governorate</option>';
-  governorates.forEach(gov => {
-    const opt = document.createElement('option');
-    opt.value = gov;
-    opt.textContent = gov;
-    sel.appendChild(opt);
+// --- Populate Clients in Task dropdown ---
+function populateClientDropdown(){
+  const sel=document.getElementById('taskClient');
+  sel.innerHTML='<option value="">Select Client</option>';
+  clients.forEach(c=>{
+    sel.innerHTML+=<option value="${c.name}">${c.name}</option>;
   });
 }
-fillGovernorates();
 
-// === دالة تصدير PDF مع دعم العربية باستخدام pdfmake ===
-function exportPDFWithPdfmake() {
-  const body = [
-    ['الاسم', 'الهاتف', 'المحافظة', 'التاريخ', 'الحالة', 'ملاحظات', 'التذكير', 'المتابعة']
-  ];
+// --- Tasks ---
+let tasks=[];let taskEditIndex=-1;
+function loadTasksFromFirebase(){
+  db.ref('tasks').on('value',snapshot=>{
+    tasks=snapshot.val()?Object.values(snapshot.val()):[];
+    renderTasks();
+  });
+}
+function saveTasksToFirebase(){
+  const updates={};
+  tasks.forEach((t,i)=>{updates[i]={...t};});
+  db.ref('tasks').set(updates);
+}
+function addTask(){
+  const client=document.getElementById('taskClient').value;
+  const governorate=document.getElementById('taskGovernorate').value;
+  const taskText=document.getElementById('taskInput').value;
+  const date=document.getElementById('taskDate').value;
+  const stage=document.getElementById('taskStage').value;
+  if(!client || !taskText) return; 
+  if(taskEditIndex>-1){
+    tasks[taskEditIndex]={client,governorate,taskText,date,stage};
+    taskEditIndex=-1;
+  }
+  else{
+    tasks.push({client,governorate,taskText,date,stage});
+  }
+  saveTasksToFirebase();
+  renderTasks();
+  document.getElementById('taskInput').value='';
+  document.getElementById('taskDate').value='';
+  document.getElementById('taskGovernorate').value='';
+}
+function renderTasks(){
+  const list=document.getElementById('taskList');
+  list.innerHTML='';
+  tasks.forEach((t,i)=>{
+    list.innerHTML+=`<tr>
+      <td>${t.client}</td>
+      <td>${t.governorate||'-'}</td>
+      <td>${t.date}</td>
+      <td class="task-stage stage-${t.stage}">${t.stage}</td>
+      <td>${t.taskText}</td>
+      <td><button onclick="editTask(${i})">✏️</button></td>
+      <td><button onclick="deleteTask(${i})">❌</button></td>
+    </tr>`;
+  });
+}
+function editTask(i){
+  const t=tasks[i];
+  taskEditIndex=i;
+  document.getElementById('taskInput').value=t.taskText;
+  document.getElementById('taskClient').value=t.client;
+  document.getElementById('taskGovernorate').value=t.governorate;
+  document.getElementById('taskDate').value=t.date;
+  document.getElementById('taskStage').value=t.stage;
+}
+function deleteTask(i){
+  if(confirm("Delete this task?")){
+    tasks.splice(i,1);
+    saveTasksToFirebase();
+    renderTasks();
+  }
+}
 
-  clients.forEach(c => {
-    body.push([
-      c.name || '-',
-      c.phone || '-',
-      c.governorate || '-',
-      c.date || '-',
-      c.status || '-',
-      c.notes || '-',
-      c.reminderDays || '-',
-      c.followUp || '-'
+// --- Export PDF with Arabic Support ---
+function exportPDFWithArabicSupport(){
+  import("https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js").then(jsPDFModule=>{
+    const { jsPDF } = jsPDFModule;
+    const doc = new jsPDF('l', 'pt', 'a4');
+    
+    // إضافة الخط العربي من Google Fonts (مثال: Amiri)
+    const fontUrl = "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/amiri-regular.ttf";
+
+    // لتحميل الخط (أسهل طريقة) يمكنك استخدام خطوط مبنية في jsPDF أو إدخال النص يدويًا بترتيب صحيح
+    // هنا سنستخدم النص العربي بشكل مباشر لكن مع دعم الخط العادي
+
+    const header = [["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"]];
+    const body = clients.map(c=>[
+      c.name, c.phone, c.governorate||"-", c.date, c.status, c.notes, c.reminderDays||"-", c.followUp||"-"
     ]);
+
+    // لضمان عرض العربية بشكل صحيح، نستطيع تعكس النصوص العربية يدويًا باستخدام دالة صغيرة:
+    function reverseArabic(text){
+      if(!text) return "";
+      return text.split("").reverse().join("");
+    }
+
+    // نقوم بعكس الحقول العربية فقط (الاسم، المحافظة، الملاحظات، المتابعة)، الباقي إنجليزي أو أرقام
+    const bodyFixed = body.map(row=>[
+      reverseArabic(row[0]),
+      row[1],
+      reverseArabic(row[2]),
+      row[3],
+      row[4],
+      reverseArabic(row[5]),
+      row[6],
+      reverseArabic(row[7])
+    ]);
+
+    doc.autoTable({
+      head: [header[0].map(h=>reverseArabic(h))], // عكس عناوين الأعمدة العربية
+      body: bodyFixed,
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [30, 30, 47], textColor: 255, fontStyle: 'bold' },
+      theme: 'striped',
+      startY: 30
+    });
+    doc.save("crm_clients_report.pdf");
   });
-
-  const docDefinition = {
-    content: [
-      { text: 'تقرير عملاء CRM', style: 'header', alignment: 'center' },
-      {
-        table: {
-          headerRows: 1,
-          widths: Array(8).fill('*'),
-          body: body
-        },
-        layout: 'lightHorizontalLines'
-      }
-    ],
-    defaultStyle: { font: 'Helvetica', alignment: 'right' },
-    styles: {
-      header: { fontSize: 18, bold: true }
-    },
-    pageOrientation: 'landscape'
-  };
-
-  pdfMake.createPdf(docDefinition).download('CRM_Report.pdf');
 }
 
-// --- تحميل البيانات عند البداية ---
-loadClients();
+// --- Change Language ---
+function changeLang(lang){
+  if(lang==="ar"){
+    document.body.dir = "rtl";
+    document.body.lang = "ar";
+    document.body.style.fontFamily = "'Arial', 'Tahoma', 'Segoe UI', sans-serif";
+  }
+  else{
+    document.body.dir = "ltr";
+    document.body.lang = "en";
+    document.body.style.fontFamily = "'Arial', sans-serif";
+  }
+}
+
+// --- Initialization ---
+loadClientsFromFirebase();
+loadTasksFromFirebase();
 
 </script>
 </body>
