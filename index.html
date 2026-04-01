@@ -5,67 +5,36 @@
 <title>CRM System & Tasks For Utopia Trading And Export</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background:#f5f6fa;
-  margin:0;
-  padding:0;
-  display:flex;
-  flex-direction:row;
-  min-height:100vh;
-  color:#333;
-  overflow-x:hidden;
-}
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f6fa; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; color:#333; overflow-x:hidden; }
 h2 { margin-top:0; text-align:center; }
-
-/* Sidebar */
-.sidebar {
-  width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column;
-  padding:20px; box-sizing:border-box; transition: all 0.3s ease;
-}
+.sidebar { width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; transition: all 0.3s ease; }
 .sidebar h2 { font-size:1.5em; margin-bottom:20px; color:#ffcc00; }
 .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; transition: all 0.2s ease; }
 .sidebar button:hover { background:#3f3f6b; }
 .sidebar button.active { background:#ffcc00; color:#1e1e2f; }
-.sidebar select { padding:10px; border-radius:8px; border:none; margin-top:10px; }
-
-/* Tabs */
+.sidebar select, .sidebar label { margin-top:10px; }
 .tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; min-width:0; }
 .tab-content { animation:fadeIn 0.3s ease; display:none; }
 .tab-content.active { display:block; }
-
-/* Inputs & Buttons */
 input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none; }
 textarea { resize:none; height:80px; }
 button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:bold; transition:0.2s; }
-
-/* Cards */
 .card { background:#fff; padding:15px; text-align:center; border-radius:12px; margin:5px; flex:1; box-shadow:0 4px 6px rgba(0,0,0,0.1); font-weight:bold; }
 .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-
-/* Table */
 table { width:100%; border-collapse:collapse; margin-top:15px; table-layout: fixed; background:#fff; border-radius:12px; overflow-x:auto; display:block; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
 th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
-
-/* Notifications */
-#notification { position: fixed; top:20px; right:20px; background:#ffcc00; color:#1e1e2f; padding:15px 20px; border-radius:12px; display:none; z-index:999; min-width:220px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.2); cursor:pointer; }
-
-/* Task Stages */
+#notification { position: fixed; top:20px; right:20px; z-index:999; display:flex; flex-direction:column; gap:10px; max-width:300px; }
+.notification-card { background:#ffcc00; color:#1e1e2f; padding:12px 20px; border-radius:12px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.2); cursor:pointer; transform: translateY(-50px); opacity:0; transition: transform 0.5s ease, opacity 0.5s ease; }
+.notification-card.show { transform: translateY(0); opacity:1; }
 .task-stage { padding:5px 10px; color:#fff; border-radius:12px; font-weight:bold; font-size:0.9em; }
 .stage-quote { background:#ff7f50; }
 .stage-follow { background:#1e90ff; }
 .stage-order { background:#28a745; }
 .stage-bank { background:#6f42c1; }
-
-/* Logo */
 .logo-container { text-align:center; margin-bottom:20px; }
 .logo-container img { max-width: 100%; height: auto; display: inline-block; border-radius: 12px; }
-
-/* Tasks List */
 #taskList li { background:#f9f9f9; padding:12px; margin-bottom:8px; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,0.05); list-style:none; }
-
-/* Responsive */
 @media (max-width: 768px) {
   body { flex-direction: column; }
   .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; }
@@ -80,8 +49,6 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
   .card { flex: 1 1 100%; margin-bottom: 10px; }
   .logo-container img { max-height: 80px; }
 }
-
-/* Animations */
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -99,10 +66,17 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
     <option value="en">English</option>
     <option value="ar">عربي</option>
   </select>
+  <label for="notifDuration" data-lang-key="notif_duration">Notification Duration:</label>
+  <select id="notifDuration" onchange="updateNotifDuration()">
+    <option value="3000" data-lang-option-en="3 seconds" data-lang-option-ar="3 ثواني">3 seconds</option>
+    <option value="5000" data-lang-option-en="5 seconds" data-lang-option-ar="5 ثواني" selected>5 seconds</option>
+    <option value="8000" data-lang-option-en="8 seconds" data-lang-option-ar="8 ثواني">8 seconds</option>
+  </select>
 </div>
 
 <div class="tabs-content">
   <div id="notification"></div>
+  <audio id="notifSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
   <!-- CRM Tab -->
   <div id="crmTab" class="tab-content active">
@@ -149,9 +123,7 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
     <h2 data-lang-key="tasks_title">Tasks</h2>
     <div class="row">
       <input id="taskInput" placeholder="Task Text" data-lang-placeholder-en="Task Text" data-lang-placeholder-ar="نص المهمة">
-      <select id="taskClient">
-        <option value="">Select Client</option>
-      </select>
+      <select id="taskClient"><option value="">Select Client</option></select>
       <input type="date" id="taskDate">
       <select id="taskStage">
         <option value="quote" data-lang-option-en="Quote" data-lang-option-ar="تقديم عرض سعر">Quote</option>
@@ -173,7 +145,6 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 </div>
 
 <script>
-// ------------------- Firebase -------------------
 const firebaseConfig = {
   apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY",
   authDomain: "crm-tasking.firebaseapp.com",
@@ -187,7 +158,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ------------------- Tabs -------------------
+let lang='en', clients=[], tasks=[], editIndex=-1, taskEditIndex=-1, notifDuration=5000;
+let notifQueue=[];
+
+const translations = {
+  title: {en:"CRM System & Tasks For Utopia Trading And Export", ar:"نظام إدارة العملاء والمهام لشركة يوتوبيا"},
+  crm: {en:"CRM", ar:"نظام العملاء"}, tasks:{en:"Tasks", ar:"المهام"},
+  developer:{en:"Developed by Eng : Mahmoud Mohamed Marie", ar:"تم التطوير بواسطة مهندس : محمود محمد ماري"},
+  crm_title:{en:"CRM System", ar:"نظام العملاء"},
+  tasks_title:{en:"Tasks", ar:"المهام"}, save:{en:"💾 Save", ar:"💾 حفظ"},
+  add_task:{en:"➕ Add Task", ar:"➕ إضافة مهمة"}, name:{en:"Name", ar:"الاسم"}, phone:{en:"Phone", ar:"الهاتف"},
+  date:{en:"Date", ar:"التاريخ"}, status:{en:"Status", ar:"الحالة"}, notes:{en:"Notes", ar:"الملاحظات"},
+  reminder:{en:"Reminder", ar:"التذكير"}, followup:{en:"Follow Up", ar:"المتابعة"}, whatsapp:{en:"WhatsApp", ar:"واتساب"},
+  edit:{en:"Edit", ar:"تعديل"}, delete:{en:"Delete", ar:"حذف"}, client:{en:"Client", ar:"العميل"}, stage:{en:"Stage", ar:"المرحلة"},
+  task:{en:"Task", ar:"المهمة"}, notif_duration:{en:"Notification Duration:", ar:"مدة ظهور الإشعارات:"}
+};
+
+// -------- Tabs --------
 function showTab(id, btn){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -195,76 +182,130 @@ function showTab(id, btn){
   btn.classList.add('active');
 }
 
-// ------------------- CRM & Tasks -------------------
-let clients=[], tasks=[], editIndex=-1, taskEditIndex=-1;
+// -------- Language Change --------
+function changeLang(selectedLang){
+  lang=selectedLang;
+  document.querySelectorAll('[data-lang-key]').forEach(el=>{
+    const key=el.getAttribute('data-lang-key');
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') return;
+    if(translations[key]) el.innerText=translations[key][lang];
+  });
+  document.querySelectorAll('[data-lang-placeholder-en]').forEach(el=>{
+    el.placeholder = lang==='ar'? el.getAttribute('data-lang-placeholder-ar') : el.getAttribute('data-lang-placeholder-en');
+  });
+  document.querySelectorAll('#notifDuration option').forEach(opt=>{
+    opt.text = lang==='ar'? opt.getAttribute('data-lang-option-ar') : opt.getAttribute('data-lang-option-en');
+  });
+  document.querySelectorAll('select option[data-lang-option-en]').forEach(opt=>{
+    opt.text = lang==='ar'? opt.getAttribute('data-lang-option-ar') : opt.getAttribute('data-lang-option-en');
+  });
+}
 
-// ---------- Clients ----------
+// -------- Notification --------
+function updateNotifDuration(){
+  notifDuration = parseInt(document.getElementById('notifDuration').value);
+}
+function showNotifications(messages){
+  const notifContainer=document.getElementById('notification');
+  const sound=document.getElementById('notifSound');
+
+  messages.forEach((msg,index)=>{
+    const card=document.createElement('div');
+    card.className='notification-card'; card.innerText='🔔 '+msg;
+    card.onclick=()=>removeNotification(card);
+    notifContainer.appendChild(card); notifQueue.push(card);
+    setTimeout(()=>{ card.classList.add('show'); sound.currentTime=0; sound.play().catch(()=>{}); }, index*200);
+    setTimeout(()=>{ removeNotification(card); }, notifDuration+index*200);
+  });
+}
+function removeNotification(card){
+  const notifContainer=document.getElementById('notification');
+  card.classList.remove('show');
+  setTimeout(()=>{ if(card.parentNode) notifContainer.removeChild(card); notifQueue=notifQueue.filter(c=>c!==card); },500);
+}
+
+// -------- CRM --------
 function loadClientsFromFirebase(){
   db.ref('clients').on('value', snapshot=>{
     const data=snapshot.val(); clients=data?Object.values(data):[];
-    renderCRM(); populateClientDropdown(); checkReminders();
+    renderCRM(); populateClientDropdown(); checkHoldReminders();
   });
 }
 function saveClientsToFirebase(){
   const updates={}; clients.forEach((c,i)=>updates[i]={...c}); db.ref('clients').set(updates);
 }
 function addOrUpdate(){
-  const name=document.getElementById('name').value,
-        phone=document.getElementById('phone').value,
-        date=document.getElementById('date').value,
-        status=document.getElementById('status').value,
-        notes=document.getElementById('notes').value,
-        agent=document.getElementById('agent').value,
-        reminderDays=document.getElementById('reminderDays').value,
-        followUp=document.getElementById('followUp').value;
+  const name=document.getElementById('name').value, phone=document.getElementById('phone').value,
+        date=document.getElementById('date').value, status=document.getElementById('status').value,
+        notes=document.getElementById('notes').value, agent=document.getElementById('agent').value,
+        reminderDays=document.getElementById('reminderDays').value, followUp=document.getElementById('followUp').value;
   if(editIndex>-1){ clients[editIndex]={name,phone,date,status,notes,agent,reminderDays,followUp}; editIndex=-1; }
   else clients.push({name,phone,date,status,notes,agent,reminderDays,followUp});
-  saveClientsToFirebase(); renderCRM(); populateClientDropdown();
+  saveClientsToFirebase(); clearCRMFields(); renderCRM();
+}
+function clearCRMFields(){
   ['name','phone','date','status','notes','agent','reminderDays','followUp'].forEach(id=>document.getElementById(id).value='');
 }
-function populateClientDropdown(){
-  const sel=document.getElementById('taskClient'); sel.innerHTML='<option value="">Select Client</option>';
-  clients.forEach(c=>{ sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`; });
-}
 function renderCRM(){
-  const table=document.getElementById('table'); const filter=document.getElementById('universalSearch').value.toLowerCase();
-  table.innerHTML=''; let holdCount=0, holdNames=[];
+  const search=document.getElementById('universalSearch').value.toLowerCase();
+  const tbody=document.getElementById('table'); tbody.innerHTML='';
   clients.forEach((c,i)=>{
-    let combinedText=`${c.name} ${c.phone} ${c.date} ${c.status} ${c.notes} ${c.followUp}`.toLowerCase();
-    if(filter && !combinedText.includes(filter)) return;
-    if(c.status==="Hold"){ holdCount++; holdNames.push(c.name); }
-    const rowColor=c.status==="Hold"?"style='background:#fff3cd'":'';
-    table.innerHTML+=`<tr id="clientRow-${i}" ${rowColor}>
+    if(!Object.values(c).some(v=>v && v.toString().toLowerCase().includes(search))) return;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
       <td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td>
-      <td>${c.notes}</td><td>${c.reminderDays||'-'}</td><td>${c.followUp||'-'}</td>
-      <td><button onclick="openWhatsApp('${c.phone}')">📱</button></td>
+      <td>${c.notes}</td><td>${c.reminderDays}</td><td>${c.followUp}</td>
+      <td><a href="https://wa.me/${c.phone}" target="_blank">💬</a></td>
       <td><button onclick="editClient(${i})">✏️</button></td>
-      <td><button onclick="deleteClient(${i})">❌</button></td>
-    </tr>`;
+      <td><button onclick="deleteClient(${i})">🗑️</button></td>
+    `;
+    tbody.appendChild(tr);
   });
-  document.getElementById("total").innerText=(lang==='ar'?'الإجمالي: ':'Total: ')+clients.length;
-  document.getElementById("hold").innerText=(lang==='ar'?'قيد الانتظار: ':'Hold: ')+holdCount;
-  if(holdCount>0) showNotification(`⚠️ ${lang==='ar'?'العملاء قيد الانتظار: ':'Clients on Hold: '}${holdNames.join(', ')}`);
+  document.getElementById('total').innerText=`${lang==='ar'?'الإجمالي':'Total'}: ${clients.length}`;
+  document.getElementById('hold').innerText=`Hold: ${clients.filter(c=>c.status==='Hold').length}`;
 }
-function editClient(i){ const c=clients[i]; editIndex=i;
+function editClient(i){
+  editIndex=i; const c=clients[i];
   ['name','phone','date','status','notes','agent','reminderDays','followUp'].forEach(id=>document.getElementById(id).value=c[id]);
 }
-function deleteClient(i){ clients.splice(i,1); saveClientsToFirebase(); renderCRM(); populateClientDropdown(); }
-function openWhatsApp(phone){ window.open(`https://wa.me/${phone}`,'_blank'); }
+function deleteClient(i){ clients.splice(i,1); saveClientsToFirebase(); renderCRM(); }
+function populateClientDropdown(){
+  const sel=document.getElementById('taskClient'); sel.innerHTML='<option value="">Select Client</option>';
+  clients.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.name; opt.text=c.name; sel.appendChild(opt); });
+}
+function checkHoldReminders(){
+  const messages=clients.filter(c=>c.status==='Hold').map(c=>`${c.name} is on Hold!`);
+  if(messages.length>0) showNotifications(messages);
+}
 
-// ---------- Tasks ----------
+// -------- Tasks --------
 function loadTasksFromFirebase(){
   db.ref('tasks').on('value', snapshot=>{ const data=snapshot.val(); tasks=data?Object.values(data):[]; renderTasks(); });
 }
 function saveTasksToFirebase(){ const updates={}; tasks.forEach((t,i)=>updates[i]={...t}); db.ref('tasks').set(updates); }
 function addTask(){
-  const t={ text:document.getElementById('taskInput').value, client:document.getElementById('taskClient').value, date:document.getElementById('taskDate').value, stage:document.getElementById('taskStage').value };
-  if(taskEditIndex>-1){ tasks[taskEditIndex]=t; taskEditIndex=-1; } else tasks.push(t);
-  saveTasksToFirebase(); renderTasks();
-  ['taskInput','taskClient','taskDate'].forEach(id=>document.getElementById(id).value=''); document.getElementById('taskStage').value='quote';
+  const text=document.getElementById('taskInput').value, client=document.getElementById('taskClient').value,
+        date=document.getElementById('taskDate').value, stage=document.getElementById('taskStage').value;
+  if(!text||!client) return;
+  if(taskEditIndex>-1){ tasks[taskEditIndex]={text,client,date,stage}; taskEditIndex=-1; }
+  else tasks.push({text,client,date,stage});
+  saveTasksToFirebase(); renderTasks(); document.getElementById('taskInput').value='';
 }
 function renderTasks(){
-  const table=document.getElementById('taskList'); table.innerHTML='';
-  const stageNames={ en:{quote:"Quote",follow:"Follow Up",order:"Order",bank:"Bank"}, ar:{quote:"تقديم عرض سعر",follow:"متابعة عرض السعر",order:"أمر توريد",bank:"البنك"} };
-  const stageColors={ quote:"#ff7f50", follow:"#1e90ff", order:"#28a745", bank:"#6f42c1" };
+  const tbody=document.getElementById('taskList'); tbody.innerHTML='';
   tasks.forEach((t,i)=>{
+    const tr=document.createElement('tr'); 
+    const stageClass=t.stage==='quote'?'stage-quote':t.stage==='follow'?'stage-follow':t.stage==='order'?'stage-order':'stage-bank';
+    tr.innerHTML=`<td>${t.client}</td><td>${t.date}</td><td><span class="task-stage ${stageClass}">${t.stage}</span></td><td>${t.text}</td>
+    <td><button onclick="editTask(${i})">✏️</button></td><td><button onclick="deleteTask(${i})">🗑️</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function editTask(i){ taskEditIndex=i; const t=tasks[i]; document.getElementById('taskInput').value=t.text; document.getElementById('taskClient').value=t.client; document.getElementById('taskDate').value=t.date; document.getElementById('taskStage').value=t.stage; }
+function deleteTask(i){ tasks.splice(i,1); saveTasksToFirebase(); renderTasks(); }
+
+// -------- Init --------
+loadClientsFromFirebase(); loadTasksFromFirebase(); changeLang('en');
+</script>
+</body>
+</html>
