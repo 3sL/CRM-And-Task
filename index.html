@@ -21,8 +21,8 @@ textarea { resize:none; height:80px; }
 button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:bold; transition:0.2s; }
 .card { background:#fff; padding:15px; text-align:center; border-radius:12px; margin:5px; flex:1; box-shadow:0 4px 6px rgba(0,0,0,0.1); font-weight:bold; }
 .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-table { width:100%; border-collapse:collapse; margin-top:15px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; }
+table { width:100%; border-collapse:collapse; margin-top:15px; background:#fff; border-radius:12px; overflow-x:auto; display:block; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; min-width: 120px; }
 th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 #notification { position: fixed; top:20px; right:20px; background:#ffcc00; color:#1e1e2f; padding:15px 20px; border-radius:12px; display:none; z-index:999; min-width:220px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.2); cursor:pointer; }
 .task-stage { padding:5px 10px; color:#fff; border-radius:12px; font-weight:bold; font-size:0.9em; }
@@ -30,7 +30,9 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 .stage-follow { background:#1e90ff; }
 .stage-order { background:#28a745; }
 .stage-bank { background:#6f42c1; }
-@media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; } .sidebar h2 { display:none; } .tabs-content { padding: 10px; } table { display: block; overflow-x: auto; } }
+.logo-container { text-align:center; margin-bottom:20px; }
+.logo-container img { max-width: 150px; height: auto; border-radius: 12px; }
+@media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; } .sidebar h2 { display:none; } .tabs-content { padding: 10px; } .row { flex-direction: column; } }
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -38,14 +40,13 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 </head>
 <body>
 
-<div id="notification"></div>
-
 <div class="sidebar">
   <h2 data-lang-key="title">Utopia CRM</h2>
   <button class="tab-btn active" onclick="showTab('crmTab', this)" data-lang-key="crm">CRM</button>
   <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks</button>
   <hr>
-  <div style="font-size:0.8em; text-align:center; opacity:0.8">Developed by Eng: Mahmoud Marie</div>
+  <div class="developer" data-lang-key="developer">Developed by Eng : <strong>Mahmoud Mohamed Marie</strong></div>
+  <div class="phone">📞 +201222153415</div>
   <select id="language" onchange="changeLang(this.value)">
     <option value="en">English</option>
     <option value="ar">عربي</option>
@@ -53,27 +54,30 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 </div>
 
 <div class="tabs-content">
+  <div id="notification"></div>
+
   <div id="crmTab" class="tab-content active">
+    <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
     <h2 data-lang-key="crm_title">CRM System</h2>
     <div class="row">
-      <input id="universalSearch" placeholder="Search..." oninput="renderCRM()">
+      <input id="universalSearch" placeholder="Search Any Column..." oninput="renderCRM()">
     </div>
     <div class="row">
-      <input id="name" placeholder="Client Name">
-      <input id="phone" placeholder="Phone">
+      <input id="name" placeholder="Client Name" data-lang-placeholder-en="Client Name" data-lang-placeholder-ar="اسم العميل">
+      <input id="phone" placeholder="Phone" data-lang-placeholder-en="Phone" data-lang-placeholder-ar="رقم الهاتف">
       <input type="date" id="date">
       <select id="status">
-        <option value="Interested">Interested</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Hold">Hold</option>
-        <option value="Completed">Completed</option>
+        <option value="Interested" data-lang-option-en="Interested" data-lang-option-ar="مهتم">Interested</option>
+        <option value="In Progress" data-lang-option-en="In Progress" data-lang-option-ar="قيد المتابعة">In Progress</option>
+        <option value="Hold" data-lang-option-en="Hold" data-lang-option-ar="Hold">Hold</option>
+        <option value="Completed" data-lang-option-en="Completed" data-lang-option-ar="مكتمل">Completed</option>
       </select>
-      <textarea id="notes" placeholder="Notes"></textarea>
-      <input id="agent" placeholder="Agent Name">
-      <input type="number" id="reminderDays" placeholder="Reminder Days">
-      <input type="text" id="followUp" placeholder="Follow Up">
+      <textarea id="notes" placeholder="Notes" data-lang-placeholder-en="Notes" data-lang-placeholder-ar="ملاحظات"></textarea>
+      <input id="agent" placeholder="Agent Name" data-lang-placeholder-en="Agent Name" data-lang-placeholder-ar="اسم المندوب">
+      <input type="number" id="reminderDays" placeholder="Reminder Days" data-lang-placeholder-en="Reminder Days" data-lang-placeholder-ar="Reminder بالأيام">
+      <input type="text" id="followUp" placeholder="Follow Up" data-lang-placeholder-en="Follow Up" data-lang-placeholder-ar="متابعة">
     </div>
-    <button onclick="addOrUpdate()" id="saveBtn">💾 Save</button>
+    <button onclick="addOrUpdate()" data-lang-key="save" id="mainSaveBtn">💾 Save</button>
     <div class="row">
       <div class="card" id="total">Total: 0</div>
       <div class="card" id="hold">Hold: 0</div>
@@ -81,31 +85,34 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
     <table>
       <thead>
         <tr>
-          <th data-lang-key="name">Name</th><th data-lang-key="phone">Phone</th><th>Status</th><th>Notes</th><th>WhatsApp</th><th>Edit</th><th>Delete</th>
+          <th data-lang-key="name">Name</th><th data-lang-key="phone">Phone</th><th data-lang-key="date">Date</th><th data-lang-key="status">Status</th>
+          <th data-lang-key="notes">Notes</th><th data-lang-key="reminder">Reminder</th><th data-lang-key="followup">Follow Up</th>
+          <th data-lang-key="whatsapp">WhatsApp</th><th data-lang-key="edit">Edit</th><th data-lang-key="delete">Delete</th>
         </tr>
       </thead>
-      <tbody id="crmTable"></tbody>
+      <tbody id="table"></tbody>
     </table>
   </div>
 
   <div id="tasksTab" class="tab-content">
+    <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
     <h2 data-lang-key="tasks_title">Tasks</h2>
     <div class="row">
-      <input id="taskInput" placeholder="Task Text">
+      <input id="taskInput" placeholder="Task Text" data-lang-placeholder-en="Task Text" data-lang-placeholder-ar="نص المهمة">
       <select id="taskClient"><option value="">Select Client</option></select>
       <input type="date" id="taskDate">
       <select id="taskStage">
-        <option value="quote">Quote</option>
-        <option value="follow">Follow Up</option>
-        <option value="order">Order</option>
-        <option value="bank">Bank</option>
+        <option value="quote" data-lang-option-en="Quote" data-lang-option-ar="تقديم عرض سعر">Quote</option>
+        <option value="follow" data-lang-option-en="Follow Up" data-lang-option-ar="متابعة عرض السعر">Follow Up</option>
+        <option value="order" data-lang-option-en="Order" data-lang-option-ar="أمر توريد">Order</option>
+        <option value="bank" data-lang-option-en="Bank" data-lang-option-ar="البنك">Bank</option>
       </select>
-      <button onclick="addTask()">➕ Add Task</button>
+      <button onclick="addTask()" data-lang-key="add_task">➕ Add Task</button>
     </div>
     <table>
       <thead>
         <tr>
-          <th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Edit</th><th>Delete</th>
+          <th data-lang-key="client">Client</th><th data-lang-key="date">Date</th><th data-lang-key="stage">Stage</th><th data-lang-key="task">Task</th><th data-lang-key="edit">Edit</th><th data-lang-key="delete">Delete</th>
         </tr>
       </thead>
       <tbody id="taskList"></tbody>
@@ -114,154 +121,158 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 </div>
 
 <script>
-// Firebase Initialization
-const firebaseConfig = { 
-    apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", 
-    authDomain: "crm-tasking.firebaseapp.com", 
-    databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", 
-    projectId: "crm-tasking", 
-    storageBucket: "crm-tasking.appspot.com", 
-    messagingSenderId: "368062369619", 
-    appId: "1:368062369619:web:cd38383ab75ab473961ba6" 
-};
+// Firebase Config
+const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let editId = null;
-let taskEditId = null;
-let clientsData = {};
-let tasksData = {};
-let lang = 'en';
-
-// Real-time Sync
-window.onload = () => {
-    db.ref('clients').on('value', snapshot => {
-        clientsData = snapshot.val() || {};
-        renderCRM();
-        updateClientDropdown();
-    });
-    db.ref('tasks').on('value', snapshot => {
-        tasksData = snapshot.val() || {};
-        renderTasks();
-    });
+const langData = {
+  en: { title:"Utopia CRM", crm:"CRM", tasks:"Tasks", developer:"Developed by Eng : Mahmoud Mohamed Marie", crm_title:"CRM System", tasks_title:"Tasks", save:"💾 Save", add_task:"➕ Add Task", name:"Name", phone:"Phone", date:"Date", status:"Status", notes:"Notes", reminder:"Reminder", followup:"Follow Up", whatsapp:"WhatsApp", edit:"Edit", delete:"Delete", client:"Client", stage:"Stage", task:"Task" },
+  ar: { title:"يوتوبيا CRM", crm:"نظام العملاء", tasks:"المهام", developer:"تطوير المهندس: محمود محمد ماري", crm_title:"نظام العملاء", tasks_title:"المهام", save:"💾 حفظ", add_task:"➕ إضافة مهمة", name:"الاسم", phone:"الهاتف", date:"التاريخ", status:"الحالة", notes:"ملاحظات", reminder:"تذكير", followup:"متابعة", whatsapp:"واتساب", edit:"تعديل", delete:"حذف", client:"العميل", stage:"المرحلة", task:"المهمة" }
 };
 
-function showTab(id, btn){
-    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
+let lang='en', clientsObj={}, tasksObj={}, editId=null;
+
+function showTab(id, btn){ 
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); 
+  document.getElementById(id).classList.add('active'); 
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
+  btn.classList.add('active'); 
 }
 
-// CRM Logic
+function showNotification(msg){ 
+  const n=document.getElementById('notification'); n.innerText=msg; n.style.display='block'; 
+  setTimeout(()=>{ n.style.display='none'; },4000); 
+}
+
+// CRM Logic (المعدلة للربط الصح)
+db.ref('clients').on('value', snapshot => {
+  clientsObj = snapshot.val() || {};
+  renderCRM();
+  populateClientDropdown();
+});
+
 function addOrUpdate(){
-    const data = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
-        date: document.getElementById('date').value,
-        status: document.getElementById('status').value,
-        notes: document.getElementById('notes').value,
-        agent: document.getElementById('agent').value,
-        reminderDays: document.getElementById('reminderDays').value,
-        followUp: document.getElementById('followUp').value
-    };
+  const name = document.getElementById('name').value;
+  if(!name) return alert("Name is required");
 
-    if(!data.name) return alert("Please enter name");
+  const c = {
+    name,
+    phone: document.getElementById('phone').value,
+    date: document.getElementById('date').value,
+    status: document.getElementById('status').value,
+    notes: document.getElementById('notes').value,
+    agent: document.getElementById('agent').value,
+    reminderDays: document.getElementById('reminderDays').value,
+    followUp: document.getElementById('followUp').value
+  };
 
-    if(editId){
-        db.ref('clients/' + editId).update(data);
-        editId = null;
-        document.getElementById('saveBtn').innerText = "💾 Save";
-    } else {
-        db.ref('clients').push(data);
-    }
-    clearInputs(['name','phone','date','notes','agent','reminderDays','followUp']);
+  if(editId){
+    db.ref('clients/' + editId).set(c);
+    editId = null;
+    document.getElementById('mainSaveBtn').innerText = lang==='ar' ? "💾 حفظ" : "💾 Save";
+  } else {
+    db.ref('clients').push(c);
+  }
+  
+  document.querySelectorAll('#name,#phone,#date,#status,#notes,#agent,#reminderDays,#followUp').forEach(e=>e.value='');
 }
 
 function renderCRM(){
-    const tbody = document.getElementById('crmTable');
-    const search = document.getElementById('universalSearch').value.toLowerCase();
-    tbody.innerHTML = '';
-    let total = 0, hold = 0;
+  const table=document.getElementById('table'); 
+  const filter=document.getElementById('universalSearch').value.toLowerCase(); 
+  table.innerHTML=''; 
+  let totalCount=0, holdCount=0;
 
-    for(let id in clientsData){
-        const c = clientsData[id];
-        if(search && !c.name.toLowerCase().includes(search)) continue;
-        
-        total++;
-        if(c.status === "Hold") hold++;
+  for(let id in clientsObj){
+    const c = clientsObj[id];
+    let combinedText = `${c.name} ${c.phone} ${c.status}`.toLowerCase();
+    if(filter && !combinedText.includes(filter)) continue;
 
-        const row = `<tr>
-            <td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td>${c.notes}</td>
-            <td><button onclick="window.open('https://wa.me/${c.phone}')">💬</button></td>
-            <td><button onclick="editClient('${id}')">✏️</button></td>
-            <td><button onclick="deleteClient('${id}')" style="background:red">🗑️</button></td>
-        </tr>`;
-        tbody.innerHTML += row;
-    }
-    document.getElementById('total').innerText = "Total: " + total;
-    document.getElementById('hold').innerText = "Hold: " + hold;
+    totalCount++;
+    if(c.status === "Hold") holdCount++;
+
+    table.innerHTML += `<tr>
+      <td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td>
+      <td>${c.notes}</td><td>${c.reminderDays || '-'}</td><td>${c.followUp || '-'}</td>
+      <td><button onclick="window.open('https://wa.me/${c.phone}')">📱</button></td>
+      <td><button onclick="editClient('${id}')">✏️</button></td>
+      <td><button onclick="deleteClient('${id}')">❌</button></td>
+    </tr>`;
+  }
+  document.getElementById("total").innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + totalCount;
+  document.getElementById("hold").innerText = (lang==='ar'?'قيد الانتظار: ':'Hold: ') + holdCount;
 }
 
 function editClient(id){
-    const c = clientsData[id];
-    editId = id;
-    document.getElementById('name').value = c.name;
-    document.getElementById('phone').value = c.phone;
-    document.getElementById('status').value = c.status;
-    document.getElementById('notes').value = c.notes;
-    document.getElementById('saveBtn').innerText = "Update Client";
+  const c = clientsObj[id];
+  editId = id;
+  document.getElementById('name').value = c.name;
+  document.getElementById('phone').value = c.phone;
+  document.getElementById('date').value = c.date;
+  document.getElementById('status').value = c.status;
+  document.getElementById('notes').value = c.notes;
+  document.getElementById('agent').value = c.agent;
+  document.getElementById('reminderDays').value = c.reminderDays;
+  document.getElementById('followUp').value = c.followUp;
+  document.getElementById('mainSaveBtn').innerText = lang==='ar' ? "تحديث العميل" : "Update Client";
 }
 
-function deleteClient(id){
-    if(confirm("Delete this client?")) db.ref('clients/' + id).remove();
+function deleteClient(id){ if(confirm("Delete?")) db.ref('clients/'+id).remove(); }
+
+function populateClientDropdown(){
+  const sel=document.getElementById('taskClient'); sel.innerHTML='<option value="">Select Client</option>';
+  for(let id in clientsObj) {
+    sel.innerHTML += `<option value="${clientsObj[id].name}">${clientsObj[id].name}</option>`;
+  }
 }
 
 // Tasks Logic
+db.ref('tasks').on('value', snapshot => {
+  tasksObj = snapshot.val() || {};
+  renderTasks();
+});
+
 function addTask(){
-    const data = {
-        text: document.getElementById('taskInput').value,
-        client: document.getElementById('taskClient').value,
-        date: document.getElementById('taskDate').value,
-        stage: document.getElementById('taskStage').value
-    };
-    if(!data.text) return alert("Task text required");
-    db.ref('tasks').push(data);
-    document.getElementById('taskInput').value = '';
+  const t = {
+    text: document.getElementById('taskInput').value,
+    client: document.getElementById('taskClient').value,
+    date: document.getElementById('taskDate').value,
+    stage: document.getElementById('taskStage').value
+  };
+  if(!t.text) return;
+  db.ref('tasks').push(t);
+  document.getElementById('taskInput').value='';
 }
 
 function renderTasks(){
-    const tbody = document.getElementById('taskList');
-    tbody.innerHTML = '';
-    for(let id in tasksData){
-        const t = tasksData[id];
-        tbody.innerHTML += `<tr>
-            <td>${t.client}</td><td>${t.date}</td>
-            <td><span class="task-stage stage-${t.stage}">${t.stage}</span></td>
-            <td>${t.text}</td>
-            <td><button onclick="editTask('${id}')">✏️</button></td>
-            <td><button onclick="deleteTask('${id}')" style="background:red">🗑️</button></td>
-        </tr>`;
-    }
+  const table=document.getElementById('taskList'); table.innerHTML='';
+  const stageNames = { 
+    en:{quote:"Quote",follow:"Follow Up",order:"Order",bank:"Bank"}, 
+    ar:{quote:"تقديم عرض سعر",follow:"متابعة عرض السعر",order:"أمر توريد",bank:"البنك"} 
+  };
+  for(let id in tasksObj){
+    const t = tasksObj[id];
+    table.innerHTML += `<tr>
+      <td>${t.client}</td><td>${t.date}</td>
+      <td><span class="task-stage stage-${t.stage}">${stageNames[lang][t.stage]}</span></td>
+      <td>${t.text}</td>
+      <td><button onclick="editTask('${id}')">✏️</button></td>
+      <td><button onclick="deleteTask('${id}')">❌</button></td>
+    </tr>`;
+  }
 }
 
-function deleteTask(id){
-    if(confirm("Delete task?")) db.ref('tasks/' + id).remove();
-}
+function deleteTask(id){ db.ref('tasks/'+id).remove(); }
 
-function updateClientDropdown(){
-    const sel = document.getElementById('taskClient');
-    sel.innerHTML = '<option value="">Select Client</option>';
-    for(let id in clientsData){
-        const name = clientsData[id].name;
-        sel.innerHTML += `<option value="${name}">${name}</option>`;
-    }
-}
-
-function clearInputs(ids){ ids.forEach(id => document.getElementById(id).value = ''); }
-
-function changeLang(l){
-    document.body.dir = (l === 'ar' ? 'rtl' : 'ltr');
+function changeLang(selectedLang){
+  lang=selectedLang;
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-lang-key]').forEach(el=>{
+    const key=el.getAttribute('data-lang-key');
+    if(langData[lang][key]) el.innerText=langData[lang][key];
+  });
+  renderCRM(); renderTasks();
 }
 </script>
 </body>
