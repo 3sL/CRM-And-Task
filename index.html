@@ -5,16 +5,15 @@
 <title>CRM System & Tasks For Utopia Trading And Export</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-/* --- التنسيقات الأصلية كاملة بدون حذف --- */
+/* --- التنسيقات الأصلية كاملة --- */
 body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; color:#333; overflow-x:hidden; }
-h2 { margin-top:0; text-align:center; }
-.sidebar { width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; transition: all 0.3s ease; }
-.sidebar h2 { font-size:1.5em; margin-bottom:20px; color:#ffcc00; }
-.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; transition: all 0.2s ease; }
+.sidebar { width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; transition: all 0.3s ease; border-right: 2px solid #ffcc00; }
+.sidebar h2 { font-size:1.4em; margin-bottom:20px; color:#ffcc00; text-align:center; }
+.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; transition: 0.2s; }
 .sidebar button:hover { background:#3f3f6b; }
 .sidebar button.active { background:#ffcc00; color:#1e1e2f; }
-.sidebar select { padding:10px; border-radius:8px; border:none; margin-top:10px; }
-.tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; min-width:0; }
+.sidebar select { padding:10px; border-radius:8px; border:none; margin-top:10px; background: #fff; }
+.tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; }
 .tab-content { animation:fadeIn 0.3s ease; display:none; }
 .tab-content.active { display:block; }
 input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none; }
@@ -26,18 +25,33 @@ table { width:100%; border-collapse:collapse; margin-top:15px; background:#fff; 
 th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; min-width:130px; }
 th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 
-/* --- الإضافات الجديدة: نظام التنبيهات والأكشن --- */
+/* --- نظام الألوان والـ Hold --- */
+.row-hold { background-color: #fff3cd !important; border-left: 5px solid #ffcc00; }
+.status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.85em; color: white; font-weight: bold; }
+.badge-interested { background: #17a2b8; }
+.badge-inprogress { background: #007bff; }
+.badge-hold { background: #ffcc00; color: #1e1e2f; }
+.badge-completed { background: #28a745; }
+
+/* ألوان مراحل المهام */
+.task-stage { padding:6px 12px; color:#fff; border-radius:12px; font-weight:bold; font-size:0.85em; }
+.stage-quote { background:#ff7f50; } 
+.stage-follow { background:#1e90ff; }
+.stage-order { background:#28a745; }
+.stage-bank { background:#6f42c1; }
+
+/* --- التنبيهات (Toasts) --- */
 #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
 .toast { background: #1e1e2f; color: #fff; padding: 15px 25px; margin-bottom: 10px; border-radius: 12px; border-left: 6px solid #ffcc00; box-shadow: 0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.4s ease forwards; font-weight: bold; }
 .toast.success { border-left-color: #28a745; }
 .toast.error { border-left-color: #dc3545; }
 
 .logo-container { text-align:center; margin-bottom:20px; }
-.logo-container img { max-width: 180px; height: auto; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.logo-container img { max-width: 180px; height: auto; border-radius: 12px; }
 
 @keyframes slideIn { from { transform: translateX(100%); opacity:0; } to { transform: translateX(0); opacity:1; } }
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-@media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; } }
+@media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; } .sidebar h2 { display:none; } }
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -51,8 +65,8 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
   <button class="tab-btn active" onclick="showTab('crmTab', this)" data-lang-key="crm">CRM</button>
   <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks</button>
   <hr>
-  <div class="developer" style="font-size:0.8em; text-align:center;">Developed by Eng:<br><strong>Mahmoud Mohamed Marie</strong></div>
-  <div class="phone" style="font-size:0.8em; text-align:center; margin-top:5px;">📞 +201222153415</div>
+  <div style="font-size:0.8em; text-align:center;">Developed by Eng:<br><strong>Mahmoud Mohamed Marie</strong></div>
+  <div style="font-size:0.8em; text-align:center;">📞 +201222153415</div>
   <select id="language" onchange="changeLang(this.value)">
     <option value="en">English</option>
     <option value="ar">عربي</option>
@@ -61,10 +75,10 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 
 <div class="tabs-content">
   <div id="crmTab" class="tab-content active">
-    <div class="logo-container"><img src="logo.png" alt="Utopia Logo"></div>
+    <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
     <h2 data-lang-key="crm_title">CRM System</h2>
     <div class="row">
-      <input id="universalSearch" placeholder="Search All Columns..." oninput="renderCRM()">
+      <input id="universalSearch" placeholder="Search Any Column..." oninput="renderCRM()">
     </div>
     <div class="row">
       <input id="name" placeholder="Client Name">
@@ -79,17 +93,17 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
       <textarea id="notes" placeholder="Notes"></textarea>
       <input id="agent" placeholder="Agent Name">
       <input type="number" id="reminderDays" placeholder="Reminder Days">
-      <input type="text" id="followUp" placeholder="Follow Up">
+      <input type="text" id="followUp" placeholder="Follow Up Status">
     </div>
     <button onclick="addOrUpdate()" id="mainSaveBtn" data-lang-key="save">💾 Save Data</button>
     <div class="row">
       <div class="card" id="totalCount">Total: 0</div>
-      <div class="card" id="holdCount" style="color: #d9534f;">Hold: 0</div>
+      <div class="card" id="holdCount" style="color:#ffcc00">Hold: 0</div>
     </div>
     <table>
       <thead>
         <tr>
-          <th>Name</th><th>Phone</th><th>Date</th><th>Status</th><th>Notes</th><th>Agent</th><th>Reminder</th><th>Action</th>
+          <th>Name</th><th>Phone</th><th>Date</th><th>Status</th><th>Notes</th><th>Agent</th><th>Reminder</th><th>Follow Up</th><th>WhatsApp</th><th>Edit</th><th>Delete</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -97,8 +111,8 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
   </div>
 
   <div id="tasksTab" class="tab-content">
-    <div class="logo-container"><img src="logo.png" alt="Utopia Logo"></div>
-    <h2 data-lang-key="tasks_title">Tasks Tracker</h2>
+    <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
+    <h2 data-lang-key="tasks_title">Tasks</h2>
     <div class="row">
       <input id="taskInput" placeholder="Task Details">
       <select id="taskClient"><option value="">Select Client</option></select>
@@ -109,12 +123,12 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
         <option value="order">Order</option>
         <option value="bank">Bank</option>
       </select>
-      <button onclick="addTask()">➕ Add Task</button>
+      <button onclick="addTask()" data-lang-key="add_task">➕ Add Task</button>
     </div>
     <table>
       <thead>
         <tr>
-          <th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Delete</th>
+          <th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Action</th>
         </tr>
       </thead>
       <tbody id="tasksTableBody"></tbody>
@@ -123,14 +137,14 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 </div>
 
 <script>
-// Firebase Setup
+// Firebase Initialization
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = {}, tasks = {}, editId = null, currentLang = 'en';
+let clients = {}, tasks = {}, editId = null, lang = 'en';
 
-// --- دالة التنبيهات والأكشن (Toast) ---
+// --- Toast Notifications ---
 function showToast(msg, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -140,7 +154,7 @@ function showToast(msg, type = 'success') {
     setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
 }
 
-// تحميل البيانات (Real-time)
+// Data Sync
 db.ref('clients').on('value', snap => { clients = snap.val() || {}; renderCRM(); updateDropdown(); });
 db.ref('tasks').on('value', snap => { tasks = snap.val() || {}; renderTasks(); });
 
@@ -154,7 +168,7 @@ function showTab(id, btn){
 // CRM Logic
 function addOrUpdate(){
   const name = document.getElementById('name').value;
-  if(!name) { showToast("Please enter client name", "error"); return; }
+  if(!name) { showToast("Name is required!", "error"); return; }
 
   const data = {
     name,
@@ -168,13 +182,13 @@ function addOrUpdate(){
   };
 
   if(editId){
-    db.ref('clients/'+editId).update(data).then(() => showToast("Client data updated successfully!"));
+    db.ref('clients/'+editId).update(data).then(() => showToast("Updated: " + name));
     editId = null;
     document.getElementById('mainSaveBtn').innerText = "💾 Save Data";
   } else {
-    db.ref('clients').push(data).then(() => showToast("New client added to database"));
+    db.ref('clients').push(data).then(() => showToast("Added: " + name));
   }
-  clearForm();
+  clearInputs();
 }
 
 function renderCRM(){
@@ -186,15 +200,21 @@ function renderCRM(){
   for(let id in clients){
     const c = clients[id];
     if(search && !c.name.toLowerCase().includes(search)) continue;
-    total++; if(c.status === "Hold") hold++;
+    
+    total++;
+    const isHold = c.status === "Hold";
+    if(isHold) hold++;
 
-    tbody.innerHTML += `<tr>
-      <td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td>
-      <td>${c.notes}</td><td>${c.agent}</td><td>${c.reminderDays}</td>
-      <td>
-        <button onclick="editClient('${id}')" style="background:#28a745">✏️</button>
-        <button onclick="deleteClient('${id}')" style="background:#dc3545">🗑️</button>
-      </td>
+    const badgeClass = `badge-${c.status.toLowerCase().replace(" ", "")}`;
+    const rowClass = isHold ? 'row-hold' : '';
+
+    tbody.innerHTML += `<tr class="${rowClass}">
+      <td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td>
+      <td><span class="status-badge ${badgeClass}">${c.status}</span></td>
+      <td>${c.notes}</td><td>${c.agent}</td><td>${c.reminderDays}</td><td>${c.followUp}</td>
+      <td><button onclick="window.open('https://wa.me/${c.phone.replace(/\D/g,'')}')" style="background:#25D366">📱</button></td>
+      <td><button onclick="editClient('${id}')" style="background:#28a745">✏️</button></td>
+      <td><button onclick="deleteClient('${id}')" style="background:#dc3545">🗑️</button></td>
     </tr>`;
   }
   document.getElementById('totalCount').innerText = "Total: " + total;
@@ -206,17 +226,18 @@ function editClient(id){
   editId = id;
   document.getElementById('name').value = c.name;
   document.getElementById('phone').value = c.phone;
+  document.getElementById('date').value = c.date;
   document.getElementById('status').value = c.status;
   document.getElementById('notes').value = c.notes;
   document.getElementById('agent').value = c.agent;
+  document.getElementById('reminderDays').value = c.reminderDays;
+  document.getElementById('followUp').value = c.followUp;
   document.getElementById('mainSaveBtn').innerText = "Update Now";
-  showToast("Ready to edit " + c.name, "success");
+  showToast("Editing mode: " + c.name);
 }
 
 function deleteClient(id){
-  if(confirm("Are you sure?")){
-    db.ref('clients/'+id).remove().then(() => showToast("Client removed", "error"));
-  }
+  if(confirm("Delete this client?")) db.ref('clients/'+id).remove().then(() => showToast("Client Deleted", "error"));
 }
 
 // Tasks Logic
@@ -227,8 +248,8 @@ function addTask(){
     date: document.getElementById('taskDate').value,
     stage: document.getElementById('taskStage').value
   };
-  if(!t.text) return showToast("Enter task details", "error");
-  db.ref('tasks').push(t).then(() => showToast("Task assigned successfully"));
+  if(!t.text) return showToast("Enter task info", "error");
+  db.ref('tasks').push(t).then(() => showToast("Task Added"));
   document.getElementById('taskInput').value = '';
 }
 
@@ -239,14 +260,14 @@ function renderTasks(){
     const t = tasks[id];
     tbody.innerHTML += `<tr>
       <td>${t.client}</td><td>${t.date}</td>
-      <td><span class="task-stage stage-${t.stage}">${t.stage}</span></td>
+      <td><span class="task-stage stage-${t.stage}">${t.stage.toUpperCase()}</span></td>
       <td>${t.text}</td>
       <td><button onclick="deleteTask('${id}')" style="background:red">🗑️</button></td>
     </tr>`;
   }
 }
 
-function deleteTask(id){ db.ref('tasks/'+id).remove().then(() => showToast("Task deleted", "error")); }
+function deleteTask(id){ db.ref('tasks/'+id).remove().then(() => showToast("Task Removed", "error")); }
 
 function updateDropdown(){
   const sel = document.getElementById('taskClient');
@@ -254,14 +275,14 @@ function updateDropdown(){
   for(let id in clients) sel.innerHTML += `<option value="${clients[id].name}">${clients[id].name}</option>`;
 }
 
-function clearForm(){
+function clearInputs(){
   ['name','phone','date','notes','agent','reminderDays','followUp'].forEach(i=>document.getElementById(i).value='');
 }
 
 function changeLang(l){
-  currentLang = l;
+  lang = l;
   document.body.dir = (l === 'ar' ? 'rtl' : 'ltr');
-  showToast(l === 'ar' ? "تم تغيير اللغة" : "Language Switched");
+  showToast(l === 'ar' ? "تم تغيير اللغة" : "Language changed");
 }
 </script>
 </body>
