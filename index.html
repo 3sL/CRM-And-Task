@@ -2,316 +2,233 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<title>CRM System & Tasks For Utopia Trading And Export</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CRM System - Utopia Trading</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f6fa; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; color:#333; overflow-x:hidden; }
-h2 { margin-top:0; text-align:center; }
-.sidebar { width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; transition: all 0.3s ease; }
-.sidebar h2 { font-size:1.5em; margin-bottom:20px; color:#ffcc00; }
-.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; transition: all 0.2s ease; }
-.sidebar button:hover { background:#3f3f6b; }
-.sidebar button.active { background:#ffcc00; color:#1e1e2f; }
-.sidebar select, .sidebar label { margin-top:10px; }
-.tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; min-width:0; }
-.tab-content { animation:fadeIn 0.3s ease; display:none; }
-.tab-content.active { display:block; }
-input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none; }
-textarea { resize:none; height:80px; }
-button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:bold; transition:0.2s; }
-.card { background:#fff; padding:15px; text-align:center; border-radius:12px; margin:5px; flex:1; box-shadow:0 4px 6px rgba(0,0,0,0.1); font-weight:bold; }
-.row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-table { width:100%; border-collapse:collapse; margin-top:15px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; }
-th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
-#notification { position: fixed; top:20px; right:20px; z-index:999; display:flex; flex-direction:column; gap:10px; max-width:300px; }
-.notification-card { background:#ffcc00; color:#1e1e2f; padding:12px 20px; border-radius:12px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.2); cursor:pointer; }
-.task-stage { padding:5px 10px; color:#fff; border-radius:12px; font-weight:bold; font-size:0.9em; }
-.stage-quote { background:#ff7f50; }
-.stage-follow { background:#1e90ff; }
-.stage-order { background:#28a745; }
-.stage-bank { background:#6f42c1; }
-.logo-container { text-align:center; margin-bottom:20px; }
-.logo-container img { max-width: 100%; height: auto; display: inline-block; border-radius: 12px; }
-@media (max-width: 768px) {
-  body { flex-direction: column; }
-  .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; }
-  .sidebar h2 { display: none; }
-  .tabs-content { padding: 10px; }
-  table { display: block; overflow-x: auto; }
-}
-@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    /* التنسيقات الأساسية */
+    body { font-family: 'Segoe UI', sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; }
+    .sidebar { width:250px; background:#1e1e2f; color:#fff; padding:20px; display:flex; flex-direction:column; }
+    .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:8px; cursor:pointer; text-align:left; }
+    .sidebar button.active { background:#ffcc00; color:#1e1e2f; font-weight:bold; }
+    .tabs-content { flex:1; padding:25px; overflow-y:auto; }
+    .tab-content { display:none; animation: fadeIn 0.3s; }
+    .tab-content.active { display:block; }
+    .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
+    input, select, textarea, button { padding:10px; border-radius:5px; border:1px solid #ccc; flex:1; min-width:150px; }
+    button.save-btn { background:#28a745; color:white; font-weight:bold; cursor:pointer; flex:none; width:100%; }
+    table { width:100%; border-collapse:collapse; background:white; border-radius:10px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    th, td { padding:12px; border-bottom:1px solid #eee; text-align:center; }
+    th { background:#1e1e2f; color:#ffcc00; }
+    .btn-edit { background:#007bff; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; }
+    .btn-del { background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; }
+    @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+    @media (max-width:768px) { body { flex-direction:column; } .sidebar { width:100%; flex-direction:row; overflow-x:auto; } }
 </style>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
 <div class="sidebar">
-  <h2 data-lang-key="title">Utopia CRM</h2>
-  <button class="tab-btn active" onclick="showTab('crmTab', this)" data-lang-key="crm">CRM</button>
-  <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks</button>
-  <hr>
-  <div class="developer" style="font-size: 0.8em; opacity: 0.8;">Developed by: Eng. Mahmoud Marie</div>
-  <select id="language" onchange="changeLang(this.value)">
-    <option value="en">English</option>
-    <option value="ar">عربي</option>
-  </select>
+    <h2>Utopia CRM</h2>
+    <button class="tab-btn active" onclick="showTab('crmTab', this)">CRM</button>
+    <button class="tab-btn" onclick="showTab('tasksTab', this)">Tasks</button>
+    <div style="margin-top:auto; font-size:12px; opacity:0.6;">Dev by: Eng. Mahmoud Marie</div>
 </div>
 
 <div class="tabs-content">
-  <div id="notification"></div>
-
-  <div id="crmTab" class="tab-content active">
-    <h2 data-lang-key="crm_title">CRM System</h2>
-    <div class="row">
-      <input id="name" placeholder="Client Name">
-      <input id="phone" placeholder="Phone">
-      <input type="date" id="date">
-      <select id="status">
-        <option value="Interested">Interested</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Hold">Hold</option>
-        <option value="Completed">Completed</option>
-      </select>
-      <textarea id="notes" placeholder="Notes"></textarea>
-      <input id="agent" placeholder="Agent Name">
-      <input type="number" id="reminderDays" placeholder="Reminder Days">
-      <input type="text" id="followUp" placeholder="Follow Up">
+    <div id="crmTab" class="tab-content active">
+        <h2>Client Management</h2>
+        <div class="row">
+            <input type="text" id="name" placeholder="Client Name">
+            <input type="text" id="phone" placeholder="Phone">
+            <input type="date" id="date">
+            <select id="status">
+                <option value="Interested">Interested</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </select>
+            <textarea id="notes" placeholder="Notes"></textarea>
+        </div>
+        <button class="save-btn" id="saveCrmBtn" onclick="saveCRM()">💾 Save Client</button>
+        
+        <div class="row" style="margin-top:20px;">
+            <input type="text" id="searchCrm" placeholder="Search by name..." oninput="renderCRM()">
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th><th>Phone</th><th>Status</th><th>Notes</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="crmTableBody"></tbody>
+        </table>
     </div>
-    <button id="btnSaveCRM" onclick="saveCRM()" data-lang-key="save">💾 Save Client</button>
-    
-    <div class="row" style="margin-top:20px;">
-        <input id="universalSearch" placeholder="Search Clients..." oninput="renderCRM()">
-    </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th data-lang-key="name">Name</th>
-          <th data-lang-key="phone">Phone</th>
-          <th data-lang-key="status">Status</th>
-          <th data-lang-key="notes">Notes</th>
-          <th data-lang-key="edit">Edit</th>
-          <th data-lang-key="delete">Delete</th>
-        </tr>
-      </thead>
-      <tbody id="crmTableBody"></tbody>
-    </table>
-  </div>
-
-  <div id="tasksTab" class="tab-content">
-    <h2 data-lang-key="tasks_title">Tasks</h2>
-    <div class="row">
-      <input id="taskInput" placeholder="Task Details">
-      <select id="taskClientSelect"><option value="">Select Client</option></select>
-      <input type="date" id="taskDate">
-      <select id="taskStage">
-        <option value="quote">Quote</option>
-        <option value="follow">Follow Up</option>
-        <option value="order">Order</option>
-        <option value="bank">Bank</option>
-      </select>
-      <button id="btnSaveTask" onclick="saveTask()" data-lang-key="add_task">➕ Add Task</button>
+    <div id="tasksTab" class="tab-content">
+        <h2>Task Tracker</h2>
+        <div class="row">
+            <input type="text" id="taskText" placeholder="Task details...">
+            <select id="taskClientSelect"><option value="">Select Client</option></select>
+            <input type="date" id="taskDate">
+            <button class="save-btn" onclick="saveTask()">➕ Add Task</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Client</th><th>Date</th><th>Task</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="taskTableBody"></tbody>
+        </table>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="taskListBody"></tbody>
-    </table>
-  </div>
 </div>
 
 <script>
-// Firebase Configuration
+// 1. Firebase Config (بياناتك اللي بعتها)
 const firebaseConfig = {
-  apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY",
-  authDomain: "crm-tasking.firebaseapp.com",
-  databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com",
-  projectId: "crm-tasking",
-  storageBucket: "crm-tasking.appspot.com",
-  messagingSenderId: "368062369619",
-  appId: "1:368062369619:web:cd38383ab75ab473961ba6"
+    apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY",
+    authDomain: "crm-tasking.firebaseapp.com",
+    databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com",
+    projectId: "crm-tasking",
+    storageBucket: "crm-tasking.appspot.com",
+    messagingSenderId: "368062369619",
+    appId: "1:368062369619:web:cd38383ab75ab473961ba6"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let currentCrmId = null;
-let currentTaskId = null;
-let allClients = {};
-let allTasks = {};
+let editId = null; // للمتابعة لو بنعدل عميل موجود
 
-// --- Core Functions ---
-
-// 1. Load Data from Firebase
-function loadData() {
-    // Load CRM
+// 2. جلب البيانات (Real-time)
+// الميزة هنا إن أي تغيير من أي جهاز بيسمع عند الكل فوراً
+function fetchData() {
+    // جلب العملاء
     db.ref('clients').on('value', (snapshot) => {
-        allClients = snapshot.val() || {};
-        renderCRM();
-        updateClientDropdown();
+        const data = snapshot.val() || {};
+        renderCRM(data);
+        updateDropdown(data);
     });
 
-    // Load Tasks
+    // جلب المهام
     db.ref('tasks').on('value', (snapshot) => {
-        allTasks = snapshot.val() || {};
-        renderTasks();
+        renderTasks(snapshot.val() || {});
     });
 }
 
-// 2. Save/Update CRM
+// 3. حفظ بيانات CRM
 function saveCRM() {
-    const data = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    if(!name) return alert("Please enter name");
+
+    const clientData = {
+        name: name,
+        phone: phone,
         date: document.getElementById('date').value,
         status: document.getElementById('status').value,
-        notes: document.getElementById('notes').value,
-        agent: document.getElementById('agent').value,
-        reminderDays: document.getElementById('reminderDays').value,
-        followUp: document.getElementById('followUp').value
+        notes: document.getElementById('notes').value
     };
 
-    if (!data.name) return alert("Please enter client name");
-
-    if (currentCrmId) {
-        db.ref('clients/' + currentCrmId).update(data);
-        currentCrmId = null;
-        document.getElementById('btnSaveCRM').innerText = "💾 Save Client";
+    if(editId) {
+        // تحديث عميل موجود
+        db.ref('clients/' + editId).update(clientData);
+        editId = null;
+        document.getElementById('saveCrmBtn').innerText = "💾 Save Client";
     } else {
-        db.ref('clients').push(data);
+        // إضافة عميل جديد
+        db.ref('clients').push(clientData);
     }
-    clearCRMInputs();
+    clearInputs(['name', 'phone', 'date', 'notes']);
 }
 
-// 3. Render CRM Table
-function renderCRM() {
+// 4. عرض جدول الـ CRM
+function renderCRM(data) {
     const tbody = document.getElementById('crmTableBody');
-    const search = document.getElementById('universalSearch').value.toLowerCase();
+    const search = document.getElementById('searchCrm').value.toLowerCase();
     tbody.innerHTML = '';
 
-    for (let id in allClients) {
-        const c = allClients[id];
-        if (search && !c.name.toLowerCase().includes(search) && !c.phone.includes(search)) continue;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${c.name}</td>
-            <td>${c.phone}</td>
-            <td>${c.status}</td>
-            <td>${c.notes}</td>
-            <td><button onclick="editCRM('${id}')">✏️</button></td>
-            <td><button style="background:red" onclick="deleteCRM('${id}')">🗑️</button></td>
-        `;
-        tbody.appendChild(tr);
-    }
-}
-
-function editCRM(id) {
-    const c = allClients[id];
-    currentCrmId = id;
-    document.getElementById('name').value = c.name;
-    document.getElementById('phone').value = c.phone;
-    document.getElementById('status').value = c.status;
-    document.getElementById('notes').value = c.notes;
-    document.getElementById('btnSaveCRM').innerText = "Update Client Info";
-}
-
-function deleteCRM(id) {
-    if (confirm("Are you sure?")) db.ref('clients/' + id).remove();
-}
-
-// 4. Tasks Logic
-function saveTask() {
-    const data = {
-        text: document.getElementById('taskInput').value,
-        client: document.getElementById('taskClientSelect').value,
-        date: document.getElementById('taskDate').value,
-        stage: document.getElementById('taskStage').value
-    };
-
-    if (!data.text) return alert("Enter task details");
-
-    if (currentTaskId) {
-        db.ref('tasks/' + currentTaskId).update(data);
-        currentTaskId = null;
-        document.getElementById('btnSaveTask').innerText = "➕ Add Task";
-    } else {
-        db.ref('tasks').push(data);
-    }
-    document.getElementById('taskInput').value = '';
-}
-
-function renderTasks() {
-    const tbody = document.getElementById('taskListBody');
-    tbody.innerHTML = '';
-    for (let id in allTasks) {
-        const t = allTasks[id];
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${t.client}</td>
-            <td>${t.date}</td>
-            <td><span class="task-stage stage-${t.stage}">${t.stage}</span></td>
-            <td>${t.text}</td>
+    for (let id in data) {
+        if(search && !data[id].name.toLowerCase().includes(search)) continue;
+        
+        const tr = `<tr>
+            <td>${data[id].name}</td>
+            <td>${data[id].phone}</td>
+            <td>${data[id].status}</td>
+            <td>${data[id].notes}</td>
             <td>
-                <button onclick="editTask('${id}')">✏️</button>
-                <button style="background:red" onclick="deleteTask('${id}')">🗑️</button>
+                <button class="btn-edit" onclick="startEdit('${id}', ${JSON.stringify(data[id]).replace(/"/g, '&quot;')})">✏️</button>
+                <button class="btn-del" onclick="deleteItem('clients/${id}')">🗑️</button>
             </td>
-        `;
-        tbody.appendChild(tr);
+        </tr>`;
+        tbody.innerHTML += tr;
     }
 }
 
-function editTask(id) {
-    const t = allTasks[id];
-    currentTaskId = id;
-    document.getElementById('taskInput').value = t.text;
-    document.getElementById('taskClientSelect').value = t.client;
-    document.getElementById('taskDate').value = t.date;
-    document.getElementById('taskStage').value = t.stage;
-    document.getElementById('btnSaveTask').innerText = "Update Task";
+// 5. حفظ المهام
+function saveTask() {
+    const task = {
+        text: document.getElementById('taskText').value,
+        client: document.getElementById('taskClientSelect').value,
+        date: document.getElementById('taskDate').value
+    };
+    if(!task.text) return;
+    db.ref('tasks').push(task);
+    document.getElementById('taskText').value = '';
 }
 
-function deleteTask(id) {
-    if (confirm("Delete task?")) db.ref('tasks/' + id).remove();
+function renderTasks(data) {
+    const tbody = document.getElementById('taskTableBody');
+    tbody.innerHTML = '';
+    for (let id in data) {
+        tbody.innerHTML += `<tr>
+            <td>${data[id].client}</td>
+            <td>${data[id].date}</td>
+            <td>${data[id].text}</td>
+            <td><button class="btn-del" onclick="deleteItem('tasks/${id}')">🗑️</button></td>
+        </tr>`;
+    }
 }
 
-// Helpers
-function updateClientDropdown() {
+// وظائف مساعدة
+function deleteItem(path) {
+    if(confirm("Are you sure?")) db.ref(path).remove();
+}
+
+function startEdit(id, val) {
+    editId = id;
+    document.getElementById('name').value = val.name;
+    document.getElementById('phone').value = val.phone;
+    document.getElementById('status').value = val.status;
+    document.getElementById('notes').value = val.notes;
+    document.getElementById('saveCrmBtn').innerText = "Update Client";
+}
+
+function updateDropdown(clients) {
     const select = document.getElementById('taskClientSelect');
     select.innerHTML = '<option value="">Select Client</option>';
-    for (let id in allClients) {
-        const name = allClients[id].name;
-        select.innerHTML += `<option value="${name}">${name}</option>`;
+    for(let id in clients) {
+        select.innerHTML += `<option value="${clients[id].name}">${clients[id].name}</option>`;
     }
 }
 
-function clearCRMInputs() {
-    ['name', 'phone', 'date', 'notes', 'agent', 'reminderDays', 'followUp'].forEach(id => {
-        document.getElementById(id).value = '';
-    });
+function clearInputs(ids) {
+    ids.forEach(id => document.getElementById(id).value = '');
 }
 
-function showTab(id, btn) {
+function showTab(tabId, btn) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
     btn.classList.add('active');
 }
 
-function changeLang(val) {
-    // Basic lang toggle logic
-    const dir = val === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.dir = dir;
-}
+// تشغيل جلب البيانات عند فتح الصفحة
+window.onload = fetchData;
 
-// Initialize
-window.onload = loadData;
 </script>
-
 </body>
 </html>
