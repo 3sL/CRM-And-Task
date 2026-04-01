@@ -57,7 +57,7 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 <div id="toast-container"></div>
 
 <div class="sidebar">
-  <h2 data-lang-key="title">Utopia CRM</h2>
+  <h2 data-lang-key="title">Utopia Trading CRM & Tasks Program</h2>
   <button class="tab-btn active" onclick="showTab('crmTab', this)" data-lang-key="crm">CRM System</button>
   <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks Tracker</button>
   <hr>
@@ -181,7 +181,7 @@ const db = firebase.database();
 // --- القاموس الكامل للغات ---
 const langData = {
   en: { title:"Utopia CRM", crm:"CRM System", tasks:"Tasks Tracker", dev_name:"Dev: Mahmoud Mohamed Marie", crm_title:"Client Management", tasks_title:"Tasks Management", save_btn:"💾 Save Client Data", add_task_btn:"➕ Add New Task", sel_city:"Select City", th_name:"Name", th_phone:"Phone", th_city:"City", th_status:"Status", th_notes:"Notes", th_agent:"Agent", th_reminder:"Remind", th_whatsapp:"WhatsApp", th_edit:"Edit", th_delete:"Delete", th_client:"Client", th_date:"Date", th_stage:"Stage", th_task:"Task", opt_interested:"Interested", opt_progress:"In Progress", opt_hold:"Hold", opt_completed:"Completed" },
-  ar: { title:"يوتوبيا CRM", crm:"نظام العملاء", tasks:"جدول المهام", dev_name:"تطوير: محمود محمد ماري", crm_title:"إدارة بيانات العملاء", tasks_title:"إدارة المهام المطلوبة", save_btn:"💾 حفظ بيانات العميل", add_task_btn:"➕ إضافة مهمة جديدة", sel_city:"اختر المحافظة", th_name:"الاسم", th_phone:"الهاتف", th_city:"المحافظة", th_status:"الحالة", th_notes:"ملاحظات", th_agent:"المندوب", th_reminder:"تذكير", th_whatsapp:"واتساب", th_edit:"تعديل", th_delete:"حذف", th_client:"العميل", th_date:"التاريخ", th_stage:"المرحلة", th_task:"المهمة", opt_interested:"مهتم", opt_progress:"قيد التنفيذ", opt_hold:"انتظار", opt_completed:"مكتمل" }
+  ar: { title:"يوتوبيا CRM", crm:"نظام العملاء", tasks:"جدول المهام", dev_name:"تطوير: محمود محمد مرعى", crm_title:"إدارة بيانات العملاء", tasks_title:"إدارة المهام المطلوبة", save_btn:"💾 حفظ بيانات العميل", add_task_btn:"➕ إضافة مهمة جديدة", sel_city:"اختر المحافظة", th_name:"الاسم", th_phone:"الهاتف", th_city:"المحافظة", th_status:"الحالة", th_notes:"ملاحظات", th_agent:"المندوب", th_reminder:"تذكير", th_whatsapp:"واتساب", th_edit:"تعديل", th_delete:"حذف", th_client:"العميل", th_date:"التاريخ", th_stage:"المرحلة", th_task:"المهمة", opt_interested:"مهتم", opt_progress:"قيد التنفيذ", opt_hold:"انتظار", opt_completed:"مكتمل" }
 };
 
 let clients = {}, tasks = {}, editId = null, currentLang = 'en';
