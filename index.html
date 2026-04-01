@@ -133,6 +133,27 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
       </select>
       <button onclick="addTask()" data-lang-key="add_task">➕ Add Task</button>
     </div>
+
+    <!-- فلتر العملاء متعدد + زر مسح -->
+    <div class="row">
+      <label data-lang-key="filter_client">Filter by Client:</label>
+      <select id="taskFilter" multiple onchange="renderTasks()" style="height:100px;"></select>
+      <button onclick="clearTaskFilter()" style="margin-top:5px;">Clear Selection</button>
+    </div>
+
+    <!-- فلتر المرحلة + زر مسح -->
+    <div class="row">
+      <label data-lang-key="filter_stage">Filter by Stage:</label>
+      <select id="taskStageFilter" onchange="renderTasks()">
+        <option value="">All Stages</option>
+        <option value="quote" data-lang-option-en="Quote" data-lang-option-ar="تقديم عرض سعر">Quote</option>
+        <option value="follow" data-lang-option-en="Follow Up" data-lang-option-ar="متابعة عرض السعر">Follow Up</option>
+        <option value="order" data-lang-option-en="Order" data-lang-option-ar="أمر توريد">Order</option>
+        <option value="bank" data-lang-option-en="Bank" data-lang-option-ar="البنك">Bank</option>
+      </select>
+      <button onclick="clearStageFilter()" style="margin-top:5px;">Clear Stage</button>
+    </div>
+
     <table>
       <thead>
         <tr>
@@ -171,7 +192,8 @@ const translations = {
   date:{en:"Date", ar:"التاريخ"}, status:{en:"Status", ar:"الحالة"}, notes:{en:"Notes", ar:"الملاحظات"},
   reminder:{en:"Reminder", ar:"التذكير"}, followup:{en:"Follow Up", ar:"المتابعة"}, whatsapp:{en:"WhatsApp", ar:"واتساب"},
   edit:{en:"Edit", ar:"تعديل"}, delete:{en:"Delete", ar:"حذف"}, client:{en:"Client", ar:"العميل"}, stage:{en:"Stage", ar:"المرحلة"},
-  task:{en:"Task", ar:"المهمة"}, notif_duration:{en:"Notification Duration:", ar:"مدة ظهور الإشعارات:"}
+  task:{en:"Task", ar:"المهمة"}, notif_duration:{en:"Notification Duration:", ar:"مدة ظهور الإشعارات:"},
+  filter_client:{en:"Filter by Client:", ar:"تصفية حسب العميل:"}, filter_stage:{en:"Filter by Stage:", ar:"تصفية حسب المرحلة:"}
 };
 
 // -------- Tabs --------
@@ -202,13 +224,10 @@ function changeLang(selectedLang){
 }
 
 // -------- Notification --------
-function updateNotifDuration(){
-  notifDuration = parseInt(document.getElementById('notifDuration').value);
-}
+function updateNotifDuration(){ notifDuration = parseInt(document.getElementById('notifDuration').value); }
 function showNotifications(messages){
   const notifContainer=document.getElementById('notification');
   const sound=document.getElementById('notifSound');
-
   messages.forEach((msg,index)=>{
     const card=document.createElement('div');
     card.className='notification-card'; card.innerText='🔔 '+msg;
@@ -218,94 +237,79 @@ function showNotifications(messages){
     setTimeout(()=>{ removeNotification(card); }, notifDuration+index*200);
   });
 }
-function removeNotification(card){
-  const notifContainer=document.getElementById('notification');
-  card.classList.remove('show');
-  setTimeout(()=>{ if(card.parentNode) notifContainer.removeChild(card); notifQueue=notifQueue.filter(c=>c!==card); },500);
-}
+function removeNotification(card){ if(card){ card.classList.remove('show'); setTimeout(()=>{ card.remove(); },500); } }
 
-// -------- CRM --------
-function loadClientsFromFirebase(){
-  db.ref('clients').on('value', snapshot=>{
-    const data=snapshot.val(); clients=data?Object.values(data):[];
-    renderCRM(); populateClientDropdown(); checkHoldReminders();
-  });
-}
-function saveClientsToFirebase(){
-  const updates={}; clients.forEach((c,i)=>updates[i]={...c}); db.ref('clients').set(updates);
-}
+// -------- CRM Logic --------
+let clientsData=[], crmData=[];
 function addOrUpdate(){
-  const name=document.getElementById('name').value, phone=document.getElementById('phone').value,
-        date=document.getElementById('date').value, status=document.getElementById('status').value,
-        notes=document.getElementById('notes').value, agent=document.getElementById('agent').value,
-        reminderDays=document.getElementById('reminderDays').value, followUp=document.getElementById('followUp').value;
-  if(editIndex>-1){ clients[editIndex]={name,phone,date,status,notes,agent,reminderDays,followUp}; editIndex=-1; }
-  else clients.push({name,phone,date,status,notes,agent,reminderDays,followUp});
-  saveClientsToFirebase(); clearCRMFields(); renderCRM();
-}
-function clearCRMFields(){
-  ['name','phone','date','status','notes','agent','reminderDays','followUp'].forEach(id=>document.getElementById(id).value='');
+  const name=document.getElementById('name').value.trim();
+  if(!name){ alert('Enter client name'); return; }
+  const client={name, phone:document.getElementById('phone').value, date:document.getElementById('date').value,
+    status:document.getElementById('status').value, notes:document.getElementById('notes').value,
+    agent:document.getElementById('agent').value, reminderDays:document.getElementById('reminderDays').value,
+    followUp:document.getElementById('followUp').value };
+  if(editIndex>-1){ crmData[editIndex]=client; editIndex=-1; } else { crmData.push(client); }
+  renderCRM(); updateClients(); clearCRMInputs();
 }
 function renderCRM(){
-  const search=document.getElementById('universalSearch').value.toLowerCase();
   const tbody=document.getElementById('table'); tbody.innerHTML='';
-  clients.forEach((c,i)=>{
-    if(!Object.values(c).some(v=>v && v.toString().toLowerCase().includes(search))) return;
+  const search=document.getElementById('universalSearch').value.toLowerCase();
+  crmData.forEach((c,i)=>{
+    if(search && !Object.values(c).some(v=>String(v).toLowerCase().includes(search))) return;
     const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td>
-      <td>${c.notes}</td><td>${c.reminderDays}</td><td>${c.followUp}</td>
-      <td><a href="https://wa.me/${c.phone}" target="_blank">💬</a></td>
-      <td><button onclick="editClient(${i})">✏️</button></td>
-      <td><button onclick="deleteClient(${i})">🗑️</button></td>
-    `;
+    tr.innerHTML=`<td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td>
+    <td>${c.notes}</td><td>${c.reminderDays}</td><td>${c.followUp}</td>
+    <td><a href="https://wa.me/${c.phone}" target="_blank">💬</a></td>
+    <td><button onclick="editCRM(${i})">✏️</button></td><td><button onclick="deleteCRM(${i})">🗑️</button></td>`;
     tbody.appendChild(tr);
   });
-  document.getElementById('total').innerText=`${lang==='ar'?'الإجمالي':'Total'}: ${clients.length}`;
-  document.getElementById('hold').innerText=`Hold: ${clients.filter(c=>c.status==='Hold').length}`;
 }
-function editClient(i){
-  editIndex=i; const c=clients[i];
-  ['name','phone','date','status','notes','agent','reminderDays','followUp'].forEach(id=>document.getElementById(id).value=c[id]);
+function editCRM(i){ editIndex=i; const c=crmData[i]; document.getElementById('name').value=c.name; document.getElementById('phone').value=c.phone;
+  document.getElementById('date').value=c.date; document.getElementById('status').value=c.status;
+  document.getElementById('notes').value=c.notes; document.getElementById('agent').value=c.agent;
+  document.getElementById('reminderDays').value=c.reminderDays; document.getElementById('followUp').value=c.followUp;
 }
-function deleteClient(i){ clients.splice(i,1); saveClientsToFirebase(); renderCRM(); }
-function populateClientDropdown(){
-  const sel=document.getElementById('taskClient'); sel.innerHTML='<option value="">Select Client</option>';
-  clients.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.name; opt.text=c.name; sel.appendChild(opt); });
+function deleteCRM(i){ if(confirm('Delete?')){ crmData.splice(i,1); renderCRM(); updateClients(); } }
+function clearCRMInputs(){ document.getElementById('name').value=''; document.getElementById('phone').value='';
+  document.getElementById('date').value=''; document.getElementById('status').value='Interested'; document.getElementById('notes').value='';
+  document.getElementById('agent').value=''; document.getElementById('reminderDays').value=''; document.getElementById('followUp').value='';
 }
-function checkHoldReminders(){
-  const messages=clients.filter(c=>c.status==='Hold').map(c=>`${c.name} is on Hold!`);
-  if(messages.length>0) showNotifications(messages);
+function updateClients(){
+  const select=document.getElementById('taskClient');
+  select.innerHTML='<option value="">Select Client</option>';
+  const filterSelect=document.getElementById('taskFilter'); filterSelect.innerHTML='';
+  crmData.forEach(c=>{
+    select.innerHTML+=`<option value="${c.name}">${c.name}</option>`;
+    filterSelect.innerHTML+=`<option value="${c.name}">${c.name}</option>`;
+  });
 }
 
-// -------- Tasks --------
-function loadTasksFromFirebase(){
-  db.ref('tasks').on('value', snapshot=>{ const data=snapshot.val(); tasks=data?Object.values(data):[]; renderTasks(); });
-}
-function saveTasksToFirebase(){ const updates={}; tasks.forEach((t,i)=>updates[i]={...t}); db.ref('tasks').set(updates); }
+// -------- Tasks Logic --------
 function addTask(){
-  const text=document.getElementById('taskInput').value, client=document.getElementById('taskClient').value,
-        date=document.getElementById('taskDate').value, stage=document.getElementById('taskStage').value;
-  if(!text||!client) return;
-  if(taskEditIndex>-1){ tasks[taskEditIndex]={text,client,date,stage}; taskEditIndex=-1; }
-  else tasks.push({text,client,date,stage});
-  saveTasksToFirebase(); renderTasks(); document.getElementById('taskInput').value='';
+  const text=document.getElementById('taskInput').value.trim();
+  if(!text){ alert('Enter task'); return; }
+  const task={text, client:document.getElementById('taskClient').value, date:document.getElementById('taskDate').value, stage:document.getElementById('taskStage').value};
+  if(taskEditIndex>-1){ tasks[taskEditIndex]=task; taskEditIndex=-1; } else { tasks.push(task); }
+  renderTasks(); document.getElementById('taskInput').value=''; document.getElementById('taskDate').value=''; document.getElementById('taskClient').value='';
 }
 function renderTasks(){
   const tbody=document.getElementById('taskList'); tbody.innerHTML='';
+  const selectedClients=Array.from(document.getElementById('taskFilter').selectedOptions).map(opt=>opt.value);
+  const stageFilter=document.getElementById('taskStageFilter').value;
   tasks.forEach((t,i)=>{
+    if(selectedClients.length>0 && !selectedClients.includes(t.client)) return;
+    if(stageFilter && t.stage!==stageFilter) return;
     const tr=document.createElement('tr'); 
-    const stageClass=t.stage==='quote'?'stage-quote':t.stage==='follow'?'stage-follow':t.stage==='order'?'stage-order':'stage-bank';
+    const stageClass = t.stage==='quote'?'stage-quote':t.stage==='follow'?'stage-follow':t.stage==='order'?'stage-order':'stage-bank';
     tr.innerHTML=`<td>${t.client}</td><td>${t.date}</td><td><span class="task-stage ${stageClass}">${t.stage}</span></td><td>${t.text}</td>
     <td><button onclick="editTask(${i})">✏️</button></td><td><button onclick="deleteTask(${i})">🗑️</button></td>`;
     tbody.appendChild(tr);
   });
 }
 function editTask(i){ taskEditIndex=i; const t=tasks[i]; document.getElementById('taskInput').value=t.text; document.getElementById('taskClient').value=t.client; document.getElementById('taskDate').value=t.date; document.getElementById('taskStage').value=t.stage; }
-function deleteTask(i){ tasks.splice(i,1); saveTasksToFirebase(); renderTasks(); }
-
-// -------- Init --------
-loadClientsFromFirebase(); loadTasksFromFirebase(); changeLang('en');
+function deleteTask(i){ if(confirm('Delete?')){ tasks.splice(i,1); renderTasks(); } }
+function clearTaskFilter(){ document.getElementById('taskFilter').value=''; renderTasks(); }
+function clearStageFilter(){ document.getElementById('taskStageFilter').value=''; renderTasks(); }
 </script>
 </body>
 </html>
