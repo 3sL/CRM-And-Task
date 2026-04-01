@@ -154,11 +154,12 @@ btn.classList.add('active');
 }
 
 // --- Notification ---
-function showNotification(msg){
+function showNotification(msg,stage='quote'){
 const notif=document.getElementById('notification');
 notif.innerHTML=msg;
 notif.style.display='block';
-document.getElementById('notifSoundQuote').play();
+const soundMap={quote:'notifSoundQuote',follow:'notifSoundFollow',order:'notifSoundOrder',bank:'notifSoundBank'};
+document.getElementById(soundMap[stage]||'notifSoundQuote').play();
 setTimeout(()=>{notif.style.display='none';},4000);
 }
 
@@ -201,7 +202,7 @@ document.getElementById('universalSearch').placeholder=t.search;
 document.getElementById('name').placeholder=t.clientName;
 document.getElementById('phone').placeholder=t.phone;
 document.getElementById('governorate').options[0].text=t.governorate;
-populateGovernorates(); // <-- إعادة تعبئة المحافظات بعد تغيير اللغة
+populateGovernorates();
 for(let i=0;i<document.getElementById('status').options.length;i++){
 document.getElementById('status').options[i].text=t.statusOptions[i];
 }
@@ -216,6 +217,8 @@ document.getElementById('taskClient').options[0].text=t.selectClient;
 document.getElementById('addTaskBtn').innerText=t.addTask;
 document.getElementById('crmHeader').innerText=t.crm;
 document.getElementById('tasksHeader').innerText=t.tasks;
+renderCRM();
+renderTasks();
 }
 
 // --- CRUD & PDF Functions ---
@@ -286,8 +289,7 @@ if(confirm('Are you sure?')){clients.splice(i,1);db.ref('clients').set(clients);
 function clearClientForm(){
 document.getElementById('name').value='';
 document.getElementById('phone').value='';
-document.getElementById('governorate').
-  .value='';
+document.getElementById('governorate').value='';
 document.getElementById('date').value='';
 document.getElementById('status').selectedIndex=0;
 document.getElementById('notes').value='';
@@ -297,36 +299,14 @@ document.getElementById('followUp').value='';
 editIndex=-1;
 }
 
-// Track Client on Map
-function trackClient(i){
-const c = clients[i];
-if(c.governorate){
-window.open(`https://www.google.com/maps/search/${encodeURIComponent(c.governorate)}`,'_blank');
-} else {
-alert('No governorate selected for this client');
-}
-}
-
-// Populate Client Dropdown for Tasks
+// Populate Client Dropdown
 function populateClientDropdown(){
 const sel=document.getElementById('taskClient');
 sel.innerHTML=`<option value="">${texts[document.documentElement.lang].selectClient}</option>`;
-clients.forEach((c,i)=>{
-sel.innerHTML+=`<option value="${i}">${c.name}</option>`;
-});
+clients.forEach((c,i)=>{sel.innerHTML+=`<option value="${i}">${c.name}</option>`;});
 }
 
-// Export PDF
-function exportPDFWithArabicSupport(){
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
-const columns = ["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"];
-const rows = clients.map(c=>[c.name,c.phone,c.governorate,c.date,c.status,c.notes,c.reminderDays,c.followUp]);
-doc.autoTable({head:[columns],body:rows});
-doc.save("CRM_Data.pdf");
-}
-
-// --- Tasks ---
+// Tasks
 function addTask(){
 const idx=document.getElementById('taskClient').value;
 const clientName=idx!==""?clients[idx].name:"";
@@ -335,67 +315,64 @@ if(taskEditIndex===-1) tasks.push(task); else tasks[taskEditIndex]=task;
 db.ref('tasks').set(tasks);
 renderTasks();
 clearTaskForm();
-showNotification('Task Saved');
+showNotification('Task Saved',task.stage);
 }
 
-// Render Tasks
+function clearTaskForm(){
+document.getElementById('taskInput').value='';
+document.getElementById('taskClient').selectedIndex=0;
+document.getElementById('taskGovernorate').selectedIndex=0;
+document.getElementById('taskDate').value='';
+document.getElementById('taskStage').selectedIndex=0;
+taskEditIndex=-1;
+}
+
 function renderTasks(){
-const tbody=document.getElementById('taskList');
-tbody.innerHTML='';
+const tbody=document.getElementById('taskList');tbody.innerHTML='';
 tasks.forEach((t,i)=>{
 const row=document.createElement('tr');
-row.innerHTML=`<td>${t.client}</td><td>${t.governorate}</td><td>${t.date}</td>
-<td><span class="task-stage ${t.stage}">${t.stage}</span></td>
-<td>${t.text}</td>
+row.innerHTML=`<td>${t.client}</td><td>${t.governorate}</td><td>${t.date}</td><td><span class="task-stage stage-${t.stage}">${t.stage}</span></td><td>${t.text}</td>
 <td><button onclick="editTask(${i})">Edit</button></td>
 <td><button onclick="deleteTask(${i})">Delete</button></td>`;
 tbody.appendChild(row);
 });
 }
 
-// Edit Task
 function editTask(i){
 taskEditIndex=i;
 const t=tasks[i];
+document.getElementById('taskInput').value=t.text;
 document.getElementById('taskClient').value=clients.findIndex(c=>c.name===t.client);
 document.getElementById('taskGovernorate').value=t.governorate;
 document.getElementById('taskDate').value=t.date;
 document.getElementById('taskStage').value=t.stage;
-document.getElementById('taskInput').value=t.text;
 }
 
-// Delete Task
 function deleteTask(i){
-if(confirm('Are you sure?')){
-tasks.splice(i,1);
-db.ref('tasks').set(tasks);
-renderTasks();
-showNotification('Task Deleted');
-}
+if(confirm('Are you sure?')){tasks.splice(i,1);db.ref('tasks').set(tasks);renderTasks();showNotification('Task Deleted');}
 }
 
-// Clear Task Form
-function clearTaskForm(){
-document.getElementById('taskClient').selectedIndex=0;
-document.getElementById('taskGovernorate').selectedIndex=0;
-document.getElementById('taskDate').value='';
-document.getElementById('taskStage').selectedIndex=0;
-document.getElementById('taskInput').value='';
-taskEditIndex=-1;
+// Track Client (Google Maps)
+function trackClient(i){
+const c=clients[i];
+window.open(`https://www.google.com/maps/search/${c.governorate}`, '_blank');
 }
 
-// Load Tasks
-function loadTasksFromFirebase(){
-db.ref('tasks').on('value',snapshot=>{
-tasks=snapshot.val()?Object.values(snapshot.val()):[];
-renderTasks();
-});
+// --- PDF Export ---
+function exportPDFWithArabicSupport(){
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+doc.setFont("helvetica");
+doc.setFontSize(12);
+const data = clients.map(c=>[c.name,c.phone,c.governorate,c.date,c.status,c.notes,c.reminderDays,c.followUp]);
+doc.autoTable({head:[["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"]],body:data});
+doc.save('CRM.pdf');
 }
 
-// --- Init ---
+// --- Initialize ---
 loadClientsFromFirebase();
-loadTasksFromFirebase();
-changeLang('en'); // default language
+populateGovernorates();
+changeLang('en');
 </script>
 </body>
 </html>
