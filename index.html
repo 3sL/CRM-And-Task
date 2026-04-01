@@ -140,6 +140,13 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 </div>
 
 </div>
+
+<!-- --- Audio Notifications --- -->
+<audio id="notifSoundQuote" src="notif_quote.mp3" preload="auto"></audio>
+<audio id="notifSoundFollow" src="notif_follow.mp3" preload="auto"></audio>
+<audio id="notifSoundOrder" src="notif_order.mp3" preload="auto"></audio>
+<audio id="notifSoundBank" src="notif_bank.mp3" preload="auto"></audio>
+
 <script>
 // --- Firebase ---
 const firebaseConfig = {
@@ -168,6 +175,7 @@ function showNotification(msg){
   const notif=document.getElementById('notification');
   notif.innerHTML=msg;
   notif.style.display='block';
+  document.getElementById('notifSoundQuote').play(); // صوت عام للإشعارات CRM
   setTimeout(()=>{
     notif.style.display='none';
   },4000);
@@ -181,8 +189,8 @@ function populateGovernorates(){
   sel.innerHTML='<option value="">Select Governorate</option>';
   taskSel.innerHTML='<option value="">Select Governorate</option>';
   governorates.forEach(g=>{
-    sel.innerHTML+=<option value="${g}">${g}</option>;
-    taskSel.innerHTML+=<option value="${g}">${g}</option>;
+    sel.innerHTML+=`<option value="${g}">${g}</option>`;
+    taskSel.innerHTML+=`<option value="${g}">${g}</option>`;
   });
 }
 populateGovernorates();
@@ -234,14 +242,14 @@ function addOrUpdate(){
   document.getElementById('followUp').value='';
 }
 
-// --- Render CRM with Track button ---
+// --- Render CRM ---
 function renderCRM(){
   const table=document.getElementById("table");
   const filter=document.getElementById("universalSearch").value.toLowerCase();
   table.innerHTML="";
   let holdCount=0;
   clients.forEach((c,i)=>{
-    let combinedText=${c.name} ${c.phone} ${c.governorate} ${c.date} ${c.status} ${c.notes} ${c.followUp}.toLowerCase();
+    let combinedText=`${c.name} ${c.phone} ${c.governorate} ${c.date} ${c.status} ${c.notes} ${c.followUp}`.toLowerCase();
     if(filter && !combinedText.includes(filter))return;
     if(c.status==="Hold")holdCount++;
     table.innerHTML+=`<tr>
@@ -291,23 +299,21 @@ function openWhatsApp(phone){
   window.open("https://wa.me/"+phone,"_blank");
 }
 
-// --- New: Track Client ---
 function trackClient(phone){
-  // مثال: فتح Google Maps مع رقم العميل (يمكن تعديل حسب بيانات التتبع الفعلية)
   window.open("https://www.google.com/maps/search/?api=1&query="+phone,"_blank");
 }
 
-// --- Populate Clients in Task dropdown ---
 function populateClientDropdown(){
   const sel=document.getElementById('taskClient');
   sel.innerHTML='<option value="">Select Client</option>';
   clients.forEach(c=>{
-    sel.innerHTML+=<option value="${c.name}">${c.name}</option>;
+    sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`;
   });
 }
 
 // --- Tasks ---
 let tasks=[];let taskEditIndex=-1;
+
 function loadTasksFromFirebase(){
   db.ref('tasks').on('value',snapshot=>{
     tasks=snapshot.val()?Object.values(snapshot.val()):[];
@@ -319,6 +325,17 @@ function saveTasksToFirebase(){
   tasks.forEach((t,i)=>{updates[i]={...t};});
   db.ref('tasks').set(updates);
 }
+
+// --- Play Stage Sounds ---
+function playStageSound(stage){
+  switch(stage){
+    case 'quote': document.getElementById('notifSoundQuote').play(); break;
+    case 'follow': document.getElementById('notifSoundFollow').play(); break;
+    case 'order': document.getElementById('notifSoundOrder').play(); break;
+    case 'bank': document.getElementById('notifSoundBank').play(); break;
+  }
+}
+
 function addTask(){
   const client=document.getElementById('taskClient').value;
   const governorate=document.getElementById('taskGovernorate').value;
@@ -335,34 +352,38 @@ function addTask(){
   }
   saveTasksToFirebase();
   renderTasks();
+  playStageSound(stage); // تشغيل صوت المرحلة المناسبة
   document.getElementById('taskInput').value='';
   document.getElementById('taskDate').value='';
   document.getElementById('taskGovernorate').value='';
 }
+
 function renderTasks(){
-  const list=document.getElementById('taskList');
-  list.innerHTML='';
+  const tbody=document.getElementById('taskList');
+  tbody.innerHTML='';
   tasks.forEach((t,i)=>{
-    list.innerHTML+=`<tr>
+    tbody.innerHTML+=`<tr>
       <td>${t.client}</td>
       <td>${t.governorate||'-'}</td>
-      <td>${t.date}</td>
-      <td class="task-stage stage-${t.stage}">${t.stage}</td>
+      <td>${t.date||'-'}</td>
+      <td><span class="task-stage stage-${t.stage}">${t.stage}</span></td>
       <td>${t.taskText}</td>
       <td><button onclick="editTask(${i})">✏️</button></td>
       <td><button onclick="deleteTask(${i})">❌</button></td>
     </tr>`;
   });
 }
+
 function editTask(i){
-  const t=tasks[i];
   taskEditIndex=i;
-  document.getElementById('taskInput').value=t.taskText;
+  const t=tasks[i];
   document.getElementById('taskClient').value=t.client;
   document.getElementById('taskGovernorate').value=t.governorate;
+  document.getElementById('taskInput').value=t.taskText;
   document.getElementById('taskDate').value=t.date;
   document.getElementById('taskStage').value=t.stage;
 }
+
 function deleteTask(i){
   if(confirm("Delete this task?")){
     tasks.splice(i,1);
@@ -371,71 +392,9 @@ function deleteTask(i){
   }
 }
 
-// --- Export PDF with Arabic Support ---
-function exportPDFWithArabicSupport(){
-  import("https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js").then(jsPDFModule=>{
-    const { jsPDF } = jsPDFModule;
-    const doc = new jsPDF('l', 'pt', 'a4');
-    
-    // إضافة الخط العربي من Google Fonts (مثال: Amiri)
-    const fontUrl = "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/amiri-regular.ttf";
-
-    // لتحميل الخط (أسهل طريقة) يمكنك استخدام خطوط مبنية في jsPDF أو إدخال النص يدويًا بترتيب صحيح
-    // هنا سنستخدم النص العربي بشكل مباشر لكن مع دعم الخط العادي
-
-    const header = [["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"]];
-    const body = clients.map(c=>[
-      c.name, c.phone, c.governorate||"-", c.date, c.status, c.notes, c.reminderDays||"-", c.followUp||"-"
-    ]);
-
-    // لضمان عرض العربية بشكل صحيح، نستطيع تعكس النصوص العربية يدويًا باستخدام دالة صغيرة:
-    function reverseArabic(text){
-      if(!text) return "";
-      return text.split("").reverse().join("");
-    }
-
-    // نقوم بعكس الحقول العربية فقط (الاسم، المحافظة، الملاحظات، المتابعة)، الباقي إنجليزي أو أرقام
-    const bodyFixed = body.map(row=>[
-      reverseArabic(row[0]),
-      row[1],
-      reverseArabic(row[2]),
-      row[3],
-      row[4],
-      reverseArabic(row[5]),
-      row[6],
-      reverseArabic(row[7])
-    ]);
-
-    doc.autoTable({
-      head: [header[0].map(h=>reverseArabic(h))], // عكس عناوين الأعمدة العربية
-      body: bodyFixed,
-      styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: [30, 30, 47], textColor: 255, fontStyle: 'bold' },
-      theme: 'striped',
-      startY: 30
-    });
-    doc.save("crm_clients_report.pdf");
-  });
-}
-
-// --- Change Language ---
-function changeLang(lang){
-  if(lang==="ar"){
-    document.body.dir = "rtl";
-    document.body.lang = "ar";
-    document.body.style.fontFamily = "'Arial', 'Tahoma', 'Segoe UI', sans-serif";
-  }
-  else{
-    document.body.dir = "ltr";
-    document.body.lang = "en";
-    document.body.style.fontFamily = "'Arial', sans-serif";
-  }
-}
-
-// --- Initialization ---
+// --- Initial Load ---
 loadClientsFromFirebase();
 loadTasksFromFirebase();
-
 </script>
 </body>
 </html>
