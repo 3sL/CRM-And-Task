@@ -2,51 +2,51 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<title>Utopia CRM | Full Professional Version</title>
+<title>Utopia CRM | Professional Edition 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-/* --- التنسيقات العامة --- */
-body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; color:#333; overflow-x:hidden; }
-.sidebar { width:260px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; border-right: 3px solid #ffcc00; position: sticky; top:0; height: 100vh; z-index: 1000; }
-.sidebar h2 { font-size:1.5em; margin-bottom:20px; color:#ffcc00; text-align:center; border-bottom: 1px solid #3f3f6b; padding-bottom: 10px; }
-.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:inherit; font-weight:bold; transition: 0.3s; }
-.sidebar button.active { background:#ffcc00; color:#1e1e2f; }
-.sidebar .developer { font-size: 0.75em; margin-top: auto; padding: 10px; text-align: center; opacity: 0.8; }
+/* --- التصميم الاحترافي --- */
+body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f0f2f5; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; color:#1a1a1a; }
+.sidebar { width:260px; background:#1c1c2d; color:#ffffff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; border-right: 4px solid #ffcc00; position: sticky; top:0; height: 100vh; z-index: 1000; }
+.sidebar h2 { color:#ffcc00; text-align:center; margin-bottom:25px; font-size:1.6em; border-bottom:2px solid #33334d; padding-bottom:10px; }
+.sidebar button { background:#2d2d44; color:#fff; border:none; padding:12px; margin:8px 0; border-radius:10px; cursor:pointer; text-align:inherit; font-weight:bold; transition:0.3s; }
+.sidebar button.active { background:#ffcc00; color:#1c1c2d; }
+.sidebar .dev-info { margin-top:auto; font-size:0.75em; text-align:center; padding:10px; border-top:1px solid #33334d; opacity:0.9; }
 
-.tabs-content { flex:1; padding:25px; overflow-y:auto; box-sizing:border-box; width: 100%; }
-.tab-content { animation:fadeIn 0.4s ease; display:none; }
+.main-content { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; }
+.tab-content { display:none; animation:fadeIn 0.4s ease; }
 .tab-content.active { display:block; }
 
-/* ضبط المدخلات لضمان الرؤية الكاملة */
-input, select, textarea { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #ccc; font-size: 14px; color: #000 !important; background: #ffffff !important; display: block; opacity: 1 !important; }
-textarea { resize:none; height:80px; }
-button { padding:12px; border-radius:10px; border:none; cursor:pointer; font-weight:bold; transition:0.2s; color:#fff; }
+/* ألوان المدخلات لضمان الوضوح التام */
+input, select, textarea { 
+    padding:12px; margin:8px 0; width:100%; box-sizing:border-box; 
+    border-radius:8px; border:1px solid #bdc3c7; font-size:14px; 
+    color:#000000 !important; background:#ffffff !important; 
+    display:block; font-weight: 500;
+}
+textarea { height:100px; resize:none; }
+button.save-btn { background:#007bff; color:#fff; padding:15px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:220px; font-size:16px; transition:0.3s; }
+button.save-btn:hover { background:#0056b3; transform:scale(1.02); }
 
-.row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
-.card { background:#fff; padding:20px; border-radius:15px; margin-bottom:15px; box-shadow:0 4px 12px rgba(0,0,0,0.08); flex: 1; min-width: 200px; }
-
-/* الجداول */
-.table-container { overflow-x: auto; background: #fff; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-table { width:100%; border-collapse:collapse; min-width: 1000px; }
-th, td { padding:15px; text-align:center; border-bottom: 1px solid #eee; }
-th { background:#1e1e2f; color:#ffcc00; font-weight:bold; position: sticky; top: 0; }
-.row-hold { background-color: #fff3cd !important; border-inline-start: 6px solid #ff9800; }
+/* الجداول والكروت */
+.stats-row { display:flex; gap:15px; margin-bottom:20px; }
+.stat-card { background:#fff; padding:20px; border-radius:12px; flex:1; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.05); border-bottom:4px solid #ffcc00; font-weight:bold; font-size:1.1em; }
+.table-wrapper { background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.08); overflow-x:auto; margin-top:20px; }
+table { width:100%; border-collapse:collapse; min-width:1100px; }
+th { background:#1c1c2d; color:#ffcc00; padding:15px; text-align:center; font-size:14px; position:sticky; top:0; }
+td { padding:12px; text-align:center; border-bottom:1px solid #edf2f7; font-size:13px; font-weight:500; }
+.row-hold { background-color: #fff9e6 !important; border-left: 5px solid #ffa500; }
 
 /* التنبيهات */
-#toast-container { position: fixed; top:20px; right:20px; z-index:11000; }
-.toast { background:#1e1e2f; color:#fff; padding:15px 25px; border-radius:12px; margin-bottom:10px; border-left: 5px solid #ffcc00; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; font-weight: bold; }
-.toast.error { border-left-color: #dc3545; }
-.toast.success { border-left-color: #28a745; }
+#toast-container { position:fixed; top:20px; right:20px; z-index:9999; }
+.toast { background:#1c1c2d; color:#fff; padding:15px 25px; border-radius:10px; margin-bottom:10px; border-left:5px solid #ffcc00; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation:slideIn 0.3s ease; }
 
-.logo-container { text-align:center; margin-bottom:20px; }
-.logo-container img { max-width: 150px; height: auto; border-radius: 10px; }
+.logo-box { text-align:center; margin-bottom:20px; }
+.logo-box img { max-width:160px; border-radius:12px; }
 
-.stage-badge { padding:5px 10px; border-radius:8px; color:#fff; font-size:0.85em; font-weight:bold; }
-.stage-quote { background:#ff7f50; } .stage-follow { background:#1e90ff; } .stage-order { background:#28a745; } .stage-bank { background:#6f42c1; }
-
-@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-@media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; overflow-x: auto; } .sidebar h2, .sidebar .developer { display:none; } .tabs-content { padding: 15px; } }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+@keyframes slideIn { from{transform:translateX(100%);} to{transform:translateX(0);} }
+@media (max-width: 768px) { body{flex-direction:column;} .sidebar{width:100%; height:auto; position:relative; flex-direction:row; overflow-x:auto;} .sidebar h2, .sidebar .dev-info {display:none;} }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -57,27 +57,27 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; position: sticky; top:
 <div id="toast-container"></div>
 
 <div class="sidebar">
-  <h2 data-lang-key="title">Utopia CRM</h2>
+  <h2 data-lang-key="title">Utopia Trading CRM & Tasks Program/h2>
   <button class="tab-btn active" onclick="showTab('crmTab', this)" data-lang-key="crm">CRM System</button>
-  <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks Tracker</button>
-  <hr style="width:100%; border:0.5px solid #3f3f6b;">
-  <select id="language" onchange="changeLang(this.value)" style="cursor:pointer; background:#2e2e4d !important; color:#fff !important; border:1px solid #ffcc00;">
+  <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks Manager</button>
+  <hr style="width:100%; border:0.5px solid #333;">
+  <select id="language" onchange="changeLang(this.value)" style="background:#2d2d44 !important; color:#fff !important; border:1px solid #ffcc00;">
     <option value="en">English</option>
     <option value="ar">العربية</option>
   </select>
-  <div class="developer">Dev: <strong>Mahmoud Marie</strong><br>+201222153415</div>
+  <div class="dev-info">Developed by: <strong>Mahmoud Mohamed Marie</strong><br>📞 +201222153415</div>
 </div>
 
-<div class="tabs-content">
+<div class="main-content">
   <div id="crmTab" class="tab-content active">
-    <div class="logo-container"><img src="logo.png" alt="Utopia Logo"></div>
-    <h3 data-lang-key="crm_title">Client Management</h3>
+    <div class="logo-box"><img src="logo.png" alt="Utopia Logo"></div>
+    <h3 data-lang-key="crm_title">Client Management System</h3>
     
-    <div class="card">
-      <input id="universalSearch" placeholder="🔍 Search..." oninput="renderCRM()">
-      <div class="row">
+    <div style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <input id="universalSearch" placeholder="🔍 Search by name, phone or city..." oninput="renderCRM()">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
         <input id="name" placeholder="Client Name">
-        <input id="phone" placeholder="Phone">
+        <input id="phone" placeholder="Phone Number">
         <input type="date" id="date">
         <select id="status">
           <option value="Interested">Interested</option>
@@ -87,50 +87,41 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; position: sticky; top:
         </select>
         <select id="city">
           <option value="">Select City - اختر المحافظة</option>
-          <option value="Cairo">القاهرة - Cairo</option>
-          <option value="Giza">الجيزة - Giza</option>
-          <option value="Alexandria">الإسكندرية - Alexandria</option>
-          <option value="Dakahlia">الدقهلية - Dakahlia</option>
-          <option value="Sharkia">الشرقية - Sharkia</option>
-          <option value="Monufia">المنوفية - Monufia</option>
-          <option value="Qalyubia">القليوبية - Qalyubia</option>
-          <option value="Gharbia">الغربية - Gharbia</option>
-          <option value="Beheira">البحيرة - Beheira</option>
-          <option value="Kafr El Sheikh">كفر الشيخ - Kafr El Sheikh</option>
-          <option value="Damietta">دمياط - Damietta</option>
-          <option value="Port Said">بورسعيد - Port Said</option>
-          <option value="Ismailia">الإسماعيلية - Ismailia</option>
-          <option value="Suez">السويس - Suez</option>
-          <option value="Beni Suef">بني سويف - Beni Suef</option>
-          <option value="Fayoum">الفيوم - Fayoum</option>
-          <option value="Minya">المنيا - Minya</option>
-          <option value="Assiut">أسيوط - Assiut</option>
-          <option value="Sohag">سوهاج - Sohag</option>
-          <option value="Qena">قنا - Qena</option>
-          <option value="Luxor">الأقصر - Luxor</option>
-          <option value="Aswan">أسوان - Aswan</option>
-          <option value="Red Sea">البحر الأحمر - Red Sea</option>
+          <option value="Cairo">القاهرة - Cairo</option><option value="Giza">الجيزة - Giza</option>
+          <option value="Alexandria">الإسكندرية - Alexandria</option><option value="Dakahlia">الدقهلية - Dakahlia</option>
+          <option value="Sharkia">الشرقية - Sharkia</option><option value="Monufia">المنوفية - Monufia</option>
+          <option value="Qalyubia">القليوبية - Qalyubia</option><option value="Gharbia">الغربية - Gharbia</option>
+          <option value="Beheira">البحيرة - Beheira</option><option value="Kafr El Sheikh">كفر الشيخ - Kafr El Sheikh</option>
+          <option value="Damietta">دمياط - Damietta</option><option value="Port Said">بورسعيد - Port Said</option>
+          <option value="Ismailia">الإسماعيلية - Ismailia</option><option value="Suez">السويس - Suez</option>
+          <option value="North Sinai">شمال سيناء - North Sinai</option><option value="South Sinai">جنوب سيناء - South Sinai</option>
+          <option value="Beni Suef">بني سويف - Beni Suef</option><option value="Fayoum">الفيوم - Fayoum</option>
+          <option value="Minya">المنيا - Minya</option><option value="Assiut">أسيوط - Assiut</option>
+          <option value="Sohag">سوهاج - Sohag</option><option value="Qena">قنا - Qena</option>
+          <option value="Luxor">الأقصر - Luxor</option><option value="Aswan">أسوان - Aswan</option>
+          <option value="Red Sea">البحر الأحمر - Red Sea</option><option value="New Valley">الوادي الجديد - New Valley</option>
           <option value="Matrouh">مطروح - Matrouh</option>
         </select>
         <input id="agent" placeholder="Agent Name">
-        <input type="number" id="reminderDays" placeholder="Reminder Days">
+        <input type="number" id="reminderDays" placeholder="Reminder (Days)">
         <input type="text" id="followUp" placeholder="Follow Up Status">
-        <textarea id="notes" placeholder="Detailed Notes"></textarea>
       </div>
-      <button onclick="addOrUpdate()" id="mainSaveBtn" style="background: #007bff; width: 200px;" data-lang-key="save_btn">💾 Save Data</button>
+      <textarea id="notes" placeholder="Notes & Details"></textarea>
+      <button onclick="addOrUpdate()" id="mainSaveBtn" class="save-btn" data-lang-key="save_btn">💾 Save Data</button>
     </div>
 
-    <div class="row">
-      <div class="card" id="totalCard">Total Clients: 0</div>
-      <div class="card" id="holdCard" style="color: #ff9800; border-bottom: 4px solid #ff9800;">Hold: 0</div>
+    <div class="stats-row" style="margin-top:20px;">
+      <div class="stat-card" id="totalCard">Total: 0</div>
+      <div class="stat-card" id="holdCard" style="color:#e67e22;">Hold: 0</div>
     </div>
-    
-    <div class="table-container">
+
+    <div class="table-wrapper">
       <table>
         <thead>
           <tr>
-            <th data-lang-key="th_name">Name</th><th data-lang-key="th_phone">Phone</th><th data-lang-key="th_city">City</th>
-            <th data-lang-key="th_status">Status</th><th data-lang-key="th_agent">Agent</th><th data-lang-key="th_notes">Notes</th>
+            <th data-lang-key="th_name">Name</th><th data-lang-key="th_phone">Phone</th>
+            <th data-lang-key="th_city">City</th><th data-lang-key="th_status">Status</th>
+            <th data-lang-key="th_agent">Agent</th><th data-lang-key="th_rem">Rem</th>
             <th data-lang-key="th_wa">WA</th><th data-lang-key="th_edit">Edit</th><th data-lang-key="th_del">Del</th>
           </tr>
         </thead>
@@ -140,23 +131,23 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; position: sticky; top:
   </div>
 
   <div id="tasksTab" class="tab-content">
-    <div class="logo-container"><img src="logo.png" alt="Utopia Logo"></div>
+    <div class="logo-box"><img src="logo.png" alt="Utopia Logo"></div>
     <h3 data-lang-key="tasks_title">Tasks Management</h3>
-    <div class="card">
-      <div class="row">
+    <div style="background:#fff; padding:20px; border-radius:12px;">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
         <input id="taskInput" placeholder="Task Details">
-        <select id="taskClient" style="color: #000 !important; font-weight: bold;"></select>
+        <select id="taskClient" style="font-weight:bold;"></select>
         <input type="date" id="taskDate">
         <select id="taskStage">
-          <option value="quote">Quote Stage</option>
-          <option value="follow">Follow Up Stage</option>
-          <option value="order">Order Stage</option>
-          <option value="bank">Bank Stage</option>
+          <option value="Quote">Quote Stage</option>
+          <option value="Follow">Follow Up</option>
+          <option value="Order">Order Stage</option>
+          <option value="Bank">Bank Stage</option>
         </select>
       </div>
-      <button onclick="addTask()" style="background: #28a745; width: 200px;" data-lang-key="add_task_btn">➕ Add Task</button>
+      <button onclick="addTask()" class="save-btn" style="background:#27ae60; margin-top:10px;" data-lang-key="add_task_btn">➕ Add Task</button>
     </div>
-    <div class="table-container">
+    <div class="table-wrapper">
       <table>
         <thead>
           <tr>
@@ -171,27 +162,29 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; position: sticky; top:
 </div>
 
 <script>
+// --- Firebase ---
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// --- القاموس الكامل ---
 const langData = {
-  en: { title:"Utopia CRM", crm:"CRM System", tasks:"Tasks Tracker", crm_title:"Client Management", tasks_title:"Tasks Management", save_btn:"💾 Save Data", add_task_btn:"➕ Add Task", th_name:"Name", th_phone:"Phone", th_city:"City", th_status:"Status", th_agent:"Agent", th_notes:"Notes", th_wa:"WA", th_edit:"Edit", th_del:"Del", th_client:"Client", th_date:"Date", th_stage:"Stage", th_task:"Task" },
-  ar: { title:"يوتوبيا CRM", crm:"نظام العملاء", tasks:"جدول المهام", crm_title:"إدارة بيانات العملاء", tasks_title:"إدارة المهام المطلوبة", save_btn:"💾 حفظ البيانات", add_task_btn:"➕ إضافة مهمة", th_name:"الاسم", th_phone:"الهاتف", th_city:"المحافظة", th_status:"الحالة", th_agent:"المندوب", th_notes:"ملاحظات", th_wa:"واتساب", th_edit:"تعديل", th_del:"حذف", th_client:"العميل", th_date:"التاريخ", th_stage:"المرحلة", th_task:"المهمة" }
+  en: { title:"Utopia CRM", crm:"CRM System", tasks:"Tasks Manager", crm_title:"Client Management", tasks_title:"Tasks Manager", save_btn:"💾 Save Data", add_task_btn:"➕ Add Task", th_name:"Name", th_phone:"Phone", th_city:"City", th_status:"Status", th_agent:"Agent", th_rem:"Rem", th_wa:"WA", th_edit:"Edit", th_del:"Del", th_client:"Client", th_date:"Date", th_stage:"Stage", th_task:"Task" },
+  ar: { title:"يوتوبيا CRM", crm:"نظام العملاء", tasks:"إدارة المهام", crm_title:"إدارة بيانات العملاء", tasks_title:"إدارة المهام المطلوبة", save_btn:"💾 حفظ البيانات", add_task_btn:"➕ إضافة مهمة", th_name:"الاسم", th_phone:"الهاتف", th_city:"المحافظة", th_status:"الحالة", th_agent:"المندوب", th_rem:"تذكير", th_wa:"واتساب", th_edit:"تعديل", th_del:"حذف", th_client:"العميل", th_date:"التاريخ", th_stage:"المرحلة", th_task:"المهمة" }
 };
 
 let clients = {}, tasks = {}, editId = null, currentLang = 'en';
 
-function showToast(msg, type='success') {
+function showToast(msg) {
   const container = document.getElementById('toast-container');
   const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerText = msg;
+  toast.className = 'toast'; toast.innerText = msg;
   container.appendChild(toast);
-  setTimeout(() => { toast.remove(); }, 3000);
+  setTimeout(() => toast.remove(), 3000);
 }
 
-db.ref('clients').on('value', s => { clients = s.val() || {}; renderCRM(); updateClientDropdown(); });
+// المزامنة
+db.ref('clients').on('value', s => { clients = s.val() || {}; renderCRM(); updateTaskDropdown(); });
 db.ref('tasks').on('value', s => { tasks = s.val() || {}; renderTasks(); });
 
 function showTab(id, btn){
@@ -203,25 +196,25 @@ function showTab(id, btn){
 
 function addOrUpdate(){
   const name = document.getElementById('name').value;
-  if(!name) return showToast("Name required", "error");
+  if(!name) { alert("Please enter name"); return; }
   const data = {
     name, phone: document.getElementById('phone').value,
     date: document.getElementById('date').value,
     status: document.getElementById('status').value,
     city: document.getElementById('city').value,
-    notes: document.getElementById('notes').value,
     agent: document.getElementById('agent').value,
     reminderDays: document.getElementById('reminderDays').value,
-    followUp: document.getElementById('followUp').value
+    followUp: document.getElementById('followUp').value,
+    notes: document.getElementById('notes').value
   };
   if(editId){
     db.ref('clients/'+editId).set(data).then(()=>showToast("Updated!"));
     editId = null;
-    document.getElementById('mainSaveBtn').innerText = currentLang==='ar' ? "💾 حفظ البيانات" : "💾 Save Data";
+    document.getElementById('mainSaveBtn').innerText = currentLang === 'ar' ? "💾 حفظ البيانات" : "💾 Save Data";
   } else {
-    db.ref('clients').push(data).then(()=>showToast("Added!"));
+    db.ref('clients').push(data).then(()=>showToast("Saved!"));
   }
-  clearFields();
+  clearInputs();
 }
 
 function renderCRM(){
@@ -231,28 +224,28 @@ function renderCRM(){
   let total=0, hold=0;
   for(let id in clients){
     const c = clients[id];
-    if(search && !c.name.toLowerCase().includes(search) && !c.phone.includes(search) && !c.city.toLowerCase().includes(search)) continue;
+    if(search && !c.name.toLowerCase().includes(search) && !c.city.toLowerCase().includes(search)) continue;
     total++; if(c.status === "Hold") hold++;
     tbody.innerHTML += `<tr class="${c.status === 'Hold' ? 'row-hold' : ''}">
-      <td style="font-weight:bold">${c.name}</td><td>${c.phone}</td><td>${c.city}</td><td>${c.status}</td><td>${c.agent}</td><td>${c.notes}</td>
-      <td><button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; padding:5px 10px;">📱</button></td>
-      <td><button onclick="editClient('${id}')" style="background:#28a745; padding:5px 10px;">✏️</button></td>
-      <td><button onclick="deleteClient('${id}')" style="background:#dc3545; padding:5px 10px;">🗑️</button></td>
+      <td>${c.name}</td><td>${c.phone}</td><td>${c.city}</td><td>${c.status}</td><td>${c.agent}</td><td>${c.reminderDays}</td>
+      <td><button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; color:#fff; border-radius:5px; padding:5px;">WA</button></td>
+      <td><button onclick="editClient('${id}')" style="background:#27ae60; color:#fff; border-radius:5px; padding:5px;">Edit</button></td>
+      <td><button onclick="deleteClient('${id}')" style="background:#e74c3c; color:#fff; border-radius:5px; padding:5px;">Del</button></td>
     </tr>`;
   }
-  document.getElementById('totalCard').innerText = (currentLang==='ar'?'إجمالي العملاء: ':'Total Clients: ') + total;
+  document.getElementById('totalCard').innerText = (currentLang==='ar'?'الإجمالي: ':'Total: ') + total;
   document.getElementById('holdCard').innerText = (currentLang==='ar'?'الانتظار: ':'Hold: ') + hold;
 }
 
 function editClient(id){
   const c = clients[id]; editId = id;
-  ['name','phone','date','status','city','notes','agent','reminderDays','followUp'].forEach(k => {
+  ['name','phone','date','status','city','agent','reminderDays','followUp','notes'].forEach(k => {
     document.getElementById(k).value = c[k] || '';
   });
-  document.getElementById('mainSaveBtn').innerText = currentLang==='ar' ? "تحديث الآن" : "Update Now";
+  document.getElementById('mainSaveBtn').innerText = currentLang === 'ar' ? "تحديث" : "Update Now";
 }
 
-function deleteClient(id){ if(confirm("Delete?")) db.ref('clients/'+id).remove().then(()=>showToast("Deleted", "error")); }
+function deleteClient(id){ if(confirm("Delete?")) db.ref('clients/'+id).remove(); }
 
 function addTask(){
   const t = {
@@ -261,9 +254,9 @@ function addTask(){
     date: document.getElementById('taskDate').value,
     stage: document.getElementById('taskStage').value
   };
-  if(!t.text || !t.client) return showToast("Missing Data", "error");
+  if(!t.text || !t.client) return showToast("Enter Details");
   db.ref('tasks').push(t).then(()=>showToast("Task Added"));
-  document.getElementById('taskInput').value='';
+  document.getElementById('taskInput').value = '';
 }
 
 function renderTasks(){
@@ -271,30 +264,23 @@ function renderTasks(){
   for(let id in tasks){
     const t = tasks[id];
     tbody.innerHTML += `<tr>
-      <td style="font-weight:bold">${t.client}</td><td>${t.date}</td>
-      <td><span class="stage-badge stage-${t.stage}">${t.stage.toUpperCase()}</span></td>
-      <td>${t.text}</td><td><button onclick="deleteTask('${id}')" style="background:#dc3545; padding:5px 10px;">🗑️</button></td>
+      <td>${t.client}</td><td>${t.date}</td><td>${t.stage}</td><td>${t.text}</td>
+      <td><button onclick="db.ref('tasks/${id}').remove()" style="background:#e74c3c; color:#fff; border-radius:5px; padding:5px;">Del</button></td>
     </tr>`;
   }
 }
 
-function deleteTask(id){ db.ref('tasks/'+id).remove().then(()=>showToast("Removed", "error")); }
-
-// حل مشكلة قائمة العملاء في التاسك
-function updateClientDropdown(){
+// حل مشكلة قائمة العملاء
+function updateTaskDropdown(){
   const sel = document.getElementById('taskClient');
-  const placeholder = currentLang === 'ar' ? "اختر العميل" : "Select Client";
-  sel.innerHTML = `<option value="">-- ${placeholder} --</option>`;
-  for(let id in clients) {
-    const option = document.createElement('option');
-    option.value = clients[id].name;
-    option.innerText = clients[id].name;
-    sel.appendChild(option);
+  sel.innerHTML = `<option value="">-- ${currentLang==='ar'?'اختر العميل':'Select Client'} --</option>`;
+  for(let id in clients){
+    sel.innerHTML += `<option value="${clients[id].name}">${clients[id].name}</option>`;
   }
 }
 
-function clearFields(){
-  ['name','phone','date','status','city','notes','agent','reminderDays','followUp'].forEach(i=>document.getElementById(i).value='');
+function clearInputs(){
+  ['name','phone','date','status','city','agent','reminderDays','followUp','notes'].forEach(i=>document.getElementById(i).value='');
 }
 
 function changeLang(l){
@@ -302,8 +288,7 @@ function changeLang(l){
   document.querySelectorAll('[data-lang-key]').forEach(el => {
     el.innerText = langData[l][el.getAttribute('data-lang-key')];
   });
-  updateClientDropdown(); // تحديث القائمة فوراً عند تغيير اللغة
-  renderCRM(); renderTasks();
+  updateTaskDropdown(); renderCRM(); renderTasks();
 }
 </script>
 </body>
