@@ -163,13 +163,22 @@ setTimeout(()=>{notif.style.display='none';},4000);
 }
 
 // --- Governorates ---
-const governorates=["Cairo","Alexandria","Giza","Qalyubia","Gharbia","Dakahlia","Sharqia","Beheira","Fayoum","Menofia","Assiut","Sohag","Minya","Beni Suef","Luxor","Aswan","Red Sea","New Valley","Ismailia","Suez","North Sinai","South Sinai","Port Said","Damietta","Kafr El Sheikh","Matrouh","Qena","Helwan","Marsa Matrouh"];
+const governorates=[
+  "Cairo","Alexandria","Giza","Qalyubia","Gharbia","Dakahlia","Sharqia",
+  "Beheira","Fayoum","Menofia","Assiut","Sohag","Minya","Beni Suef",
+  "Luxor","Aswan","Red Sea","New Valley","Ismailia","Suez","North Sinai",
+  "South Sinai","Port Said","Damietta","Kafr El Sheikh","Matrouh","Qena",
+  "Helwan","Marsa Matrouh"
+];
 function populateGovernorates(){
-const sel=document.getElementById('governorate');
-const taskSel=document.getElementById('taskGovernorate');
-sel.innerHTML='<option value="">Select Governorate</option>';
-taskSel.innerHTML='<option value="">Select Governorate</option>';
-governorates.forEach(g=>{sel.innerHTML+=`<option value="${g}">${g}</option>`;taskSel.innerHTML+=`<option value="${g}">${g}</option>`;});
+  const sel=document.getElementById('governorate');
+  const taskSel=document.getElementById('taskGovernorate');
+  sel.innerHTML='<option value="">Select Governorate</option>';
+  taskSel.innerHTML='<option value="">Select Governorate</option>';
+  governorates.forEach(g=>{
+    sel.innerHTML+=`<option value="${g}">${g}</option>`;
+    taskSel.innerHTML+=`<option value="${g}">${g}</option>`;
+  });
 }
 populateGovernorates();
 
@@ -192,6 +201,7 @@ document.getElementById('universalSearch').placeholder=t.search;
 document.getElementById('name').placeholder=t.clientName;
 document.getElementById('phone').placeholder=t.phone;
 document.getElementById('governorate').options[0].text=t.governorate;
+populateGovernorates(); // <-- إعادة تعبئة المحافظات بعد تغيير اللغة
 for(let i=0;i<document.getElementById('status').options.length;i++){
 document.getElementById('status').options[i].text=t.statusOptions[i];
 }
@@ -276,9 +286,10 @@ if(confirm('Are you sure?')){clients.splice(i,1);db.ref('clients').set(clients);
 function clearClientForm(){
 document.getElementById('name').value='';
 document.getElementById('phone').value='';
-document.getElementById('governorate').value='';
+document.getElementById('governorate').
+  .value='';
 document.getElementById('date').value='';
-document.getElementById('status').value=document.getElementById('status').options[0].value;
+document.getElementById('status').selectedIndex=0;
 document.getElementById('notes').value='';
 document.getElementById('agent').value='';
 document.getElementById('reminderDays').value='';
@@ -286,67 +297,105 @@ document.getElementById('followUp').value='';
 editIndex=-1;
 }
 
-// Populate Task Client Dropdown
+// Track Client on Map
+function trackClient(i){
+const c = clients[i];
+if(c.governorate){
+window.open(`https://www.google.com/maps/search/${encodeURIComponent(c.governorate)}`,'_blank');
+} else {
+alert('No governorate selected for this client');
+}
+}
+
+// Populate Client Dropdown for Tasks
 function populateClientDropdown(){
 const sel=document.getElementById('taskClient');
 sel.innerHTML=`<option value="">${texts[document.documentElement.lang].selectClient}</option>`;
-clients.forEach((c,i)=>sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`);
-}
-
-// Track Client
-function trackClient(i){alert(`Tracking ${clients[i].name}`);}
-
-// Tasks CRUD
-function loadTasksFromFirebase(){
-db.ref('tasks').on('value',snapshot=>{tasks=snapshot.val()?Object.values(snapshot.val()):[];renderTasks();});
-}
-function renderTasks(){
-const tbody=document.getElementById('taskList');tbody.innerHTML='';
-tasks.forEach((t,i)=>{
-const row=document.createElement('tr');
-row.innerHTML=`<td>${t.client}</td><td>${t.governorate}</td><td>${t.date}</td><td><span class="task-stage stage-${t.stage}">${t.stage}</span></td><td>${t.text}</td>
-<td><button onclick="editTask(${i})">Edit</button></td>
-<td><button onclick="deleteTask(${i})">Delete</button></td>`;
-tbody.appendChild(row);
+clients.forEach((c,i)=>{
+sel.innerHTML+=`<option value="${i}">${c.name}</option>`;
 });
 }
+
+// Export PDF
+function exportPDFWithArabicSupport(){
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+const columns = ["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"];
+const rows = clients.map(c=>[c.name,c.phone,c.governorate,c.date,c.status,c.notes,c.reminderDays,c.followUp]);
+doc.autoTable({head:[columns],body:rows});
+doc.save("CRM_Data.pdf");
+}
+
+// --- Tasks ---
 function addTask(){
-const task={text:document.getElementById('taskInput').value,client:document.getElementById('taskClient').value,governorate:document.getElementById('taskGovernorate').value,date:document.getElementById('taskDate').value,stage:document.getElementById('taskStage').value};
+const idx=document.getElementById('taskClient').value;
+const clientName=idx!==""?clients[idx].name:"";
+const task={client:clientName,governorate:document.getElementById('taskGovernorate').value,date:document.getElementById('taskDate').value,stage:document.getElementById('taskStage').value,text:document.getElementById('taskInput').value};
 if(taskEditIndex===-1) tasks.push(task); else tasks[taskEditIndex]=task;
 db.ref('tasks').set(tasks);
 renderTasks();
 clearTaskForm();
 showNotification('Task Saved');
 }
+
+// Render Tasks
+function renderTasks(){
+const tbody=document.getElementById('taskList');
+tbody.innerHTML='';
+tasks.forEach((t,i)=>{
+const row=document.createElement('tr');
+row.innerHTML=`<td>${t.client}</td><td>${t.governorate}</td><td>${t.date}</td>
+<td><span class="task-stage ${t.stage}">${t.stage}</span></td>
+<td>${t.text}</td>
+<td><button onclick="editTask(${i})">Edit</button></td>
+<td><button onclick="deleteTask(${i})">Delete</button></td>`;
+tbody.appendChild(row);
+});
+}
+
+// Edit Task
 function editTask(i){
 taskEditIndex=i;
 const t=tasks[i];
-document.getElementById('taskInput').value=t.text;
-document.getElementById('taskClient').value=t.client;
+document.getElementById('taskClient').value=clients.findIndex(c=>c.name===t.client);
 document.getElementById('taskGovernorate').value=t.governorate;
 document.getElementById('taskDate').value=t.date;
 document.getElementById('taskStage').value=t.stage;
-}
-function deleteTask(i){if(confirm('Are you sure?')){tasks.splice(i,1);db.ref('tasks').set(tasks);renderTasks();showNotification('Task Deleted');}}
-function clearTaskForm(){document.getElementById('taskInput').value='';document.getElementById('taskClient').value='';document.getElementById('taskGovernorate').value='';document.getElementById('taskDate').value='';document.getElementById('taskStage').value='quote';taskEditIndex=-1;}
-
-// Export PDF
-function exportPDFWithArabicSupport(){
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF('l', 'pt', 'a4');
-const col=["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"];
-const rows=clients.map(c=>[c.name,c.phone,c.governorate,c.date,c.status,c.notes,c.reminderDays,c.followUp]);
-doc.setFontSize(14);doc.text("CRM Export",40,40);
-doc.autoTable({head:[col],body:rows,startY:60,styles:{fontSize:10}});
-doc.save('crm_export.pdf');
+document.getElementById('taskInput').value=t.text;
 }
 
-// Init
+// Delete Task
+function deleteTask(i){
+if(confirm('Are you sure?')){
+tasks.splice(i,1);
+db.ref('tasks').set(tasks);
+renderTasks();
+showNotification('Task Deleted');
+}
+}
+
+// Clear Task Form
+function clearTaskForm(){
+document.getElementById('taskClient').selectedIndex=0;
+document.getElementById('taskGovernorate').selectedIndex=0;
+document.getElementById('taskDate').value='';
+document.getElementById('taskStage').selectedIndex=0;
+document.getElementById('taskInput').value='';
+taskEditIndex=-1;
+}
+
+// Load Tasks
+function loadTasksFromFirebase(){
+db.ref('tasks').on('value',snapshot=>{
+tasks=snapshot.val()?Object.values(snapshot.val()):[];
+renderTasks();
+});
+}
+
+// --- Init ---
 loadClientsFromFirebase();
 loadTasksFromFirebase();
-renderCRM();
-renderTasks();
-populateClientDropdown();
+changeLang('en'); // default language
 </script>
 </body>
 </html>
