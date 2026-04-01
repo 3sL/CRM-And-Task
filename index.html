@@ -5,48 +5,52 @@
 <title>CRM System & Tasks For Utopia Trading And Export</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
+/* التنسيقات الأصلية */
 body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; color:#333; overflow-x:hidden; }
-h2 { margin-top:0; text-align:center; }
 .sidebar { width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; transition: all 0.3s ease; }
-.sidebar h2 { font-size:1.5em; margin-bottom:20px; color:#ffcc00; }
-.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; transition: all 0.2s ease; }
-.sidebar button:hover { background:#3f3f6b; }
+.sidebar h2 { font-size:1.2em; margin-bottom:20px; color:#ffcc00; text-align:center; }
+.sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align:right; font-weight:bold; }
 .sidebar button.active { background:#ffcc00; color:#1e1e2f; }
-.sidebar select { padding:10px; border-radius:8px; border:none; margin-top:10px; }
-.tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; min-width:0; }
+.tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; }
 .tab-content { animation:fadeIn 0.3s ease; display:none; }
 .tab-content.active { display:block; }
-input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none; }
-textarea { resize:none; height:80px; }
-button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:bold; transition:0.2s; }
+input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; }
+button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:bold; }
 .card { background:#fff; padding:15px; text-align:center; border-radius:12px; margin:5px; flex:1; box-shadow:0 4px 6px rgba(0,0,0,0.1); font-weight:bold; }
 .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-table { width:100%; border-collapse:collapse; margin-top:15px; background:#fff; border-radius:12px; overflow-x:auto; display:block; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; min-width: 120px; }
-th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
-#notification { position: fixed; top:20px; right:20px; background:#ffcc00; color:#1e1e2f; padding:15px 20px; border-radius:12px; display:none; z-index:999; min-width:220px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.2); cursor:pointer; }
-.task-stage { padding:5px 10px; color:#fff; border-radius:12px; font-weight:bold; font-size:0.9em; }
-.stage-quote { background:#ff7f50; }
-.stage-follow { background:#1e90ff; }
-.stage-order { background:#28a745; }
-.stage-bank { background:#6f42c1; }
+table { width:100%; border-collapse:collapse; margin-top:15px; background:#fff; border-radius:12px; overflow-x:auto; display:block; }
+th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; min-width:120px; }
+th { background:#1e1e2f; color:#ffcc00; }
+
+/* إضافات نظام التنبيهات الجديد (Actions) */
+#notification-container { position: fixed; top: 20px; right: 20px; z-index: 10000; }
+.toast { background: #333; color: #fff; padding: 15px 25px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-left: 5px solid #ffcc00; animation: slideIn 0.5s ease forwards; }
+.toast.success { border-left-color: #28a745; }
+.toast.info { border-left-color: #17a2b8; }
+.toast.warning { border-left-color: #dc3545; }
+
 .logo-container { text-align:center; margin-bottom:20px; }
-.logo-container img { max-width: 150px; height: auto; border-radius: 12px; }
-@media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; } .sidebar h2 { display:none; } .tabs-content { padding: 10px; } .row { flex-direction: column; } }
+.logo-container img { max-width: 150px; border-radius: 12px; }
+
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+@media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; } }
 </style>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
+<div id="notification-container"></div>
+
 <div class="sidebar">
-  <h2 data-lang-key="title">Utopia CRM</h2>
+  <h2 data-lang-key="title">Utopia CRM & Tasks</h2>
   <button class="tab-btn active" onclick="showTab('crmTab', this)" data-lang-key="crm">CRM</button>
   <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks</button>
   <hr>
-  <div class="developer" data-lang-key="developer">Developed by Eng : <strong>Mahmoud Mohamed Marie</strong></div>
-  <div class="phone">📞 +201222153415</div>
+  <div class="developer" style="font-size:0.7em; text-align:center">Developed by Eng: <br><strong>Mahmoud Mohamed Marie</strong></div>
+  <div class="phone" style="font-size:0.8em; text-align:center">📞 +201222153415</div>
   <select id="language" onchange="changeLang(this.value)">
     <option value="en">English</option>
     <option value="ar">عربي</option>
@@ -54,30 +58,26 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
 </div>
 
 <div class="tabs-content">
-  <div id="notification"></div>
-
   <div id="crmTab" class="tab-content active">
     <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
     <h2 data-lang-key="crm_title">CRM System</h2>
+    <div class="row"><input id="universalSearch" placeholder="Search..." oninput="renderCRM()"></div>
     <div class="row">
-      <input id="universalSearch" placeholder="Search Any Column..." oninput="renderCRM()">
-    </div>
-    <div class="row">
-      <input id="name" placeholder="Client Name" data-lang-placeholder-en="Client Name" data-lang-placeholder-ar="اسم العميل">
-      <input id="phone" placeholder="Phone" data-lang-placeholder-en="Phone" data-lang-placeholder-ar="رقم الهاتف">
+      <input id="name" placeholder="Client Name">
+      <input id="phone" placeholder="Phone">
       <input type="date" id="date">
       <select id="status">
-        <option value="Interested" data-lang-option-en="Interested" data-lang-option-ar="مهتم">Interested</option>
-        <option value="In Progress" data-lang-option-en="In Progress" data-lang-option-ar="قيد المتابعة">In Progress</option>
-        <option value="Hold" data-lang-option-en="Hold" data-lang-option-ar="Hold">Hold</option>
-        <option value="Completed" data-lang-option-en="Completed" data-lang-option-ar="مكتمل">Completed</option>
+        <option value="Interested">Interested</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Hold">Hold</option>
+        <option value="Completed">Completed</option>
       </select>
-      <textarea id="notes" placeholder="Notes" data-lang-placeholder-en="Notes" data-lang-placeholder-ar="ملاحظات"></textarea>
-      <input id="agent" placeholder="Agent Name" data-lang-placeholder-en="Agent Name" data-lang-placeholder-ar="اسم المندوب">
-      <input type="number" id="reminderDays" placeholder="Reminder Days" data-lang-placeholder-en="Reminder Days" data-lang-placeholder-ar="Reminder بالأيام">
-      <input type="text" id="followUp" placeholder="Follow Up" data-lang-placeholder-en="Follow Up" data-lang-placeholder-ar="متابعة">
+      <textarea id="notes" placeholder="Notes"></textarea>
+      <input id="agent" placeholder="Agent Name">
+      <input type="number" id="reminderDays" placeholder="Reminder Days">
+      <input type="text" id="followUp" placeholder="Follow Up">
     </div>
-    <button onclick="addOrUpdate()" data-lang-key="save" id="mainSaveBtn">💾 Save</button>
+    <button onclick="addOrUpdate()" id="mainSaveBtn" data-lang-key="save">💾 Save</button>
     <div class="row">
       <div class="card" id="total">Total: 0</div>
       <div class="card" id="hold">Hold: 0</div>
@@ -85,9 +85,7 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
     <table>
       <thead>
         <tr>
-          <th data-lang-key="name">Name</th><th data-lang-key="phone">Phone</th><th data-lang-key="date">Date</th><th data-lang-key="status">Status</th>
-          <th data-lang-key="notes">Notes</th><th data-lang-key="reminder">Reminder</th><th data-lang-key="followup">Follow Up</th>
-          <th data-lang-key="whatsapp">WhatsApp</th><th data-lang-key="edit">Edit</th><th data-lang-key="delete">Delete</th>
+          <th>Name</th><th>Phone</th><th>Date</th><th>Status</th><th>Notes</th><th>WhatsApp</th><th>Edit</th><th>Delete</th>
         </tr>
       </thead>
       <tbody id="table"></tbody>
@@ -98,21 +96,21 @@ th { background:#1e1e2f; color:#ffcc00; font-weight:bold; }
     <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
     <h2 data-lang-key="tasks_title">Tasks</h2>
     <div class="row">
-      <input id="taskInput" placeholder="Task Text" data-lang-placeholder-en="Task Text" data-lang-placeholder-ar="نص المهمة">
+      <input id="taskInput" placeholder="Task Text">
       <select id="taskClient"><option value="">Select Client</option></select>
       <input type="date" id="taskDate">
       <select id="taskStage">
-        <option value="quote" data-lang-option-en="Quote" data-lang-option-ar="تقديم عرض سعر">Quote</option>
-        <option value="follow" data-lang-option-en="Follow Up" data-lang-option-ar="متابعة عرض السعر">Follow Up</option>
-        <option value="order" data-lang-option-en="Order" data-lang-option-ar="أمر توريد">Order</option>
-        <option value="bank" data-lang-option-en="Bank" data-lang-option-ar="البنك">Bank</option>
+        <option value="quote">Quote</option>
+        <option value="follow">Follow Up</option>
+        <option value="order">Order</option>
+        <option value="bank">Bank</option>
       </select>
-      <button onclick="addTask()" data-lang-key="add_task">➕ Add Task</button>
+      <button onclick="addTask()">➕ Add Task</button>
     </div>
     <table>
       <thead>
         <tr>
-          <th data-lang-key="client">Client</th><th data-lang-key="date">Date</th><th data-lang-key="stage">Stage</th><th data-lang-key="task">Task</th><th data-lang-key="edit">Edit</th><th data-lang-key="delete">Delete</th>
+          <th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Delete</th>
         </tr>
       </thead>
       <tbody id="taskList"></tbody>
@@ -126,153 +124,147 @@ const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const langData = {
-  en: { title:"Utopia CRM", crm:"CRM", tasks:"Tasks", developer:"Developed by Eng : Mahmoud Mohamed Marie", crm_title:"CRM System", tasks_title:"Tasks", save:"💾 Save", add_task:"➕ Add Task", name:"Name", phone:"Phone", date:"Date", status:"Status", notes:"Notes", reminder:"Reminder", followup:"Follow Up", whatsapp:"WhatsApp", edit:"Edit", delete:"Delete", client:"Client", stage:"Stage", task:"Task" },
-  ar: { title:"يوتوبيا CRM", crm:"نظام العملاء", tasks:"المهام", developer:"تطوير المهندس: محمود محمد ماري", crm_title:"نظام العملاء", tasks_title:"المهام", save:"💾 حفظ", add_task:"➕ إضافة مهمة", name:"الاسم", phone:"الهاتف", date:"التاريخ", status:"الحالة", notes:"ملاحظات", reminder:"تذكير", followup:"متابعة", whatsapp:"واتساب", edit:"تعديل", delete:"حذف", client:"العميل", stage:"المرحلة", task:"المهمة" }
-};
-
 let lang='en', clientsObj={}, tasksObj={}, editId=null;
 
+// --- نظام التنبيهات الجديد (Action Alerts) ---
+function notify(message, type='info') {
+    const container = document.getElementById('notification-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+    container.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+}
+
+// المزامنة والتحميل
+db.ref('clients').on('value', snap => { clientsObj = snap.val() || {}; renderCRM(); populateDropdown(); });
+db.ref('tasks').on('value', snap => { tasksObj = snap.val() || {}; renderTasks(); });
+
 function showTab(id, btn){ 
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); 
-  document.getElementById(id).classList.add('active'); 
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
-  btn.classList.add('active'); 
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
+    btn.classList.add('active'); 
 }
 
-function showNotification(msg){ 
-  const n=document.getElementById('notification'); n.innerText=msg; n.style.display='block'; 
-  setTimeout(()=>{ n.style.display='none'; },4000); 
-}
-
-// CRM Logic (المعدلة للربط الصح)
-db.ref('clients').on('value', snapshot => {
-  clientsObj = snapshot.val() || {};
-  renderCRM();
-  populateClientDropdown();
-});
-
+// CRM Actions
 function addOrUpdate(){
-  const name = document.getElementById('name').value;
-  if(!name) return alert("Name is required");
+    const name = document.getElementById('name').value;
+    if(!name) { notify("Please enter a name!", "warning"); return; }
 
-  const c = {
-    name,
-    phone: document.getElementById('phone').value,
-    date: document.getElementById('date').value,
-    status: document.getElementById('status').value,
-    notes: document.getElementById('notes').value,
-    agent: document.getElementById('agent').value,
-    reminderDays: document.getElementById('reminderDays').value,
-    followUp: document.getElementById('followUp').value
-  };
+    const c = {
+        name, phone: document.getElementById('phone').value,
+        date: document.getElementById('date').value,
+        status: document.getElementById('status').value,
+        notes: document.getElementById('notes').value,
+        agent: document.getElementById('agent').value,
+        reminderDays: document.getElementById('reminderDays').value,
+        followUp: document.getElementById('followUp').value
+    };
 
-  if(editId){
-    db.ref('clients/' + editId).set(c);
-    editId = null;
-    document.getElementById('mainSaveBtn').innerText = lang==='ar' ? "💾 حفظ" : "💾 Save";
-  } else {
-    db.ref('clients').push(c);
-  }
-  
-  document.querySelectorAll('#name,#phone,#date,#status,#notes,#agent,#reminderDays,#followUp').forEach(e=>e.value='');
+    if(editId){
+        db.ref('clients/' + editId).set(c)
+        .then(() => notify(`Updated client: ${name}`, "success"));
+        editId = null;
+        document.getElementById('mainSaveBtn').innerText = "💾 Save";
+    } else {
+        db.ref('clients').push(c)
+        .then(() => notify(`New client added: ${name}`, "success"));
+    }
+    clearInputs();
 }
 
 function renderCRM(){
-  const table=document.getElementById('table'); 
-  const filter=document.getElementById('universalSearch').value.toLowerCase(); 
-  table.innerHTML=''; 
-  let totalCount=0, holdCount=0;
+    const table=document.getElementById('table'); 
+    const filter=document.getElementById('universalSearch').value.toLowerCase(); 
+    table.innerHTML=''; 
+    let total=0, hold=0;
 
-  for(let id in clientsObj){
-    const c = clientsObj[id];
-    let combinedText = `${c.name} ${c.phone} ${c.status}`.toLowerCase();
-    if(filter && !combinedText.includes(filter)) continue;
+    for(let id in clientsObj){
+        const c = clientsObj[id];
+        if(filter && !c.name.toLowerCase().includes(filter)) continue;
+        total++; if(c.status === "Hold") hold++;
 
-    totalCount++;
-    if(c.status === "Hold") holdCount++;
-
-    table.innerHTML += `<tr>
-      <td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td>
-      <td>${c.notes}</td><td>${c.reminderDays || '-'}</td><td>${c.followUp || '-'}</td>
-      <td><button onclick="window.open('https://wa.me/${c.phone}')">📱</button></td>
-      <td><button onclick="editClient('${id}')">✏️</button></td>
-      <td><button onclick="deleteClient('${id}')">❌</button></td>
-    </tr>`;
-  }
-  document.getElementById("total").innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + totalCount;
-  document.getElementById("hold").innerText = (lang==='ar'?'قيد الانتظار: ':'Hold: ') + holdCount;
+        table.innerHTML += `<tr>
+            <td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td>
+            <td>${c.notes}</td>
+            <td><button onclick="window.open('https://wa.me/${c.phone}')">📱</button></td>
+            <td><button onclick="editClient('${id}')">✏️</button></td>
+            <td><button onclick="deleteClient('${id}')" style="background:red">❌</button></td>
+        </tr>`;
+    }
+    document.getElementById("total").innerText = "Total: " + total;
+    document.getElementById("hold").innerText = "Hold: " + hold;
 }
 
 function editClient(id){
-  const c = clientsObj[id];
-  editId = id;
-  document.getElementById('name').value = c.name;
-  document.getElementById('phone').value = c.phone;
-  document.getElementById('date').value = c.date;
-  document.getElementById('status').value = c.status;
-  document.getElementById('notes').value = c.notes;
-  document.getElementById('agent').value = c.agent;
-  document.getElementById('reminderDays').value = c.reminderDays;
-  document.getElementById('followUp').value = c.followUp;
-  document.getElementById('mainSaveBtn').innerText = lang==='ar' ? "تحديث العميل" : "Update Client";
+    const c = clientsObj[id];
+    editId = id;
+    document.getElementById('name').value = c.name;
+    document.getElementById('phone').value = c.phone;
+    document.getElementById('status').value = c.status;
+    document.getElementById('mainSaveBtn').innerText = "Update Now";
+    notify("Editing mode activated", "info");
 }
 
-function deleteClient(id){ if(confirm("Delete?")) db.ref('clients/'+id).remove(); }
-
-function populateClientDropdown(){
-  const sel=document.getElementById('taskClient'); sel.innerHTML='<option value="">Select Client</option>';
-  for(let id in clientsObj) {
-    sel.innerHTML += `<option value="${clientsObj[id].name}">${clientsObj[id].name}</option>`;
-  }
+function deleteClient(id){
+    if(confirm("Delete client?")){
+        const name = clientsObj[id].name;
+        db.ref('clients/'+id).remove()
+        .then(() => notify(`Client ${name} deleted`, "warning"));
+    }
 }
 
-// Tasks Logic
-db.ref('tasks').on('value', snapshot => {
-  tasksObj = snapshot.val() || {};
-  renderTasks();
-});
-
+// Tasks Actions
 function addTask(){
-  const t = {
-    text: document.getElementById('taskInput').value,
-    client: document.getElementById('taskClient').value,
-    date: document.getElementById('taskDate').value,
-    stage: document.getElementById('taskStage').value
-  };
-  if(!t.text) return;
-  db.ref('tasks').push(t);
-  document.getElementById('taskInput').value='';
+    const t = {
+        text: document.getElementById('taskInput').value,
+        client: document.getElementById('taskClient').value,
+        date: document.getElementById('taskDate').value,
+        stage: document.getElementById('taskStage').value
+    };
+    if(!t.text) return notify("Enter task details", "warning");
+    db.ref('tasks').push(t).then(() => notify("New task assigned", "success"));
+    document.getElementById('taskInput').value='';
 }
 
 function renderTasks(){
-  const table=document.getElementById('taskList'); table.innerHTML='';
-  const stageNames = { 
-    en:{quote:"Quote",follow:"Follow Up",order:"Order",bank:"Bank"}, 
-    ar:{quote:"تقديم عرض سعر",follow:"متابعة عرض السعر",order:"أمر توريد",bank:"البنك"} 
-  };
-  for(let id in tasksObj){
-    const t = tasksObj[id];
-    table.innerHTML += `<tr>
-      <td>${t.client}</td><td>${t.date}</td>
-      <td><span class="task-stage stage-${t.stage}">${stageNames[lang][t.stage]}</span></td>
-      <td>${t.text}</td>
-      <td><button onclick="editTask('${id}')">✏️</button></td>
-      <td><button onclick="deleteTask('${id}')">❌</button></td>
-    </tr>`;
-  }
+    const table=document.getElementById('taskList'); table.innerHTML='';
+    for(let id in tasksObj){
+        const t = tasksObj[id];
+        table.innerHTML += `<tr>
+            <td>${t.client}</td><td>${t.date}</td>
+            <td><span class="task-stage stage-${t.stage}">${t.stage}</span></td>
+            <td>${t.text}</td>
+            <td><button onclick="deleteTask('${id}')" style="background:red">❌</button></td>
+        </tr>`;
+    }
 }
 
-function deleteTask(id){ db.ref('tasks/'+id).remove(); }
+function deleteTask(id){
+    db.ref('tasks/'+id).remove().then(() => notify("Task completed/removed", "info"));
+}
 
-function changeLang(selectedLang){
-  lang=selectedLang;
-  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
-  document.querySelectorAll('[data-lang-key]').forEach(el=>{
-    const key=el.getAttribute('data-lang-key');
-    if(langData[lang][key]) el.innerText=langData[lang][key];
-  });
-  renderCRM(); renderTasks();
+function populateDropdown(){
+    const sel=document.getElementById('taskClient'); sel.innerHTML='<option value="">Select Client</option>';
+    for(let id in clientsObj) sel.innerHTML += `<option value="${clientsObj[id].name}">${clientsObj[id].name}</option>`;
+}
+
+function clearInputs(){
+    document.querySelectorAll('#name,#phone,#date,#notes,#agent,#reminderDays,#followUp').forEach(e=>e.value='');
+}
+
+function changeLang(l){
+    lang=l;
+    document.documentElement.dir = l==='ar'?'rtl':'ltr';
+    const dict = {
+        ar: { title: "يوتوبيا CRM", crm: "نظام العملاء", tasks: "المهام", save: "💾 حفظ" },
+        en: { title: "Utopia CRM", crm: "CRM", tasks: "Tasks", save: "💾 Save" }
+    };
+    document.querySelector('[data-lang-key="title"]').innerText = dict[l].title;
+    document.querySelector('[data-lang-key="crm"]').innerText = dict[l].crm;
+    document.querySelector('[data-lang-key="save"]').innerText = dict[l].save;
+    notify(l === 'ar' ? "تم تغيير اللغة" : "Language changed", "info");
 }
 </script>
 </body>
