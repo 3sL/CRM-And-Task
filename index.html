@@ -41,8 +41,6 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 /* --- Logo --- */
 .logo-container{text-align:center;margin-bottom:20px}
 .logo-container img{max-width:100%;height:auto;display:inline-block;border-radius:12px}
-/* --- Tasks List --- */
-#taskList li{background:#f9f9f9;padding:12px;margin-bottom:8px;border-radius:12px;box-shadow:0 2px 4px rgba(0,0,0,0.05);list-style:none}
 /* --- Responsive --- */
 @media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:10px}.sidebar h2{font-size:1em;margin-bottom:0;white-space:nowrap;flex:1 0 auto}.sidebar button{flex:1 0 auto;margin:0 5px;white-space:nowrap;font-size:0.9em;padding:8px}.sidebar select{width:auto;margin-left:10px;font-size:0.9em}.tabs-content{padding:10px;width:100%}table{width:100%;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}th,td{white-space:nowrap;font-size:0.8em;padding:6px}.row{flex-direction:column}input,select,textarea,button{font-size:0.9em}.card{flex:1 1 100%;margin-bottom:10px}.logo-container img{max-height:80px}}
 /* --- Animations --- */
@@ -69,16 +67,20 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 
 <div class="tabs-content">
 <div id="notification"></div>
+
 <!-- CRM Tab -->
 <div id="crmTab" class="tab-content active">
 <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
 <h2>CRM System</h2>
+
 <div class="row">
 <input id="universalSearch" placeholder="Search Any Column..." oninput="renderCRM()">
 </div>
+
 <div class="row">
 <input id="name" placeholder="Client Name">
 <input id="phone" placeholder="Phone">
+<select id="governorate"></select>
 <input type="date" id="date">
 <select id="status">
 <option value="Interested">Interested</option>
@@ -91,15 +93,20 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 <input type="number" id="reminderDays" placeholder="Reminder Days">
 <input type="text" id="followUp" placeholder="Follow Up">
 </div>
+
 <button onclick="addOrUpdate()">💾 Save</button>
 <button onclick="exportPDF()">📄 Export PDF</button>
+
 <div class="row">
 <div class="card" id="total">0</div>
 <div class="card" id="hold">Hold: 0</div>
 </div>
+
 <table>
 <thead>
-<tr><th>Name</th><th>Phone</th><th>Date</th><th>Status</th><th>Notes</th><th>Reminder</th><th>Follow Up</th><th>WhatsApp</th><th>Edit</th><th>Delete</th></tr>
+<tr>
+<th>Name</th><th>Phone</th><th>Governorate</th><th>Date</th><th>Status</th><th>Notes</th><th>Reminder</th><th>Follow Up</th><th>WhatsApp</th><th>Edit</th><th>Delete</th>
+</tr>
 </thead>
 <tbody id="table"></tbody>
 </table>
@@ -109,9 +116,11 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 <div id="tasksTab" class="tab-content">
 <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
 <h2>Tasks</h2>
+
 <div class="row">
 <input id="taskInput" placeholder="Task Text">
 <select id="taskClient"><option value="">Select Client</option></select>
+<select id="taskGovernorate"></select>
 <input type="date" id="taskDate">
 <select id="taskStage">
 <option value="quote">Quote</option>
@@ -121,15 +130,16 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 </select>
 <button onclick="addTask()">➕ Add Task</button>
 </div>
+
 <table>
 <thead>
-<tr><th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Edit</th><th>Delete</th></tr>
+<tr><th>Client</th><th>Governorate</th><th>Date</th><th>Stage</th><th>Task</th><th>Edit</th><th>Delete</th></tr>
 </thead>
 <tbody id="taskList"></tbody>
 </table>
 </div>
-</div>
 
+</div>
 <script>
 // --- Firebase ---
 const firebaseConfig = {
@@ -151,38 +161,61 @@ function showTab(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.
 // --- Notification ---
 function showNotification(msg){const notif=document.getElementById('notification');notif.innerHTML=msg;notif.style.display='block';setTimeout(()=>{notif.style.display='none';},4000);}
 
+// --- Governorates List ---
+const governorates=["Cairo","Alexandria","Giza","Qalyubia","Gharbia","Dakahlia","Sharqia","Beheira","Fayoum","Menofia","Assiut","Sohag","Minya","Beni Suef","Luxor","Aswan","Red Sea","New Valley","Ismailia","Suez","North Sinai","South Sinai","Port Said","Damietta","Kafr El Sheikh","Matrouh","Qena","Helwan","Marsa Matrouh"];
+function populateGovernorates(){
+const sel=document.getElementById('governorate');const taskSel=document.getElementById('taskGovernorate');
+sel.innerHTML='<option value="">Select Governorate</option>';
+taskSel.innerHTML='<option value="">Select Governorate</option>';
+governorates.forEach(g=>{sel.innerHTML+=`<option value="${g}">${g}</option>`;taskSel.innerHTML+=`<option value="${g}">${g}</option>`;});}
+populateGovernorates();
+
 // --- CRM Data ---
 let clients=[];let editIndex=-1;
 
 function loadClientsFromFirebase(){db.ref('clients').on('value',snapshot=>{clients=snapshot.val()?Object.values(snapshot.val()):[];renderCRM();populateClientDropdown();});}
-
 function saveClientsToFirebase(){const updates={};clients.forEach((c,i)=>{updates[i]={...c};});db.ref('clients').set(updates);}
 
 function addOrUpdate(){
 const name=document.getElementById('name').value;
 const phone=document.getElementById('phone').value;
+const governorate=document.getElementById('governorate').value;
 const date=document.getElementById('date').value;
 const status=document.getElementById('status').value;
 const notes=document.getElementById('notes').value;
 const agent=document.getElementById('agent').value;
 const reminderDays=document.getElementById('reminderDays').value;
 const followUp=document.getElementById('followUp').value;
-if(editIndex>-1){clients[editIndex]={name,phone,date,status,notes,agent,reminderDays,followUp};editIndex=-1;}
-else{clients.push({name,phone,date,status,notes,agent,reminderDays,followUp});}
+if(editIndex>-1){clients[editIndex]={name,phone,governorate,date,status,notes,agent,reminderDays,followUp};editIndex=-1;}
+else{clients.push({name,phone,governorate,date,status,notes,agent,reminderDays,followUp});}
 saveClientsToFirebase();renderCRM();populateClientDropdown();
-document.getElementById('name').value='';document.getElementById('phone').value='';document.getElementById('date').value='';document.getElementById('status').value='Interested';document.getElementById('notes').value='';document.getElementById('agent').value='';document.getElementById('reminderDays').value='';document.getElementById('followUp').value='';
+document.getElementById('name').value='';document.getElementById('phone').value='';document.getElementById('governorate').value='';document.getElementById('date').value='';document.getElementById('status').value='Interested';document.getElementById('notes').value='';document.getElementById('agent').value='';document.getElementById('reminderDays').value='';document.getElementById('followUp').value='';
 }
 
 function renderCRM(){
 const table=document.getElementById("table");
 const filter=document.getElementById("universalSearch").value.toLowerCase();
 table.innerHTML="";let holdCount=0;
-clients.forEach((c,i)=>{let combinedText=`${c.name} ${c.phone} ${c.date} ${c.status} ${c.notes} ${c.followUp}`.toLowerCase();if(filter && !combinedText.includes(filter))return;if(c.status==="Hold")holdCount++;table.innerHTML+=`<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.date}</td><td>${c.status}</td><td>${c.notes}</td><td>${c.reminderDays||'-'}</td><td>${c.followUp||'-'}</td><td><button onclick="openWhatsApp('${c.phone}')">📱</button></td><td><button onclick="editClient(${i})">✏️</button></td><td><button onclick="deleteClient(${i})">❌</button></td></tr>`;});
+clients.forEach((c,i)=>{let combinedText=`${c.name} ${c.phone} ${c.governorate} ${c.date} ${c.status} ${c.notes} ${c.followUp}`.toLowerCase();
+if(filter && !combinedText.includes(filter))return;if(c.status==="Hold")holdCount++;
+table.innerHTML+=`<tr>
+<td>${c.name}</td>
+<td>${c.phone}</td>
+<td>${c.governorate||'-'}</td>
+<td>${c.date}</td>
+<td>${c.status}</td>
+<td>${c.notes}</td>
+<td>${c.reminderDays||'-'}</td>
+<td>${c.followUp||'-'}</td>
+<td><button onclick="openWhatsApp('${c.phone}')">📱</button></td>
+<td><button onclick="editClient(${i})">✏️</button></td>
+<td><button onclick="deleteClient(${i})">❌</button></td>
+</tr>`;});
 document.getElementById("total").innerText="Total: "+clients.length;
 document.getElementById("hold").innerText="Hold: "+holdCount;
 }
 
-function editClient(i){editIndex=i;const c=clients[i];document.getElementById('name').value=c.name;document.getElementById('phone').value=c.phone;document.getElementById('date').value=c.date;document.getElementById('status').value=c.status;document.getElementById('notes').value=c.notes;document.getElementById('agent').value=c.agent;document.getElementById('reminderDays').value=c.reminderDays;document.getElementById('followUp').value=c.followUp;}
+function editClient(i){editIndex=i;const c=clients[i];document.getElementById('name').value=c.name;document.getElementById('phone').value=c.phone;document.getElementById('governorate').value=c.governorate;document.getElementById('date').value=c.date;document.getElementById('status').value=c.status;document.getElementById('notes').value=c.notes;document.getElementById('agent').value=c.agent;document.getElementById('reminderDays').value=c.reminderDays;document.getElementById('followUp').value=c.followUp;}
 
 function deleteClient(i){if(confirm("Delete this client?")){clients.splice(i,1);saveClientsToFirebase();renderCRM();populateClientDropdown();}}
 
@@ -194,9 +227,26 @@ function populateClientDropdown(){const sel=document.getElementById('taskClient'
 let tasks=[];let taskEditIndex=-1;
 function loadTasksFromFirebase(){db.ref('tasks').on('value',snapshot=>{tasks=snapshot.val()?Object.values(snapshot.val()):[];renderTasks();});}
 function saveTasksToFirebase(){const updates={};tasks.forEach((t,i)=>{updates[i]={...t};});db.ref('tasks').set(updates);}
-function addTask(){const client=document.getElementById('taskClient').value;const taskText=document.getElementById('taskInput').value;const date=document.getElementById('taskDate').value;const stage=document.getElementById('taskStage').value;if(!client || !taskText) return; if(taskEditIndex>-1){tasks[taskEditIndex]={client,taskText,date,stage};taskEditIndex=-1;}else{tasks.push({client,taskText,date,stage});}saveTasksToFirebase();renderTasks();document.getElementById('taskInput').value='';document.getElementById('taskDate').value='';}
-function renderTasks(){const list=document.getElementById('taskList');list.innerHTML='';tasks.forEach((t,i)=>{list.innerHTML+=`<tr><td>${t.client}</td><td>${t.date}</td><td class="task-stage stage-${t.stage}">${t.stage}</td><td>${t.taskText}</td><td><button onclick="editTask(${i})">✏️</button></td><td><button onclick="deleteTask(${i})">❌</button></td></tr>`;});}
-function editTask(i){taskEditIndex=i;const t=tasks[i];document.getElementById('taskClient').value=t.client;document.getElementById('taskInput').value=t.taskText;document.getElementById('taskDate').value=t.date;document.getElementById('taskStage').value=t.stage;}
+function addTask(){
+const client=document.getElementById('taskClient').value;
+const governorate=document.getElementById('taskGovernorate').value;
+const taskText=document.getElementById('taskInput').value;
+const date=document.getElementById('taskDate').value;
+const stage=document.getElementById('taskStage').value;
+if(!client || !taskText) return; 
+if(taskEditIndex>-1){tasks[taskEditIndex]={client,governorate,taskText,date,stage};taskEditIndex=-1;}
+else{tasks.push({client,governorate,taskText,date,stage});}
+saveTasksToFirebase();renderTasks();document.getElementById('taskInput').value='';document.getElementById('taskDate').value='';document.getElementById('taskGovernorate').value='';}
+function renderTasks(){const list=document.getElementById('taskList');list.innerHTML='';tasks.forEach((t,i)=>{list.innerHTML+=`<tr>
+<td>${t.client}</td>
+<td>${t.governorate||'-'}</td>
+<td>${t.date}</td>
+<td class="task-stage stage-${t.stage}">${t.stage}</td>
+<td>${t.taskText}</td>
+<td><button onclick="editTask(${i})">✏️</button></td>
+<td><button onclick="deleteTask(${i})">❌</button></td>
+</tr>`;});}
+function editTask(i){taskEditIndex=i;const t=tasks[i];document.getElementById('taskClient').value=t.client;document.getElementById('taskGovernorate').value=t.governorate;document.getElementById('taskInput').value=t.taskText;document.getElementById('taskDate').value=t.date;document.getElementById('taskStage').value=t.stage;}
 function deleteTask(i){if(confirm("Delete this task?")){tasks.splice(i,1);saveTasksToFirebase();renderTasks();}}
 
 // --- PDF Export ---
@@ -204,10 +254,32 @@ function exportPDF(){
 const { jsPDF } = window.jspdf;
 const doc=new jsPDF();
 doc.text("CRM Clients Report",14,16);
-const columns=["Name","Phone","Date","Status","Notes","Reminder","Follow Up"];
-const rows=clients.map(c=>[c.name,c.phone,c.date,c.status,c.notes,c.reminderDays||'-',c.followUp||'-']);
+const columns=["Name","Phone","Governorate","Date","Status","Notes","Reminder","Follow Up"];
+const rows=clients.map(c=>[c.name,c.phone,c.governorate||'-',c.date,c.status,c.notes,c.reminderDays||'-',c.followUp||'-']);
 doc.autoTable({startY:20,head:[columns],body:rows});
 doc.save("CRM_Report.pdf");
+}
+
+// --- Language Switch ---
+function changeLang(lang){
+if(lang==="ar"){
+document.body.dir="rtl";
+document.getElementById('universalSearch').placeholder="ابحث في أي عمود...";
+document.getElementById('name').placeholder="اسم العميل";
+document.getElementById('phone').placeholder="الهاتف";
+document.getElementById('date').placeholder="التاريخ";
+document.getElementById('notes').placeholder="ملاحظات";
+document.getElementById('agent').placeholder="اسم المندوب";
+document.getElementById('reminderDays').placeholder="أيام التذكير";
+document.getElementById('followUp').placeholder="متابعة";
+document.getElementById('taskInput').placeholder="نص المهمة";
+document.getElementById('taskClient').options[0].text="اختر العميل";
+document.getElementById('taskGovernorate').options[0].text="اختر المحافظة";
+document.getElementById('taskStage').options[0].text="عرض سعر";
+document.getElementById('taskStage').options[1].text="متابعة";
+document.getElementById('taskStage').options[2].text="طلب";
+document.getElementById('taskStage').options[3].text="بنك";
+}else{document.body.dir="ltr";document.getElementById('universalSearch').placeholder="Search Any Column...";document.getElementById('name').placeholder="Client Name";document.getElementById('phone').placeholder="Phone";document.getElementById('date').placeholder="Date";document.getElementById('notes').placeholder="Notes";document.getElementById('agent').placeholder="Agent Name";document.getElementById('reminderDays').placeholder="Reminder Days";document.getElementById('followUp').placeholder="Follow Up";document.getElementById('taskInput').placeholder="Task Text";document.getElementById('taskClient').options[0].text="Select Client";document.getElementById('taskGovernorate').options[0].text="Select Governorate";document.getElementById('taskStage').options[0].text="Quote";document.getElementById('taskStage').options[1].text="Follow Up";document.getElementById('taskStage').options[2].text="Order";document.getElementById('taskStage').options[3].text="Bank";}
 }
 
 // --- Init ---
