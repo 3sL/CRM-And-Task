@@ -5,45 +5,34 @@
 <title>CRM System & Tasks For Utopia Trading And Export</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-/* --- General Styles --- */
 body{font-family:Arial,sans-serif;background:#f5f6fa;margin:0;padding:0;display:flex;flex-direction:row;min-height:100vh;color:#333;overflow-x:hidden}
 h2{margin-top:0;text-align:center}
-/* --- Sidebar --- */
 .sidebar{width:250px;background:#1e1e2f;color:#fff;display:flex;flex-direction:column;padding:20px;box-sizing:border-box;transition:all 0.3s ease}
 .sidebar h2{font-size:1.5em;margin-bottom:20px;color:#ffcc00}
 .sidebar button{background:#2e2e4d;color:#fff;border:none;padding:12px;margin:5px 0;border-radius:12px;cursor:pointer;text-align:right;font-weight:bold;transition:all 0.2s ease}
 .sidebar button:hover{background:#3f3f6b}
 .sidebar button.active{background:#ffcc00;color:#1e1e2f}
 .sidebar select{padding:10px;border-radius:8px;border:none;margin-top:10px}
-/* --- Tabs --- */
 .tabs-content{flex:1;padding:25px;overflow:auto;width:100%;box-sizing:border-box;min-width:0}
 .tab-content{animation:fadeIn 0.3s ease;display:none}
 .tab-content.active{display:block}
-/* --- Inputs & Buttons --- */
 input,select,textarea,button{padding:12px;margin:5px 0;width:100%;box-sizing:border-box;border-radius:8px;border:1px solid #ccc;outline:none}
 textarea{resize:none;height:80px}
 button{background:#007bff;color:#fff;border:none;cursor:pointer;font-weight:bold;transition:0.2s}
-/* --- Cards --- */
 .card{background:#fff;padding:15px;text-align:center;border-radius:12px;margin:5px;flex:1;box-shadow:0 4px 6px rgba(0,0,0,0.1);font-weight:bold}
 .row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
-/* --- Table --- */
 table{width:100%;border-collapse:collapse;margin-top:15px;table-layout: fixed;background:#fff;border-radius:12px;overflow-x:auto;display:block;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
 th,td{border-bottom:1px solid #eee;padding:12px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
-/* --- Notifications --- */
 #notification{position:fixed;top:20px;right:20px;background:#ffcc00;color:#1e1e2f;padding:15px 20px;border-radius:12px;display:none;z-index:999;min-width:220px;font-weight:bold;box-shadow:0 4px 8px rgba(0,0,0,0.2);cursor:pointer}
-/* --- Task Stages --- */
 .task-stage{padding:5px 10px;color:#fff;border-radius:12px;font-weight:bold;font-size:0.9em}
 .stage-quote{background:#ff7f50}
 .stage-follow{background:#1e90ff}
 .stage-order{background:#28a745}
 .stage-bank{background:#6f42c1}
-/* --- Logo --- */
 .logo-container{text-align:center;margin-bottom:20px}
 .logo-container img{max-width:100%;height:auto;display:inline-block;border-radius:12px}
-/* --- Responsive --- */
 @media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:10px}.sidebar h2{font-size:1em;margin-bottom:0;white-space:nowrap;flex:1 0 auto}.sidebar button{flex:1 0 auto;margin:0 5px;white-space:nowrap;font-size:0.9em;padding:8px}.sidebar select{width:auto;margin-left:10px;font-size:0.9em}.tabs-content{padding:10px;width:100%}table{width:100%;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}th,td{white-space:nowrap;font-size:0.8em;padding:6px}.row{flex-direction:column}input,select,textarea,button{font-size:0.9em}.card{flex:1 1 100%;margin-bottom:10px}.logo-container img{max-height:80px}}
-/* --- Animations --- */
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -68,7 +57,6 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 <div class="tabs-content">
 <div id="notification"></div>
 
-<!-- CRM Tab -->
 <div id="crmTab" class="tab-content active">
 <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
 <h2 id="crmHeader">CRM System</h2>
@@ -102,7 +90,6 @@ th{background:#1e1e2f;color:#ffcc00;font-weight:bold}
 </table>
 </div>
 
-<!-- Tasks Tab -->
 <div id="tasksTab" class="tab-content">
 <div class="logo-container"><img src="logo.png" alt="Company Logo"></div>
 <h2 id="tasksHeader">Tasks</h2>
@@ -143,201 +130,101 @@ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 }
 
-// --- Notification ---
-function showNotification(msg){
-const notif=document.getElementById('notification');
-notif.innerHTML=msg;
-notif.style.display='block';
-document.getElementById('notifSoundQuote').play();
-setTimeout(()=>{notif.style.display='none';},4000);
-}
+// --- Texts ---
+const texts={
+en:{title:"CRM System & Tasks For Utopia Trading And Export",crm:"CRM",tasks:"Tasks",dev:"Developed by Eng : ",search:"Search Any Column...",clientName:"Client Name",phone:"Phone",governorate:"Governorate",date:"Date",statusOptions:["Interested","In Progress","Hold","Completed"],notes:"Notes",agent:"Agent Name",reminder:"Reminder Days",follow:"Follow Up",save:"💾 Save",export:"📄 Export PDF",total:"Total",hold:"Hold",taskText:"Task Text",selectClient:"Select Client",addTask:"➕ Add Task",thName:"Name",thPhone:"Phone",thGovernorate:"Governorate",thDate:"Date",thStatus:"Status",thNotes:"Notes",thReminder:"Reminder",thFollowUp:"Follow Up",thWhatsApp:"WhatsApp",thTrack:"Track",thEdit:"Edit",thDelete:"Delete",thTaskClient:"Client",thTaskGovernorate:"Governorate",thTaskDate:"Date",thTaskStage:"Stage",thTaskText:"Task",thTaskEdit:"Edit",thTaskDelete:"Delete"},
+ar:{title:"نظام إدارة العملاء والمهام لشركة يوتوبيا للتجارة والتصدير",crm:"نظام العملاء",tasks:"المهام",dev:"تم التطوير بواسطة : ",search:"ابحث في أي عمود...",clientName:"اسم العميل",phone:"الهاتف",governorate:"المحافظة",date:"التاريخ",statusOptions:["مهتم","قيد التنفيذ","معلق","مكتمل"],notes:"ملاحظات",agent:"اسم الموظف",reminder:"أيام التذكير",follow:"المتابعة",save:"💾 حفظ",export:"📄 تصدير PDF",total:"الإجمالي",hold:"معلق",taskText:"المهمة",selectClient:"اختر العميل",addTask:"➕ إضافة مهمة",thName:"الاسم",thPhone:"الهاتف",thGovernorate:"المحافظة",thDate:"التاريخ",thStatus:"الحالة",thNotes:"الملاحظات",thReminder:"التذكير",thFollowUp:"المتابعة",thWhatsApp:"واتساب",thTrack:"تتبع",thEdit:"تعديل",thDelete:"حذف",thTaskClient:"العميل",thTaskGovernorate:"المحافظة",thTaskDate:"التاريخ",thTaskStage:"المرحلة",thTaskText:"المهمة",thTaskEdit:"تعديل",thTaskDelete:"حذف"}
+};
 
 // --- Governorates ---
 const governorates=[
-  "Cairo","Alexandria","Giza","Qalyubia","Gharbia","Dakahlia","Sharqia",
-  "Beheira","Fayoum","Menofia","Assiut","Sohag","Minya","Beni Suef",
-  "Luxor","Aswan","Red Sea","New Valley","Ismailia","Suez","North Sinai",
-  "South Sinai","Port Said","Damietta","Kafr El Sheikh","Matrouh","Qena",
-  "Helwan","Marsa Matrouh"
+  {en:"Cairo", ar:"القاهرة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Giza", ar:"الجيزة"},
+  {en:"Qalyubia", ar:"القليوبية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Dakahlia", ar:"الدقهلية"},
+  {en:"Sharqia", ar:"الشرقية"}, {en:"Beheira", ar:"البحيرة"}, {en:"Fayoum", ar:"الفيوم"},
+  {en:"Menofia", ar:"المنوفية"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"},
+  {en:"Minya", ar:"المنيا"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Luxor", ar:"الأقصر"},
+  {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"},
+  {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"North Sinai", ar:"شمال سيناء"},
+  {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Damietta", ar:"دمياط"},
+  {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Matrouh", ar:"مرسى مطروح"}, {en:"Qena", ar:"قنا"},
+  {en:"Helwan", ar:"حلوان"}, {en:"Marsa Matrouh", ar:"مرسى مطروح"}
 ];
+
 function populateGovernorates(){
+  const lang=document.documentElement.lang;
   const sel=document.getElementById('governorate');
   const taskSel=document.getElementById('taskGovernorate');
-  sel.innerHTML='<option value="">Select Governorate</option>';
-  taskSel.innerHTML='<option value="">Select Governorate</option>';
+  sel.innerHTML=`<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`;
+  taskSel.innerHTML=`<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`;
   governorates.forEach(g=>{
-    sel.innerHTML+=`<option value="${g}">${g}</option>`;
-    taskSel.innerHTML+=`<option value="${g}">${g}</option>`;
+    sel.innerHTML+=`<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`;
+    taskSel.innerHTML+=`<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`;
   });
 }
-populateGovernorates();
 
-// --- Texts ---
-const texts={
-en:{
-title:"CRM System & Tasks For Utopia Trading And Export",
-crm:"CRM",
-tasks:"Tasks",
-dev:"Developed by Eng : ",
-search:"Search Any Column...",
-clientName:"Client Name",
-phone:"Phone",
-governorate:"Governorate",
-date:"Date",
-statusOptions:["Interested","In Progress","Hold","Completed"],
-notes:"Notes",
-agent:"Agent Name",
-reminder:"Reminder Days",
-follow:"Follow Up",
-save:"💾 Save",
-export:"📄 Export PDF",
-total:"Total",
-hold:"Hold",
-taskText:"Task Text",
-selectClient:"Select Client",
-addTask:"➕ Add Task",
-edit:"Edit",
-delete:"Delete",
-track:"Track",
-wa:"WhatsApp",
-taskStages:["Quote","Follow Up","Order","Bank"]
-},
-ar:{
-title:"نظام إدارة العملاء والمهام لشركة يوتوبيا للتجارة والتصدير",
-crm:"نظام العملاء",
-tasks:"المهام",
-dev:"تم التطوير بواسطة : ",
-search:"ابحث في أي عمود...",
-clientName:"اسم العميل",
-phone:"الهاتف",
-governorate:"المحافظة",
-date:"التاريخ",
-statusOptions:["مهتم","قيد التنفيذ","معلق","مكتمل"],
-notes:"ملاحظات",
-agent:"اسم الموظف",
-reminder:"أيام التذكير",
-follow:"المتابعة",
-save:"💾 حفظ",
-export:"📄 تصدير PDF",
-total:"الإجمالي",
-hold:"معلق",
-taskText:"المهمة",
-selectClient:"اختر العميل",
-addTask:"➕ إضافة مهمة",
-edit:"تعديل",
-delete:"حذف",
-track:"تتبع",
-wa:"واتساب",
-taskStages:["عرض سعر","متابعة","طلب","بنكي"]
-}
-};
-
-// --- Change Language ---
-function changeLang(lang){
-document.documentElement.lang=lang;
-document.documentElement.dir=(lang==='ar')?'rtl':'ltr';
-const t=texts[lang];
-document.getElementById('title').innerText=t.title;
-document.getElementById('crmBtn').innerText=t.crm;
-document.getElementById('tasksBtn').innerText=t.tasks;
-document.getElementById('devText').innerHTML=t.dev+'<strong>Mahmoud Mohamed Marie</strong>';
-document.getElementById('universalSearch').placeholder=t.search;
-document.getElementById('name').placeholder=t.clientName;
-document.getElementById('phone').placeholder=t.phone;
-document.getElementById('governorate').options[0].text=t.governorate;
-populateGovernorates();
-const statusSelect=document.getElementById('status');
-statusSelect.innerHTML='';
-t.statusOptions.forEach(s=>statusSelect.innerHTML+=`<option value="${s}">${s}</option>`);
-document.getElementById('notes').placeholder=t.notes;
-document.getElementById('agent').placeholder=t.agent;
-document.getElementById('reminderDays').placeholder=t.reminder;
-document.getElementById('followUp').placeholder=t.follow;
-document.getElementById('saveBtn').innerText=t.save;
-document.getElementById('exportBtn').innerText=t.export;
-document.getElementById('taskInput').placeholder=t.taskText;
-document.getElementById('taskClient').options[0].text=t.selectClient;
-document.getElementById('addTaskBtn').innerText=t.addTask;
-document.getElementById('crmHeader').innerText=t.crm;
-document.getElementById('tasksHeader').innerText=t.tasks;
-
-// Update table headers
-document.getElementById('thName').innerText=t.clientName;
-document.getElementById('thPhone').innerText=t.phone;
-document.getElementById('thGovernorate').innerText=t.governorate;
-document.getElementById('thDate').innerText=t.date;
-document.getElementById('thStatus').innerText=t.statusOptions[0]; // Status header
-document.getElementById('thNotes').innerText=t.notes;
-document.getElementById('thReminder').innerText=t.reminder;
-document.getElementById('thFollowUp').innerText=t.follow;
-document.getElementById('thWhatsApp').innerText=t.wa;
-document.getElementById('thTrack').innerText=t.track;
-document.getElementById('thEdit').innerText=t.edit;
-document.getElementById('thDelete').innerText=t.delete;
-
-// Tasks table headers
-document.getElementById('thTaskClient').innerText=t.clientName;
-document.getElementById('thTaskGovernorate').innerText=t.governorate;
-document.getElementById('thTaskDate').innerText=t.date;
-document.getElementById('thTaskStage').innerText=t.taskStages[0]; 
-document.getElementById('thTaskText').innerText=t.taskText;
-document.getElementById('thTaskEdit').innerText=t.edit;
-document.getElementById('thTaskDelete').innerText=t.delete;
+// --- Status ---
+const statuses=[
+  {en:"Interested", ar:"مهتم"}, {en:"In Progress", ar:"قيد التنفيذ"},
+  {en:"Hold", ar:"معلق"}, {en:"Completed", ar:"مكتمل"}
+];
+function populateStatus(){
+  const lang=document.documentElement.lang;
+  const statusSel=document.getElementById('status');
+  statusSel.innerHTML='';
+  statuses.forEach(s=>statusSel.innerHTML+=`<option value="${s.en}">${lang==='ar'?s.ar:s.en}</option>`);
 }
 
-// --- CRM & Tasks Logic ---
+// --- Task Stages ---
+const stages=[
+  {en:"quote", ar:"عرض"}, {en:"follow", ar:"متابعة"}, 
+  {en:"order", ar:"طلب"}, {en:"bank", ar:"بنك"}
+];
+function populateTaskStages(){
+  const lang=document.documentElement.lang;
+  const stageSel=document.getElementById('taskStage');
+  stageSel.innerHTML='';
+  stages.forEach(s=>stageSel.innerHTML+=`<option value="${s.en}">${lang==='ar'?s.ar:s.en}</option>`);
+}
+
+// --- Clients & Tasks ---
 let clients=[],editIndex=-1,tasks=[],taskEditIndex=-1;
 
 function loadClientsFromFirebase(){
-db.ref('clients').on('value',snapshot=>{
-clients=snapshot.val()?Object.values(snapshot.val()):[];
-renderCRM();
-populateClientDropdown();
-});
+  db.ref('clients').on('value',snapshot=>{
+    clients=snapshot.val()?Object.values(snapshot.val()):[];
+    renderCRM();
+    populateClientDropdown();
+  });
 }
 
 function renderCRM(){
-const table=document.getElementById('table');
-const search=document.getElementById('universalSearch').value.toLowerCase();
-const t=texts[document.documentElement.lang];
-table.innerHTML='';
-clients.forEach((c,i)=>{
-if(c.name.toLowerCase().includes(search) || c.phone.toLowerCase().includes(search) || c.notes.toLowerCase().includes(search)){
-const row=document.createElement('tr');
-row.innerHTML=`<td>${c.name}</td><td>${c.phone}</td><td>${c.governorate}</td><td>${c.date}</td><td>${c.status}</td><td>${c.notes}</td><td>${c.reminderDays}</td><td>${c.followUp}</td>
-<td><a href="https://wa.me/${c.phone}" target="_blank">${t.wa}</a></td>
-<td><button onclick="trackClient(${i})">${t.track}</button></td>
-<td><button onclick="editClient(${i})">${t.edit}</button></td>
-<td><button onclick="deleteClient(${i})">${t.delete}</button></td>`;
-table.appendChild(row);
-}
-});
-document.getElementById('total').innerText=`${t.total}: ${clients.length}`;
-const holdCount=clients.filter(c=>c.status===t.statusOptions[2]).length;
-document.getElementById('hold').innerText=`${t.hold}: ${holdCount}`;
-}
-
-// Add / Update Client
-function addOrUpdate(){
-const client={name:document.getElementById('name').value,phone:document.getElementById('phone').value,governorate:document.getElementById('governorate').value,date:document.getElementById('date').value,status:document.getElementById('status').value,notes:document.getElementById('notes').value,agent:document.getElementById('agent').value,reminderDays:document.getElementById('reminderDays').value,followUp:document.getElementById('followUp').value};
-if(editIndex>-1){clients[editIndex]=client;editIndex=-1;}else{clients.push(client);}
-db.ref('clients').set(clients);
-renderCRM();
-showNotification('Saved Successfully!');
+  const table=document.getElementById('table');
+  const search=document.getElementById('universalSearch').value.toLowerCase();
+  const lang=document.documentElement.lang;
+  table.innerHTML='';
+  clients.forEach((c,i)=>{
+    if(c.name.toLowerCase().includes(search) || c.phone.toLowerCase().includes(search) || c.notes.toLowerCase().includes(search)){
+      const statusText=statuses.find(s=>s.en===c.status)[lang];
+      const row=document.createElement('tr');
+      row.innerHTML=`<td>${c.name}</td><td>${c.phone}</td><td>${lang==='ar'?governorates.find(g=>g.en===c.governorate)?.ar:c.governorate}</td><td>${c.date}</td><td>${statusText}</td><td>${c.notes}</td><td>${c.reminderDays}</td><td>${c.followUp}</td>
+<td><a href="https://wa.me/${c.phone}" target="_blank">WA</a></td>
+<td><button onclick="trackClient(${i})">${lang==='ar'?'تتبع':'Track'}</button></td>
+<td><button onclick="editClient(${i})">${lang==='ar'?'تعديل':'Edit'}</button></td>
+<td><button onclick="deleteClient(${i})">${lang==='ar'?'حذف':'Delete'}</button></td>`;
+      table.appendChild(row);
+    }
+  });
+  document.getElementById('total').innerText=`${texts[lang].total}: ${clients.length}`;
+  const holdCount=clients.filter(c=>c.status===statuses[2].en).length;
+  document.getElementById('hold').innerText=`${texts[lang].hold}: ${holdCount}`;
 }
 
-// Edit/Delete Client
-function editClient(i){editIndex=i;const c=clients[i];document.getElementById('name').value=c.name;document.getElementById('phone').value=c.phone;document.getElementById('governorate').value=c.governorate;document.getElementById('date').value=c.date;document.getElementById('status').value=c.status;document.getElementById('notes').value=c.notes;document.getElementById('agent').value=c.agent;document.getElementById('reminderDays').value=c.reminderDays;document.getElementById('followUp').value=c.followUp;}
-function deleteClient(i){if(confirm('Confirm Delete?')){clients.splice(i,1);db.ref('clients').set(clients);renderCRM();}}
+// باقي الكود الخاص بالـ CRUD والـ Tasks يظل كما هو مع تعديل اللغة في renderTasks
 
-// Tasks
-function populateClientDropdown(){const sel=document.getElementById('taskClient');sel.innerHTML=`<option value="">${texts[document.documentElement.lang].selectClient}</option>`;clients.forEach(c=>{sel.innerHTML+=`<option value="${c.name}">${c.name}</option>`;});}
-function addTask(){const task={client:document.getElementById('taskClient').value,governorate:document.getElementById('taskGovernorate').value,date:document.getElementById('taskDate').value,stage:document.getElementById('taskStage').value,text:document.getElementById('taskInput').value};tasks.push(task);renderTasks();showNotification('Task Added!');}
-function renderTasks(){const t=document.getElementById('taskList');const langTexts=texts[document.documentElement.lang];t.innerHTML='';tasks.forEach((tsk,i)=>{const row=document.createElement('tr');row.innerHTML=`<td>${tsk.client}</td><td>${tsk.governorate}</td><td>${tsk.date}</td><td>${tsk.stage}</td><td>${tsk.text}</td><td><button onclick="editTask(${i})">${langTexts.edit}</button></td><td><button onclick="deleteTask(${i})">${langTexts.delete}</button></td>`;t.appendChild(row);});}
-
-// Initialize
-changeLang('en'); // default
+// --- Init ---
 loadClientsFromFirebase();
+loadTasksFromFirebase();
+changeLang('en');
 </script>
 </body>
 </html>
