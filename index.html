@@ -75,9 +75,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
-<body>
-
-<div id="notification"></div>
+<body oncontextmenu="return false;"> <div id="notification"></div>
 
 <div id="loginOverlay">
     <div class="login-card">
@@ -223,6 +221,18 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
+// --- [SECURITY UPDATE] Anti-Inspection & Protection ---
+const _0x1 = "YWRtaW4="; // admin
+const _0x2 = "dXRvcGlhMjAyNg=="; // utopia2026
+
+document.onkeydown = function(e) {
+    if(e.keyCode == 123) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+};
+
 // --- AI Tracking Logic ---
 function triggerTracking() {
     const govValue = document.getElementById('gov').value;
@@ -248,13 +258,11 @@ function updateDashboard() {
     document.getElementById('convRate').innerText = rate + '%';
     document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
     
-    // حساب أكثر محافظة
     const govCounts = {};
     clients.forEach(c => { if(c.gov) govCounts[c.gov] = (govCounts[c.gov] || 0) + 1; });
     const top = Object.keys(govCounts).reduce((a, b) => govCounts[a] > govCounts[b] ? a : b, '-');
     document.getElementById('topGov').innerText = top;
 
-    // Chart.js Update
     const ctx = document.getElementById('statusChart').getContext('2d');
     const data = {
         labels: ['Interested', 'In Progress', 'Hold', 'Completed'],
@@ -301,19 +309,33 @@ function syncAll() {
     db.ref('deletedClients').set({...deletedClients});
 }
 
-// --- Basic UI Logic ---
+// --- [SECURITY UPDATE] Login & Auth Logic ---
 function checkLogin() {
-    if (document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === 'admin') {
+    const u = btoa(document.getElementById('userInput').value);
+    const p = btoa(document.getElementById('passInput').value);
+    
+    if (u === _0x1 && p === _0x2) {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
-        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('secure_session', 'active_utopia');
+        notify(lang==='ar'?'تم تسجيل الدخول':'Logged In', 'success');
     } else {
         document.getElementById('loginError').style.display = 'block';
     }
 }
-if (sessionStorage.getItem('isLoggedIn') === 'true') { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; }
 
-function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
+// التأكد من الجلسة عند التحميل
+window.addEventListener('load', () => {
+    if (sessionStorage.getItem('secure_session') === 'active_utopia') { 
+        document.getElementById('loginOverlay').style.display = 'none'; 
+        document.getElementById('mainApp').style.display = 'flex'; 
+    }
+    fillGovs();
+});
+
+function logout() { sessionStorage.removeItem('secure_session'); location.reload(); }
+
+// --- Basic UI Logic ---
 function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; setTimeout(() => n.style.display = 'none', 3000); }
 function showTab(id, btn) { 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
@@ -325,6 +347,7 @@ function showTab(id, btn) {
 
 function fillGovs() { 
     const s = document.getElementById('gov'); 
+    if(!s) return;
     s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
     govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
 }
@@ -410,7 +433,6 @@ db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) 
 db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
-fillGovs();
 </script>
 </body>
 </html>
