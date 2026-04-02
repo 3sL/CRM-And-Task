@@ -118,7 +118,7 @@
             <h2 id="crmHeader">Clients Registry</h2>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
-                <button class="btn-import" onclick="document.getElementById('csvFileInput').click()">📥 Import Any CSV</button>
+                <button class="btn-import" onclick="document.getElementById('csvFileInput').click()">📥 Import Any CSV (Arabic/English)</button>
                 <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
                 <button class="btn-export" onclick="exportData('clients')">📤 Export Excel</button>
             </div>
@@ -218,7 +218,7 @@ function showTab(id, btn) {
     document.getElementById(id).classList.add('active'); 
     btn.classList.add('active'); 
     if(id === 'dashboardTab') { 
-        setTimeout(updateDashboard, 100); // تأخير بسيط لضمان ظهور الـ Canvas
+        setTimeout(updateDashboard, 100); 
     } 
 }
 
@@ -275,7 +275,6 @@ function updateDashboard() {
     const gc = {}; clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
     document.getElementById('topGov').innerText = Object.keys(gc).length > 0 ? Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b) : '-';
 
-    // تهيئة الرسم البياني
     const ctx = document.getElementById('statusChart').getContext('2d');
     const counts = { 'Interested': 0, 'In Progress': 0, 'Hold': 0, 'Completed': 0 };
     clients.forEach(c => { if(counts[c.status] !== undefined) counts[c.status]++; });
@@ -294,36 +293,64 @@ function updateDashboard() {
     });
 }
 
+// دالة الاستيراد الجديدة المطورة لدعم العربية والانجليزية بدون حذف الكود الاصلي
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
+    
     reader.onload = function(e) {
         try {
-            const text = e.target.result;
+            const arrayBuffer = e.target.result;
+            // محاولة القراءة بترميز Windows-1256 للعربية ثم UTF-8 للانجليزية
+            let text = new TextDecoder('windows-1256').decode(arrayBuffer);
+            if (text.includes('')) { 
+                text = new TextDecoder('utf-8').decode(arrayBuffer);
+            }
+
             const rows = text.split(/\r?\n/).filter(row => row.trim() !== "");
+            if (rows.length < 2) return notify('File is empty', 'error');
+
             const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
             let importedCount = 0;
+
             rows.slice(1).forEach(row => {
                 const cols = row.split(',').map(c => c.replace(/"/g, '').trim());
                 if (cols.length > 0) {
-                    let clientObj = { name: "Unknown", phone: "", gov: "", status: "Interested", notes: "", agent: "Imported", date: new Date().toISOString().split('T')[0] };
+                    let clientObj = { 
+                        name: "Unknown", 
+                        phone: "", 
+                        gov: "", 
+                        status: "Interested", 
+                        notes: "Imported", 
+                        agent: "System", 
+                        date: new Date().toISOString().split('T')[0] 
+                    };
+
                     cols.forEach((val, idx) => {
                         const h = headers[idx] || "";
+                        // دعم مسميات الاعمده بالعربي والانجليزي
                         if (h.includes("name") || h.includes("الاسم") || idx === 0) clientObj.name = val || clientObj.name;
-                        else if (h.includes("phone") || h.includes("الهاتف") || /^\d+$/.test(val)) clientObj.phone = val || clientObj.phone;
-                        else if (h.includes("gov") || h.includes("محافظة")) clientObj.gov = val || clientObj.gov;
+                        else if (h.includes("phone") || h.includes("الهاتف") || h.includes("موبايل")) clientObj.phone = val || clientObj.phone;
+                        else if (h.includes("gov") || h.includes("محافظة") || h.includes("استان")) clientObj.gov = val || clientObj.gov;
                         else if (h.includes("status") || h.includes("الحالة")) clientObj.status = val || clientObj.status;
                         else if (h.includes("note") || h.includes("ملاحظات")) clientObj.notes = val || clientObj.notes;
-                        else if (h.includes("agent") || h.includes("مسؤول")) clientObj.agent = val || clientObj.agent;
                     });
-                    clients.push(clientObj); importedCount++;
+                    clients.push(clientObj); 
+                    importedCount++;
                 }
             });
-            if (importedCount > 0) { db.ref('clients').set({...clients}); notify(`Imported ${importedCount} successfully`, 'success'); }
-        } catch (err) { notify('Error reading file', 'error'); }
+
+            if (importedCount > 0) { 
+                db.ref('clients').set({...clients}); 
+                notify(`Imported ${importedCount} Clients Successfully`, 'success'); 
+            }
+        } catch (err) { 
+            notify('Error reading file content', 'error'); 
+        }
     };
-    reader.readAsText(file);
+    // قراءة كـ ArrayBuffer لدعم التحويل بين الترميزات
+    reader.readAsArrayBuffer(file);
     event.target.value = '';
 }
 
