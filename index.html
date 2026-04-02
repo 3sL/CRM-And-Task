@@ -1,315 +1,278 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-<meta charset="UTF-8">
-<title>CRM System & Tasks - Utopia Trading</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<style>
-    body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; padding:0; display:flex; flex-direction:row; min-height:100vh; color:#333; overflow-x:hidden; }
-    .sidebar { width:250px; background:#1e1e2f; color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; transition: all 0.3s ease; }
-    .sidebar h2 { font-size:1.2em; margin-bottom:20px; color:#ffcc00; text-align:center; }
-    .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.2s; }
-    .sidebar button.active { background:#ffcc00; color:#1e1e2f; }
-    .tabs-content { flex:1; padding:25px; overflow:auto; width:100%; box-sizing:border-box; }
-    .tab-content { display:none; animation:fadeIn 0.3s ease; }
-    .tab-content.active { display:block; }
-    input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none; }
-    
-    #notification { position: fixed; top:20px; right:20px; padding:15px 25px; border-radius:12px; display:none; z-index:9999; color:#fff; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
-    
-    table { width:100%; border-collapse:collapse; margin-top:15px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-    th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; }
-    th { background:#1e1e2f; color:#ffcc00; }
-    
-    .status-interested { background-color: #e3f2fd !important; }
-    .status-inprogress { background-color: #fff3e0 !important; }
-    .status-hold { background-color: #ffebee !important; }
-    .status-completed { background-color: #e8f5e9 !important; }
-    
-    .card { background:#fff; padding:15px; text-align:center; border-radius:12px; margin:5px; flex:1; box-shadow:0 4px 6px rgba(0,0,0,0.1); font-weight:bold; border-top: 4px solid #ffcc00; }
-    .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-    .task-stage { padding:5px 10px; color:#fff; border-radius:12px; font-weight:bold; font-size:0.8em; }
-    .stage-quote { background:#ff7f50; } .stage-follow { background:#1e90ff; } .stage-order { background:#28a745; } .stage-bank { background:#6f42c1; }
+    <meta charset="UTF-8">
+    <title>Utopia CRM - Eng. Mahmoud Marie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; }
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow-x:hidden; }
+        
+        /* Sidebar & Dev Info */
+        .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; }
+        .sidebar h2 { font-size:1.3em; margin-bottom:20px; color:var(--accent); text-align:center; border-bottom: 2px solid #2e2e4d; padding-bottom: 10px; }
+        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: left; }
+        .sidebar button.active { background:var(--accent); color:var(--primary); }
+        .dev-box { margin-top:auto; font-size:0.8em; border-top:1px solid #3f3f6b; padding-top:15px; color:#bbb; }
+        .dev-box b { color: var(--accent); display: block; margin-bottom: 5px; }
+        .dev-link { color: #25D366; text-decoration: none; font-weight: bold; font-size: 1.1em; display: block; }
 
-    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-    @media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; } .row { flex-direction: column; } }
-</style>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+        /* Main Content */
+        .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; }
+        .tab-content { display:none; animation:fadeIn 0.4s; }
+        .tab-content.active { display:block; }
+        
+        /* Form Elements */
+        input, select, textarea, .btn-save { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #ccc; outline:none; font-size: 14px; }
+        .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
+        .row > * { flex: 1; min-width: 180px; }
+        .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
+        .btn-save:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* Table & UI */
+        table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
+        th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
+        th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
+        .status-interested { background: #e3f2fd !important; }
+        .status-inprogress { background: #fff3e0 !important; }
+        .status-hold { background: #ffebee !important; }
+        .status-completed { background: #e8f5e9 !important; }
+        
+        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
+        .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+        @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+        @media (max-width: 768px) { 
+            body { flex-direction: column; } 
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 5px; } 
+            .dev-box { display: none; }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
+<div id="notification"></div>
+
 <div class="sidebar">
-    <h2 data-lang-key="title">Utopia Trading CRM & Tasks Programs</h2>
-    <button class="tab-btn active" onclick="showTab('crmTab', this)" data-lang-key="crm">CRM</button>
-    <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks</button>
-    <div style="margin-top:auto; font-size:0.8em; border-top:1px solid #3f3f6b; padding-top:10px;">
-        <p>Dev: Eng. Mahmoud Mohamed Marie</p>
-        <select id="language" onchange="changeLang(this.value)">
+    <h2>Utopia Trading Program CRM & Tasks</h2>
+    <button class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
+    <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
+    
+    <div class="dev-box">
+        <b>Developer Info:</b>
+        Eng. Mahmoud Mohamed Marie
+        <a href="https://wa.me/201222153415" class="dev-link">🟢 +201222153415</a>
+        <select id="language" onchange="changeLang(this.value)" style="margin-top: 15px; background: #2e2e4d; color: white; border: none;">
             <option value="en">English</option>
-            <option value="ar">عربي</option>
+            <option value="ar">العربية</option>
         </select>
     </div>
 </div>
 
-<div class="tabs-content">
-    <div id="notification"></div>
-
+<div class="main">
     <div id="crmTab" class="tab-content active">
-        <h2 data-lang-key="crm_title">Client Management</h2>
-        <div class="row"><input id="universalSearch" placeholder="Search Clients..." oninput="renderCRM()" style="border:2px solid #ffcc00;"></div>
-        <div class="row">
-            <input id="name" placeholder="Client Name">
-            <input id="phone" placeholder="Phone">
-            <select id="governorate">
-                </select>
-            <input type="date" id="date">
-            <select id="status">
-                <option value="Interested">Interested</option><option value="In Progress">In Progress</option>
-                <option value="Hold">Hold</option><option value="Completed">Completed</option>
-            </select>
-            <textarea id="notes" placeholder="Notes"></textarea>
-            <input id="agent" placeholder="Agent">
-            <input type="text" id="followUp" placeholder="Follow Up">
-        </div>
-        <button onclick="addOrUpdate()" style="background:#28a745; color:white; font-weight:bold;">💾 Save Client</button>
+        <h2 id="crmHeader">Clients Registry</h2>
+        <input id="search" placeholder="🔍 Search by name, phone or governorate..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px;">
         
         <div class="row">
-            <div class="card" id="total">Total: 0</div>
-            <div class="card" id="hold_card">Hold: 0</div>
+            <input id="name" placeholder="Client Name">
+            <input id="phone" placeholder="Phone Number">
+            <select id="gov"></select>
+            <select id="status">
+                <option value="Interested">Interested</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Hold">Hold</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
+        <div class="row">
+            <textarea id="notes" placeholder="Detailed Notes..."></textarea>
+            <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
+                <input id="agent" placeholder="Sales Agent">
+                <input id="followUp" placeholder="Next Follow-up Action">
+                <input type="date" id="date">
+            </div>
+        </div>
+        <button class="btn-save" onclick="addOrUpdate()">💾 Save Client Data</button>
+
+        <div class="row" style="margin-top: 20px;">
+            <div class="card" id="countAll">Total Clients: 0</div>
+            <div class="card" id="countHold" style="border-top-color: var(--danger);">On Hold: 0</div>
         </div>
 
         <table>
             <thead>
                 <tr>
-                    <th>Name</th><th>Phone</th><th>Gov</th><th>Status</th><th>Map</th><th>WhatsApp</th><th>Edit</th><th>Delete</th>
+                    <th>Name</th><th>Phone</th><th>Gov</th><th>Status</th><th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="table"></tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 
     <div id="tasksTab" class="tab-content">
-        <h2 data-lang-key="tasks_title">Tasks</h2>
-        <div class="row"><input id="taskSearch" placeholder="Filter Tasks by Client or Text..." oninput="renderTasks()" style="border:2px solid #1e90ff;"></div>
+        <h2>Operations Tasks</h2>
+        <input id="taskSearch" placeholder="🔍 Filter tasks..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px;">
         <div class="row">
-            <input id="taskInput" placeholder="Task Details">
-            <select id="taskClient"><option value="">Select Client</option></select>
+            <input id="taskText" placeholder="What needs to be done?">
+            <select id="taskClientSelect"><option value="">Link to Client</option></select>
             <input type="date" id="taskDate">
             <select id="taskStage">
-                <option value="quote">Quote</option><option value="follow">Follow Up</option>
-                <option value="order">Order</option><option value="bank">Bank</option>
+                <option value="quote">Price Quote</option>
+                <option value="follow">Follow Up</option>
+                <option value="order">Order Confirmed</option>
+                <option value="bank">Bank Transfer</option>
             </select>
-            <button onclick="addTask()" style="background:#1e90ff; color:white;">➕ Add Task</button>
+            <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">➕ Add</button>
         </div>
         <table>
             <thead>
-                <tr><th>Client</th><th>Date</th><th>Stage</th><th>Task</th><th>Edit</th><th>Delete</th></tr>
+                <tr><th>Client</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr>
             </thead>
-            <tbody id="taskList"></tbody>
+            <tbody id="taskBody"></tbody>
         </table>
     </div>
 </div>
 
 <script>
-// --- Firebase Config ---
+// --- Configuration & Data ---
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], editIndex = -1, taskEditIndex = -1, lang = 'en';
-
-const govList = [
-    {en: "Cairo", ar: "القاهرة"}, {en: "Giza", ar: "الجيزة"}, {en: "Alexandria", ar: "الإسكندرية"},
-    {en: "Dakahlia", ar: "الدقهلية"}, {en: "Red Sea", ar: "البحر الأحمر"}, {en: "Beheira", ar: "البحيرة"},
-    {en: "Fayoum", ar: "الفيوم"}, {en: "Gharbia", ar: "الغربية"}, {en: "Ismailia", ar: "الإسماعيلية"},
-    {en: "Monufia", ar: "المنوفية"}, {en: "Minya", ar: "المنيا"}, {en: "Qalyubia", ar: "القليوبية"},
-    {en: "New Valley", ar: "الوادي الجديد"}, {en: "Suez", ar: "السويس"}, {en: "Aswan", ar: "أسوان"},
-    {en: "Assiut", ar: "أسيوط"}, {en: "Beni Suef", ar: "بني سويف"}, {en: "Port Said", ar: "بورسعيد"},
-    {en: "Damietta", ar: "دمياط"}, {en: "Sharkia", ar: "الشرقية"}, {en: "South Sinai", ar: "جنوب سيناء"},
-    {en: "Kafr El Sheikh", ar: "كفر الشيخ"}, {en: "Matrouh", ar: "مطروح"}, {en: "Luxor", ar: "الأقصر"},
-    {en: "Qena", ar: "قنا"}, {en: "North Sinai", ar: "شمال سيناء"}, {en: "Sohag", ar: "سوهاج"}
+let clients = [], tasks = [], editIdx = -1, lang = 'en';
+const govs = [
+    {en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"},
+    {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"},
+    {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"},
+    {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"},
+    {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"},
+    {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"},
+    {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"},
+    {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}
 ];
 
-// --- Audio Feedback ---
-function playSound(type) {
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(type === 'success' ? 880 : 220, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-    } catch(e) { console.log("Audio play blocked"); }
+// --- Utilities ---
+function play(soundType) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.frequency.value = soundType === 'success' ? 880 : 220;
+    osc.start(); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+    osc.stop(ctx.currentTime + 0.5);
 }
 
-// --- Notifications ---
-function notify(msg, type='info') {
+function notify(m, t='info') {
     const n = document.getElementById('notification');
-    n.innerText = msg; n.style.display = 'block';
-    const colors = { success: '#28a745', error: '#dc3545', warning: '#ffc107', info: '#17a2b8' };
-    n.style.backgroundColor = colors[type];
-    playSound(type === 'error' ? 'error' : 'success');
+    n.innerText = m; n.style.display = 'block';
+    n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8';
+    play(t);
     setTimeout(() => n.style.display = 'none', 3000);
 }
 
-// --- Dynamic Governorates ---
-function fillGovSelect() {
-    const sel = document.getElementById('governorate');
-    sel.innerHTML = `<option value="">${lang === 'ar' ? 'اختر المحافظة' : 'Select Governorate'}</option>`;
-    govList.forEach(g => {
-        sel.innerHTML += `<option value="${g.en}">${lang === 'ar' ? g.ar : g.en}</option>`;
-    });
-}
-
-// --- Tabs ---
-function showTab(id, btn){
-    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
 }
 
-// --- CRM Logic ---
-function loadData(){
-    db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); populateDropdown(); });
-    db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+// --- Logic ---
+function fillGovs() {
+    const s = document.getElementById('gov');
+    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`;
+    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`);
 }
 
-function addOrUpdate(){
-    const name = document.getElementById('name').value;
-    if(!name) return notify('Name Required', 'error');
-    
-    const client = {
-        name, phone: document.getElementById('phone').value,
-        gov: document.getElementById('governorate').value,
-        date: document.getElementById('date').value,
-        status: document.getElementById('status').value,
-        notes: document.getElementById('notes').value,
-        agent: document.getElementById('agent').value,
-        followUp: document.getElementById('followUp').value
+function addOrUpdate() {
+    const n = document.getElementById('name').value;
+    if(!n) return notify('Name is required!', 'error');
+    const c = {
+        name: n, phone: document.getElementById('phone').value,
+        gov: document.getElementById('gov').value, status: document.getElementById('status').value,
+        notes: document.getElementById('notes').value, agent: document.getElementById('agent').value,
+        followUp: document.getElementById('followUp').value, date: document.getElementById('date').value
     };
-
-    if(editIndex > -1) { 
-        clients[editIndex] = client; 
-        editIndex = -1; 
-        notify('Updated!', 'warning'); 
-    } else { 
-        clients.push(client); 
-        notify('Saved!', 'success'); 
-    }
-    
+    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('Client Updated'); }
+    else { clients.push(c); notify('Client Saved', 'success'); }
     db.ref('clients').set({...clients});
     document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language') i.value = ''; });
-    fillGovSelect();
+    fillGovs();
 }
 
-function renderCRM(){
-    const tbody = document.getElementById('table');
-    const search = document.getElementById('universalSearch').value.toLowerCase();
-    tbody.innerHTML = ''; let holds = 0;
-
+function renderCRM() {
+    const b = document.getElementById('tableBody'); b.innerHTML = '';
+    const q = document.getElementById('search').value.toLowerCase();
+    let hCount = 0;
     clients.forEach((c, i) => {
-        if(search && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(search)) return;
-        if(c.status === 'Hold') holds++;
-        
-        const rowClass = `status-${c.status.replace(' ', '').toLowerCase()}`;
-        const govDisp = lang === 'ar' ? (govList.find(g => g.en === c.gov)?.ar || c.gov) : c.gov;
-
-        tbody.innerHTML += `
-            <tr class="${rowClass}">
-                <td>${c.name}</td><td>${c.phone}</td><td>${govDisp}</td>
-                <td><strong>${c.status}</strong></td>
-                <td><button onclick="window.open('https://www.google.com/maps/search/${c.gov}')">📍</button></td>
-                <td><button onclick="openWA('${c.phone}')" style="background:#25D366; color:white; border:none; border-radius:5px; padding:5px;">WA</button></td>
-                <td><button onclick="editClient(${i})" style="background:#ffc107; border:none; border-radius:5px; padding:5px;">✏️</button></td>
-                <td><button onclick="deleteClient(${i})" style="background:#dc3545; color:white; border:none; border-radius:5px; padding:5px;">❌</button></td>
-            </tr>`;
+        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
+        if(c.status === 'Hold') hCount++;
+        const rowCls = `status-${c.status.toLowerCase().replace(/\s/g, '')}`;
+        const gName = lang === 'ar' ? (govs.find(g=>g.en===c.gov)?.ar || c.gov) : c.gov;
+        b.innerHTML += `<tr class="${rowCls}">
+            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${gName}</td><td>${c.status}</td>
+            <td>
+                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; border-radius:5px; padding:5px; cursor:pointer;">💬</button>
+                <button onclick="window.open('https://www.google.com/maps/search/${c.gov}')" style="background:#4285F4; border:none; border-radius:5px; padding:5px; cursor:pointer;">📍</button>
+                <button onclick="editClient(${i})" style="background:#ffc107; border:none; border-radius:5px; padding:5px; cursor:pointer;">✏️</button>
+                <button onclick="delClient(${i})" style="background:#f44336; border:none; border-radius:5px; padding:5px; cursor:pointer; color:white;">✕</button>
+            </td>
+        </tr>`;
     });
-    document.getElementById('total').innerText = 'Total: ' + clients.length;
-    document.getElementById('hold_card').innerText = 'Hold: ' + holds;
+    document.getElementById('countAll').innerText = (lang==='ar'?'إجمالي العملاء: ':'Total Clients: ') + clients.length;
+    document.getElementById('countHold').innerText = (lang==='ar'?'قيد الانتظار: ':'On Hold: ') + hCount;
 }
 
-function editClient(i){
-    editIndex = i; const c = clients[i];
+function editClient(i) {
+    editIdx = i; const c = clients[i];
     document.getElementById('name').value = c.name;
     document.getElementById('phone').value = c.phone;
-    document.getElementById('governorate').value = c.gov;
+    document.getElementById('gov').value = c.gov;
     document.getElementById('status').value = c.status;
     document.getElementById('notes').value = c.notes;
-    document.getElementById('agent').value = c.agent || '';
-    document.getElementById('followUp').value = c.followUp || '';
+    document.getElementById('agent').value = c.agent;
+    document.getElementById('followUp').value = c.followUp;
     window.scrollTo(0,0);
 }
 
-function deleteClient(i){
-    if(confirm('Delete this client?')) { clients.splice(i, 1); db.ref('clients').set({...clients}); notify('Deleted', 'error'); }
+function delClient(i) { if(confirm('Delete?')) { clients.splice(i,1); db.ref('clients').set({...clients}); notify('Deleted', 'error'); } }
+
+function addTask() {
+    const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value };
+    if(!t.text) return notify('Task details empty', 'error');
+    tasks.push(t); db.ref('tasks').set({...tasks});
+    notify('Task Added', 'success');
 }
 
-function openWA(p){ window.open(`https://wa.me/${p.replace(/\D/g,'')}`); notify('Opening WhatsApp...', 'info'); }
-
-// --- Tasks Logic ---
-function addTask(){
-    const tInput = document.getElementById('taskInput').value;
-    if(!tInput) return notify('Task details required', 'error');
-
-    const t = { 
-        text: tInput, 
-        client: document.getElementById('taskClient').value, 
-        date: document.getElementById('taskDate').value, 
-        stage: document.getElementById('taskStage').value 
-    };
-    if(taskEditIndex > -1) { tasks[taskEditIndex] = t; taskEditIndex = -1; notify('Task Updated', 'warning'); }
-    else { tasks.push(t); notify('Task Added', 'success'); }
-    db.ref('tasks').set({...tasks});
-    document.getElementById('taskInput').value = '';
-}
-
-function renderTasks(){
-    const tbody = document.getElementById('taskList');
-    const search = document.getElementById('taskSearch').value.toLowerCase();
-    tbody.innerHTML = '';
-    
+function renderTasks() {
+    const b = document.getElementById('taskBody'); b.innerHTML = '';
+    const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => {
-        if(search && !`${t.client} ${t.text}`.toLowerCase().includes(search)) return;
-        tbody.innerHTML += `
-            <tr>
-                <td>${t.client}</td><td>${t.date}</td>
-                <td><span class="task-stage stage-${t.stage}">${t.stage.toUpperCase()}</span></td>
-                <td>${t.text}</td>
-                <td><button onclick="editTask(${i})">✏️</button></td>
-                <td><button onclick="deleteTask(${i})" style="background:red; color:white;">❌</button></td>
-            </tr>`;
+        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
+        b.innerHTML += `<tr>
+            <td>${t.client}</td><td>${t.text}</td><td>${t.date}</td>
+            <td><span style="background:#eee; padding:3px 8px; border-radius:5px; font-size:0.8em; font-weight:bold;">${t.stage.toUpperCase()}</span></td>
+            <td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none; cursor:pointer;">✕</button></td>
+        </tr>`;
     });
 }
 
-function editTask(i){
-    taskEditIndex = i; const t = tasks[i];
-    document.getElementById('taskInput').value = t.text;
-    document.getElementById('taskClient').value = t.client;
-    document.getElementById('taskDate').value = t.date;
-    document.getElementById('taskStage').value = t.stage;
-}
-
-function deleteTask(i){ tasks.splice(i, 1); db.ref('tasks').set({...tasks}); notify('Task Deleted', 'error'); }
-
-function populateDropdown(){
-    const sel = document.getElementById('taskClient'); sel.innerHTML = '<option value="">Select Client</option>';
-    clients.forEach(c => sel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-}
-
-function changeLang(l){
+function changeLang(l) {
     lang = l;
     document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-    fillGovSelect();
-    renderCRM();
-    notify(l === 'ar' ? 'تم تغيير اللغة' : 'Language Changed', 'info');
+    fillGovs(); renderCRM(); renderTasks();
 }
 
-// Start
-fillGovSelect();
-loadData();
+// --- Initializing ---
+db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); 
+    const sel = document.getElementById('taskClientSelect'); sel.innerHTML = '<option value="">Link to Client</option>';
+    clients.forEach(c => sel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
+});
+db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+fillGovs();
 </script>
 </body>
 </html>
