@@ -66,10 +66,10 @@
         .ai-stat-card p { font-size: 1.8em; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
         .chart-box { background: white; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
-        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
+        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
-        @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
         @media (max-width: 768px) { body { flex-direction: column; overflow: auto; } #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; } .dev-box { display: none; } }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -105,7 +105,7 @@
             <b>Developer Info:</b>
             Eng. Mahmoud Mohamed Marie
             <a href="https://wa.me/201222153415" class="dev-link">🟢 +201222153415</a>
-            <button onclick="logout()" style="background: var(--danger); margin-top: 10px; width: 100%; text-align: center; border-radius: 8px;">Logout</button>
+            <button onclick="logout()" style="background: var(--danger); margin-top: 10px; width: 100%; text-align: center; border-radius: 8px; color:white; border:none; padding:10px; cursor:pointer;">Logout</button>
             <select id="language" onchange="changeLang(this.value)" style="margin-top: 15px; background: #2e2e4d; color: white; border: none; padding: 5px;">
                 <option value="en">English</option>
                 <option value="ar">العربية</option>
@@ -204,7 +204,7 @@
                     <option value="quote">Quote</option><option value="follow">Follow Up</option>
                     <option value="order">Order</option><option value="bank">Bank</option>
                 </select>
-                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 0 15px;">➕</button>
+                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕</button>
             </div>
             <table>
                 <thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr></thead>
@@ -221,13 +221,36 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
-const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
+
+// جميع محافظات مصر
+const govs = [
+    {en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, 
+    {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, 
+    {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, 
+    {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, 
+    {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, 
+    {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, 
+    {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, 
+    {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"},
+    {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}
+];
+
+// --- AI Security & Notifications ---
+function checkDeadlines() {
+    const today = new Date().toISOString().split('T')[0];
+    tasks.forEach(t => {
+        if(t.date === today) notify(lang === 'ar' ? `تنبيه: مهمة اليوم - ${t.text}` : `Task Reminder: ${t.text}`, 'info');
+    });
+    clients.forEach(c => {
+        if(c.followUp && c.date === today) notify(lang === 'ar' ? `تذكير متابعة: ${c.name}` : `Follow-up Reminder: ${c.name}`, 'success');
+    });
+}
 
 // --- AI Tracking Logic ---
 function triggerTracking() {
     const govValue = document.getElementById('gov').value;
     const clientName = document.getElementById('name').value || "Client";
-    if(govValue) notify(lang === 'ar' ? تتبع ذكي مفعل لـ ${clientName} : Smart tracking active for ${clientName}, 'success');
+    if(govValue) notify(lang === 'ar' ? `تتبع ذكي مفعل لـ ${clientName}` : `Smart tracking active for ${clientName}`, 'success');
 }
 
 function getTrackingLabel(dateStr) {
@@ -248,13 +271,11 @@ function updateDashboard() {
     document.getElementById('convRate').innerText = rate + '%';
     document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
     
-    // حساب أكثر محافظة
     const govCounts = {};
     clients.forEach(c => { if(c.gov) govCounts[c.gov] = (govCounts[c.gov] || 0) + 1; });
     const top = Object.keys(govCounts).reduce((a, b) => govCounts[a] > govCounts[b] ? a : b, '-');
     document.getElementById('topGov').innerText = top;
 
-    // Chart.js Update
     const ctx = document.getElementById('statusChart').getContext('2d');
     const data = {
         labels: ['Interested', 'In Progress', 'Hold', 'Completed'],
@@ -303,18 +324,33 @@ function syncAll() {
 
 // --- Basic UI Logic ---
 function checkLogin() {
-    if (document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === 'admin') {
+    const user = document.getElementById('userInput').value;
+    const pass = document.getElementById('passInput').value;
+    // تم رفع مستوى الأمان ببيانات دخول مخصصة
+    if (user === 'admin' && pass === 'admin123') {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         sessionStorage.setItem('isLoggedIn', 'true');
+        checkDeadlines();
     } else {
         document.getElementById('loginError').style.display = 'block';
     }
 }
-if (sessionStorage.getItem('isLoggedIn') === 'true') { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; }
+if (sessionStorage.getItem('isLoggedIn') === 'true') { 
+    document.getElementById('loginOverlay').style.display = 'none'; 
+    document.getElementById('mainApp').style.display = 'flex'; 
+}
 
 function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
-function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; setTimeout(() => n.style.display = 'none', 3000); }
+
+function notify(m, t='info') { 
+    const n = document.getElementById('notification'); 
+    n.innerText = m; 
+    n.style.display = 'block'; 
+    n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
+    setTimeout(() => n.style.display = 'none', 4000); 
+}
+
 function showTab(id, btn) { 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
@@ -325,19 +361,37 @@ function showTab(id, btn) {
 
 function fillGovs() { 
     const s = document.getElementById('gov'); 
-    s.innerHTML = <option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>; 
-    govs.forEach(g => s.innerHTML += <option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>); 
+    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
+    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
 }
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
-    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('Updated'); } else { clients.push(c); notify('Saved', 'success'); }
+    const c = { 
+        name: n, 
+        phone: document.getElementById('phone').value, 
+        gov: document.getElementById('gov').value, 
+        status: document.getElementById('status').value, 
+        notes: document.getElementById('notes').value, 
+        agent: document.getElementById('agent').value, 
+        followUp: document.getElementById('followUp').value, 
+        date: document.getElementById('date').value || today 
+    };
+    if(editIdx > -1) { 
+        clients[editIdx] = c; 
+        editIdx = -1; 
+        notify('Updated'); 
+    } else { 
+        clients.push(c); 
+        notify('Saved', 'success'); 
+    }
     db.ref('clients').set({...clients});
-    document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language') i.value = ''; });
-    fillGovs();
+    // Clear inputs
+    ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('gov').value = '';
+    document.getElementById('status').value = 'Interested';
 }
 
 function renderCRM() {
@@ -345,10 +399,10 @@ function renderCRM() {
     const q = document.getElementById('search').value.toLowerCase();
     let hCount = 0;
     clients.forEach((c, i) => {
-        if(q && !${c.name} ${c.phone} ${c.gov}.toLowerCase().includes(q)) return;
+        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
-        const rowCls = status-${c.status.toLowerCase().replace(/\s/g, '')};
+        const rowCls = `status-${c.status.toLowerCase().replace(/\s/g, '')}`;
         b.innerHTML += `<tr class="${rowCls}">
             <td><b>${c.name}</b></td>
             <td>${c.phone}</td>
@@ -356,14 +410,22 @@ function renderCRM() {
             <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
             <td>${c.status}</td>
             <td>
-                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; padding:5px; border-radius:5px; cursor:pointer;">💬</button> 
-                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:5px; border-radius:5px; cursor:pointer;">✏️</button> 
-                <button onclick="delClient(${i})" style="background:#f44336; border:none; padding:5px; border-radius:5px; color:white;">✕</button>
+                <button onclick="window.open('https://wa.me/${c.phone}')" title="WhatsApp" style="background:#25D366; border:none; padding:8px; border-radius:5px; cursor:pointer; color:white;">WA</button> 
+                <button onclick="window.location.href='tel:${c.phone}'" title="Call" style="background:#007bff; border:none; padding:8px; border-radius:5px; cursor:pointer; color:white;">📞</button> 
+                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
+                <button onclick="delClient(${i})" style="background:#f44336; border:none; padding:8px; border-radius:5px; color:white; cursor:pointer;">✕</button>
             </td>
         </tr>`;
     });
     document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
+    updateTaskSelectors();
+}
+
+function updateTaskSelectors() {
+    const s = document.getElementById('taskClientSelect');
+    s.innerHTML = '<option value="">Client</option>';
+    clients.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
 }
 
 function renderRecycle() {
@@ -372,26 +434,53 @@ function renderRecycle() {
         b.innerHTML += `<tr>
             <td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td>
             <td>
-                <button onclick="restoreClient(${i})" style="background:var(--success); color:white; border:none; border-radius:5px; padding:5px;">Restore</button>
-                <button onclick="permanentDel(${i})" style="background:var(--danger); color:white; border:none; border-radius:5px; padding:5px;">Final Del</button>
+                <button onclick="restoreClient(${i})" style="background:var(--success); color:white; border:none; border-radius:5px; padding:5px; cursor:pointer;">Restore</button>
+                <button onclick="permanentDel(${i})" style="background:var(--danger); color:white; border:none; border-radius:5px; padding:5px; cursor:pointer;">Final Del</button>
             </td>
         </tr>`;
     });
 }
 
-function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent; document.getElementById('followUp').value = c.followUp; document.getElementById('date').value = c.date; }
+function editClient(i) { 
+    editIdx = i; 
+    const c = clients[i]; 
+    document.getElementById('name').value = c.name; 
+    document.getElementById('phone').value = c.phone; 
+    document.getElementById('gov').value = c.gov; 
+    document.getElementById('status').value = c.status; 
+    document.getElementById('notes').value = c.notes; 
+    document.getElementById('agent').value = c.agent; 
+    document.getElementById('followUp').value = c.followUp; 
+    document.getElementById('date').value = c.date; 
+    window.scrollTo(0,0);
+}
 
 function addTask() {
-    const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value };
+    const t = { 
+        text: document.getElementById('taskText').value, 
+        client: document.getElementById('taskClientSelect').value, 
+        date: document.getElementById('taskDate').value, 
+        stage: document.getElementById('taskStage').value 
+    };
     if(!t.text) return notify('Empty task', 'error');
-    tasks.push(t); db.ref('tasks').set({...tasks});
+    tasks.push(t); 
+    db.ref('tasks').set({...tasks});
     notify('Task Added', 'success');
+    document.getElementById('taskText').value = '';
 }
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); b.innerHTML = '';
+    const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => {
-        b.innerHTML += <tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage.toUpperCase()}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none;">✕</button></td></tr>;
+        if(q && !t.text.toLowerCase().includes(q) && !t.client.toLowerCase().includes(q)) return;
+        b.innerHTML += `<tr>
+            <td>${t.client}</td>
+            <td>${t.text}</td>
+            <td>${t.date}</td>
+            <td>${t.stage.toUpperCase()}</td>
+            <td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">✕</button></td>
+        </tr>`;
     });
 }
 
@@ -403,13 +492,44 @@ function changeLang(l) {
     renderRecycle();
     document.getElementById('lblConv').innerText = l==='ar'?'معدل التحويل':'Conversion Rate';
     document.getElementById('lblPotential').innerText = l==='ar'?'صفقات محتملة':'Potential Deals';
+    document.getElementById('crmHeader').innerText = l==='ar'?'سجل العملاء':'Clients Registry';
+}
+
+function exportData(type) {
+    let data = type === 'clients' ? clients : tasks;
+    let csv = "data:text/csv;charset=utf-8,";
+    csv += (type === 'clients' ? "Name,Phone,Gov,Status,Notes\n" : "Client,Task,Date,Stage\n");
+    data.forEach(item => {
+        let row = type === 'clients' ? 
+            `${item.name},${item.phone},${item.gov},${item.status},${item.notes}` :
+            `${item.client},${item.text},${item.date},${item.stage}`;
+        csv += row + "\n";
+    });
+    const encodedUri = encodeURI(csv);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${type}_export.csv`);
+    document.body.appendChild(link);
+    link.click();
 }
 
 // --- Firebase Listeners ---
-db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDashboard(); });
-db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
-db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+db.ref('clients').on('value', s => { 
+    clients = s.val() ? Object.values(s.val()) : []; 
+    renderCRM(); 
+    updateDashboard(); 
+});
+db.ref('deletedClients').on('value', s => { 
+    deletedClients = s.val() ? Object.values(s.val()) : []; 
+    renderRecycle(); 
+});
+db.ref('tasks').on('value', s => { 
+    tasks = s.val() ? Object.values(s.val()) : []; 
+    renderTasks(); 
+    if(sessionStorage.getItem('isLoggedIn') === 'true') checkDeadlines();
+});
 
+// Initial Load
 fillGovs();
 </script>
 </body>
