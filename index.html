@@ -40,7 +40,6 @@
         .row > * { flex: 1; min-width: 180px; }
         .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
         
-        /* Export Button Style */
         .btn-export { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
         .btn-export:hover { background: #5a6268; }
 
@@ -53,6 +52,12 @@
         .status-hold { background: #ffebee !important; }
         .status-completed { background: #e8f5e9 !important; }
         
+        /* Tracking Badge Style */
+        .track-badge { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; }
+        .track-new { background: #17a2b8; }
+        .track-active { background: #28a745; }
+        .track-old { background: #6c757d; }
+
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
         .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
@@ -107,7 +112,7 @@
             <div class="row">
                 <input id="name" placeholder="Client Name">
                 <input id="phone" placeholder="Phone Number">
-                <select id="gov"></select>
+                <select id="gov" onchange="triggerTracking()"></select>
                 <select id="status">
                     <option value="Interested">Interested</option>
                     <option value="In Progress">In Progress</option>
@@ -129,7 +134,15 @@
                 <div class="card" id="countHold" style="border-top-color: var(--danger);">Hold: 0</div>
             </div>
             <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>Status</th><th>Actions</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Gov</th>
+                        <th>Tracking</th> <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
@@ -166,12 +179,30 @@ const db = firebase.database();
 let clients = [], tasks = [], editIdx = -1, lang = 'en';
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
-// --- Export Functionality (Fixed for Arabic) ---
+// --- Customer Tracking Logic ---
+function triggerTracking() {
+    const govValue = document.getElementById('gov').value;
+    if(govValue) {
+        notify(lang === 'ar' ? `تم تفعيل تتبع المنطقة: ${govValue}` : `Tracking active for: ${govValue}`, 'info');
+    }
+}
+
+function getTrackingLabel(dateStr) {
+    if(!dateStr) return { lab: 'New', cls: 'track-new' };
+    const clientDate = new Date(dateStr);
+    const today = new Date();
+    const diffDays = Math.ceil((today - clientDate) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 2) return { lab: (lang === 'ar' ? 'نشط' : 'Active'), cls: 'track-active' };
+    if (diffDays > 30) return { lab: (lang === 'ar' ? 'قديم' : 'Old'), cls: 'track-old' };
+    return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-new' };
+}
+
+// --- Export Functionality ---
 function exportData(type) {
     let csvContent = "";
     let filename = "";
-    const BOM = "\uFEFF"; // Byte Order Mark for Excel Arabic Support
-
+    const BOM = "\uFEFF"; 
     if (type === 'clients') {
         const headers = lang === 'ar' ? "الاسم,الموبايل,المحافظة,الحالة,الملاحظات" : "Name,Phone,Governorate,Status,Notes";
         csvContent = headers + "\n";
@@ -188,7 +219,6 @@ function exportData(type) {
         });
         filename = "Utopia_Tasks.csv";
     }
-
     const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -206,7 +236,6 @@ function checkLogin() {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         sessionStorage.setItem('isLoggedIn', 'true');
-        notify('Welcome back!', 'success');
     } else {
         document.getElementById('loginError').style.display = 'block';
         play('error');
@@ -223,7 +252,8 @@ function fillGovs() { const s = document.getElementById('gov'); s.innerHTML = `<
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify('Name required', 'error');
-    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value };
+    const today = new Date().toISOString().split('T')[0];
+    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today, createdAt: editIdx > -1 ? clients[editIdx].createdAt : today };
     if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('Updated'); } else { clients.push(c); notify('Saved', 'success'); }
     db.ref('clients').set({...clients});
     document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language') i.value = ''; });
@@ -237,15 +267,27 @@ function renderCRM() {
     clients.forEach((c, i) => {
         if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
+        const track = getTrackingLabel(c.date);
         const rowCls = `status-${c.status.toLowerCase().replace(/\s/g, '')}`;
         const gName = lang === 'ar' ? (govs.find(g=>g.en===c.gov)?.ar || c.gov) : c.gov;
-        b.innerHTML += `<tr class="${rowCls}"><td><b>${c.name}</b></td><td>${c.phone}</td><td>${gName}</td><td>${c.status}</td><td><button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; border-radius:5px; cursor:pointer;">💬</button> <button onclick="editClient(${i})" style="background:#ffc107; border:none; border-radius:5px; cursor:pointer;">✏️</button> <button onclick="delClient(${i})" style="background:#f44336; border:none; border-radius:5px; color:white;">✕</button></td></tr>`;
+        b.innerHTML += `<tr class="${rowCls}">
+            <td><b>${c.name}</b></td>
+            <td>${c.phone}</td>
+            <td>${gName}</td>
+            <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
+            <td>${c.status}</td>
+            <td>
+                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; border-radius:5px; cursor:pointer;">💬</button> 
+                <button onclick="editClient(${i})" style="background:#ffc107; border:none; border-radius:5px; cursor:pointer;">✏️</button> 
+                <button onclick="delClient(${i})" style="background:#f44336; border:none; border-radius:5px; color:white;">✕</button>
+            </td>
+        </tr>`;
     });
-    document.getElementById('countAll').innerText = 'Total: ' + clients.length;
-    document.getElementById('countHold').innerText = 'Hold: ' + hCount;
+    document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
+    document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
 }
 
-function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent; document.getElementById('followUp').value = c.followUp; }
+function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent; document.getElementById('followUp').value = c.followUp; document.getElementById('date').value = c.date; }
 function delClient(i) { if(confirm('Delete?')) { clients.splice(i,1); db.ref('clients').set({...clients}); } }
 
 function addTask() {
