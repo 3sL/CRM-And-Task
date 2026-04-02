@@ -52,11 +52,12 @@
         .status-hold { background: #ffebee !important; }
         .status-completed { background: #e8f5e9 !important; }
         
-        /* Tracking Badge Style */
-        .track-badge { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; }
-        .track-new { background: #17a2b8; }
-        .track-active { background: #28a745; }
-        .track-old { background: #6c757d; }
+        /* --- Tracking Badges --- */
+        .track-badge { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; display: inline-block; }
+        .track-new { background: #17a2b8; }     /* أزرق: عميل جديد اليوم */
+        .track-active { background: #28a745; }  /* أخضر: متابعة حديثة */
+        .track-warning { background: #ffc107; color: #333; } /* أصفر: لم يتم التواصل منذ 3 أيام */
+        .track-old { background: #dc3545; }     /* أحمر: عميل قديم (أكثر من 7 أيام) */
 
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
         .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -139,7 +140,8 @@
                         <th>Name</th>
                         <th>Phone</th>
                         <th>Gov</th>
-                        <th>Tracking</th> <th>Status</th>
+                        <th>Tracking</th> 
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -179,26 +181,32 @@ const db = firebase.database();
 let clients = [], tasks = [], editIdx = -1, lang = 'en';
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
-// --- Customer Tracking Logic ---
+// --- ميزة التتبع (Tracking Logic) ---
 function triggerTracking() {
     const govValue = document.getElementById('gov').value;
+    const clientName = document.getElementById('name').value || "Client";
     if(govValue) {
-        notify(lang === 'ar' ? `تم تفعيل تتبع المنطقة: ${govValue}` : `Tracking active for: ${govValue}`, 'info');
+        // بمجرد اختيار المحافظة، يظهر إشعار تتبع
+        notify(lang === 'ar' ? `تتبع نشط لـ ${clientName} في ${govValue}` : `Active tracking for ${clientName} in ${govValue}`, 'success');
     }
 }
 
 function getTrackingLabel(dateStr) {
-    if(!dateStr) return { lab: 'New', cls: 'track-new' };
+    if(!dateStr) return { lab: (lang === 'ar' ? 'جديد' : 'New'), cls: 'track-new' };
+    
     const clientDate = new Date(dateStr);
     const today = new Date();
-    const diffDays = Math.ceil((today - clientDate) / (1000 * 60 * 60 * 24));
+    // حساب الفرق بالأيام
+    const diffTime = Math.abs(today - clientDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays <= 2) return { lab: (lang === 'ar' ? 'نشط' : 'Active'), cls: 'track-active' };
-    if (diffDays > 30) return { lab: (lang === 'ar' ? 'قديم' : 'Old'), cls: 'track-old' };
-    return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-new' };
+    if (diffDays <= 1) return { lab: (lang === 'ar' ? 'نشط' : 'Active'), cls: 'track-active' };
+    if (diffDays <= 3) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-new' };
+    if (diffDays <= 7) return { lab: (lang === 'ar' ? 'تنبيه' : 'Warning'), cls: 'track-warning' };
+    return { lab: (lang === 'ar' ? 'قديم' : 'Old'), cls: 'track-old' };
 }
 
-// --- Export Functionality ---
+// --- بقية الوظائف الأساسية ---
 function exportData(type) {
     let csvContent = "";
     let filename = "";
@@ -230,7 +238,6 @@ function exportData(type) {
     notify(lang === 'ar' ? 'تم تصدير الملف بنجاح' : 'Exported Successfully', 'success');
 }
 
-// --- Login & Basic Logic ---
 function checkLogin() {
     if (document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === 'admin') {
         document.getElementById('loginOverlay').style.display = 'none';
@@ -253,7 +260,7 @@ function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
-    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today, createdAt: editIdx > -1 ? clients[editIdx].createdAt : today };
+    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
     if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('Updated'); } else { clients.push(c); notify('Saved', 'success'); }
     db.ref('clients').set({...clients});
     document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language') i.value = ''; });
@@ -267,7 +274,10 @@ function renderCRM() {
     clients.forEach((c, i) => {
         if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
+        
+        // استدعاء دالة التتبع لعرض الشارة (Badge)
         const track = getTrackingLabel(c.date);
+        
         const rowCls = `status-${c.status.toLowerCase().replace(/\s/g, '')}`;
         const gName = lang === 'ar' ? (govs.find(g=>g.en===c.gov)?.ar || c.gov) : c.gov;
         b.innerHTML += `<tr class="${rowCls}">
