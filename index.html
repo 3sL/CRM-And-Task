@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
+    <title>Utopia Trading For Export Pro AI CRM & Tasks - DEV BY ENG.MAHMOUD MARIE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -11,30 +11,34 @@
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
         
         /* Logo Styling */
-        .app-logo { width: 80px; height: 80px; margin: 0 auto 15px; display: block; border-radius: 50%; border: 2px solid var(--accent); background: #fff; padding: 5px; object-fit: contain; }
+        .app-logo { width: 90px; height: 90px; margin: 0 auto 15px; display: block; border-radius: 50%; border: 3px solid var(--accent); background: #fff; padding: 5px; object-fit: contain; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
+        /* Login Overlay */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; transition: 0.5s; }
-        .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
+        .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 380px; text-align: center; color: white; }
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
         .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; box-sizing: border-box; outline: none; font-size: 16px; }
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .login-card button:hover { opacity: 0.9; transform: scale(1.02); }
+        .login-card button:hover { transform: scale(1.02); opacity: 0.9; }
         
+        /* Dev Info on Login */
         .login-dev-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #3f3f6b; font-size: 0.85em; color: #bbb; }
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
 
+        /* Sidebar */
         #mainApp { display: none; width: 100%; height: 100vh; flex-direction: row; }
-        .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; }
+        .sidebar { width:280px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; border-right: 1px solid #333; }
         .sidebar h2 { font-size:1.3em; margin-bottom:20px; color:var(--accent); text-align:center; border-bottom: 2px solid #2e2e4d; padding-bottom: 10px; }
-        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: left; }
+        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: left; display: flex; align-items: center; gap: 10px; }
         .sidebar button.active { background:var(--accent); color:var(--primary); }
         
         .dev-box { margin-top:auto; font-size:0.8em; border-top:1px solid #3f3f6b; padding-top:15px; color:#bbb; }
         .dev-box b { color: var(--accent); display: block; margin-bottom: 5px; }
         .dev-link { color: #25D366; text-decoration: none; font-weight: bold; font-size: 1.1em; display: block; }
 
-        .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; }
+        /* Main Area */
+        .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; background: #f8f9fc; }
         .tab-content { display:none; animation:fadeIn 0.4s; }
         .tab-content.active { display:block; }
         
@@ -43,61 +47,56 @@
         .row > * { flex: 1; min-width: 180px; }
         .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
         
-        .btn-export { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
-        
+        /* Action Buttons Cell */
+        .action-cell { display: flex; gap: 5px; justify-content: center; }
+        .btn-call { background: #007bff; color: white; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; }
+        .btn-whatsapp { background: #25D366; color: white; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; }
+
+        /* Table Design */
         table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
         
-        .status-interested { background: #e3f2fd !important; }
-        .status-inprogress { background: #fff3e0 !important; }
-        .status-hold { background: #ffebee !important; }
-        .status-completed { background: #e8f5e9 !important; }
-        
+        /* Tracking Badges */
         .track-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; display: inline-block; }
-        .track-new { background: #17a2b8; box-shadow: 0 0 8px #17a2b8; }
+        .track-new { background: #17a2b8; }
         .track-active { background: #28a745; }
         .track-warning { background: #ffc107; color: #333; }
         .track-old { background: #dc3545; }
 
+        /* Dashboard Cards */
         .ai-card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .ai-stat-card { background: white; padding: 20px; border-radius: 15px; border-left: 5px solid var(--info); box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
-        .ai-stat-card h3 { margin: 0; font-size: 0.9em; color: #666; }
         .ai-stat-card p { font-size: 1.8em; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
-        .chart-box { background: white; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
-        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
-        .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:30000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
 
         @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-        @media (max-width: 768px) { body { flex-direction: column; overflow: auto; } #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; } .dev-box { display: none; } }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
-<body oncontextmenu="return false;"> 
+<body oncontextmenu="return false;">
 
 <div id="notification"></div>
-<audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
 <div id="loginOverlay">
     <div class="login-card">
-        <img src="https://i.ibb.co/pvf9ZT45/logo.png" alt="Utopia Logo" class="app-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5968/5968204.png'">
-        <h2>Utopia Trading For Export</h2>
+        <img src="https://i.ibb.co/pvf9ZT45/logo.png" alt="Utopia Logo" class="app-logo">
+        <h2>Utopia CRM Pro</h2>
         <input type="text" id="userInput" placeholder="Username">
         <input type="password" id="passInput" placeholder="Password">
         <button onclick="checkLogin()">Login</button>
-        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Invalid Credentials!</p>
         <div class="login-dev-info">
-            <b>Dev By: Eng. Mahmoud Mohamed Marie</b>
-            <a href="https://wa.me/201222153415">🟢 +201222153415</a>
+            <b>Developed By: Eng. Mahmoud Mohamed Marie</b>
+            <a href="https://wa.me/201222153415">🟢 WhatsApp: +201222153415</a>
         </div>
     </div>
 </div>
 
 <div id="mainApp">
     <div class="sidebar">
-        <img src="https://i.ibb.co/pvf9ZT45/logo.png" alt="Utopia Logo" class="app-logo" style="width: 60px; height: 60px;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5968/5968204.png'">
+        <img src="https://i.ibb.co/pvf9ZT45/logo.png" alt="Utopia Logo" class="app-logo" style="width: 70px; height: 70px;">
         <h2>Utopia CRM</h2>
         <button class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
@@ -109,24 +108,20 @@
             Eng. Mahmoud Mohamed Marie
             <a href="https://wa.me/201222153415" class="dev-link">🟢 +201222153415</a>
             <button onclick="logout()" style="background: var(--danger); margin-top: 10px; width: 100%; text-align: center; border-radius: 8px;">Logout</button>
-            <select id="language" onchange="changeLang(this.value)" style="margin-top: 15px; background: #2e2e4d; color: white; border: none; padding: 5px;">
-                <option value="en">English</option>
-                <option value="ar">العربية</option>
-            </select>
         </div>
     </div>
 
     <div class="main">
         <div id="crmTab" class="tab-content active">
-            <h2 id="crmHeader">Clients Registry</h2>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
-                <button class="btn-export" onclick="exportToExcel('clients')">📤 Export Excel</button>
-            </div>
+            <h2>Clients Registry</h2>
             <div class="row">
                 <input id="name" placeholder="Client Name">
-                <input id="phone" placeholder="Phone Number">
-                <select id="gov" onchange="triggerTracking()"></select>
+                <input id="phone" placeholder="Phone Number (e.g. 010...)">
+                <select id="gov">
+                    <option value="">Select Governorate</option>
+                    <option value="Cairo">Cairo</option><option value="Giza">Giza</option><option value="Alexandria">Alexandria</option>
+                    <option value="Dakahlia">Dakahlia</option><option value="Sharkia">Sharkia</option><option value="Beheira">Beheira</option>
+                </select>
                 <select id="status">
                     <option value="Interested">Interested</option>
                     <option value="In Progress">In Progress</option>
@@ -134,23 +129,23 @@
                     <option value="Completed">Completed</option>
                 </select>
             </div>
-            <div class="row">
-                <textarea id="notes" placeholder="Notes..."></textarea>
-                <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
-                    <input id="agent" placeholder="Agent Name">
-                    <input id="followUp" placeholder="Next Action">
-                    <input type="date" id="date">
-                </div>
-            </div>
+            <textarea id="notes" placeholder="Notes & Follow-up details..."></textarea>
             <button class="btn-save" onclick="addOrUpdate()">💾 Save Data</button>
-            <div class="row" style="margin-top: 20px;">
-                <div class="card" id="countAll">Total: 0</div>
-                <div class="card" id="countHold" style="border-top-color: var(--danger);">Hold: 0</div>
+
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 20px;">
+                <input id="search" placeholder="🔍 Search by name or phone..." oninput="renderCRM()" style="flex: 1; border: 2px solid var(--accent);">
+                <button onclick="exportToExcel()" style="width: auto; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 10px; cursor: pointer;">📥 Excel</button>
             </div>
+
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking Status</th><th>Sales Status</th><th>Actions</th>
+                        <th>Client Info</th>
+                        <th>Actions (Call/WA)</th>
+                        <th>Gov</th>
+                        <th>Tracking</th>
+                        <th>Status</th>
+                        <th>Manage</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -158,17 +153,19 @@
         </div>
 
         <div id="dashboardTab" class="tab-content">
-            <h2>📊 Smart Analytics & AI Insight</h2>
+            <h2>📊 AI Analytics Dashboard</h2>
             <div class="ai-card-container">
-                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">Conversion Rate</h3><p id="convRate">0%</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">Potential Deals</h3><p id="potentialDeals">0</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">Top Governorate</h3><p id="topGov">-</p></div>
+                <div class="ai-stat-card"><h3>Total Clients</h3><p id="countAll">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3>Completed</h3><p id="countDone">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--danger);"><h3>On Hold</h3><p id="countHold">0</p></div>
             </div>
-            <div class="chart-box" style="height: 300px;"><canvas id="statusChart"></canvas></div>
+            <div style="background: white; padding: 20px; border-radius: 15px; height: 350px;">
+                <canvas id="statusChart"></canvas>
+            </div>
         </div>
 
         <div id="recycleTab" class="tab-content">
-            <h2 style="color: var(--danger);">♻️ Deleted Clients (Recycle Bin)</h2>
+            <h2 style="color: var(--danger);">♻️ Recycle Bin</h2>
             <table>
                 <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr></thead>
                 <tbody id="recycleBody"></tbody>
@@ -176,110 +173,167 @@
         </div>
 
         <div id="tasksTab" class="tab-content">
-            <h2>Operations Tasks</h2>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <input id="taskSearch" placeholder="🔍 Filter..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
-                <button class="btn-export" onclick="exportToExcel('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
-            </div>
+            <h2>📅 Tasks Board</h2>
             <div class="row">
                 <input id="taskText" placeholder="Task details">
-                <select id="taskClientSelect"><option value="">Client</option></select>
                 <input type="date" id="taskDate">
-                <select id="taskStage"><option value="quote">Quote</option><option value="follow">Follow Up</option><option value="order">Order</option><option value="bank">Bank</option></select>
-                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 0 15px;">➕</button>
+                <button onclick="addTask()" style="background: var(--info); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Add Task</button>
             </div>
-            <table>
-                <thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr></thead>
-                <tbody id="taskBody"></tbody>
-            </table>
+            <div id="taskList"></div>
         </div>
     </div>
 </div>
 
 <script>
-const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
+// Firebase Config
+const firebaseConfig = { 
+    apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", 
+    authDomain: "crm-tasking.firebaseapp.com", 
+    databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", 
+    projectId: "crm-tasking" 
+};
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
-const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
+let clients = [], tasks = [], deletedClients = [], editIdx = -1, statusChart = null;
 
-const _U = "admin";
-const _P = "utopia2026";
-
-// حماية الكود
-document.onkeydown = (e) => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false; };
-
-// نظام الإشعارات والصوت
-function notify(m, t='info') { 
-    const n = document.getElementById('notification'); 
-    const s = document.getElementById('notifSound');
-    if(s) { s.currentTime = 0; s.play().catch(e => console.log("Sound error")); }
-    n.innerText = m; 
-    n.style.display = 'block'; 
-    n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
-    setTimeout(() => n.style.display = 'none', 3000); 
-}
-
-// تصدير إكسيل
-function exportToExcel(type) {
-    let dataToExport = [];
-    let fileName = (type === 'clients') ? "Utopia_Clients.xlsx" : "Utopia_Tasks.xlsx";
-    dataToExport = (type === 'clients') ? clients.map(c => ({ "Name": c.name, "Phone": c.phone, "Gov": c.gov, "Status": c.status })) : tasks.map(t => ({ "Client": t.client, "Task": t.text }));
-    const ws = XLSX.utils.json_to_sheet(dataToExport);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Data");
-    XLSX.writeFile(wb, fileName);
-    notify("Exported!", "success");
-}
-
-function triggerTracking() {
-    const g = document.getElementById('gov').value;
-    if(g) notify(lang === 'ar' ? `تتبع ذكي مفعل` : `Smart tracking active`, 'success');
-}
-
-function getTrackingLabel(dateStr) {
-    if(!dateStr) return { lab: 'New', cls: 'track-new' };
-    const diff = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
-    if (diff <= 1) return { lab: (lang === 'ar' ? 'نشط' : 'Active'), cls: 'track-new' };
-    if (diff <= 7) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow'), cls: 'track-active' };
-    return { lab: (lang === 'ar' ? 'قديم' : 'Old'), cls: 'track-old' };
-}
-
+// Auth
 function checkLogin() {
-    if (document.getElementById('userInput').value === _U && document.getElementById('passInput').value === _P) {
-        localStorage.setItem('utopia_secure_session', JSON.stringify({ active: true, exp: new Date().getTime() + 28800000 }));
+    const u = document.getElementById('userInput').value;
+    const p = document.getElementById('passInput').value;
+    if (u === "admin" && p === "utopia2026") {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
-        initializeFirebaseListeners();
+        initListeners();
     } else {
-        document.getElementById('loginError').style.display = 'block';
-        notify('Invalid Login', 'error');
+        notify("Invalid Credentials!", "error");
     }
 }
 
-function logout() { localStorage.removeItem('utopia_secure_session'); location.reload(); }
-
-function initializeFirebaseListeners() {
-    db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDashboard(); updateTaskClients(); });
+function initListeners() {
+    db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDashboard(); });
     db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
     db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 }
 
-function updateTaskClients() {
-    const s = document.getElementById('taskClientSelect'); if(!s) return;
-    s.innerHTML = '<option value="">Select Client</option>';
-    clients.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
+// Logic
+function addOrUpdate() {
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    if(!name || !phone) return notify("Name and Phone required!", "error");
+
+    const data = {
+        name, phone,
+        gov: document.getElementById('gov').value,
+        status: document.getElementById('status').value,
+        notes: document.getElementById('notes').value,
+        date: editIdx > -1 ? clients[editIdx].date : new Date().toISOString()
+    };
+
+    if(editIdx > -1) {
+        db.ref('clients').once('value', s => {
+            const keys = Object.keys(s.val());
+            db.ref('clients').child(keys[editIdx]).set(data);
+            editIdx = -1;
+        });
+    } else {
+        db.ref('clients').push(data);
+    }
+    clearForm();
+    notify("Saved Successfully!", "success");
 }
 
-window.addEventListener('load', () => {
-    const sess = JSON.parse(localStorage.getItem('utopia_secure_session'));
-    if (sess && sess.active && new Date().getTime() < sess.exp) {
-        document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex';
-        initializeFirebaseListeners();
+function renderCRM() {
+    const b = document.getElementById('tableBody');
+    const search = document.getElementById('search').value.toLowerCase();
+    b.innerHTML = '';
+    clients.forEach((c, i) => {
+        if(c.name.toLowerCase().includes(search) || c.phone.includes(search)) {
+            const cleanPhone = c.phone.replace(/\s/g, '');
+            const track = getTrackLabel(c.date);
+            const waLink = `https://wa.me/2${cleanPhone.startsWith('0') ? cleanPhone : '0'+cleanPhone}`;
+            
+            b.innerHTML += `<tr>
+                <td><b>${c.name}</b><br><small>${c.phone}</small></td>
+                <td>
+                    <div class="action-cell">
+                        <a href="tel:${cleanPhone}" class="btn-call">📞 Call</a>
+                        <a href="${waLink}" target="_blank" class="btn-whatsapp">💬 WA</a>
+                    </div>
+                </td>
+                <td>${c.gov}</td>
+                <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
+                <td>${c.status}</td>
+                <td>
+                    <button onclick="editClient(${i})">✏️</button>
+                    <button onclick="delClient(${i})">✕</button>
+                </td>
+            </tr>`;
+        }
+    });
+}
+
+function getTrackLabel(d) {
+    const diff = Math.ceil((new Date() - new Date(d)) / (1000 * 60 * 60 * 24));
+    if(diff <= 1) return {lab: "New", cls: "track-new"};
+    if(diff <= 5) return {lab: "Active", cls: "track-active"};
+    if(diff <= 10) return {lab: "Follow Up", cls: "track-warning"};
+    return {lab: "Old", cls: "track-old"};
+}
+
+function delClient(i) {
+    if(confirm("Move to Recycle Bin?")) {
+        const c = clients[i];
+        c.deletedAt = new Date().toLocaleString();
+        db.ref('deletedClients').push(c);
+        db.ref('clients').once('value', s => {
+            const keys = Object.keys(s.val());
+            db.ref('clients').child(keys[i]).remove();
+        });
     }
-    fillGovs();
-});
+}
+
+function renderRecycle() {
+    const b = document.getElementById('recycleBody'); b.innerHTML = '';
+    deletedClients.forEach((c, i) => {
+        b.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td>
+        <td><button onclick="restoreClient(${i})" style="background:var(--success); color:white;">Restore</button></td></tr>`;
+    });
+}
+
+function restoreClient(i) {
+    const c = deletedClients[i]; delete c.deletedAt;
+    db.ref('clients').push(c);
+    db.ref('deletedClients').once('value', s => {
+        const keys = Object.keys(s.val());
+        db.ref('deletedClients').child(keys[i]).remove();
+    });
+}
+
+function updateDashboard() {
+    document.getElementById('countAll').innerText = clients.length;
+    document.getElementById('countDone').innerText = clients.filter(c => c.status === 'Completed').length;
+    document.getElementById('countHold').innerText = clients.filter(c => c.status === 'Hold').length;
+
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    if(statusChart) statusChart.destroy();
+    statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Interested', 'In Progress', 'Hold', 'Completed'],
+            datasets: [{
+                data: [
+                    clients.filter(c => c.status === 'Interested').length,
+                    clients.filter(c => c.status === 'In Progress').length,
+                    clients.filter(c => c.status === 'Hold').length,
+                    clients.filter(c => c.status === 'Completed').length
+                ],
+                backgroundColor: ['#007bff', '#ffc107', '#dc3545', '#28a745']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
 
 function showTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -287,77 +341,35 @@ function showTab(id, btn) {
     document.getElementById(id).classList.add('active'); btn.classList.add('active');
 }
 
-function fillGovs() {
-    const s = document.getElementById('gov'); if(!s) return;
-    s.innerHTML = `<option value="">Select Gov</option>`;
-    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`);
+function notify(m, t) {
+    const n = document.getElementById('notification');
+    n.innerText = m; n.style.display = 'block';
+    n.style.background = t === 'success' ? '#28a745' : '#dc3545';
+    setTimeout(() => n.style.display = 'none', 3000);
 }
 
-function addOrUpdate() {
-    const n = document.getElementById('name').value;
-    if(!n) return notify('Name required', 'error');
-    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0] };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; } else { clients.push(c); }
-    db.ref('clients').set({...clients});
-    notify('Saved', 'success');
+function clearForm() {
+    document.getElementById('name').value = ''; document.getElementById('phone').value = '';
+    document.getElementById('notes').value = ''; editIdx = -1;
 }
 
-function renderCRM() {
-    const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
-    clients.forEach((c, i) => {
-        const track = getTrackingLabel(c.date);
-        b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
-            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td>
-            <td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
-            <td><button onclick="editClient(${i})">✏️</button><button onclick="delClient(${i})">✕</button></td></tr>`;
-    });
+function exportToExcel() {
+    const ws = XLSX.utils.json_to_sheet(clients);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Clients");
+    XLSX.writeFile(wb, "Utopia_CRM_Data.xlsx");
 }
 
-function delClient(i) {
-    if(confirm('Delete?')) {
-        const d = clients.splice(i, 1)[0]; d.deletedAt = new Date().toLocaleDateString();
-        deletedClients.push(d); db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients});
-    }
+function editClient(i) {
+    editIdx = i; const c = clients[i];
+    document.getElementById('name').value = c.name;
+    document.getElementById('phone').value = c.phone;
+    document.getElementById('gov').value = c.gov;
+    document.getElementById('status').value = c.status;
+    document.getElementById('notes').value = c.notes;
 }
 
-function renderRecycle() {
-    const b = document.getElementById('recycleBody'); if(!b) return; b.innerHTML = '';
-    deletedClients.forEach((c, i) => b.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button></td></tr>`);
-}
-
-function restoreClient(i) {
-    clients.push(deletedClients.splice(i, 1)[0]);
-    db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients});
-}
-
-function editClient(i) { 
-    editIdx = i; const c = clients[i]; 
-    document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; 
-    document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status;
-}
-
-function addTask() {
-    const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value };
-    if(!t.text) return notify('Empty task', 'error');
-    tasks.push(t); db.ref('tasks').set({...tasks}); notify('Task Added', 'success');
-}
-
-function renderTasks() {
-    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = '';
-    tasks.forEach((t, i) => b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});">✕</button></td></tr>`);
-}
-
-function updateDashboard() {
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    const data = { labels: ['Interested', 'In Progress', 'Hold', 'Completed'], datasets: [{ data: [clients.filter(c => c.status === 'Interested').length, clients.filter(c => c.status === 'In Progress').length, clients.filter(c => c.status === 'Hold').length, clients.filter(c => c.status === 'Completed').length], backgroundColor: ['#e3f2fd', '#fff3e0', '#ffebee', '#e8f5e9'] }] };
-    if(statusChart) statusChart.destroy();
-    statusChart = new Chart(ctx, { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false } });
-}
-
-function changeLang(l) { 
-    lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
-    fillGovs(); renderCRM(); 
-}
+function logout() { location.reload(); }
 </script>
 </body>
 </html>
