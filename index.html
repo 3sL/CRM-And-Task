@@ -10,6 +10,9 @@
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
         
+        /* Logo Styling */
+        .app-logo { width: 80px; height: 80px; margin: 0 auto 15px; display: block; border-radius: 50%; border: 2px solid var(--accent); background: #fff; padding: 5px; }
+
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; transition: 0.5s; }
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
@@ -79,6 +82,7 @@
 
 <div id="loginOverlay">
     <div class="login-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968204.png" alt="Utopia Logo" class="app-logo">
         <h2>Utopia Trading For Export</h2>
         <input type="text" id="userInput" placeholder="Username">
         <input type="password" id="passInput" placeholder="Password">
@@ -93,6 +97,7 @@
 
 <div id="mainApp">
     <div class="sidebar">
+        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968204.png" alt="Utopia Logo" class="app-logo" style="width: 60px; height: 60px;">
         <h2>Utopia CRM</h2>
         <button class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
@@ -173,7 +178,7 @@
                     <p id="topGov">-</p>
                 </div>
             </div>
-            <div class="chart-box">
+            <div class="chart-box" style="height: 300px;">
                 <canvas id="statusChart"></canvas>
             </div>
         </div>
@@ -221,55 +226,28 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
-// --- ADVANCED PROTECTION LAYER ---
+// --- LOGIN PROTECTION ---
 const _U = "admin";
 const _P = "utopia2026";
 
-// منع الأزرار والاختصارات
 document.onkeydown = (e) => {
     if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false;
 };
 
-// مراقبة فتح الـ DevTools لتعطيل البرنامج
-setInterval(() => {
-    const devtools = /./;
-    devtools.toString = function() {
-        this.opened = true;
-    };
-    console.log('%c', devtools);
-    if (devtools.opened) {
-        document.body.innerHTML = "Security Blocked";
-    }
-}, 1000);
+// تم إزالة الجزء الخاص بمراقبة DevTools الذي يسبب Security Blocked
 
-// --- Excel Export Logic (Fixed) ---
+// --- Excel Export Logic ---
 function exportToExcel(type) {
     let dataToExport = [];
     let fileName = "";
-
     if(type === 'clients') {
-        dataToExport = clients.map(c => ({
-            "Name": c.name,
-            "Phone": c.phone,
-            "Governorate": c.gov,
-            "Status": c.status,
-            "Agent": c.agent,
-            "Notes": c.notes,
-            "Date": c.date
-        }));
+        dataToExport = clients.map(c => ({ "Name": c.name, "Phone": c.phone, "Governorate": c.gov, "Status": c.status, "Agent": c.agent, "Notes": c.notes, "Date": c.date }));
         fileName = "Utopia_Clients.xlsx";
     } else {
-        dataToExport = tasks.map(t => ({
-            "Client": t.client,
-            "Task": t.text,
-            "Deadline": t.date,
-            "Stage": t.stage
-        }));
+        dataToExport = tasks.map(t => ({ "Client": t.client, "Task": t.text, "Deadline": t.date, "Stage": t.stage }));
         fileName = "Utopia_Tasks.xlsx";
     }
-
     if(dataToExport.length === 0) return notify("No data to export", "error");
-
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
@@ -277,7 +255,6 @@ function exportToExcel(type) {
     notify("Exported Successfully", "success");
 }
 
-// --- Notification ---
 function notify(m, t='info') { 
     const n = document.getElementById('notification'); 
     const s = document.getElementById('notifSound');
@@ -288,7 +265,6 @@ function notify(m, t='info') {
     setTimeout(() => n.style.display = 'none', 3000); 
 }
 
-// --- Logic functions ---
 function triggerTracking() {
     const govValue = document.getElementById('gov').value;
     const clientName = document.getElementById('name').value || "Client";
@@ -308,10 +284,8 @@ function updateDashboard() {
     const total = clients.length;
     const completed = clients.filter(c => c.status === 'Completed').length;
     const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
-    
     document.getElementById('convRate').innerText = rate + '%';
     document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
-    
     const govCounts = {};
     clients.forEach(c => { if(c.gov) govCounts[c.gov] = (govCounts[c.gov] || 0) + 1; });
     const top = Object.keys(govCounts).reduce((a, b) => govCounts[a] > govCounts[b] ? a : b, '-');
@@ -337,7 +311,6 @@ function updateDashboard() {
 function checkLogin() {
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
-    
     if (u === _U && p === _P) {
         const expiry = new Date().getTime() + (8 * 60 * 60 * 1000);
         localStorage.setItem('utopia_secure_session', JSON.stringify({ active: true, exp: expiry }));
@@ -365,6 +338,7 @@ function initializeFirebaseListeners() {
 
 function updateTaskClients() {
     const s = document.getElementById('taskClientSelect');
+    if(!s) return;
     s.innerHTML = '<option value="">Select Client</option>';
     clients.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
 }
@@ -404,13 +378,13 @@ function addOrUpdate() {
     const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
     if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; } else { clients.push(c); }
     db.ref('clients').set({...clients});
-    document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language') i.value = ''; });
+    document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language' && i.id !== 'gov') i.value = ''; });
     fillGovs();
     notify('Data Saved', 'success');
 }
 
 function renderCRM() {
-    const b = document.getElementById('tableBody'); b.innerHTML = '';
+    const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase();
     let hCount = 0;
     clients.forEach((c, i) => {
@@ -446,7 +420,7 @@ function delClient(i) {
 }
 
 function renderRecycle() {
-    const b = document.getElementById('recycleBody'); b.innerHTML = '';
+    const b = document.getElementById('recycleBody'); if(!b) return; b.innerHTML = '';
     deletedClients.forEach((c, i) => {
         b.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td>
                 <button onclick="restoreClient(${i})" style="background:var(--success); color:white; border:none; border-radius:5px; padding:5px;">Restore</button>
@@ -479,7 +453,7 @@ function addTask() {
 }
 
 function renderTasks() {
-    const b = document.getElementById('taskBody'); b.innerHTML = '';
+    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = '';
     const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => {
         if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
