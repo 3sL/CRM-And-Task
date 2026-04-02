@@ -203,11 +203,34 @@ let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', st
 
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
 
-function playNotifySound() { const audio = document.getElementById('notifySound'); if(audio) { audio.currentTime = 0; audio.play().catch(e => { console.log("Sound play failed", e); }); } }
+// دالة تشغيل الصوت المصححة
+function playNotifySound() { 
+    const audio = document.getElementById('notifySound'); 
+    if(audio) { 
+        audio.currentTime = 0; 
+        audio.play().catch(e => console.log("Audio blocked by browser policy. Interaction needed first.", e)); 
+    } 
+}
 
 function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; playNotifySound(); setTimeout(() => n.style.display = 'none', 4000); }
 
-function checkLogin() { if (document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === 'admin123') { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; sessionStorage.setItem('isLoggedIn', 'true'); notify('Welcome Admin', 'success'); } else { document.getElementById('loginError').style.display = 'block'; notify('Login Failed', 'error'); } }
+// دالة الدخول المصححة لتفعيل الصوت
+function checkLogin() { 
+    // تفعيل سياق الصوت بمجرد التفاعل (حل مشكلة المتصفح)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+
+    if (document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === 'admin123') { 
+        document.getElementById('loginOverlay').style.display = 'none'; 
+        document.getElementById('mainApp').style.display = 'flex'; 
+        sessionStorage.setItem('isLoggedIn', 'true'); 
+        notify('Welcome Admin', 'success'); 
+    } else { 
+        document.getElementById('loginError').style.display = 'block'; 
+        notify('Login Failed', 'error'); 
+    } 
+}
+
 if (sessionStorage.getItem('isLoggedIn') === 'true') { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; }
 
 function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
