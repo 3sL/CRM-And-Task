@@ -15,15 +15,12 @@
     .tab-content.active { display:block; }
     input, select, textarea, button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; outline:none; }
     
-    /* Notification */
     #notification { position: fixed; top:20px; right:20px; padding:15px 25px; border-radius:12px; display:none; z-index:9999; color:#fff; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
     
-    /* Table Styling */
     table { width:100%; border-collapse:collapse; margin-top:15px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
     th, td { border-bottom:1px solid #eee; padding:12px; text-align:center; }
     th { background:#1e1e2f; color:#ffcc00; }
     
-    /* Status Colors */
     .status-interested { background-color: #e3f2fd !important; }
     .status-inprogress { background-color: #fff3e0 !important; }
     .status-hold { background-color: #ffebee !important; }
@@ -35,7 +32,7 @@
     .stage-quote { background:#ff7f50; } .stage-follow { background:#1e90ff; } .stage-order { background:#28a745; } .stage-bank { background:#6f42c1; }
 
     @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-    @media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; } .row { flex-direction: column; } }
+    @media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; } .row { flex-direction: column; } }
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -43,11 +40,11 @@
 <body>
 
 <div class="sidebar">
-    <h2 data-lang-key="title">Utopia CRM</h2>
+    <h2 data-lang-key="title">Utopia Trading CRM & Tasks Programs</h2>
     <button class="tab-btn active" onclick="showTab('crmTab', this)" data-lang-key="crm">CRM</button>
     <button class="tab-btn" onclick="showTab('tasksTab', this)" data-lang-key="tasks">Tasks</button>
     <div style="margin-top:auto; font-size:0.8em; border-top:1px solid #3f3f6b; padding-top:10px;">
-        <p>Dev: Eng. Mahmoud Marie</p>
+        <p>Dev: Eng. Mahmoud Mohamed Marie</p>
         <select id="language" onchange="changeLang(this.value)">
             <option value="en">English</option>
             <option value="ar">عربي</option>
@@ -65,17 +62,7 @@
             <input id="name" placeholder="Client Name">
             <input id="phone" placeholder="Phone">
             <select id="governorate">
-                <option value="">Select Governorate - اختر المحافظة</option>
-                <option value="Cairo">القاهرة</option><option value="Giza">الجيزة</option><option value="Alexandria">الإسكندرية</option>
-                <option value="Dakahlia">الدقهلية</option><option value="Red Sea">البحر الأحمر</option><option value="Beheira">البحيرة</option>
-                <option value="Fayoum">الفيوم</option><option value="Gharbia">الغربية</option><option value="Ismailia">الإسماعيلية</option>
-                <option value="Monufia">المنوفية</option><option value="Minya">المنيا</option><option value="Qalyubia">القليوبية</option>
-                <option value="New Valley">الوادي الجديد</option><option value="Suez">السويس</option><option value="Aswan">أسوان</option>
-                <option value="Assiut">أسيوط</option><option value="Beni Suef">بني سويف</option><option value="Port Said">بورسعيد</option>
-                <option value="Damietta">دمياط</option><option value="Sharkia">الشرقية</option><option value="South Sinai">جنوب سيناء</option>
-                <option value="Kafr El Sheikh">كفر الشيخ</option><option value="Matrouh">مطروح</option><option value="Luxor">الأقصر</option>
-                <option value="Qena">قنا</option><option value="North Sinai">شمال سيناء</option><option value="Sohag">سوهاج</option>
-            </select>
+                </select>
             <input type="date" id="date">
             <select id="status">
                 <option value="Interested">Interested</option><option value="In Progress">In Progress</option>
@@ -95,7 +82,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th><th>Phone</th><th>Gov</th><th>Status</th><th>Notes</th><th>WhatsApp</th><th>Edit</th><th>Delete</th>
+                    <th>Name</th><th>Phone</th><th>Gov</th><th>Status</th><th>Map</th><th>WhatsApp</th><th>Edit</th><th>Delete</th>
                 </tr>
             </thead>
             <tbody id="table"></tbody>
@@ -132,15 +119,29 @@ const db = firebase.database();
 
 let clients = [], tasks = [], editIndex = -1, taskEditIndex = -1, lang = 'en';
 
+const govList = [
+    {en: "Cairo", ar: "القاهرة"}, {en: "Giza", ar: "الجيزة"}, {en: "Alexandria", ar: "الإسكندرية"},
+    {en: "Dakahlia", ar: "الدقهلية"}, {en: "Red Sea", ar: "البحر الأحمر"}, {en: "Beheira", ar: "البحيرة"},
+    {en: "Fayoum", ar: "الفيوم"}, {en: "Gharbia", ar: "الغربية"}, {en: "Ismailia", ar: "الإسماعيلية"},
+    {en: "Monufia", ar: "المنوفية"}, {en: "Minya", ar: "المنيا"}, {en: "Qalyubia", ar: "القليوبية"},
+    {en: "New Valley", ar: "الوادي الجديد"}, {en: "Suez", ar: "السويس"}, {en: "Aswan", ar: "أسوان"},
+    {en: "Assiut", ar: "أسيوط"}, {en: "Beni Suef", ar: "بني سويف"}, {en: "Port Said", ar: "بورسعيد"},
+    {en: "Damietta", ar: "دمياط"}, {en: "Sharkia", ar: "الشرقية"}, {en: "South Sinai", ar: "جنوب سيناء"},
+    {en: "Kafr El Sheikh", ar: "كفر الشيخ"}, {en: "Matrouh", ar: "مطروح"}, {en: "Luxor", ar: "الأقصر"},
+    {en: "Qena", ar: "قنا"}, {en: "North Sinai", ar: "شمال سيناء"}, {en: "Sohag", ar: "سوهاج"}
+];
+
 // --- Audio Feedback ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playSound(type) {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    if(type === 'success') { osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5); }
-    else { osc.frequency.setValueAtTime(220, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5); }
-    osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(type === 'success' ? 880 : 220, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+    } catch(e) { console.log("Audio play blocked"); }
 }
 
 // --- Notifications ---
@@ -151,6 +152,15 @@ function notify(msg, type='info') {
     n.style.backgroundColor = colors[type];
     playSound(type === 'error' ? 'error' : 'success');
     setTimeout(() => n.style.display = 'none', 3000);
+}
+
+// --- Dynamic Governorates ---
+function fillGovSelect() {
+    const sel = document.getElementById('governorate');
+    sel.innerHTML = `<option value="">${lang === 'ar' ? 'اختر المحافظة' : 'Select Governorate'}</option>`;
+    govList.forEach(g => {
+        sel.innerHTML += `<option value="${g.en}">${lang === 'ar' ? g.ar : g.en}</option>`;
+    });
 }
 
 // --- Tabs ---
@@ -181,11 +191,18 @@ function addOrUpdate(){
         followUp: document.getElementById('followUp').value
     };
 
-    if(editIndex > -1) { clients[editIndex] = client; editIndex = -1; notify('Updated!', 'warning'); }
-    else { clients.push(client); notify('Saved!', 'success'); }
+    if(editIndex > -1) { 
+        clients[editIndex] = client; 
+        editIndex = -1; 
+        notify('Updated!', 'warning'); 
+    } else { 
+        clients.push(client); 
+        notify('Saved!', 'success'); 
+    }
     
     db.ref('clients').set({...clients});
-    document.querySelectorAll('input, textarea, select').forEach(i => { if(i.id !== 'language') i.value = ''; });
+    document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language') i.value = ''; });
+    fillGovSelect();
 }
 
 function renderCRM(){
@@ -198,10 +215,13 @@ function renderCRM(){
         if(c.status === 'Hold') holds++;
         
         const rowClass = `status-${c.status.replace(' ', '').toLowerCase()}`;
+        const govDisp = lang === 'ar' ? (govList.find(g => g.en === c.gov)?.ar || c.gov) : c.gov;
+
         tbody.innerHTML += `
             <tr class="${rowClass}">
-                <td>${c.name}</td><td>${c.phone}</td><td>${c.gov}</td>
-                <td><strong>${c.status}</strong></td><td>${c.notes}</td>
+                <td>${c.name}</td><td>${c.phone}</td><td>${govDisp}</td>
+                <td><strong>${c.status}</strong></td>
+                <td><button onclick="window.open('https://www.google.com/maps/search/${c.gov}')">📍</button></td>
                 <td><button onclick="openWA('${c.phone}')" style="background:#25D366; color:white; border:none; border-radius:5px; padding:5px;">WA</button></td>
                 <td><button onclick="editClient(${i})" style="background:#ffc107; border:none; border-radius:5px; padding:5px;">✏️</button></td>
                 <td><button onclick="deleteClient(${i})" style="background:#dc3545; color:white; border:none; border-radius:5px; padding:5px;">❌</button></td>
@@ -218,6 +238,9 @@ function editClient(i){
     document.getElementById('governorate').value = c.gov;
     document.getElementById('status').value = c.status;
     document.getElementById('notes').value = c.notes;
+    document.getElementById('agent').value = c.agent || '';
+    document.getElementById('followUp').value = c.followUp || '';
+    window.scrollTo(0,0);
 }
 
 function deleteClient(i){
@@ -228,8 +251,11 @@ function openWA(p){ window.open(`https://wa.me/${p.replace(/\D/g,'')}`); notify(
 
 // --- Tasks Logic ---
 function addTask(){
+    const tInput = document.getElementById('taskInput').value;
+    if(!tInput) return notify('Task details required', 'error');
+
     const t = { 
-        text: document.getElementById('taskInput').value, 
+        text: tInput, 
         client: document.getElementById('taskClient').value, 
         date: document.getElementById('taskDate').value, 
         stage: document.getElementById('taskStage').value 
@@ -237,6 +263,7 @@ function addTask(){
     if(taskEditIndex > -1) { tasks[taskEditIndex] = t; taskEditIndex = -1; notify('Task Updated', 'warning'); }
     else { tasks.push(t); notify('Task Added', 'success'); }
     db.ref('tasks').set({...tasks});
+    document.getElementById('taskInput').value = '';
 }
 
 function renderTasks(){
@@ -275,10 +302,13 @@ function populateDropdown(){
 function changeLang(l){
     lang = l;
     document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+    fillGovSelect();
+    renderCRM();
     notify(l === 'ar' ? 'تم تغيير اللغة' : 'Language Changed', 'info');
 }
 
 // Start
+fillGovSelect();
 loadData();
 </script>
 </body>
