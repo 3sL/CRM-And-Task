@@ -5,11 +5,11 @@
     <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
         
-        /* --- Login Screen Styling --- */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; transition: 0.5s; }
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
@@ -21,7 +21,6 @@
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
 
-        /* --- Main App UI --- */
         #mainApp { display: none; width: 100%; height: 100vh; flex-direction: row; }
         .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; }
         .sidebar h2 { font-size:1.3em; margin-bottom:20px; color:var(--accent); text-align:center; border-bottom: 2px solid #2e2e4d; padding-bottom: 10px; }
@@ -117,7 +116,7 @@
             <h2 id="crmHeader">Clients Registry</h2>
             <div style="display: flex; gap: 10px; align-items: center;">
                 <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
-                <button class="btn-export" onclick="exportData('clients')">📤 Export Excel</button>
+                <button class="btn-export" onclick="exportToExcel('clients')">📤 Export Excel</button>
             </div>
             <div class="row">
                 <input id="name" placeholder="Client Name">
@@ -193,7 +192,7 @@
             <h2>Operations Tasks</h2>
             <div style="display: flex; gap: 10px; align-items: center;">
                 <input id="taskSearch" placeholder="🔍 Filter..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
-                <button class="btn-export" onclick="exportData('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
+                <button class="btn-export" onclick="exportToExcel('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
             </div>
             <div class="row">
                 <input id="taskText" placeholder="Task details">
@@ -214,7 +213,7 @@
 </div>
 
 <script>
-// --- Configuration & Global Variables ---
+// --- Configuration ---
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -223,25 +222,62 @@ let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', st
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
 // --- ADVANCED PROTECTION LAYER ---
-const _0x1 = "YWRtaW4="; // admin
-const _0x2 = "dXRvcGlhMjAyNg=="; // utopia2026
+const _U = "admin";
+const _P = "utopia2026";
 
-document.onkeydown = function(e) {
-    if(e.keyCode == 123) return false;
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+// منع الأزرار والاختصارات
+document.onkeydown = (e) => {
+    if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false;
 };
 
-// Auto-Kill session if tools are opened
-setInterval(function() {
-    if (window.outerHeight - window.innerHeight > 160 || window.outerWidth - window.innerWidth > 160) {
-        document.body.innerHTML = "<div style='color:white; background:#1e1e2f; height:100vh; display:flex; align-items:center; justify-content:center; font-family:sans-serif;'><h2>Security Protocol Active: System Locked</h2></div>";
+// مراقبة فتح الـ DevTools لتعطيل البرنامج
+setInterval(() => {
+    const devtools = /./;
+    devtools.toString = function() {
+        this.opened = true;
+    };
+    console.log('%c', devtools);
+    if (devtools.opened) {
+        document.body.innerHTML = "Security Blocked";
     }
 }, 1000);
 
-// --- Updated Notification with Sound ---
+// --- Excel Export Logic (Fixed) ---
+function exportToExcel(type) {
+    let dataToExport = [];
+    let fileName = "";
+
+    if(type === 'clients') {
+        dataToExport = clients.map(c => ({
+            "Name": c.name,
+            "Phone": c.phone,
+            "Governorate": c.gov,
+            "Status": c.status,
+            "Agent": c.agent,
+            "Notes": c.notes,
+            "Date": c.date
+        }));
+        fileName = "Utopia_Clients.xlsx";
+    } else {
+        dataToExport = tasks.map(t => ({
+            "Client": t.client,
+            "Task": t.text,
+            "Deadline": t.date,
+            "Stage": t.stage
+        }));
+        fileName = "Utopia_Tasks.xlsx";
+    }
+
+    if(dataToExport.length === 0) return notify("No data to export", "error");
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+    XLSX.writeFile(workbook, fileName);
+    notify("Exported Successfully", "success");
+}
+
+// --- Notification ---
 function notify(m, t='info') { 
     const n = document.getElementById('notification'); 
     const s = document.getElementById('notifSound');
@@ -252,7 +288,7 @@ function notify(m, t='info') {
     setTimeout(() => n.style.display = 'none', 3000); 
 }
 
-// --- AI Tracking Logic ---
+// --- Logic functions ---
 function triggerTracking() {
     const govValue = document.getElementById('gov').value;
     const clientName = document.getElementById('name').value || "Client";
@@ -268,7 +304,6 @@ function getTrackingLabel(dateStr) {
     return { lab: (lang === 'ar' ? 'بارد' : 'Cold'), cls: 'track-old' };
 }
 
-// --- AI Dashboard Logic ---
 function updateDashboard() {
     const total = clients.length;
     const completed = clients.filter(c => c.status === 'Completed').length;
@@ -299,74 +334,39 @@ function updateDashboard() {
     statusChart = new Chart(ctx, { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false } });
 }
 
-// --- Recycle Bin Logic ---
-function delClient(i) {
-    if(confirm(lang==='ar'?'نقل العميل لسلة المحذوفات؟':'Move client to Recycle Bin?')) {
-        const deleted = clients.splice(i, 1)[0];
-        deleted.deletedAt = new Date().toLocaleDateString();
-        deletedClients.push(deleted);
-        syncAll();
-        notify(lang==='ar'?'تم النقل للسلة':'Moved to Recycle Bin', 'info');
-    }
-}
-
-function restoreClient(i) {
-    clients.push(deletedClients.splice(i, 1)[0]);
-    syncAll();
-    notify(lang==='ar'?'تم الاستعادة':'Restored Successfully', 'success');
-}
-
-function permanentDel(i) {
-    if(confirm(lang==='ar'?'حذف نهائي؟':'Delete permanently?')) {
-        deletedClients.splice(i, 1);
-        syncAll();
-    }
-}
-
-function syncAll() {
-    db.ref('clients').set({...clients});
-    db.ref('deletedClients').set({...deletedClients});
-}
-
-// --- NEW SECURE LOGIN SYSTEM ---
 function checkLogin() {
-    const u = btoa(document.getElementById('userInput').value);
-    const p = btoa(document.getElementById('passInput').value);
+    const u = document.getElementById('userInput').value;
+    const p = document.getElementById('passInput').value;
     
-    if (u === _0x1 && p === _0x2) {
-        // إنشاء جلسة مؤمنة بـ 8 ساعات
+    if (u === _U && p === _P) {
         const expiry = new Date().getTime() + (8 * 60 * 60 * 1000);
-        const sessionData = { active: true, exp: expiry, token: 'secure_' + Math.random() };
-        localStorage.setItem('utopia_secure_session', JSON.stringify(sessionData));
-        
+        localStorage.setItem('utopia_secure_session', JSON.stringify({ active: true, exp: expiry }));
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
-        notify(lang==='ar'?'تم تسجيل الدخول':'Logged In', 'success');
-        initializeFirebaseListeners(); // تشغيل الجلب بعد التأكد من الدخول
+        initializeFirebaseListeners();
     } else {
         document.getElementById('loginError').style.display = 'block';
-        notify(lang==='ar'?'بيانات خاطئة':'Invalid Login', 'error');
+        notify('Invalid Login', 'error');
     }
 }
 
-function logout() { 
-    localStorage.removeItem('utopia_secure_session'); 
-    location.reload(); 
-}
+function logout() { localStorage.removeItem('utopia_secure_session'); location.reload(); }
 
-// حماية الجلب: البيانات لا تظهر إلا إذا كان اللوجن صحيحاً
 function initializeFirebaseListeners() {
-    const sessionStr = localStorage.getItem('utopia_secure_session');
-    if (!sessionStr) return;
-    
-    const session = JSON.parse(sessionStr);
-    if (session.active && new Date().getTime() < session.exp) {
-        db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDashboard(); });
-        db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
-        db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
-    } else {
-        logout();
-    }
+    db.ref('clients').on('value', s => { 
+        clients = s.val() ? Object.values(s.val()) : []; 
+        renderCRM(); 
+        updateDashboard(); 
+        updateTaskClients();
+    });
+    db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
+    db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+}
+
+function updateTaskClients() {
+    const s = document.getElementById('taskClientSelect');
+    s.innerHTML = '<option value="">Select Client</option>';
+    clients.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
 }
 
 window.addEventListener('load', () => {
@@ -382,7 +382,6 @@ window.addEventListener('load', () => {
     fillGovs();
 });
 
-// --- Tab Logic ---
 function showTab(id, btn) { 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
@@ -403,10 +402,11 @@ function addOrUpdate() {
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
     const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('Updated', 'success'); } else { clients.push(c); notify('Saved', 'success'); }
+    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; } else { clients.push(c); }
     db.ref('clients').set({...clients});
     document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language') i.value = ''; });
     fillGovs();
+    notify('Data Saved', 'success');
 }
 
 function renderCRM() {
@@ -435,6 +435,16 @@ function renderCRM() {
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
 }
 
+function delClient(i) {
+    if(confirm('Move to Recycle Bin?')) {
+        const deleted = clients.splice(i, 1)[0];
+        deleted.deletedAt = new Date().toLocaleDateString();
+        deletedClients.push(deleted);
+        db.ref('clients').set({...clients});
+        db.ref('deletedClients').set({...deletedClients});
+    }
+}
+
 function renderRecycle() {
     const b = document.getElementById('recycleBody'); b.innerHTML = '';
     deletedClients.forEach((c, i) => {
@@ -445,28 +455,45 @@ function renderRecycle() {
     });
 }
 
+function restoreClient(i) {
+    clients.push(deletedClients.splice(i, 1)[0]);
+    db.ref('clients').set({...clients});
+    db.ref('deletedClients').set({...deletedClients});
+}
+
+function permanentDel(i) {
+    if(confirm('Permanent Delete?')) {
+        deletedClients.splice(i, 1);
+        db.ref('deletedClients').set({...deletedClients});
+    }
+}
+
 function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent; document.getElementById('followUp').value = c.followUp; document.getElementById('date').value = c.date; }
 
 function addTask() {
     const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value };
     if(!t.text) return notify('Empty task', 'error');
     tasks.push(t); db.ref('tasks').set({...tasks});
+    document.getElementById('taskText').value = '';
     notify('Task Added', 'success');
 }
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); b.innerHTML = '';
+    const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => {
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage.toUpperCase()}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none;">✕</button></td></tr>`;
+        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
+        b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage.toUpperCase()}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none; cursor:pointer;">✕</button></td></tr>`;
     });
 }
 
 function changeLang(l) { 
     lang = l; 
     document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
-    fillGovs(); renderCRM(); renderRecycle();
+    fillGovs(); renderCRM(); renderRecycle(); renderTasks();
     document.getElementById('lblConv').innerText = l==='ar'?'معدل التحويل':'Conversion Rate';
     document.getElementById('lblPotential').innerText = l==='ar'?'صفقات محتملة':'Potential Deals';
+    document.getElementById('lblTopGov').innerText = l==='ar'?'أعلى محافظة':'Top Governorate';
 }
 </script>
 </body>
