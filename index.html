@@ -52,19 +52,11 @@
         .status-hold { background: #ffebee !important; }
         .status-completed { background: #e8f5e9 !important; }
         
-        /* --- Tracking Badges --- */
         .track-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; display: inline-block; }
         .track-new { background: #17a2b8; box-shadow: 0 0 8px #17a2b8; }
         .track-active { background: #28a745; }
         .track-warning { background: #ffc107; color: #333; }
         .track-old { background: #dc3545; }
-
-        /* --- AI Dashboard & Recycle Styles --- */
-        .ai-card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .ai-stat-card { background: white; padding: 20px; border-radius: 15px; border-left: 5px solid var(--info); box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
-        .ai-stat-card h3 { margin: 0; font-size: 0.9em; color: #666; }
-        .ai-stat-card p { font-size: 1.8em; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
-        .chart-box { background: white; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.5s ease-out; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
@@ -149,12 +141,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Gov</th>
-                        <th>Tracking Status</th> 
-                        <th>Sales Status</th>
-                        <th>Actions</th>
+                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking Status</th><th>Sales Status</th><th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -164,30 +151,17 @@
         <div id="dashboardTab" class="tab-content">
             <h2>📊 Smart Analytics & AI Insight</h2>
             <div class="ai-card-container">
-                <div class="ai-stat-card" style="border-left-color: var(--success);">
-                    <h3 id="lblConv">Conversion Rate</h3>
-                    <p id="convRate">0%</p>
-                </div>
-                <div class="ai-stat-card" style="border-left-color: var(--accent);">
-                    <h3 id="lblPotential">Potential Deals</h3>
-                    <p id="potentialDeals">0</p>
-                </div>
-                <div class="ai-stat-card" style="border-left-color: var(--info);">
-                    <h3 id="lblTopGov">Top Governorate</h3>
-                    <p id="topGov">-</p>
-                </div>
+                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">Conversion Rate</h3><p id="convRate">0%</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">Potential Deals</h3><p id="potentialDeals">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">Top Governorate</h3><p id="topGov">-</p></div>
             </div>
-            <div class="chart-box">
-                <canvas id="statusChart"></canvas>
-            </div>
+            <div class="chart-box"><canvas id="statusChart"></canvas></div>
         </div>
 
         <div id="recycleTab" class="tab-content">
             <h2 style="color: var(--danger);">♻️ Deleted Clients (Recycle Bin)</h2>
             <table>
-                <thead>
-                    <tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr>
-                </thead>
+                <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr></thead>
                 <tbody id="recycleBody"></tbody>
             </table>
         </div>
@@ -202,73 +176,68 @@
                 <input id="taskText" placeholder="Task details">
                 <select id="taskClientSelect"><option value="">Client</option></select>
                 <input type="date" id="taskDate">
-                <select id="taskStage">
-                    <option value="quote">Quote</option><option value="follow">Follow Up</option>
-                    <option value="order">Order</option><option value="bank">Bank</option>
-                </select>
+                <select id="taskStage"><option value="quote">Quote</option><option value="follow">Follow Up</option><option value="order">Order</option><option value="bank">Bank</option></select>
                 <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕</button>
             </div>
-            <table>
-                <thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr></thead>
-                <tbody id="taskBody"></tbody>
-            </table>
+            <table><thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr></thead><tbody id="taskBody"></tbody></table>
         </div>
     </div>
 </div>
 
 <script>
-// --- Configuration & Global Variables ---
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 
-// جميع محافظات مصر
-const govs = [
-    {en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, 
-    {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, 
-    {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, 
-    {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, 
-    {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, 
-    {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, 
-    {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, 
-    {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"},
-    {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}
-];
+const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
 
-// --- Audio & Notification System ---
-function playNotifySound() {
-    const audio = document.getElementById('notifySound');
-    if(audio) {
-        audio.currentTime = 0;
-        audio.play().catch(e => console.log("Sound enabled after user interaction"));
-    }
-}
+function playNotifySound() { const audio = document.getElementById('notifySound'); if(audio) { audio.currentTime = 0; audio.play().catch(e => {}); } }
 
-function checkDeadlines() {
+function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; playNotifySound(); setTimeout(() => n.style.display = 'none', 4000); }
+
+function checkLogin() { if (document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === 'admin123') { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; sessionStorage.setItem('isLoggedIn', 'true'); checkDeadlines(); } else { document.getElementById('loginError').style.display = 'block'; } }
+if (sessionStorage.getItem('isLoggedIn') === 'true') { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; }
+
+function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
+
+function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); if(id === 'dashboardTab') updateDashboard(); }
+
+function fillGovs() { const s = document.getElementById('gov'); s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); }
+
+function addOrUpdate() {
+    const n = document.getElementById('name').value;
+    if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
-    let hasAlert = false;
-    tasks.forEach(t => {
-        if(t.date === today) {
-            notify(lang === 'ar' ? `تنبيه: مهمة اليوم - ${t.text}` : `Task Reminder: ${t.text}`, 'info');
-            hasAlert = true;
-        }
-    });
-    clients.forEach(c => {
-        if(c.followUp && c.date === today) {
-            notify(lang === 'ar' ? `تذكير متابعة: ${c.name}` : `Follow-up Reminder: ${c.name}`, 'success');
-            hasAlert = true;
-        }
-    });
-    if(hasAlert) playNotifySound();
+    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
+    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('Updated', 'success'); } else { clients.push(c); notify('Saved', 'success'); }
+    db.ref('clients').set({...clients});
+    ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('gov').value = '';
 }
 
-// --- AI Tracking Logic ---
-function triggerTracking() {
-    const govValue = document.getElementById('gov').value;
-    const clientName = document.getElementById('name').value || "Client";
-    if(govValue) notify(lang === 'ar' ? `تتبع ذكي مفعل لـ ${clientName}` : `Smart tracking active for ${clientName}`, 'success');
+function renderCRM() {
+    const b = document.getElementById('tableBody'); b.innerHTML = '';
+    const q = document.getElementById('search').value.toLowerCase();
+    let hCount = 0;
+    clients.forEach((c, i) => {
+        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
+        if(c.status === 'Hold') hCount++;
+        const track = getTrackingLabel(c.date);
+        b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
+            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td><td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
+            <td>
+                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
+                <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
+                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
+                <button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
+            </td>
+        </tr>`;
+    });
+    document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
+    document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
+    const ts = document.getElementById('taskClientSelect'); if(ts) { ts.innerHTML = '<option value="">Client</option>'; clients.forEach(c => ts.innerHTML += `<option value="${c.name}">${c.name}</option>`); }
 }
 
 function getTrackingLabel(dateStr) {
@@ -280,277 +249,56 @@ function getTrackingLabel(dateStr) {
     return { lab: (lang === 'ar' ? 'بارد' : 'Cold'), cls: 'track-old' };
 }
 
-// --- AI Dashboard Logic ---
 function updateDashboard() {
     const total = clients.length;
     const completed = clients.filter(c => c.status === 'Completed').length;
-    const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
-    
-    document.getElementById('convRate').innerText = rate + '%';
+    document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
     document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
-    
-    const govCounts = {};
-    clients.forEach(c => { if(c.gov) govCounts[c.gov] = (govCounts[c.gov] || 0) + 1; });
-    const top = Object.keys(govCounts).reduce((a, b) => govCounts[a] > govCounts[b] ? a : b, '-');
-    document.getElementById('topGov').innerText = top;
-
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    const data = {
-        labels: ['Interested', 'In Progress', 'Hold', 'Completed'],
-        datasets: [{
-            data: [
-                clients.filter(c => c.status === 'Interested').length,
-                clients.filter(c => c.status === 'In Progress').length,
-                clients.filter(c => c.status === 'Hold').length,
-                clients.filter(c => c.status === 'Completed').length
-            ],
-            backgroundColor: ['#e3f2fd', '#fff3e0', '#ffebee', '#e8f5e9']
-        }]
-    };
-    if(statusChart) statusChart.destroy();
-    statusChart = new Chart(ctx, { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false } });
-}
-
-// --- Recycle Bin Logic ---
-function delClient(i) {
-    if(confirm(lang==='ar'?'نقل العميل لسلة المحذوفات؟':'Move client to Recycle Bin?')) {
-        const deleted = clients.splice(i, 1)[0];
-        deleted.deletedAt = new Date().toLocaleDateString();
-        deletedClients.push(deleted);
-        syncAll();
-        notify(lang==='ar'?'تم النقل للسلة':'Moved to Recycle Bin', 'info');
-    }
-}
-
-function restoreClient(i) {
-    clients.push(deletedClients.splice(i, 1)[0]);
-    syncAll();
-    notify(lang==='ar'?'تم الاستعادة':'Restored Successfully', 'success');
-}
-
-function permanentDel(i) {
-    if(confirm(lang==='ar'?'حذف نهائي؟':'Delete permanently?')) {
-        deletedClients.splice(i, 1);
-        syncAll();
-    }
-}
-
-function syncAll() {
-    db.ref('clients').set({...clients});
-    db.ref('deletedClients').set({...deletedClients});
-}
-
-// --- Basic UI Logic ---
-function checkLogin() {
-    const user = document.getElementById('userInput').value;
-    const pass = document.getElementById('passInput').value;
-    if (user === 'admin' && pass === 'admin123') {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        sessionStorage.setItem('isLoggedIn', 'true');
-        playNotifySound(); // صوت عند الدخول الناجح
-        checkDeadlines();
-    } else {
-        document.getElementById('loginError').style.display = 'block';
-    }
-}
-if (sessionStorage.getItem('isLoggedIn') === 'true') { 
-    document.getElementById('loginOverlay').style.display = 'none'; 
-    document.getElementById('mainApp').style.display = 'flex'; 
-}
-
-function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
-
-function notify(m, t='info') { 
-    const n = document.getElementById('notification'); 
-    n.innerText = m; 
-    n.style.display = 'block'; 
-    n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
-    playNotifySound(); // تشغيل الصوت عند كل إشعار
-    setTimeout(() => n.style.display = 'none', 4000); 
-}
-
-function showTab(id, btn) { 
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-    document.getElementById(id).classList.add('active'); 
-    btn.classList.add('active'); 
-    if(id === 'dashboardTab') updateDashboard();
-}
-
-function fillGovs() { 
-    const s = document.getElementById('gov'); 
-    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
-    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
-}
-
-function addOrUpdate() {
-    const n = document.getElementById('name').value;
-    if(!n) return notify('Name required', 'error');
-    const today = new Date().toISOString().split('T')[0];
-    const c = { 
-        name: n, 
-        phone: document.getElementById('phone').value, 
-        gov: document.getElementById('gov').value, 
-        status: document.getElementById('status').value, 
-        notes: document.getElementById('notes').value, 
-        agent: document.getElementById('agent').value, 
-        followUp: document.getElementById('followUp').value, 
-        date: document.getElementById('date').value || today 
-    };
-    if(editIdx > -1) { 
-        clients[editIdx] = c; 
-        editIdx = -1; 
-        notify('Updated', 'success'); 
-    } else { 
-        clients.push(c); 
-        notify('Saved', 'success'); 
-    }
-    db.ref('clients').set({...clients});
-    ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('gov').value = '';
-    document.getElementById('status').value = 'Interested';
-}
-
-function renderCRM() {
-    const b = document.getElementById('tableBody'); b.innerHTML = '';
-    const q = document.getElementById('search').value.toLowerCase();
-    let hCount = 0;
-    clients.forEach((c, i) => {
-        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
-        if(c.status === 'Hold') hCount++;
-        const track = getTrackingLabel(c.date);
-        const rowCls = `status-${c.status.toLowerCase().replace(/\s/g, '')}`;
-        b.innerHTML += `<tr class="${rowCls}">
-            <td><b>${c.name}</b></td>
-            <td>${c.phone}</td>
-            <td>${c.gov}</td>
-            <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
-            <td>${c.status}</td>
-            <td>
-                <button onclick="window.open('https://wa.me/${c.phone}')" title="WhatsApp" style="background:#25D366; border:none; padding:8px; border-radius:5px; cursor:pointer; color:white;">WA</button> 
-                <button onclick="window.location.href='tel:${c.phone}'" title="Call" style="background:#007bff; border:none; padding:8px; border-radius:5px; cursor:pointer; color:white;">📞</button> 
-                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
-                <button onclick="delClient(${i})" style="background:#f44336; border:none; padding:8px; border-radius:5px; color:white; cursor:pointer;">✕</button>
-            </td>
-        </tr>`;
-    });
-    document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
-    document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
-    updateTaskSelectors();
-}
-
-function updateTaskSelectors() {
-    const s = document.getElementById('taskClientSelect');
-    if(!s) return;
-    s.innerHTML = '<option value="">Client</option>';
-    clients.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-}
-
-function renderRecycle() {
-    const b = document.getElementById('recycleBody'); b.innerHTML = '';
-    deletedClients.forEach((c, i) => {
-        b.innerHTML += `<tr>
-            <td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td>
-            <td>
-                <button onclick="restoreClient(${i})" style="background:var(--success); color:white; border:none; border-radius:5px; padding:5px; cursor:pointer;">Restore</button>
-                <button onclick="permanentDel(${i})" style="background:var(--danger); color:white; border:none; border-radius:5px; padding:5px; cursor:pointer;">Final Del</button>
-            </td>
-        </tr>`;
-    });
-}
-
-function editClient(i) { 
-    editIdx = i; 
-    const c = clients[i]; 
-    document.getElementById('name').value = c.name; 
-    document.getElementById('phone').value = c.phone; 
-    document.getElementById('gov').value = c.gov; 
-    document.getElementById('status').value = c.status; 
-    document.getElementById('notes').value = c.notes; 
-    document.getElementById('agent').value = c.agent; 
-    document.getElementById('followUp').value = c.followUp; 
-    document.getElementById('date').value = c.date; 
-    window.scrollTo(0,0);
-}
-
-function addTask() {
-    const t = { 
-        text: document.getElementById('taskText').value, 
-        client: document.getElementById('taskClientSelect').value, 
-        date: document.getElementById('taskDate').value, 
-        stage: document.getElementById('taskStage').value 
-    };
-    if(!t.text) return notify('Empty task', 'error');
-    tasks.push(t); 
-    db.ref('tasks').set({...tasks});
-    notify('Task Added', 'success');
-    document.getElementById('taskText').value = '';
-}
-
-function renderTasks() {
-    const b = document.getElementById('taskBody'); b.innerHTML = '';
-    if(!b) return;
-    const q = document.getElementById('taskSearch').value.toLowerCase();
-    tasks.forEach((t, i) => {
-        if(q && !t.text.toLowerCase().includes(q) && !t.client.toLowerCase().includes(q)) return;
-        b.innerHTML += `<tr>
-            <td>${t.client}</td>
-            <td>${t.text}</td>
-            <td>${t.date}</td>
-            <td>${t.stage.toUpperCase()}</td>
-            <td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">✕</button></td>
-        </tr>`;
-    });
-}
-
-function changeLang(l) { 
-    lang = l; 
-    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
-    fillGovs(); 
-    renderCRM(); 
-    renderRecycle();
-    document.getElementById('lblConv').innerText = l==='ar'?'معدل التحويل':'Conversion Rate';
-    document.getElementById('lblPotential').innerText = l==='ar'?'صفقات محتملة':'Potential Deals';
-    document.getElementById('crmHeader').innerText = l==='ar'?'سجل العملاء':'Clients Registry';
+    const gc = {}; clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
+    document.getElementById('topGov').innerText = Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b, '-');
 }
 
 function exportData(type) {
     let data = type === 'clients' ? clients : tasks;
     if(data.length === 0) return notify('No data to export', 'error');
-    let csv = "data:text/csv;charset=utf-8,";
-    csv += (type === 'clients' ? "Name,Phone,Gov,Status,Notes\n" : "Client,Task,Date,Stage\n");
+
+    // تصحيح ترميز اللغة العربية للاكسيل
+    let csvContent = "\uFEFF"; // إضافة BOM لترميز UTF-8
+    csvContent += (type === 'clients' ? "Name,Phone,Governorate,Status,Notes,Agent,Date\n" : "Client,Task,Deadline,Stage\n");
+
     data.forEach(item => {
         let row = type === 'clients' ? 
-            `"${item.name}","${item.phone}","${item.gov}","${item.status}","${item.notes}"` :
+            `"${item.name}","${item.phone}","${item.gov}","${item.status}","${item.notes}","${item.agent}","${item.date}"` :
             `"${item.client}","${item.text}","${item.date}","${item.stage}"`;
-        csv += row + "\n";
+        csvContent += row + "\n";
     });
-    const encodedUri = encodeURI(csv);
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${type}_export.csv`);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Utopia_${type}_${new Date().toLocaleDateString()}.csv`);
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 }
 
-// --- Firebase Listeners ---
-db.ref('clients').on('value', s => { 
-    clients = s.val() ? Object.values(s.val()) : []; 
-    renderCRM(); 
-    updateDashboard(); 
-});
-db.ref('deletedClients').on('value', s => { 
-    deletedClients = s.val() ? Object.values(s.val()) : []; 
-    renderRecycle(); 
-});
-db.ref('tasks').on('value', s => { 
-    tasks = s.val() ? Object.values(s.val()) : []; 
-    renderTasks(); 
-    if(sessionStorage.getItem('isLoggedIn') === 'true') checkDeadlines();
-});
+function delClient(i) { if(confirm(lang==='ar'?'نقل للسلة؟':'Move to Bin?')) { const d = clients.splice(i, 1)[0]; d.deletedAt = new Date().toLocaleDateString(); deletedClients.push(d); syncAll(); notify(lang==='ar'?'تم النقل':'Moved', 'info'); } }
+function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); }
+function permanentDel(i) { if(confirm('Final Del?')) { deletedClients.splice(i, 1); syncAll(); } }
+function syncAll() { db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients}); }
 
-// Initial Load
+function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent; document.getElementById('followUp').value = c.followUp; document.getElementById('date').value = c.date; }
+
+function addTask() { const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value }; if(!t.text) return notify('Empty', 'error'); tasks.push(t); db.ref('tasks').set({...tasks}); notify('Added', 'success'); }
+function renderTasks() { const b = document.getElementById('taskBody'); b.innerHTML = ''; tasks.forEach((t, i) => { b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage.toUpperCase()}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none; cursor:pointer;">✕</button></td></tr>`; }); }
+
+function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); }
+
+db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
+db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; const rb = document.getElementById('recycleBody'); rb.innerHTML = ''; deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; }); });
+db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+
 fillGovs();
 </script>
 </body>
