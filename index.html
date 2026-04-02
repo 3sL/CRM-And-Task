@@ -96,7 +96,7 @@
 <div id="mainApp">
     <div class="sidebar">
         <h2>Utopia Trading For Export</h2>
-        <button class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
+        <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
         <button class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
@@ -190,7 +190,7 @@
                 <select id="taskStage"><option value="quote">Quote</option><option value="follow">Follow Up</option><option value="order">Order</option><option value="bank">Bank</option></select>
                 <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕</button>
             </div>
-            <table><thead><tr><th>Client</th><th>Phone</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr></thead><tbody id="taskBody"></tbody></table>
+            <table><thead><tr><th>Client</th><th>Phone</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Actions</th></tr></thead><tbody id="taskBody"></tbody></table>
         </div>
     </div>
 </div>
@@ -204,7 +204,6 @@ let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', st
 
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
 
-// دالة جلب رقم الهاتف تلقائياً عند اختيار العميل في المهام
 function autoFillTaskPhone() {
     const selectedName = document.getElementById('taskClientSelect').value;
     const client = clients.find(c => c.name === selectedName);
@@ -432,11 +431,22 @@ function editClient(i) {
     notify(lang==='ar'?'وضع التعديل مفعل':'Edit Mode Active', 'info');
 }
 
+// دالة جديدة لتعديل العميل من داخل قائمة المهام
+function editClientFromTask(clientName) {
+    const idx = clients.findIndex(c => c.name === clientName);
+    if(idx > -1) {
+        showTab('crmTab', document.getElementById('btnCrmTab'));
+        editClient(idx);
+    } else {
+        notify(lang==='ar'?'العميل غير موجود في السجل':'Client not found in registry', 'error');
+    }
+}
+
 function addTask() { 
     const t = { 
         text: document.getElementById('taskText').value, 
         client: document.getElementById('taskClientSelect').value, 
-        phone: document.getElementById('taskPhone').value, // حفظ رقم الهاتف في المهمة
+        phone: document.getElementById('taskPhone').value, 
         date: document.getElementById('taskDate').value, 
         stage: document.getElementById('taskStage').value 
     }; 
@@ -444,20 +454,25 @@ function addTask() {
     tasks.push(t); 
     db.ref('tasks').set({...tasks}); 
     notify(lang==='ar'?'تم إضافة المهمة':'Task Added Successfully', 'success'); 
-    // تفريغ الحقول
     document.getElementById('taskText').value = '';
     document.getElementById('taskPhone').value = '';
 }
+
 function renderTasks() { 
     const b = document.getElementById('taskBody'); b.innerHTML = ''; 
+    const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => { 
+        if(q && !`${t.client} ${t.text} ${t.stage}`.toLowerCase().includes(q)) return;
         b.innerHTML += `<tr>
             <td>${t.client}</td>
             <td>${t.phone || '-'}</td> 
             <td>${t.text}</td>
             <td>${t.date}</td>
             <td>${t.stage.toUpperCase()}</td>
-            <td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks}); notify('Task Removed','info');" style="color:red; border:none; background:none; cursor:pointer;">✕</button></td>
+            <td>
+                <button onclick="editClientFromTask('${t.client}')" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer; margin-right:5px;">✏️</button>
+                <button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks}); notify('Task Removed','info');" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
+            </td>
         </tr>`; 
     }); 
 }
