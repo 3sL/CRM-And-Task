@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading For Export Pro AI CRM & Tasks - DEV BY ENG.MAHMOUD MARIE</title>
+    <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -19,9 +19,8 @@
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
         .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; box-sizing: border-box; outline: none; font-size: 16px; }
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .login-card button:hover { transform: scale(1.02); opacity: 0.9; }
+        .login-card button:hover { opacity: 0.9; transform: scale(1.02); }
         
-        /* Dev Info on Login */
         .login-dev-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #3f3f6b; font-size: 0.85em; color: #bbb; }
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
@@ -37,7 +36,7 @@
         .dev-box b { color: var(--accent); display: block; margin-bottom: 5px; }
         .dev-link { color: #25D366; text-decoration: none; font-weight: bold; font-size: 1.1em; display: block; }
 
-        /* Main Area */
+        /* Main Content Area */
         .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; background: #f8f9fc; }
         .tab-content { display:none; animation:fadeIn 0.4s; }
         .tab-content.active { display:block; }
@@ -47,10 +46,10 @@
         .row > * { flex: 1; min-width: 180px; }
         .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
         
-        /* Action Buttons Cell */
+        /* Action Cell Buttons */
         .action-cell { display: flex; gap: 5px; justify-content: center; }
-        .btn-call { background: #007bff; color: white; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; }
-        .btn-whatsapp { background: #25D366; color: white; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; }
+        .btn-call { background: #007bff; color: white; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; display: flex; align-items: center; }
+        .btn-whatsapp { background: #25D366; color: white; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; display: flex; align-items: center; }
 
         /* Table Design */
         table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
@@ -64,13 +63,11 @@
         .track-warning { background: #ffc107; color: #333; }
         .track-old { background: #dc3545; }
 
-        /* Dashboard Cards */
         .ai-card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .ai-stat-card { background: white; padding: 20px; border-radius: 15px; border-left: 5px solid var(--info); box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
         .ai-stat-card p { font-size: 1.8em; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
 
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:30000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
-
         @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -83,12 +80,12 @@
 <div id="loginOverlay">
     <div class="login-card">
         <img src="https://i.ibb.co/pvf9ZT45/logo.png" alt="Utopia Logo" class="app-logo">
-        <h2>Utopia CRM Pro</h2>
+        <h2>Utopia Trading For Export</h2>
         <input type="text" id="userInput" placeholder="Username">
         <input type="password" id="passInput" placeholder="Password">
         <button onclick="checkLogin()">Login</button>
         <div class="login-dev-info">
-            <b>Developed By: Eng. Mahmoud Mohamed Marie</b>
+            <b>Dev By: Eng. Mahmoud Mohamed Marie</b>
             <a href="https://wa.me/201222153415">🟢 WhatsApp: +201222153415</a>
         </div>
     </div>
@@ -108,19 +105,47 @@
             Eng. Mahmoud Mohamed Marie
             <a href="https://wa.me/201222153415" class="dev-link">🟢 +201222153415</a>
             <button onclick="logout()" style="background: var(--danger); margin-top: 10px; width: 100%; text-align: center; border-radius: 8px;">Logout</button>
+            <select id="language" onchange="changeLang(this.value)" style="margin-top: 15px; background: #2e2e4d; color: white; border: none; padding: 5px;">
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+            </select>
         </div>
     </div>
 
     <div class="main">
         <div id="crmTab" class="tab-content active">
-            <h2>Clients Registry</h2>
+            <h2 id="crmHeader">Clients Registry</h2>
             <div class="row">
                 <input id="name" placeholder="Client Name">
-                <input id="phone" placeholder="Phone Number (e.g. 010...)">
+                <input id="phone" placeholder="Phone Number">
                 <select id="gov">
                     <option value="">Select Governorate</option>
-                    <option value="Cairo">Cairo</option><option value="Giza">Giza</option><option value="Alexandria">Alexandria</option>
-                    <option value="Dakahlia">Dakahlia</option><option value="Sharkia">Sharkia</option><option value="Beheira">Beheira</option>
+                    <option value="Cairo">Cairo - القاهرة</option>
+                    <option value="Giza">Giza - الجيزة</option>
+                    <option value="Alexandria">Alexandria - الإسكندرية</option>
+                    <option value="Dakahlia">Dakahlia - الدقهلية</option>
+                    <option value="Sharkia">Sharkia - الشرقية</option>
+                    <option value="Monufia">Monufia - المنوفية</option>
+                    <option value="Gharbia">Gharbia - الغربية</option>
+                    <option value="Kafr El Sheikh">Kafr El Sheikh - كفر الشيخ</option>
+                    <option value="Beheira">Beheira - البحيرة</option>
+                    <option value="Damietta">Damietta - دمياط</option>
+                    <option value="Port Said">Port Said - بورسعيد</option>
+                    <option value="Ismailia">Ismailia - الإسماعيلية</option>
+                    <option value="Suez">Suez - السويس</option>
+                    <option value="Beni Suef">Beni Suef - بني سويف</option>
+                    <option value="Fayoum">Fayoum - الفيوم</option>
+                    <option value="Minya">Minya - المنيا</option>
+                    <option value="Assiut">Assiut - أسيوط</option>
+                    <option value="Sohag">Sohag - سوهاج</option>
+                    <option value="Qena">Qena - قنا</option>
+                    <option value="Luxor">Luxor - الأقصر</option>
+                    <option value="Aswan">Aswan - أسوان</option>
+                    <option value="Red Sea">Red Sea - البحر الأحمر</option>
+                    <option value="New Valley">New Valley - الوادي الجديد</option>
+                    <option value="Matrouh">Matrouh - مطروح</option>
+                    <option value="North Sinai">North Sinai - شمال سيناء</option>
+                    <option value="South Sinai">South Sinai - جنوب سيناء</option>
                 </select>
                 <select id="status">
                     <option value="Interested">Interested</option>
@@ -129,23 +154,28 @@
                     <option value="Completed">Completed</option>
                 </select>
             </div>
-            <textarea id="notes" placeholder="Notes & Follow-up details..."></textarea>
-            <button class="btn-save" onclick="addOrUpdate()">💾 Save Data</button>
+            <textarea id="notes" placeholder="Notes & Follow-up Details..."></textarea>
+            <div class="row">
+                <input id="agent" placeholder="Agent/Sales Name">
+                <input id="followUp" placeholder="Next Action">
+                <input type="date" id="date">
+            </div>
+            <button class="btn-save" onclick="addOrUpdate()">💾 Save Client Data</button>
 
             <div style="display: flex; gap: 10px; align-items: center; margin-top: 20px;">
                 <input id="search" placeholder="🔍 Search by name or phone..." oninput="renderCRM()" style="flex: 1; border: 2px solid var(--accent);">
-                <button onclick="exportToExcel()" style="width: auto; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 10px; cursor: pointer;">📥 Excel</button>
+                <button onclick="exportToExcel()" style="width: auto; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 10px; cursor: pointer;">📥 Excel Export</button>
             </div>
 
             <table>
                 <thead>
                     <tr>
                         <th>Client Info</th>
-                        <th>Actions (Call/WA)</th>
-                        <th>Gov</th>
+                        <th>Connect (Call/WA)</th>
+                        <th>Location</th>
                         <th>Tracking</th>
                         <th>Status</th>
-                        <th>Manage</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -153,39 +183,39 @@
         </div>
 
         <div id="dashboardTab" class="tab-content">
-            <h2>📊 AI Analytics Dashboard</h2>
+            <h2>📊 AI Dashboard & Analytics</h2>
             <div class="ai-card-container">
-                <div class="ai-stat-card"><h3>Total Clients</h3><p id="countAll">0</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3>Completed</h3><p id="countDone">0</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--danger);"><h3>On Hold</h3><p id="countHold">0</p></div>
+                <div class="ai-stat-card"><h3>Total Clients</h3><p id="totalCount">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3>Conversions</h3><p id="convCount">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--danger);"><h3>On Hold</h3><p id="holdCount">0</p></div>
             </div>
-            <div style="background: white; padding: 20px; border-radius: 15px; height: 350px;">
+            <div style="background: white; padding: 25px; border-radius: 20px; height: 350px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
                 <canvas id="statusChart"></canvas>
             </div>
-        </div>
-
-        <div id="recycleTab" class="tab-content">
-            <h2 style="color: var(--danger);">♻️ Recycle Bin</h2>
-            <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr></thead>
-                <tbody id="recycleBody"></tbody>
-            </table>
         </div>
 
         <div id="tasksTab" class="tab-content">
             <h2>📅 Tasks Board</h2>
             <div class="row">
-                <input id="taskText" placeholder="Task details">
+                <input id="taskText" placeholder="Task description">
                 <input type="date" id="taskDate">
                 <button onclick="addTask()" style="background: var(--info); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Add Task</button>
             </div>
-            <div id="taskList"></div>
+            <div id="taskList" style="margin-top: 20px;"></div>
+        </div>
+
+        <div id="recycleTab" class="tab-content">
+            <h2 style="color: var(--danger);">♻️ Recycle Bin (Recover Deleted)</h2>
+            <table>
+                <thead><tr><th>Name</th><th>Phone</th><th>Deleted On</th><th>Recover</th></tr></thead>
+                <tbody id="recycleBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
-// Firebase Config
+// Firebase Initialization
 const firebaseConfig = { 
     apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", 
     authDomain: "crm-tasking.firebaseapp.com", 
@@ -197,16 +227,16 @@ const db = firebase.database();
 
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, statusChart = null;
 
-// Auth
+// Auth Logic
 function checkLogin() {
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
-    if (u === "admin" && p === "utopia2026") {
+    if(u === "admin" && p === "utopia2026") {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         initListeners();
     } else {
-        notify("Invalid Credentials!", "error");
+        notify("Access Denied!", "error");
     }
 }
 
@@ -216,18 +246,20 @@ function initListeners() {
     db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 }
 
-// Logic
+// Core Functions
 function addOrUpdate() {
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value;
-    if(!name || !phone) return notify("Name and Phone required!", "error");
+    if(!name || !phone) return notify("Missing Name/Phone!", "error");
 
     const data = {
         name, phone,
         gov: document.getElementById('gov').value,
         status: document.getElementById('status').value,
         notes: document.getElementById('notes').value,
-        date: editIdx > -1 ? clients[editIdx].date : new Date().toISOString()
+        agent: document.getElementById('agent').value,
+        followUp: document.getElementById('followUp').value,
+        date: editIdx > -1 ? clients[editIdx].date : (document.getElementById('date').value || new Date().toISOString())
     };
 
     if(editIdx > -1) {
@@ -240,7 +272,7 @@ function addOrUpdate() {
         db.ref('clients').push(data);
     }
     clearForm();
-    notify("Saved Successfully!", "success");
+    notify("Client Data Synchronized!", "success");
 }
 
 function renderCRM() {
@@ -250,11 +282,11 @@ function renderCRM() {
     clients.forEach((c, i) => {
         if(c.name.toLowerCase().includes(search) || c.phone.includes(search)) {
             const cleanPhone = c.phone.replace(/\s/g, '');
-            const track = getTrackLabel(c.date);
+            const tracking = getTrackingLevel(c.date);
             const waLink = `https://wa.me/2${cleanPhone.startsWith('0') ? cleanPhone : '0'+cleanPhone}`;
             
             b.innerHTML += `<tr>
-                <td><b>${c.name}</b><br><small>${c.phone}</small></td>
+                <td style="text-align:left;"><b>${c.name}</b><br><small>${c.phone}</small></td>
                 <td>
                     <div class="action-cell">
                         <a href="tel:${cleanPhone}" class="btn-call">📞 Call</a>
@@ -262,29 +294,27 @@ function renderCRM() {
                     </div>
                 </td>
                 <td>${c.gov}</td>
-                <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
-                <td>${c.status}</td>
+                <td><span class="track-badge ${tracking.cls}">${tracking.lab}</span></td>
+                <td><b>${c.status}</b></td>
                 <td>
                     <button onclick="editClient(${i})">✏️</button>
-                    <button onclick="delClient(${i})">✕</button>
+                    <button onclick="deleteClient(${i})">✕</button>
                 </td>
             </tr>`;
         }
     });
 }
 
-function getTrackLabel(d) {
+function getTrackingLevel(d) {
     const diff = Math.ceil((new Date() - new Date(d)) / (1000 * 60 * 60 * 24));
-    if(diff <= 1) return {lab: "New", cls: "track-new"};
-    if(diff <= 5) return {lab: "Active", cls: "track-active"};
-    if(diff <= 10) return {lab: "Follow Up", cls: "track-warning"};
+    if(diff <= 2) return {lab: "New", cls: "track-new"};
+    if(diff <= 7) return {lab: "Follow", cls: "track-warning"};
     return {lab: "Old", cls: "track-old"};
 }
 
-function delClient(i) {
-    if(confirm("Move to Recycle Bin?")) {
-        const c = clients[i];
-        c.deletedAt = new Date().toLocaleString();
+function deleteClient(i) {
+    if(confirm("Send to Recycle Bin?")) {
+        const c = clients[i]; c.deletedAt = new Date().toLocaleString();
         db.ref('deletedClients').push(c);
         db.ref('clients').once('value', s => {
             const keys = Object.keys(s.val());
@@ -311,17 +341,18 @@ function restoreClient(i) {
 }
 
 function updateDashboard() {
-    document.getElementById('countAll').innerText = clients.length;
-    document.getElementById('countDone').innerText = clients.filter(c => c.status === 'Completed').length;
-    document.getElementById('countHold').innerText = clients.filter(c => c.status === 'Hold').length;
+    document.getElementById('totalCount').innerText = clients.length;
+    document.getElementById('convCount').innerText = clients.filter(c => c.status === 'Completed').length;
+    document.getElementById('holdCount').innerText = clients.filter(c => c.status === 'Hold').length;
 
     const ctx = document.getElementById('statusChart').getContext('2d');
     if(statusChart) statusChart.destroy();
     statusChart = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
             labels: ['Interested', 'In Progress', 'Hold', 'Completed'],
             datasets: [{
+                label: 'Clients Analysis',
                 data: [
                     clients.filter(c => c.status === 'Interested').length,
                     clients.filter(c => c.status === 'In Progress').length,
@@ -353,13 +384,6 @@ function clearForm() {
     document.getElementById('notes').value = ''; editIdx = -1;
 }
 
-function exportToExcel() {
-    const ws = XLSX.utils.json_to_sheet(clients);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Clients");
-    XLSX.writeFile(wb, "Utopia_CRM_Data.xlsx");
-}
-
 function editClient(i) {
     editIdx = i; const c = clients[i];
     document.getElementById('name').value = c.name;
@@ -370,6 +394,13 @@ function editClient(i) {
 }
 
 function logout() { location.reload(); }
+
+function exportToExcel() {
+    const ws = XLSX.utils.json_to_sheet(clients);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "ClientsReport");
+    XLSX.writeFile(wb, "Utopia_CRM_Export.xlsx");
+}
 </script>
 </body>
 </html>
