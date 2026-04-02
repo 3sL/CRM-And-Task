@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Pro - Notifications Enabled</title>
+    <title>Utopia Pro AI CRM - Full Secure Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,42 +11,48 @@
         body { font-family:'Segoe UI',Tahoma,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
         .no-select { -webkit-user-select: none; user-select: none; }
 
-        /* Login Styling */
+        /* Login Overlay */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; }
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
-        .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; outline: none; }
+        .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; outline: none; border: 1px solid transparent; }
+        .login-card input:focus { border-color: var(--accent); }
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         
-        /* Sidebar & Layout */
+        /* Layout & Sidebar */
         #mainApp { display: none; width: 100%; height: 100vh; flex-direction: row; }
         .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; }
-        .sidebar h2 { font-size:1.1em; color:var(--accent); text-align:center; border-bottom: 1px solid #3f3f6b; padding-bottom: 15px; }
-        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align: left; transition: 0.3s; }
+        .sidebar h2 { font-size:1.1em; color:var(--accent); text-align:center; border-bottom: 1px solid #3f3f6b; padding-bottom: 15px; margin-bottom: 15px; }
+        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; text-align: left; transition: 0.3s; font-size: 0.9em; }
+        .sidebar button:hover { background: #3f3f6b; }
         .sidebar button.active { background:var(--accent); color:var(--primary); font-weight: bold; }
         
-        .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; }
+        .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; position: relative; }
         .tab-content { display:none; }
         .tab-content.active { display:block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Elements */
-        input, select, textarea, .btn-save { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #ddd; outline:none; }
-        .btn-save { background: var(--success); color: white; font-weight: bold; border: none; cursor: pointer; }
-        table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; margin-top: 20px; font-size: 0.9em; }
-        th, td { padding:12px; text-align:center; border-bottom:1px solid #eee; }
-        th { background:var(--primary); color:var(--accent); }
+        /* UI Elements */
+        input, select, textarea { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #ddd; outline:none; font-size: 0.95em; }
+        .btn-save { background: var(--success); color: white; font-weight: bold; border: none; cursor: pointer; padding: 15px; margin-top: 10px; border-radius: 10px; width: 100%; transition: 0.3s; }
+        .btn-save:hover { filter: brightness(1.1); }
+        
+        table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
+        th { background:var(--primary); color:var(--accent); font-weight: 600; }
+        tr:hover { background-color: #fcfcfc; }
 
-        /* Notification Toast */
-        #notification { 
-            position: fixed; top: 20px; right: 20px; padding: 15px 25px; 
-            border-radius: 12px; display: none; z-index: 99999; 
-            color: white; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: slideIn 0.5s ease-out;
-        }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
+        #notification { position: fixed; top:20px; right:20px; padding:15px 25px; border-radius:12px; display:none; z-index:30000; color:#fff; font-weight:bold; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        
         .dev-box { margin-top:auto; font-size:0.75em; color:#888; padding-top:10px; border-top:1px solid #3f3f6b; }
         .dev-link { color: #25D366; text-decoration: none; font-weight: bold; }
+
+        .stat-card { background:#fff; padding:15px; flex:1; border-radius:15px; text-align:center; border-top:4px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+        @media (max-width: 768px) { 
+            #mainApp { flex-direction: column; } 
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; height: auto; } 
+            .sidebar button { flex: 1; min-width: 120px; font-size: 0.7em; padding: 8px; }
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -57,22 +63,22 @@
 
 <div id="loginOverlay">
     <div class="login-card">
-        <h2>Utopia Login</h2>
+        <h2>Utopia CRM Login</h2>
         <input type="text" id="userInput" placeholder="Username">
         <input type="password" id="passInput" placeholder="Password">
         <button onclick="handleAuth()">Access System</button>
-        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Access Denied!</p>
+        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Wrong Username or Password!</p>
     </div>
 </div>
 
 <div id="mainApp">
     <div class="sidebar">
-        <h2>Utopia Export Pro</h2>
-        <p id="welcomeUser" style="font-size: 0.8em; text-align: center; color: #25D366; margin-top: -10px;"></p>
+        <h2>Utopia Export</h2>
+        <p id="welcomeUser" style="font-size: 0.8em; text-align: center; color: #25D366; margin-top: -10px; margin-bottom: 10px;"></p>
         
-        <button onclick="enableAudio()" id="audioBtn" style="background: #3f3f6b; border: 1px dashed var(--accent); font-size: 0.8em; margin-bottom: 15px;">🔔 Enable Alerts Sound</button>
+        <button onclick="enableAudio()" id="audioBtn" style="background: #3f3f6b; border: 1px dashed var(--accent); font-size: 0.75em; margin-bottom: 10px;">🔔 Enable Sound</button>
 
-        <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
+        <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Registry</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
         <button class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
@@ -86,125 +92,129 @@
 
     <div class="main">
         <div id="crmTab" class="tab-content active">
-            <h2>Clients Registry</h2>
+            <h2>Clients Management</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <input id="search" placeholder="🔍 Quick Search..." oninput="renderCRM()" style="flex:2">
+                <input id="search" placeholder="🔍 Search by name or phone..." oninput="renderCRM()" style="flex:3">
+                <button onclick="document.getElementById('csvFileInput').click()" style="flex:1; background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer;">Import CSV</button>
                 <button onclick="exportData()" style="flex:1; background:#6c757d; color:white; border:none; border-radius:10px; cursor:pointer;">Export CSV</button>
+                <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
             </div>
-            <div class="row" style="display:flex; gap:10px; flex-wrap:wrap;">
-                <input id="name" placeholder="Name" style="flex:1">
-                <input id="phone" placeholder="Phone" style="flex:1">
+            
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input id="name" placeholder="Client Name" style="flex:1">
+                <input id="phone" placeholder="Phone Number" style="flex:1">
                 <select id="gov" style="flex:1"></select>
                 <select id="status" style="flex:1">
                     <option>Interested</option><option>In Progress</option><option>Hold</option><option>Completed</option>
                 </select>
             </div>
-            <textarea id="notes" placeholder="Detailed Notes..."></textarea>
-            <div class="row" style="display:flex; gap:10px;">
-                <input id="agent" placeholder="Agent Name">
-                <input id="followUp" placeholder="Next Action">
+            <textarea id="notes" placeholder="Additional Notes & Requirements..."></textarea>
+            <div style="display:flex; gap:10px;">
+                <input id="agent" placeholder="Handled By (Agent)">
+                <input id="followUp" placeholder="Next Follow-up Action">
                 <input type="date" id="date">
             </div>
-            <button class="btn-save" onclick="addOrUpdate()">💾 Save Client Record</button>
-            
+            <button class="btn-save" onclick="addOrUpdate()">💾 Save Record</button>
+
+            <div style="display:flex; gap:15px; margin-top:20px;">
+                <div class="stat-card" id="countAll">Total: 0</div>
+                <div class="stat-card" style="border-top-color: var(--success)" id="countDone">Completed: 0</div>
+                <div class="stat-card" style="border-top-color: var(--danger)" id="countHold">Hold: 0</div>
+            </div>
+
             <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>Status</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>Status</th><th>Agent</th><th>Actions</th></tr></thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
 
         <div id="dashboardTab" class="tab-content">
-            <h2>📊 Analytics Insight</h2>
-            <div style="background:#fff; padding:20px; border-radius:15px; max-width:500px; margin:auto;">
-                <canvas id="statusChart"></canvas>
+            <h2>📊 Performance Dashboard</h2>
+            <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+                <div style="background:#fff; padding:30px; border-radius:20px; width:300px; text-align:center;">
+                    <small>Conversion Rate</small><h1 id="convRate" style="color:var(--success)">0%</h1>
+                </div>
+                <div style="background:#fff; padding:20px; border-radius:20px; width:400px;">
+                    <canvas id="statusChart"></canvas>
+                </div>
             </div>
         </div>
 
         <div id="tasksTab" class="tab-content">
-            <h2>Operations Tasks</h2>
-            <div style="display:flex; gap:10px;">
-                <input id="taskText" placeholder="Task description" style="flex:2">
+            <h2>Operations & Tasks</h2>
+            <div style="display:flex; gap:10px; background:#fff; padding:15px; border-radius:15px;">
+                <input id="taskText" placeholder="What needs to be done?" style="flex:2">
+                <select id="taskClientSelect" onchange="autoFillTaskPhone()" style="flex:1"></select>
+                <input id="taskPhone" placeholder="Client Phone" style="flex:1">
                 <input type="date" id="taskDate" style="flex:1">
                 <button onclick="addTask()" style="background:var(--info); color:white; border:none; padding:0 20px; border-radius:10px; cursor:pointer;">Add Task</button>
             </div>
             <table>
-                <thead><tr><th>Task</th><th>Deadline</th><th>Action</th></tr></thead>
+                <thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Status</th><th>Action</th></tr></thead>
                 <tbody id="taskBody"></tbody>
             </table>
         </div>
 
         <div id="recycleTab" class="tab-content">
-            <h2 style="color:var(--danger)">♻️ Deleted Records</h2>
-            <tbody id="recycleBody"></tbody>
+            <h2 style="color:var(--danger)">♻️ Recycle Bin (Recently Deleted)</h2>
+            <table>
+                <thead><tr><th>Name</th><th>Phone</th><th>Deleted On</th><th>Action</th></tr></thead>
+                <tbody id="recycleBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
-// --- AUDIO SYSTEM ---
+// --- Audio & Notification ---
 const notifySound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-
 function enableAudio() {
     notifySound.play().then(() => {
         notifySound.pause();
-        document.getElementById('audioBtn').innerHTML = "✅ Audio Active";
-        document.getElementById('audioBtn').style.borderColor = "var(--success)";
-        notify("Audio Alerts Enabled!", "success");
-    }).catch(e => console.log("Audio Init Failed"));
+        document.getElementById('audioBtn').innerText = "✅ Sound On";
+        notify("Audio system ready!", "success");
+    });
+}
+function notify(m, t='info') {
+    const n = document.getElementById('notification');
+    n.innerText = m; n.style.display = 'block';
+    n.style.background = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8';
+    if(t === 'success') { notifySound.currentTime = 0; notifySound.play().catch(e=>{}); }
+    setTimeout(() => n.style.display = 'none', 3000);
 }
 
-function playAlert() {
-    notifySound.currentTime = 0;
-    notifySound.play().catch(e => console.log("Sound blocked by browser"));
-}
-
-// --- AUTH & SECURITY ---
-const USERS = [{u:'admin', p:'admin123'}, {u:'mahmoud', p:'2026marie'}];
-
+// --- Auth & Users ---
+const USERS = [
+    {u: 'admin', p: 'admin123'},
+    {u: 'mahmoud', p: '2026marie'}
+];
 function handleAuth() {
-    const u = document.getElementById('userInput').value.toLowerCase();
-    const p = document.getElementById('passInput').value;
-    if(USERS.find(x => x.u === u && x.p === p)) {
+    const user = document.getElementById('userInput').value.toLowerCase();
+    const pass = document.getElementById('passInput').value;
+    if(USERS.find(x => x.u === user && x.p === pass)) {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
-        document.getElementById('welcomeUser').innerText = "User: " + u;
-        notify("Welcome back, " + u, "success");
+        document.getElementById('welcomeUser').innerText = "User: " + user;
+        notify("Access Granted", "success");
     } else {
         document.getElementById('loginError').style.display = 'block';
     }
 }
-
 function logout() { location.reload(); }
 
-// --- FIREBASE CONFIG ---
+// --- Firebase ---
 const firebaseConfig = { 
     apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", 
     authDomain: "crm-tasking.firebaseapp.com", 
     databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", 
-    projectId: "crm-tasking"
+    projectId: "crm-tasking" 
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- LOGIC ---
-let clients = [], tasks = [], editIdx = -1;
-const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Beheira", "Suez"];
-
-function notify(msg, type='info') {
-    const n = document.getElementById('notification');
-    n.innerText = msg;
-    n.style.display = 'block';
-    n.style.background = type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8';
-    if(type === 'success') playAlert();
-    setTimeout(() => n.style.display = 'none', 3000);
-}
-
-function showTab(id, btn) {
-    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
-}
+// --- Data & Logic ---
+let clients = [], tasks = [], deletedClients = [], editIdx = -1, statusChart = null;
+const govs = ["القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "الشرقية", "المنوفية", "القليوبية", "البحيرة", "الغربية", "بور سعيد", "دمياط", "الإسماعيلية", "السويس", "كفر الشيخ", "الفيوم", "بني سويف", "المنيا", "أسيوط", "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد", "مطروح", "شمال سيناء", "جنوب سيناء"];
 
 function fillGovs() {
     const s = document.getElementById('gov');
@@ -212,23 +222,27 @@ function fillGovs() {
     govs.forEach(g => s.innerHTML += `<option value="${g}">${g}</option>`);
 }
 
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    if(id === 'dashboardTab') updateDashboard();
+}
+
 function addOrUpdate() {
     const n = document.getElementById('name').value;
-    if(!n) return notify("Name is required!", "error");
-    
+    if(!n) return notify("Name is required", "error");
     const obj = {
         name: n, phone: document.getElementById('phone').value,
         gov: document.getElementById('gov').value, status: document.getElementById('status').value,
         notes: document.getElementById('notes').value, agent: document.getElementById('agent').value,
         followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0]
     };
-
-    if(editIdx > -1) { clients[editIdx] = obj; editIdx = -1; } 
-    else { clients.push(obj); }
-    
-    db.ref('clients').set({...clients});
-    notify("Client Saved Successfully", "success");
+    if(editIdx > -1) { clients[editIdx] = obj; editIdx = -1; } else { clients.push(obj); }
+    syncData();
     resetForm();
+    notify("Record Saved Successfully", "success");
 }
 
 function resetForm() {
@@ -238,22 +252,37 @@ function resetForm() {
 function renderCRM() {
     const b = document.getElementById('tableBody'); b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase();
+    let cDone = 0, cHold = 0;
+    
     clients.forEach((c, i) => {
-        if(q && !c.name.toLowerCase().includes(q)) return;
+        if(q && !`${c.name} ${c.phone}`.toLowerCase().includes(q)) return;
+        if(c.status === 'Completed') cDone++;
+        if(c.status === 'Hold') cHold++;
+        
         b.innerHTML += `<tr>
-            <td>${c.name}</td><td>${c.phone}</td><td>${c.gov}</td><td>${c.status}</td>
+            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td>
+            <td>${c.status}</td><td>${c.agent || '-'}</td>
             <td>
                 <button onclick="editClient(${i})">✏️</button>
                 <button onclick="delClient(${i})" style="color:red">✕</button>
             </td>
         </tr>`;
     });
+    document.getElementById('countAll').innerText = "Total: " + clients.length;
+    document.getElementById('countDone').innerText = "Completed: " + cDone;
+    document.getElementById('countHold').innerText = "Hold: " + cHold;
+    
+    // Update Tasks Client Select
+    const ts = document.getElementById('taskClientSelect');
+    ts.innerHTML = '<option value="">Link to Client</option>';
+    clients.forEach(c => ts.innerHTML += `<option value="${c.name}">${c.name}</option>`);
 }
 
 function editClient(i) {
     editIdx = i; const c = clients[i];
     document.getElementById('name').value = c.name;
     document.getElementById('phone').value = c.phone;
+    document.getElementById('gov').value = c.gov;
     document.getElementById('status').value = c.status;
     document.getElementById('notes').value = c.notes;
     document.getElementById('agent').value = c.agent;
@@ -263,17 +292,51 @@ function editClient(i) {
 }
 
 function delClient(i) {
-    if(confirm('Delete this client?')) {
-        clients.splice(i, 1);
-        db.ref('clients').set({...clients});
-        notify("Client Deleted", "info");
+    if(confirm('Move this client to recycle bin?')) {
+        const item = clients.splice(i, 1)[0];
+        item.deletedAt = new Date().toLocaleString();
+        deletedClients.push(item);
+        syncData();
+        notify("Moved to Recycle Bin", "info");
     }
 }
 
+function syncData() {
+    db.ref('clients').set({...clients});
+    db.ref('deletedClients').set({...deletedClients});
+}
+
+function updateDashboard() {
+    const total = clients.length;
+    const comp = clients.filter(c => c.status === 'Completed').length;
+    document.getElementById('convRate').innerText = (total > 0 ? Math.round((comp/total)*100) : 0) + '%';
+    
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    const chartData = { 'Interested':0, 'In Progress':0, 'Hold':0, 'Completed':0 };
+    clients.forEach(c => chartData[c.status]++);
+
+    if(statusChart) statusChart.destroy();
+    statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(chartData),
+            datasets: [{ data: Object.values(chartData), backgroundColor: ['#17a2b8','#ffcc00','#dc3545','#28a745'] }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+}
+
+// --- Tasks Functions ---
 function addTask() {
     const txt = document.getElementById('taskText').value;
-    if(!txt) return;
-    tasks.push({ text: txt, date: document.getElementById('taskDate').value });
+    if(!txt) return notify("Task text is empty", "error");
+    tasks.push({
+        client: document.getElementById('taskClientSelect').value,
+        text: txt,
+        phone: document.getElementById('taskPhone').value,
+        date: document.getElementById('taskDate').value,
+        status: 'Pending'
+    });
     db.ref('tasks').set({...tasks});
     document.getElementById('taskText').value = '';
     notify("Task Added", "success");
@@ -282,13 +345,65 @@ function addTask() {
 function renderTasks() {
     const b = document.getElementById('taskBody'); b.innerHTML = '';
     tasks.forEach((t, i) => {
-        b.innerHTML += `<tr><td>${t.text}</td><td>${t.date}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});">Done</button></td></tr>`;
+        b.innerHTML += `<tr>
+            <td>${t.client || 'General'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.status}</td>
+            <td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red">✕</button></td>
+        </tr>`;
     });
 }
 
-// Listeners
+function autoFillTaskPhone() {
+    const name = document.getElementById('taskClientSelect').value;
+    const c = clients.find(x => x.name === name);
+    if(c) document.getElementById('taskPhone').value = c.phone;
+}
+
+// --- Import / Export ---
+function exportData() {
+    let csv = "\uFEFFName,Phone,Gov,Status,Agent,Notes\n";
+    clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}"\n`);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Utopia_CRM_Backup.csv`;
+    link.click();
+}
+
+function importData(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const rows = event.target.result.split('\n').slice(1);
+        rows.forEach(row => {
+            const cols = row.split(',');
+            if(cols[0]) {
+                clients.push({
+                    name: cols[0].replace(/"/g,''),
+                    phone: cols[1]?.replace(/"/g,'') || '',
+                    gov: cols[2]?.replace(/"/g,'') || '',
+                    status: cols[3]?.replace(/"/g,'') || 'Interested',
+                    agent: cols[4]?.replace(/"/g,'') || '',
+                    notes: cols[5]?.replace(/"/g,'') || '',
+                    date: new Date().toISOString().split('T')[0]
+                });
+            }
+        });
+        syncData();
+        notify("Data Imported Successfully", "success");
+    };
+    reader.readAsText(file);
+}
+
+// --- Firebase Listeners ---
 db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+db.ref('deletedClients').on('value', s => {
+    deletedClients = s.val() ? Object.values(s.val()) : [];
+    const b = document.getElementById('recycleBody'); b.innerHTML = '';
+    deletedClients.forEach((c, i) => {
+        b.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="clients.push(deletedClients.splice(${i},1)[0]); syncData();">Restore</button></td></tr>`;
+    });
+});
 
 fillGovs();
 </script>
