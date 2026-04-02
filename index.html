@@ -52,14 +52,12 @@
         .status-hold { background: #ffebee !important; }
         .status-completed { background: #e8f5e9 !important; }
         
-        /* --- Tracking Badges --- */
         .track-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; display: inline-block; }
         .track-new { background: #17a2b8; box-shadow: 0 0 8px #17a2b8; }
         .track-active { background: #28a745; }
         .track-warning { background: #ffc107; color: #333; }
         .track-old { background: #dc3545; }
 
-        /* --- AI Dashboard & Recycle Styles --- */
         .ai-card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .ai-stat-card { background: white; padding: 20px; border-radius: 15px; border-left: 5px solid var(--info); box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
         .ai-stat-card h3 { margin: 0; font-size: 0.9em; color: #666; }
@@ -78,7 +76,6 @@
 <body oncontextmenu="return false;"> 
 
 <div id="notification"></div>
-
 <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
 <div id="loginOverlay">
@@ -225,7 +222,7 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
-// --- Protection ---
+// --- ADVANCED PROTECTION LAYER ---
 const _0x1 = "YWRtaW4="; // admin
 const _0x2 = "dXRvcGlhMjAyNg=="; // utopia2026
 
@@ -237,14 +234,18 @@ document.onkeydown = function(e) {
     if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
 };
 
+// Auto-Kill session if tools are opened
+setInterval(function() {
+    if (window.outerHeight - window.innerHeight > 160 || window.outerWidth - window.innerWidth > 160) {
+        document.body.innerHTML = "<div style='color:white; background:#1e1e2f; height:100vh; display:flex; align-items:center; justify-content:center; font-family:sans-serif;'><h2>Security Protocol Active: System Locked</h2></div>";
+    }
+}, 1000);
+
 // --- Updated Notification with Sound ---
 function notify(m, t='info') { 
     const n = document.getElementById('notification'); 
     const s = document.getElementById('notifSound');
-    
-    // تشغيل الصوت
-    if(s) { s.currentTime = 0; s.play().catch(e => console.log("Audio block by browser")); }
-    
+    if(s) { s.currentTime = 0; s.play().catch(e => {}); }
     n.innerText = m; 
     n.style.display = 'block'; 
     n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
@@ -327,30 +328,59 @@ function syncAll() {
     db.ref('deletedClients').set({...deletedClients});
 }
 
-// --- Login & Auth ---
+// --- NEW SECURE LOGIN SYSTEM ---
 function checkLogin() {
     const u = btoa(document.getElementById('userInput').value);
     const p = btoa(document.getElementById('passInput').value);
+    
     if (u === _0x1 && p === _0x2) {
+        // إنشاء جلسة مؤمنة بـ 8 ساعات
+        const expiry = new Date().getTime() + (8 * 60 * 60 * 1000);
+        const sessionData = { active: true, exp: expiry, token: 'secure_' + Math.random() };
+        localStorage.setItem('utopia_secure_session', JSON.stringify(sessionData));
+        
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
-        sessionStorage.setItem('secure_session', 'active_utopia');
         notify(lang==='ar'?'تم تسجيل الدخول':'Logged In', 'success');
+        initializeFirebaseListeners(); // تشغيل الجلب بعد التأكد من الدخول
     } else {
         document.getElementById('loginError').style.display = 'block';
         notify(lang==='ar'?'بيانات خاطئة':'Invalid Login', 'error');
     }
 }
 
+function logout() { 
+    localStorage.removeItem('utopia_secure_session'); 
+    location.reload(); 
+}
+
+// حماية الجلب: البيانات لا تظهر إلا إذا كان اللوجن صحيحاً
+function initializeFirebaseListeners() {
+    const sessionStr = localStorage.getItem('utopia_secure_session');
+    if (!sessionStr) return;
+    
+    const session = JSON.parse(sessionStr);
+    if (session.active && new Date().getTime() < session.exp) {
+        db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDashboard(); });
+        db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
+        db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+    } else {
+        logout();
+    }
+}
+
 window.addEventListener('load', () => {
-    if (sessionStorage.getItem('secure_session') === 'active_utopia') { 
-        document.getElementById('loginOverlay').style.display = 'none'; 
-        document.getElementById('mainApp').style.display = 'flex'; 
+    const sessionStr = localStorage.getItem('utopia_secure_session');
+    if (sessionStr) {
+        const session = JSON.parse(sessionStr);
+        if (session.active && new Date().getTime() < session.exp) {
+            document.getElementById('loginOverlay').style.display = 'none'; 
+            document.getElementById('mainApp').style.display = 'flex';
+            initializeFirebaseListeners();
+        }
     }
     fillGovs();
 });
-
-function logout() { sessionStorage.removeItem('secure_session'); location.reload(); }
 
 // --- Tab Logic ---
 function showTab(id, btn) { 
@@ -438,12 +468,6 @@ function changeLang(l) {
     document.getElementById('lblConv').innerText = l==='ar'?'معدل التحويل':'Conversion Rate';
     document.getElementById('lblPotential').innerText = l==='ar'?'صفقات محتملة':'Potential Deals';
 }
-
-// --- Firebase Listeners ---
-db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDashboard(); });
-db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
-db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
-
 </script>
 </body>
 </html>
