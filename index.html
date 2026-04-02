@@ -184,12 +184,13 @@
             </div>
             <div class="row">
                 <input id="taskText" placeholder="Task details">
-                <select id="taskClientSelect"><option value="">Client</option></select>
+                <select id="taskClientSelect" onchange="autoFillTaskPhone()"><option value="">Client</option></select>
+                <input id="taskPhone" placeholder="Phone Number">
                 <input type="date" id="taskDate">
                 <select id="taskStage"><option value="quote">Quote</option><option value="follow">Follow Up</option><option value="order">Order</option><option value="bank">Bank</option></select>
                 <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕</button>
             </div>
-            <table><thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr></thead><tbody id="taskBody"></tbody></table>
+            <table><thead><tr><th>Client</th><th>Phone</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr></thead><tbody id="taskBody"></tbody></table>
         </div>
     </div>
 </div>
@@ -203,7 +204,15 @@ let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', st
 
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
 
-// دالة تشغيل الصوت المصححة
+// دالة جلب رقم الهاتف تلقائياً عند اختيار العميل في المهام
+function autoFillTaskPhone() {
+    const selectedName = document.getElementById('taskClientSelect').value;
+    const client = clients.find(c => c.name === selectedName);
+    if(client) {
+        document.getElementById('taskPhone').value = client.phone || "";
+    }
+}
+
 function playNotifySound() { 
     const audio = document.getElementById('notifySound'); 
     if(audio) { 
@@ -214,9 +223,7 @@ function playNotifySound() {
 
 function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; playNotifySound(); setTimeout(() => n.style.display = 'none', 4000); }
 
-// دالة الدخول المصححة لتفعيل الصوت
 function checkLogin() { 
-    // تفعيل سياق الصوت بمجرد التفاعل (حل مشكلة المتصفح)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') { audioCtx.resume(); }
 
@@ -376,9 +383,9 @@ function importData(event) {
 function exportData(type) {
     let data = type === 'clients' ? clients : tasks;
     if(data.length === 0) return notify('No data to export', 'error');
-    let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date\n" : "Client,Task,Deadline,Stage\n");
+    let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date\n" : "Client,Phone,Task,Deadline,Stage\n");
     data.forEach(i => {
-        csv += type === 'clients' ? `"${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n` : `"${i.client}","${i.text}","${i.date}","${i.stage}"\n`;
+        csv += type === 'clients' ? `"${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n` : `"${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
@@ -426,16 +433,32 @@ function editClient(i) {
 }
 
 function addTask() { 
-    const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value }; 
+    const t = { 
+        text: document.getElementById('taskText').value, 
+        client: document.getElementById('taskClientSelect').value, 
+        phone: document.getElementById('taskPhone').value, // حفظ رقم الهاتف في المهمة
+        date: document.getElementById('taskDate').value, 
+        stage: document.getElementById('taskStage').value 
+    }; 
     if(!t.text) return notify('Task text empty', 'error'); 
     tasks.push(t); 
     db.ref('tasks').set({...tasks}); 
     notify(lang==='ar'?'تم إضافة المهمة':'Task Added Successfully', 'success'); 
+    // تفريغ الحقول
+    document.getElementById('taskText').value = '';
+    document.getElementById('taskPhone').value = '';
 }
 function renderTasks() { 
     const b = document.getElementById('taskBody'); b.innerHTML = ''; 
     tasks.forEach((t, i) => { 
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage.toUpperCase()}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks}); notify('Task Removed','info');" style="color:red; border:none; background:none; cursor:pointer;">✕</button></td></tr>`; 
+        b.innerHTML += `<tr>
+            <td>${t.client}</td>
+            <td>${t.phone || '-'}</td> 
+            <td>${t.text}</td>
+            <td>${t.date}</td>
+            <td>${t.stage.toUpperCase()}</td>
+            <td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks}); notify('Task Removed','info');" style="color:red; border:none; background:none; cursor:pointer;">✕</button></td>
+        </tr>`; 
     }); 
 }
 
