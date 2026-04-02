@@ -2,10 +2,11 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading Programs CRM & Tasks</title>
+    <title>Utopia Pro AI CRM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; }
+        :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
         
         /* --- Login Screen Styling --- */
@@ -41,8 +42,7 @@
         .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
         
         .btn-export { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
-        .btn-export:hover { background: #5a6268; }
-
+        
         table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
@@ -53,11 +53,18 @@
         .status-completed { background: #e8f5e9 !important; }
         
         /* --- Tracking Badges --- */
-        .track-badge { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; display: inline-block; }
-        .track-new { background: #17a2b8; }     /* أزرق: عميل جديد اليوم */
-        .track-active { background: #28a745; }  /* أخضر: متابعة حديثة */
-        .track-warning { background: #ffc107; color: #333; } /* أصفر: لم يتم التواصل منذ 3 أيام */
-        .track-old { background: #dc3545; }     /* أحمر: عميل قديم (أكثر من 7 أيام) */
+        .track-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; display: inline-block; }
+        .track-new { background: #17a2b8; box-shadow: 0 0 8px #17a2b8; }
+        .track-active { background: #28a745; }
+        .track-warning { background: #ffc107; color: #333; }
+        .track-old { background: #dc3545; }
+
+        /* --- AI Dashboard & Recycle Styles --- */
+        .ai-card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .ai-stat-card { background: white; padding: 20px; border-radius: 15px; border-left: 5px solid var(--info); box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .ai-stat-card h3 { margin: 0; font-size: 0.9em; color: #666; }
+        .ai-stat-card p { font-size: 1.8em; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
+        .chart-box { background: white; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
         .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -90,7 +97,10 @@
     <div class="sidebar">
         <h2>Utopia CRM</h2>
         <button class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
+        <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
+        <button class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
+        
         <div class="dev-box">
             <b>Developer Info:</b>
             Eng. Mahmoud Mohamed Marie
@@ -107,7 +117,7 @@
         <div id="crmTab" class="tab-content active">
             <h2 id="crmHeader">Clients Registry</h2>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <input id="search" placeholder="🔍 Search..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
+                <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
                 <button class="btn-export" onclick="exportData('clients')">📤 Export Excel</button>
             </div>
             <div class="row">
@@ -124,8 +134,8 @@
             <div class="row">
                 <textarea id="notes" placeholder="Notes..."></textarea>
                 <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
-                    <input id="agent" placeholder="Agent">
-                    <input id="followUp" placeholder="Action">
+                    <input id="agent" placeholder="Agent Name">
+                    <input id="followUp" placeholder="Next Action">
                     <input type="date" id="date">
                 </div>
             </div>
@@ -140,12 +150,43 @@
                         <th>Name</th>
                         <th>Phone</th>
                         <th>Gov</th>
-                        <th>Tracking</th> 
-                        <th>Status</th>
+                        <th>Tracking Status</th> 
+                        <th>Sales Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="dashboardTab" class="tab-content">
+            <h2>📊 Smart Analytics & AI Insight</h2>
+            <div class="ai-card-container">
+                <div class="ai-stat-card" style="border-left-color: var(--success);">
+                    <h3 id="lblConv">Conversion Rate</h3>
+                    <p id="convRate">0%</p>
+                </div>
+                <div class="ai-stat-card" style="border-left-color: var(--accent);">
+                    <h3 id="lblPotential">Potential Deals</h3>
+                    <p id="potentialDeals">0</p>
+                </div>
+                <div class="ai-stat-card" style="border-left-color: var(--info);">
+                    <h3 id="lblTopGov">Top Governorate</h3>
+                    <p id="topGov">-</p>
+                </div>
+            </div>
+            <div class="chart-box">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <div id="recycleTab" class="tab-content">
+            <h2 style="color: var(--danger);">♻️ Deleted Clients (Recycle Bin)</h2>
+            <table>
+                <thead>
+                    <tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="recycleBody"></tbody>
             </table>
         </div>
 
@@ -174,70 +215,93 @@
 </div>
 
 <script>
+// --- Configuration & Global Variables ---
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], editIdx = -1, lang = 'en';
+let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
-// --- ميزة التتبع (Tracking Logic) ---
+// --- AI Tracking Logic ---
 function triggerTracking() {
     const govValue = document.getElementById('gov').value;
     const clientName = document.getElementById('name').value || "Client";
-    if(govValue) {
-        // بمجرد اختيار المحافظة، يظهر إشعار تتبع
-        notify(lang === 'ar' ? `تتبع نشط لـ ${clientName} في ${govValue}` : `Active tracking for ${clientName} in ${govValue}`, 'success');
-    }
+    if(govValue) notify(lang === 'ar' ? `تتبع ذكي مفعل لـ ${clientName}` : `Smart tracking active for ${clientName}`, 'success');
 }
 
 function getTrackingLabel(dateStr) {
-    if(!dateStr) return { lab: (lang === 'ar' ? 'جديد' : 'New'), cls: 'track-new' };
-    
-    const clientDate = new Date(dateStr);
-    const today = new Date();
-    // حساب الفرق بالأيام
-    const diffTime = Math.abs(today - clientDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays <= 1) return { lab: (lang === 'ar' ? 'نشط' : 'Active'), cls: 'track-active' };
-    if (diffDays <= 3) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-new' };
-    if (diffDays <= 7) return { lab: (lang === 'ar' ? 'تنبيه' : 'Warning'), cls: 'track-warning' };
-    return { lab: (lang === 'ar' ? 'قديم' : 'Old'), cls: 'track-old' };
+    if(!dateStr) return { lab: 'New', cls: 'track-new' };
+    const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 1) return { lab: (lang === 'ar' ? 'نشط جداً' : 'V. Active'), cls: 'track-new' };
+    if (diffDays <= 3) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-active' };
+    if (diffDays <= 7) return { lab: (lang === 'ar' ? 'تحذير' : 'Warning'), cls: 'track-warning' };
+    return { lab: (lang === 'ar' ? 'بارد' : 'Cold'), cls: 'track-old' };
 }
 
-// --- بقية الوظائف الأساسية ---
-function exportData(type) {
-    let csvContent = "";
-    let filename = "";
-    const BOM = "\uFEFF"; 
-    if (type === 'clients') {
-        const headers = lang === 'ar' ? "الاسم,الموبايل,المحافظة,الحالة,الملاحظات" : "Name,Phone,Governorate,Status,Notes";
-        csvContent = headers + "\n";
-        clients.forEach(c => {
-            const gName = lang === 'ar' ? (govs.find(g=>g.en===c.gov)?.ar || c.gov) : c.gov;
-            csvContent += `"${c.name}","${c.phone}","${gName}","${c.status}","${c.notes || ''}"\n`;
-        });
-        filename = "Utopia_Clients.csv";
-    } else {
-        const headers = lang === 'ar' ? "العميل,المهمة,التاريخ,المرحلة" : "Client,Task,Date,Stage";
-        csvContent = headers + "\n";
-        tasks.forEach(t => {
-            csvContent += `"${t.client}","${t.text}","${t.date}","${t.stage}"\n`;
-        });
-        filename = "Utopia_Tasks.csv";
+// --- AI Dashboard Logic ---
+function updateDashboard() {
+    const total = clients.length;
+    const completed = clients.filter(c => c.status === 'Completed').length;
+    const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    document.getElementById('convRate').innerText = rate + '%';
+    document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
+    
+    // حساب أكثر محافظة
+    const govCounts = {};
+    clients.forEach(c => { if(c.gov) govCounts[c.gov] = (govCounts[c.gov] || 0) + 1; });
+    const top = Object.keys(govCounts).reduce((a, b) => govCounts[a] > govCounts[b] ? a : b, '-');
+    document.getElementById('topGov').innerText = top;
+
+    // Chart.js Update
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    const data = {
+        labels: ['Interested', 'In Progress', 'Hold', 'Completed'],
+        datasets: [{
+            data: [
+                clients.filter(c => c.status === 'Interested').length,
+                clients.filter(c => c.status === 'In Progress').length,
+                clients.filter(c => c.status === 'Hold').length,
+                clients.filter(c => c.status === 'Completed').length
+            ],
+            backgroundColor: ['#e3f2fd', '#fff3e0', '#ffebee', '#e8f5e9']
+        }]
+    };
+    if(statusChart) statusChart.destroy();
+    statusChart = new Chart(ctx, { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false } });
+}
+
+// --- Recycle Bin Logic ---
+function delClient(i) {
+    if(confirm(lang==='ar'?'نقل العميل لسلة المحذوفات؟':'Move client to Recycle Bin?')) {
+        const deleted = clients.splice(i, 1)[0];
+        deleted.deletedAt = new Date().toLocaleDateString();
+        deletedClients.push(deleted);
+        syncAll();
+        notify(lang==='ar'?'تم النقل للسلة':'Moved to Recycle Bin', 'info');
     }
-    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    notify(lang === 'ar' ? 'تم تصدير الملف بنجاح' : 'Exported Successfully', 'success');
 }
 
+function restoreClient(i) {
+    clients.push(deletedClients.splice(i, 1)[0]);
+    syncAll();
+    notify(lang==='ar'?'تم الاستعادة':'Restored Successfully', 'success');
+}
+
+function permanentDel(i) {
+    if(confirm(lang==='ar'?'حذف نهائي؟':'Delete permanently?')) {
+        deletedClients.splice(i, 1);
+        syncAll();
+    }
+}
+
+function syncAll() {
+    db.ref('clients').set({...clients});
+    db.ref('deletedClients').set({...deletedClients});
+}
+
+// --- Basic UI Logic ---
 function checkLogin() {
     if (document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === 'admin') {
         document.getElementById('loginOverlay').style.display = 'none';
@@ -245,16 +309,25 @@ function checkLogin() {
         sessionStorage.setItem('isLoggedIn', 'true');
     } else {
         document.getElementById('loginError').style.display = 'block';
-        play('error');
     }
 }
-function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 if (sessionStorage.getItem('isLoggedIn') === 'true') { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; }
 
-function play(t) { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = t === 'success' ? 880 : 220; o.start(); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5); o.stop(ctx.currentTime + 0.5); } catch(e){} }
-function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; play(t); setTimeout(() => n.style.display = 'none', 3000); }
-function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
-function fillGovs() { const s = document.getElementById('gov'); s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); }
+function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
+function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; setTimeout(() => n.style.display = 'none', 3000); }
+function showTab(id, btn) { 
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+    btn.classList.add('active'); 
+    if(id === 'dashboardTab') updateDashboard();
+}
+
+function fillGovs() { 
+    const s = document.getElementById('gov'); 
+    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
+    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
+}
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
@@ -274,22 +347,18 @@ function renderCRM() {
     clients.forEach((c, i) => {
         if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
-        
-        // استدعاء دالة التتبع لعرض الشارة (Badge)
         const track = getTrackingLabel(c.date);
-        
         const rowCls = `status-${c.status.toLowerCase().replace(/\s/g, '')}`;
-        const gName = lang === 'ar' ? (govs.find(g=>g.en===c.gov)?.ar || c.gov) : c.gov;
         b.innerHTML += `<tr class="${rowCls}">
             <td><b>${c.name}</b></td>
             <td>${c.phone}</td>
-            <td>${gName}</td>
+            <td>${c.gov}</td>
             <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
             <td>${c.status}</td>
             <td>
-                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; border-radius:5px; cursor:pointer;">💬</button> 
-                <button onclick="editClient(${i})" style="background:#ffc107; border:none; border-radius:5px; cursor:pointer;">✏️</button> 
-                <button onclick="delClient(${i})" style="background:#f44336; border:none; border-radius:5px; color:white;">✕</button>
+                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; padding:5px; border-radius:5px; cursor:pointer;">💬</button> 
+                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:5px; border-radius:5px; cursor:pointer;">✏️</button> 
+                <button onclick="delClient(${i})" style="background:#f44336; border:none; padding:5px; border-radius:5px; color:white;">✕</button>
             </td>
         </tr>`;
     });
@@ -297,8 +366,20 @@ function renderCRM() {
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
 }
 
+function renderRecycle() {
+    const b = document.getElementById('recycleBody'); b.innerHTML = '';
+    deletedClients.forEach((c, i) => {
+        b.innerHTML += `<tr>
+            <td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td>
+            <td>
+                <button onclick="restoreClient(${i})" style="background:var(--success); color:white; border:none; border-radius:5px; padding:5px;">Restore</button>
+                <button onclick="permanentDel(${i})" style="background:var(--danger); color:white; border:none; border-radius:5px; padding:5px;">Final Del</button>
+            </td>
+        </tr>`;
+    });
+}
+
 function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent; document.getElementById('followUp').value = c.followUp; document.getElementById('date').value = c.date; }
-function delClient(i) { if(confirm('Delete?')) { clients.splice(i,1); db.ref('clients').set({...clients}); } }
 
 function addTask() {
     const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value };
@@ -309,17 +390,26 @@ function addTask() {
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); b.innerHTML = '';
-    const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => {
-        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
         b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage.toUpperCase()}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none;">✕</button></td></tr>`;
     });
 }
 
-function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); renderTasks(); }
+function changeLang(l) { 
+    lang = l; 
+    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
+    fillGovs(); 
+    renderCRM(); 
+    renderRecycle();
+    document.getElementById('lblConv').innerText = l==='ar'?'معدل التحويل':'Conversion Rate';
+    document.getElementById('lblPotential').innerText = l==='ar'?'صفقات محتملة':'Potential Deals';
+}
 
-db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); const sel = document.getElementById('taskClientSelect'); sel.innerHTML = '<option value="">Client</option>'; clients.forEach(c => sel.innerHTML += `<option value="${c.name}">${c.name}</option>`); });
+// --- Firebase Listeners ---
+db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDashboard(); });
+db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+
 fillGovs();
 </script>
 </body>
