@@ -11,7 +11,7 @@
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
         
         /* Logo Styling */
-        .app-logo { width: 80px; height: 80px; margin: 0 auto 15px; display: block; border-radius: 50%; border: 2px solid var(--accent); background: #fff; padding: 5px; }
+        .app-logo { width: 80px; height: 80px; margin: 0 auto 15px; display: block; border-radius: 50%; border: 2px solid var(--accent); background: #fff; padding: 5px; object-fit: contain; }
 
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; transition: 0.5s; }
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
@@ -82,7 +82,7 @@
 
 <div id="loginOverlay">
     <div class="login-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968204.png" alt="Utopia Logo" class="app-logo">
+        <img src="رابط_صورة_اللوجو_هنا" alt="Utopia Logo" class="app-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5968/5968204.png'">
         <h2>Utopia Trading For Export</h2>
         <input type="text" id="userInput" placeholder="Username">
         <input type="password" id="passInput" placeholder="Password">
@@ -97,7 +97,7 @@
 
 <div id="mainApp">
     <div class="sidebar">
-        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968204.png" alt="Utopia Logo" class="app-logo" style="width: 60px; height: 60px;">
+        <img src="رابط_صورة_اللوجو_هنا" alt="Utopia Logo" class="app-logo" style="width: 60px; height: 60px;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5968/5968204.png'">
         <h2>Utopia CRM</h2>
         <button class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
@@ -150,12 +150,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Gov</th>
-                        <th>Tracking Status</th> 
-                        <th>Sales Status</th>
-                        <th>Actions</th>
+                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking Status</th><th>Sales Status</th><th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -165,30 +160,17 @@
         <div id="dashboardTab" class="tab-content">
             <h2>📊 Smart Analytics & AI Insight</h2>
             <div class="ai-card-container">
-                <div class="ai-stat-card" style="border-left-color: var(--success);">
-                    <h3 id="lblConv">Conversion Rate</h3>
-                    <p id="convRate">0%</p>
-                </div>
-                <div class="ai-stat-card" style="border-left-color: var(--accent);">
-                    <h3 id="lblPotential">Potential Deals</h3>
-                    <p id="potentialDeals">0</p>
-                </div>
-                <div class="ai-stat-card" style="border-left-color: var(--info);">
-                    <h3 id="lblTopGov">Top Governorate</h3>
-                    <p id="topGov">-</p>
-                </div>
+                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">Conversion Rate</h3><p id="convRate">0%</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">Potential Deals</h3><p id="potentialDeals">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">Top Governorate</h3><p id="topGov">-</p></div>
             </div>
-            <div class="chart-box" style="height: 300px;">
-                <canvas id="statusChart"></canvas>
-            </div>
+            <div class="chart-box" style="height: 300px;"><canvas id="statusChart"></canvas></div>
         </div>
 
         <div id="recycleTab" class="tab-content">
             <h2 style="color: var(--danger);">♻️ Deleted Clients (Recycle Bin)</h2>
             <table>
-                <thead>
-                    <tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr>
-                </thead>
+                <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr></thead>
                 <tbody id="recycleBody"></tbody>
             </table>
         </div>
@@ -203,10 +185,7 @@
                 <input id="taskText" placeholder="Task details">
                 <select id="taskClientSelect"><option value="">Client</option></select>
                 <input type="date" id="taskDate">
-                <select id="taskStage">
-                    <option value="quote">Quote</option><option value="follow">Follow Up</option>
-                    <option value="order">Order</option><option value="bank">Bank</option>
-                </select>
+                <select id="taskStage"><option value="quote">Quote</option><option value="follow">Follow Up</option><option value="order">Order</option><option value="bank">Bank</option></select>
                 <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 0 15px;">➕</button>
             </div>
             <table>
@@ -218,7 +197,6 @@
 </div>
 
 <script>
-// --- Configuration ---
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -226,94 +204,51 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
-// --- LOGIN PROTECTION ---
 const _U = "admin";
 const _P = "utopia2026";
 
-document.onkeydown = (e) => {
-    if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false;
-};
+// حماية الكود
+document.onkeydown = (e) => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) return false; };
 
-// تم إزالة الجزء الخاص بمراقبة DevTools الذي يسبب Security Blocked
-
-// --- Excel Export Logic ---
-function exportToExcel(type) {
-    let dataToExport = [];
-    let fileName = "";
-    if(type === 'clients') {
-        dataToExport = clients.map(c => ({ "Name": c.name, "Phone": c.phone, "Governorate": c.gov, "Status": c.status, "Agent": c.agent, "Notes": c.notes, "Date": c.date }));
-        fileName = "Utopia_Clients.xlsx";
-    } else {
-        dataToExport = tasks.map(t => ({ "Client": t.client, "Task": t.text, "Deadline": t.date, "Stage": t.stage }));
-        fileName = "Utopia_Tasks.xlsx";
-    }
-    if(dataToExport.length === 0) return notify("No data to export", "error");
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-    XLSX.writeFile(workbook, fileName);
-    notify("Exported Successfully", "success");
-}
-
+// نظام الإشعارات والصوت (تم إرجاعهم)
 function notify(m, t='info') { 
     const n = document.getElementById('notification'); 
     const s = document.getElementById('notifSound');
-    if(s) { s.currentTime = 0; s.play().catch(e => {}); }
+    if(s) { s.currentTime = 0; s.play().catch(e => console.log("Sound error")); }
     n.innerText = m; 
     n.style.display = 'block'; 
     n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
     setTimeout(() => n.style.display = 'none', 3000); 
 }
 
+// تصدير إكسيل
+function exportToExcel(type) {
+    let dataToExport = [];
+    let fileName = (type === 'clients') ? "Utopia_Clients.xlsx" : "Utopia_Tasks.xlsx";
+    dataToExport = (type === 'clients') ? clients.map(c => ({ "Name": c.name, "Phone": c.phone, "Gov": c.gov, "Status": c.status })) : tasks.map(t => ({ "Client": t.client, "Task": t.text }));
+    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    XLSX.writeFile(wb, fileName);
+    notify("Exported!", "success");
+}
+
 function triggerTracking() {
-    const govValue = document.getElementById('gov').value;
-    const clientName = document.getElementById('name').value || "Client";
-    if(govValue) notify(lang === 'ar' ? `تتبع ذكي مفعل لـ ${clientName}` : `Smart tracking active for ${clientName}`, 'success');
+    const g = document.getElementById('gov').value;
+    if(g) notify(lang === 'ar' ? `تتبع ذكي مفعل` : `Smart tracking active`, 'success');
 }
 
 function getTrackingLabel(dateStr) {
     if(!dateStr) return { lab: 'New', cls: 'track-new' };
-    const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
-    if (diffDays <= 1) return { lab: (lang === 'ar' ? 'نشط جداً' : 'V. Active'), cls: 'track-new' };
-    if (diffDays <= 3) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-active' };
-    if (diffDays <= 7) return { lab: (lang === 'ar' ? 'تحذير' : 'Warning'), cls: 'track-warning' };
-    return { lab: (lang === 'ar' ? 'بارد' : 'Cold'), cls: 'track-old' };
-}
-
-function updateDashboard() {
-    const total = clients.length;
-    const completed = clients.filter(c => c.status === 'Completed').length;
-    const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
-    document.getElementById('convRate').innerText = rate + '%';
-    document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
-    const govCounts = {};
-    clients.forEach(c => { if(c.gov) govCounts[c.gov] = (govCounts[c.gov] || 0) + 1; });
-    const top = Object.keys(govCounts).reduce((a, b) => govCounts[a] > govCounts[b] ? a : b, '-');
-    document.getElementById('topGov').innerText = top;
-
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    const data = {
-        labels: ['Interested', 'In Progress', 'Hold', 'Completed'],
-        datasets: [{
-            data: [
-                clients.filter(c => c.status === 'Interested').length,
-                clients.filter(c => c.status === 'In Progress').length,
-                clients.filter(c => c.status === 'Hold').length,
-                clients.filter(c => c.status === 'Completed').length
-            ],
-            backgroundColor: ['#e3f2fd', '#fff3e0', '#ffebee', '#e8f5e9']
-        }]
-    };
-    if(statusChart) statusChart.destroy();
-    statusChart = new Chart(ctx, { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false } });
+    const diff = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
+    if (diff <= 1) return { lab: (lang === 'ar' ? 'نشط' : 'Active'), cls: 'track-new' };
+    if (diff <= 7) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow'), cls: 'track-active' };
+    return { lab: (lang === 'ar' ? 'قديم' : 'Old'), cls: 'track-old' };
 }
 
 function checkLogin() {
-    const u = document.getElementById('userInput').value;
-    const p = document.getElementById('passInput').value;
-    if (u === _U && p === _P) {
-        const expiry = new Date().getTime() + (8 * 60 * 60 * 1000);
-        localStorage.setItem('utopia_secure_session', JSON.stringify({ active: true, exp: expiry }));
+    if (document.getElementById('userInput').value === _U && document.getElementById('passInput').value === _P) {
+        localStorage.setItem('utopia_secure_session', JSON.stringify({ active: true, exp: new Date().getTime() + 28800000 }));
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         initializeFirebaseListeners();
@@ -326,148 +261,102 @@ function checkLogin() {
 function logout() { localStorage.removeItem('utopia_secure_session'); location.reload(); }
 
 function initializeFirebaseListeners() {
-    db.ref('clients').on('value', s => { 
-        clients = s.val() ? Object.values(s.val()) : []; 
-        renderCRM(); 
-        updateDashboard(); 
-        updateTaskClients();
-    });
+    db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDashboard(); updateTaskClients(); });
     db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
     db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 }
 
 function updateTaskClients() {
-    const s = document.getElementById('taskClientSelect');
-    if(!s) return;
+    const s = document.getElementById('taskClientSelect'); if(!s) return;
     s.innerHTML = '<option value="">Select Client</option>';
     clients.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
 }
 
 window.addEventListener('load', () => {
-    const sessionStr = localStorage.getItem('utopia_secure_session');
-    if (sessionStr) {
-        const session = JSON.parse(sessionStr);
-        if (session.active && new Date().getTime() < session.exp) {
-            document.getElementById('loginOverlay').style.display = 'none'; 
-            document.getElementById('mainApp').style.display = 'flex';
-            initializeFirebaseListeners();
-        }
+    const sess = JSON.parse(localStorage.getItem('utopia_secure_session'));
+    if (sess && sess.active && new Date().getTime() < sess.exp) {
+        document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex';
+        initializeFirebaseListeners();
     }
     fillGovs();
 });
 
-function showTab(id, btn) { 
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-    document.getElementById(id).classList.add('active'); 
-    btn.classList.add('active'); 
-    if(id === 'dashboardTab') updateDashboard();
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active'); btn.classList.add('active');
 }
 
-function fillGovs() { 
-    const s = document.getElementById('gov'); 
-    if(!s) return;
-    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
-    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
+function fillGovs() {
+    const s = document.getElementById('gov'); if(!s) return;
+    s.innerHTML = `<option value="">Select Gov</option>`;
+    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`);
 }
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify('Name required', 'error');
-    const today = new Date().toISOString().split('T')[0];
-    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
+    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0] };
     if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; } else { clients.push(c); }
     db.ref('clients').set({...clients});
-    document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language' && i.id !== 'gov') i.value = ''; });
-    fillGovs();
-    notify('Data Saved', 'success');
+    notify('Saved', 'success');
 }
 
 function renderCRM() {
     const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
-    const q = document.getElementById('search').value.toLowerCase();
-    let hCount = 0;
     clients.forEach((c, i) => {
-        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
-        if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
-        const rowCls = `status-${c.status.toLowerCase().replace(/\s/g, '')}`;
-        b.innerHTML += `<tr class="${rowCls}">
-            <td><b>${c.name}</b></td>
-            <td>${c.phone}</td>
-            <td>${c.gov}</td>
-            <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
-            <td>${c.status}</td>
-            <td>
-                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; padding:5px; border-radius:5px; cursor:pointer;">💬</button> 
-                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:5px; border-radius:5px; cursor:pointer;">✏️</button> 
-                <button onclick="delClient(${i})" style="background:#f44336; border:none; padding:5px; border-radius:5px; color:white;">✕</button>
-            </td>
-        </tr>`;
+        b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
+            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td>
+            <td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
+            <td><button onclick="editClient(${i})">✏️</button><button onclick="delClient(${i})">✕</button></td></tr>`;
     });
-    document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
-    document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
 }
 
 function delClient(i) {
-    if(confirm('Move to Recycle Bin?')) {
-        const deleted = clients.splice(i, 1)[0];
-        deleted.deletedAt = new Date().toLocaleDateString();
-        deletedClients.push(deleted);
-        db.ref('clients').set({...clients});
-        db.ref('deletedClients').set({...deletedClients});
+    if(confirm('Delete?')) {
+        const d = clients.splice(i, 1)[0]; d.deletedAt = new Date().toLocaleDateString();
+        deletedClients.push(d); db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients});
     }
 }
 
 function renderRecycle() {
     const b = document.getElementById('recycleBody'); if(!b) return; b.innerHTML = '';
-    deletedClients.forEach((c, i) => {
-        b.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td>
-                <button onclick="restoreClient(${i})" style="background:var(--success); color:white; border:none; border-radius:5px; padding:5px;">Restore</button>
-                <button onclick="permanentDel(${i})" style="background:var(--danger); color:white; border:none; border-radius:5px; padding:5px;">Final Del</button>
-        </td></tr>`;
-    });
+    deletedClients.forEach((c, i) => b.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button></td></tr>`);
 }
 
 function restoreClient(i) {
     clients.push(deletedClients.splice(i, 1)[0]);
-    db.ref('clients').set({...clients});
-    db.ref('deletedClients').set({...deletedClients});
+    db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients});
 }
 
-function permanentDel(i) {
-    if(confirm('Permanent Delete?')) {
-        deletedClients.splice(i, 1);
-        db.ref('deletedClients').set({...deletedClients});
-    }
+function editClient(i) { 
+    editIdx = i; const c = clients[i]; 
+    document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; 
+    document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status;
 }
-
-function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent; document.getElementById('followUp').value = c.followUp; document.getElementById('date').value = c.date; }
 
 function addTask() {
     const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value };
     if(!t.text) return notify('Empty task', 'error');
-    tasks.push(t); db.ref('tasks').set({...tasks});
-    document.getElementById('taskText').value = '';
-    notify('Task Added', 'success');
+    tasks.push(t); db.ref('tasks').set({...tasks}); notify('Task Added', 'success');
 }
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = '';
-    const q = document.getElementById('taskSearch').value.toLowerCase();
-    tasks.forEach((t, i) => {
-        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage.toUpperCase()}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="color:red; border:none; background:none; cursor:pointer;">✕</button></td></tr>`;
-    });
+    tasks.forEach((t, i) => b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});">✕</button></td></tr>`);
+}
+
+function updateDashboard() {
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    const data = { labels: ['Interested', 'In Progress', 'Hold', 'Completed'], datasets: [{ data: [clients.filter(c => c.status === 'Interested').length, clients.filter(c => c.status === 'In Progress').length, clients.filter(c => c.status === 'Hold').length, clients.filter(c => c.status === 'Completed').length], backgroundColor: ['#e3f2fd', '#fff3e0', '#ffebee', '#e8f5e9'] }] };
+    if(statusChart) statusChart.destroy();
+    statusChart = new Chart(ctx, { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false } });
 }
 
 function changeLang(l) { 
-    lang = l; 
-    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
-    fillGovs(); renderCRM(); renderRecycle(); renderTasks();
-    document.getElementById('lblConv').innerText = l==='ar'?'معدل التحويل':'Conversion Rate';
-    document.getElementById('lblPotential').innerText = l==='ar'?'صفقات محتملة':'Potential Deals';
-    document.getElementById('lblTopGov').innerText = l==='ar'?'أعلى محافظة':'Top Governorate';
+    lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
+    fillGovs(); renderCRM(); 
 }
 </script>
 </body>
