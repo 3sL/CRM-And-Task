@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading Pro AI CRM - Secure Edition</title>
+    <title>Utopia Pro - Notifications Enabled</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -36,31 +36,32 @@
         th, td { padding:12px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); }
 
+        /* Notification Toast */
+        #notification { 
+            position: fixed; top: 20px; right: 20px; padding: 15px 25px; 
+            border-radius: 12px; display: none; z-index: 99999; 
+            color: white; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
         .dev-box { margin-top:auto; font-size:0.75em; color:#888; padding-top:10px; border-top:1px solid #3f3f6b; }
         .dev-link { color: #25D366; text-decoration: none; font-weight: bold; }
-        #notification { position: fixed; top:20px; right:20px; padding:15px 25px; border-radius:12px; display:none; z-index:30000; color:#fff; font-weight:bold; }
-        
-        @media (max-width: 768px) { #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; height: auto; } .dev-box { display: none; } }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body class="no-select" oncontextmenu="return false;">
 
-<audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 <div id="notification"></div>
 
 <div id="loginOverlay">
     <div class="login-card">
-        <h2 id="loginTitle">Utopia Login</h2>
-        <div id="deviceLockInfo" style="font-size: 9px; color: #aaa; margin-bottom: 10px;">Securing Connection...</div>
+        <h2>Utopia Login</h2>
         <input type="text" id="userInput" placeholder="Username">
         <input type="password" id="passInput" placeholder="Password">
         <button onclick="handleAuth()">Access System</button>
         <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Access Denied!</p>
-        <div style="margin-top:20px; font-size: 0.7em; color: #888;">
-            Authorized Devices Only
-        </div>
     </div>
 </div>
 
@@ -68,6 +69,9 @@
     <div class="sidebar">
         <h2>Utopia Export Pro</h2>
         <p id="welcomeUser" style="font-size: 0.8em; text-align: center; color: #25D366; margin-top: -10px;"></p>
+        
+        <button onclick="enableAudio()" id="audioBtn" style="background: #3f3f6b; border: 1px dashed var(--accent); font-size: 0.8em; margin-bottom: 15px;">🔔 Enable Alerts Sound</button>
+
         <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
@@ -85,9 +89,7 @@
             <h2>Clients Registry</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <input id="search" placeholder="🔍 Quick Search..." oninput="renderCRM()" style="flex:2">
-                <button onclick="document.getElementById('csvFileInput').click()" style="flex:1; background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer;">Import</button>
-                <button onclick="exportData('clients')" style="flex:1; background:#6c757d; color:white; border:none; border-radius:10px; cursor:pointer;">Export</button>
-                <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
+                <button onclick="exportData()" style="flex:1; background:#6c757d; color:white; border:none; border-radius:10px; cursor:pointer;">Export CSV</button>
             </div>
             <div class="row" style="display:flex; gap:10px; flex-wrap:wrap;">
                 <input id="name" placeholder="Name" style="flex:1">
@@ -99,31 +101,20 @@
             </div>
             <textarea id="notes" placeholder="Detailed Notes..."></textarea>
             <div class="row" style="display:flex; gap:10px;">
-                <input id="agent" placeholder="Agent">
+                <input id="agent" placeholder="Agent Name">
                 <input id="followUp" placeholder="Next Action">
                 <input type="date" id="date">
             </div>
             <button class="btn-save" onclick="addOrUpdate()">💾 Save Client Record</button>
-            <div id="statsRow" style="display:flex; gap:10px; margin-top:15px;">
-                <div style="background:#fff; padding:10px; flex:1; border-radius:10px; text-align:center; border-top:3px solid var(--accent)" id="countAll">Total: 0</div>
-                <div style="background:#fff; padding:10px; flex:1; border-radius:10px; text-align:center; border-top:3px solid var(--danger)" id="countHold">Hold: 0</div>
-            </div>
+            
             <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>Tracking</th><th>Status</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>Status</th><th>Actions</th></tr></thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
 
         <div id="dashboardTab" class="tab-content">
             <h2>📊 Analytics Insight</h2>
-            <div style="display:flex; gap:15px; margin-bottom:20px;">
-                <div style="background:#fff; padding:20px; border-radius:15px; flex:1; border-left:5px solid var(--success)">
-                    <small>Conversion</small><h2 id="convRate">0%</h2>
-                </div>
-                <div style="background:#fff; padding:20px; border-radius:15px; flex:1; border-left:5px solid var(--accent)">
-                    <small>Potentials</small><h2 id="potentialDeals">0</h2>
-                </div>
-            </div>
             <div style="background:#fff; padding:20px; border-radius:15px; max-width:500px; margin:auto;">
                 <canvas id="statusChart"></canvas>
             </div>
@@ -133,103 +124,78 @@
             <h2>Operations Tasks</h2>
             <div style="display:flex; gap:10px;">
                 <input id="taskText" placeholder="Task description" style="flex:2">
-                <select id="taskClientSelect" onchange="autoFillTaskPhone()" style="flex:1"></select>
-                <input id="taskPhone" placeholder="Phone" style="flex:1">
                 <input type="date" id="taskDate" style="flex:1">
-                <button onclick="addTask()" style="background:var(--info); color:white; border:none; padding:0 20px; border-radius:10px; cursor:pointer;">Add</button>
+                <button onclick="addTask()" style="background:var(--info); color:white; border:none; padding:0 20px; border-radius:10px; cursor:pointer;">Add Task</button>
             </div>
             <table>
-                <thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Action</th></tr></thead>
+                <thead><tr><th>Task</th><th>Deadline</th><th>Action</th></tr></thead>
                 <tbody id="taskBody"></tbody>
             </table>
         </div>
 
         <div id="recycleTab" class="tab-content">
             <h2 style="color:var(--danger)">♻️ Deleted Records</h2>
-            <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Action</th></tr></thead>
-                <tbody id="recycleBody"></tbody>
-            </table>
+            <tbody id="recycleBody"></tbody>
         </div>
     </div>
 </div>
 
 <script>
-// --- 1. إعدادات الأمان والمستخدمين ---
-const AUTHORIZED_USERS = [
-    { user: 'admin', pass: 'admin123', role: 'SuperAdmin' },
-    { user: 'mahmoud', pass: '2026marie', role: 'Owner' },
-    { user: 'sales1', pass: 'utopia2026', role: 'Sales' }
-];
+// --- AUDIO SYSTEM ---
+const notifySound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
-let currentUser = null;
-let visitorId = "detecting...";
-
-// توليد بصمة الجهاز الفريدة
-async function initSecurity() {
-    const fp = await FingerprintJS.load();
-    const result = await fp.get();
-    visitorId = result.visitorId;
-    document.getElementById('deviceLockInfo').innerText = "Security Token: " + visitorId.substring(0,10).toUpperCase();
+function enableAudio() {
+    notifySound.play().then(() => {
+        notifySound.pause();
+        document.getElementById('audioBtn').innerHTML = "✅ Audio Active";
+        document.getElementById('audioBtn').style.borderColor = "var(--success)";
+        notify("Audio Alerts Enabled!", "success");
+    }).catch(e => console.log("Audio Init Failed"));
 }
-initSecurity();
 
-// منع الاختصارات للحماية
-document.onkeydown = (e) => {
-    if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74))) return false;
-    if(e.ctrlKey && e.keyCode == 85) return false;
-};
+function playAlert() {
+    notifySound.currentTime = 0;
+    notifySound.play().catch(e => console.log("Sound blocked by browser"));
+}
 
-// --- 2. إدارة الدخول ---
+// --- AUTH & SECURITY ---
+const USERS = [{u:'admin', p:'admin123'}, {u:'mahmoud', p:'2026marie'}];
+
 function handleAuth() {
     const u = document.getElementById('userInput').value.toLowerCase();
     const p = document.getElementById('passInput').value;
-    
-    const found = AUTHORIZED_USERS.find(x => x.user === u && x.pass === p);
-    
-    if(found) {
-        currentUser = found;
-        document.getElementById('loginOverlay').style.fadeOut = "0.5s";
-        setTimeout(() => {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'flex';
-            document.getElementById('welcomeUser').innerText = "Logged in as: " + found.user;
-        }, 500);
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userRole', found.role);
-        notify('Access Granted - Welcome ' + found.user, 'success');
+    if(USERS.find(x => x.u === u && x.p === p)) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+        document.getElementById('welcomeUser').innerText = "User: " + u;
+        notify("Welcome back, " + u, "success");
     } else {
         document.getElementById('loginError').style.display = 'block';
-        notify('Invalid Credentials!', 'error');
     }
 }
 
-function logout() { sessionStorage.clear(); location.reload(); }
+function logout() { location.reload(); }
 
-// --- 3. إعدادات Firebase (الأصلية) ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = { 
     apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", 
     authDomain: "crm-tasking.firebaseapp.com", 
     databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", 
-    projectId: "crm-tasking", 
-    storageBucket: "crm-tasking.appspot.com", 
-    messagingSenderId: "368062369619", 
-    appId: "1:368062369619:web:cd38383ab75ab473961ba6" 
+    projectId: "crm-tasking"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- 4. المتغيرات والبيانات ---
-let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
+// --- LOGIC ---
+let clients = [], tasks = [], editIdx = -1;
+const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Beheira", "Suez"];
 
-const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}];
-
-// --- 5. وظائف النظام الأساسية (بدون حذف أي سطر أصلي) ---
-
-function notify(m, t='info') {
+function notify(msg, type='info') {
     const n = document.getElementById('notification');
-    n.innerText = m; n.style.display = 'block';
-    n.style.background = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8';
+    n.innerText = msg;
+    n.style.display = 'block';
+    n.style.background = type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8';
+    if(type === 'success') playAlert();
     setTimeout(() => n.style.display = 'none', 3000);
 }
 
@@ -238,60 +204,56 @@ function showTab(id, btn) {
     document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
-    if(id === 'dashboardTab') updateDashboard();
 }
 
 function fillGovs() {
     const s = document.getElementById('gov');
     s.innerHTML = '<option value="">Governorate</option>';
-    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${g.en}</option>`);
+    govs.forEach(g => s.innerHTML += `<option value="${g}">${g}</option>`);
 }
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
-    if(!n) return notify('Name is required', 'error');
+    if(!n) return notify("Name is required!", "error");
+    
     const obj = {
         name: n, phone: document.getElementById('phone').value,
         gov: document.getElementById('gov').value, status: document.getElementById('status').value,
         notes: document.getElementById('notes').value, agent: document.getElementById('agent').value,
         followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0]
     };
-    if(editIdx > -1) { clients[editIdx] = obj; editIdx = -1; } else { clients.push(obj); }
+
+    if(editIdx > -1) { clients[editIdx] = obj; editIdx = -1; } 
+    else { clients.push(obj); }
+    
     db.ref('clients').set({...clients});
+    notify("Client Saved Successfully", "success");
+    resetForm();
+}
+
+function resetForm() {
     ['name','phone','notes','agent','followUp','date'].forEach(id => document.getElementById(id).value = '');
-    notify('Data Saved Successfully', 'success');
 }
 
 function renderCRM() {
     const b = document.getElementById('tableBody'); b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase();
-    let hCount = 0;
     clients.forEach((c, i) => {
-        if(q && !`${c.name} ${c.phone}`.toLowerCase().includes(q)) return;
-        if(c.status === 'Hold') hCount++;
+        if(q && !c.name.toLowerCase().includes(q)) return;
         b.innerHTML += `<tr>
-            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td>
-            <td><small>${c.date}</small></td><td>${c.status}</td>
+            <td>${c.name}</td><td>${c.phone}</td><td>${c.gov}</td><td>${c.status}</td>
             <td>
-                <button onclick="editClient(${i})" style="background:var(--accent); border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">✏️</button>
-                <button onclick="delClient(${i})" style="background:var(--danger); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">✕</button>
+                <button onclick="editClient(${i})">✏️</button>
+                <button onclick="delClient(${i})" style="color:red">✕</button>
             </td>
         </tr>`;
     });
-    document.getElementById('countAll').innerText = "Total: " + clients.length;
-    document.getElementById('countHold').innerText = "Hold: " + hCount;
-    const ts = document.getElementById('taskClientSelect');
-    if(ts) {
-        ts.innerHTML = '<option value="">Select Client</option>';
-        clients.forEach(c => ts.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-    }
 }
 
 function editClient(i) {
     editIdx = i; const c = clients[i];
     document.getElementById('name').value = c.name;
     document.getElementById('phone').value = c.phone;
-    document.getElementById('gov').value = c.gov;
     document.getElementById('status').value = c.status;
     document.getElementById('notes').value = c.notes;
     document.getElementById('agent').value = c.agent;
@@ -301,100 +263,32 @@ function editClient(i) {
 }
 
 function delClient(i) {
-    if(confirm('Move to Recycle Bin?')) {
-        const d = clients.splice(i, 1)[0];
-        d.deletedAt = new Date().toLocaleString();
-        deletedClients.push(d);
-        syncAll();
+    if(confirm('Delete this client?')) {
+        clients.splice(i, 1);
+        db.ref('clients').set({...clients});
+        notify("Client Deleted", "info");
     }
 }
 
-function syncAll() {
-    db.ref('clients').set({...clients});
-    db.ref('deletedClients').set({...deletedClients});
-}
-
-function updateDashboard() {
-    const total = clients.length;
-    const comp = clients.filter(c => c.status === 'Completed').length;
-    document.getElementById('convRate').innerText = (total > 0 ? Math.round((comp/total)*100) : 0) + '%';
-    document.getElementById('potentialDeals').innerText = clients.filter(c => c.status !== 'Completed').length;
-    
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    const data = { 'Interested':0, 'In Progress':0, 'Hold':0, 'Completed':0 };
-    clients.forEach(c => data[c.status]++);
-
-    if(statusChart) statusChart.destroy();
-    statusChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(data),
-            datasets: [{ data: Object.values(data), backgroundColor: ['#17a2b8','#ffcc00','#dc3545','#28a745'] }]
-        }
-    });
-}
-
 function addTask() {
-    const t = {
-        text: document.getElementById('taskText').value,
-        client: document.getElementById('taskClientSelect').value,
-        phone: document.getElementById('taskPhone').value,
-        date: document.getElementById('taskDate').value,
-        stage: 'New'
-    };
-    if(!t.text) return;
-    tasks.push(t);
+    const txt = document.getElementById('taskText').value;
+    if(!txt) return;
+    tasks.push({ text: txt, date: document.getElementById('taskDate').value });
     db.ref('tasks').set({...tasks});
     document.getElementById('taskText').value = '';
-    notify('Task Added', 'success');
+    notify("Task Added", "success");
 }
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); b.innerHTML = '';
     tasks.forEach((t, i) => {
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:red; color:white; border:none; padding:5px; border-radius:5px;">✕</button></td></tr>`;
+        b.innerHTML += `<tr><td>${t.text}</td><td>${t.date}</td><td><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});">Done</button></td></tr>`;
     });
 }
 
-function autoFillTaskPhone() {
-    const name = document.getElementById('taskClientSelect').value;
-    const c = clients.find(x => x.name === name);
-    if(c) document.getElementById('taskPhone').value = c.phone;
-}
-
-function exportData(type) {
-    let csv = "\uFEFFName,Phone,Status\n";
-    clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.status}"\n`);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Utopia_Export.csv`;
-    link.click();
-}
-
-function importData(e) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        const rows = event.target.result.split('\n').slice(1);
-        rows.forEach(row => {
-            const cols = row.split(',');
-            if(cols[0]) clients.push({ name: cols[0].replace(/"/g,''), phone: cols[1]?.replace(/"/g,'') || '', status: 'Interested', date: new Date().toISOString().split('T')[0] });
-        });
-        db.ref('clients').set({...clients});
-        notify('Imported Successfully', 'success');
-    };
-    reader.readAsText(file);
-}
-
-// --- 6. المستمعات (Listeners) ---
+// Listeners
 db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
-db.ref('deletedClients').on('value', s => {
-    deletedClients = s.val() ? Object.values(s.val()) : [];
-    const b = document.getElementById('recycleBody'); b.innerHTML = '';
-    deletedClients.forEach((c, i) => b.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="clients.push(deletedClients.splice(${i},1)[0]); syncAll();">Restore</button></td></tr>`);
-});
 
 fillGovs();
 </script>
