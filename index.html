@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Tradin Programs CRM & Tasks - Login System</title>
+    <title>Utopia Trading Programs CRM & Tasks</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; }
@@ -16,7 +16,6 @@
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .login-card button:hover { opacity: 0.9; transform: scale(1.02); }
         
-        /* Dev Info in Login Page */
         .login-dev-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #3f3f6b; font-size: 0.85em; color: #bbb; }
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
@@ -41,6 +40,10 @@
         .row > * { flex: 1; min-width: 180px; }
         .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
         
+        /* Export Button Style */
+        .btn-export { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
+        .btn-export:hover { background: #5a6268; }
+
         table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
@@ -70,7 +73,6 @@
         <input type="password" id="passInput" placeholder="Password">
         <button onclick="checkLogin()">Login</button>
         <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Invalid Credentials!</p>
-        
         <div class="login-dev-info">
             <b>Dev By: Eng. Mahmoud Mohamed Marie</b>
             <a href="https://wa.me/201222153415">🟢 +201222153415</a>
@@ -83,7 +85,6 @@
         <h2>Utopia CRM</h2>
         <button class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
-        
         <div class="dev-box">
             <b>Developer Info:</b>
             Eng. Mahmoud Mohamed Marie
@@ -99,7 +100,10 @@
     <div class="main">
         <div id="crmTab" class="tab-content active">
             <h2 id="crmHeader">Clients Registry</h2>
-            <input id="search" placeholder="🔍 Search..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input id="search" placeholder="🔍 Search..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
+                <button class="btn-export" onclick="exportData('clients')">📤 Export Excel</button>
+            </div>
             <div class="row">
                 <input id="name" placeholder="Client Name">
                 <input id="phone" placeholder="Phone Number">
@@ -132,7 +136,10 @@
 
         <div id="tasksTab" class="tab-content">
             <h2>Operations Tasks</h2>
-            <input id="taskSearch" placeholder="🔍 Filter..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input id="taskSearch" placeholder="🔍 Filter..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
+                <button class="btn-export" onclick="exportData('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
+            </div>
             <div class="row">
                 <input id="taskText" placeholder="Task details">
                 <select id="taskClientSelect"><option value="">Client</option></select>
@@ -141,7 +148,7 @@
                     <option value="quote">Quote</option><option value="follow">Follow Up</option>
                     <option value="order">Order</option><option value="bank">Bank</option>
                 </select>
-                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer;">➕</button>
+                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 0 15px;">➕</button>
             </div>
             <table>
                 <thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Del</th></tr></thead>
@@ -152,34 +159,6 @@
 </div>
 
 <script>
-// --- Login Logic ---
-function checkLogin() {
-    const user = document.getElementById('userInput').value;
-    const pass = document.getElementById('passInput').value;
-    const errorMsg = document.getElementById('loginError');
-
-    if (user === 'admin' && pass === 'admin') {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        sessionStorage.setItem('isLoggedIn', 'true');
-        notify('Welcome back, Admin!', 'success');
-    } else {
-        errorMsg.style.display = 'block';
-        play('error');
-    }
-}
-
-function logout() {
-    sessionStorage.removeItem('isLoggedIn');
-    location.reload();
-}
-
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-}
-
-// --- App Config & Firebase ---
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -187,43 +166,65 @@ const db = firebase.database();
 let clients = [], tasks = [], editIdx = -1, lang = 'en';
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}];
 
-function play(soundType) {
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator(); const g = ctx.createGain();
-        osc.connect(g); g.connect(ctx.destination);
-        osc.frequency.value = soundType === 'success' ? 880 : 220;
-        osc.start(); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
-        osc.stop(ctx.currentTime + 0.5);
-    } catch(e){}
+// --- Export Functionality (Fixed for Arabic) ---
+function exportData(type) {
+    let csvContent = "";
+    let filename = "";
+    const BOM = "\uFEFF"; // Byte Order Mark for Excel Arabic Support
+
+    if (type === 'clients') {
+        const headers = lang === 'ar' ? "الاسم,الموبايل,المحافظة,الحالة,الملاحظات" : "Name,Phone,Governorate,Status,Notes";
+        csvContent = headers + "\n";
+        clients.forEach(c => {
+            const gName = lang === 'ar' ? (govs.find(g=>g.en===c.gov)?.ar || c.gov) : c.gov;
+            csvContent += `"${c.name}","${c.phone}","${gName}","${c.status}","${c.notes || ''}"\n`;
+        });
+        filename = "Utopia_Clients.csv";
+    } else {
+        const headers = lang === 'ar' ? "العميل,المهمة,التاريخ,المرحلة" : "Client,Task,Date,Stage";
+        csvContent = headers + "\n";
+        tasks.forEach(t => {
+            csvContent += `"${t.client}","${t.text}","${t.date}","${t.stage}"\n`;
+        });
+        filename = "Utopia_Tasks.csv";
+    }
+
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    notify(lang === 'ar' ? 'تم تصدير الملف بنجاح' : 'Exported Successfully', 'success');
 }
 
-function notify(m, t='info') {
-    const n = document.getElementById('notification');
-    n.innerText = m; n.style.display = 'block';
-    n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8';
-    play(t); setTimeout(() => n.style.display = 'none', 3000);
+// --- Login & Basic Logic ---
+function checkLogin() {
+    if (document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === 'admin') {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+        sessionStorage.setItem('isLoggedIn', 'true');
+        notify('Welcome back!', 'success');
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        play('error');
+    }
 }
+function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
+if (sessionStorage.getItem('isLoggedIn') === 'true') { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; }
 
-function showTab(id, btn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
-}
-
-function fillGovs() {
-    const s = document.getElementById('gov');
-    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`;
-    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`);
-}
+function play(t) { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = t === 'success' ? 880 : 220; o.start(); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5); o.stop(ctx.currentTime + 0.5); } catch(e){} }
+function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; play(t); setTimeout(() => n.style.display = 'none', 3000); }
+function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
+function fillGovs() { const s = document.getElementById('gov'); s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); }
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify('Name required', 'error');
     const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('Updated'); }
-    else { clients.push(c); notify('Saved', 'success'); }
+    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('Updated'); } else { clients.push(c); notify('Saved', 'success'); }
     db.ref('clients').set({...clients});
     document.querySelectorAll('#crmTab input, #crmTab textarea, #crmTab select').forEach(i => { if(i.id !== 'language') i.value = ''; });
     fillGovs();
@@ -238,30 +239,13 @@ function renderCRM() {
         if(c.status === 'Hold') hCount++;
         const rowCls = `status-${c.status.toLowerCase().replace(/\s/g, '')}`;
         const gName = lang === 'ar' ? (govs.find(g=>g.en===c.gov)?.ar || c.gov) : c.gov;
-        b.innerHTML += `<tr class="${rowCls}">
-            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${gName}</td><td>${c.status}</td>
-            <td>
-                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; border-radius:5px; cursor:pointer;">💬</button>
-                <button onclick="editClient(${i})" style="background:#ffc107; border:none; border-radius:5px; cursor:pointer;">✏️</button>
-                <button onclick="delClient(${i})" style="background:#f44336; border:none; border-radius:5px; color:white;">✕</button>
-            </td>
-        </tr>`;
+        b.innerHTML += `<tr class="${rowCls}"><td><b>${c.name}</b></td><td>${c.phone}</td><td>${gName}</td><td>${c.status}</td><td><button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; border:none; border-radius:5px; cursor:pointer;">💬</button> <button onclick="editClient(${i})" style="background:#ffc107; border:none; border-radius:5px; cursor:pointer;">✏️</button> <button onclick="delClient(${i})" style="background:#f44336; border:none; border-radius:5px; color:white;">✕</button></td></tr>`;
     });
     document.getElementById('countAll').innerText = 'Total: ' + clients.length;
     document.getElementById('countHold').innerText = 'Hold: ' + hCount;
 }
 
-function editClient(i) {
-    editIdx = i; const c = clients[i];
-    document.getElementById('name').value = c.name;
-    document.getElementById('phone').value = c.phone;
-    document.getElementById('gov').value = c.gov;
-    document.getElementById('status').value = c.status;
-    document.getElementById('notes').value = c.notes;
-    document.getElementById('agent').value = c.agent;
-    document.getElementById('followUp').value = c.followUp;
-}
-
+function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent; document.getElementById('followUp').value = c.followUp; }
 function delClient(i) { if(confirm('Delete?')) { clients.splice(i,1); db.ref('clients').set({...clients}); } }
 
 function addTask() {
@@ -280,15 +264,9 @@ function renderTasks() {
     });
 }
 
-function changeLang(l) {
-    lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-    fillGovs(); renderCRM(); renderTasks();
-}
+function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); renderTasks(); }
 
-db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); 
-    const sel = document.getElementById('taskClientSelect'); sel.innerHTML = '<option value="">Client</option>';
-    clients.forEach(c => sel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-});
+db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); const sel = document.getElementById('taskClientSelect'); sel.innerHTML = '<option value="">Client</option>'; clients.forEach(c => sel.innerHTML += `<option value="${c.name}">${c.name}</option>`); });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 fillGovs();
 </script>
