@@ -48,6 +48,12 @@
         th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
         
+        .ai-card-container { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .ai-stat-card { background: #fff; padding: 20px; border-radius: 15px; flex: 1; min-width: 200px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
+        .ai-stat-card h3 { margin: 0; font-size: 0.9em; color: #777; }
+        .ai-stat-card p { margin: 10px 0 0; font-size: 1.8em; font-weight: bold; color: var(--primary); }
+        .chart-box { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: auto; }
+
         .status-interested { background: #e3f2fd !important; }
         .status-inprogress { background: #fff3e0 !important; }
         .status-hold { background: #ffebee !important; }
@@ -71,7 +77,6 @@
 <body>
 
 <audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
-
 <div id="notification"></div>
 
 <div id="loginOverlay">
@@ -120,7 +125,7 @@
             <div class="row">
                 <input id="name" placeholder="Client Name">
                 <input id="phone" placeholder="Phone Number">
-                <select id="gov" onchange="triggerTracking()"></select>
+                <select id="gov"></select>
                 <select id="status">
                     <option value="Interested">Interested</option>
                     <option value="In Progress">In Progress</option>
@@ -158,7 +163,9 @@
                 <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">Potential Deals</h3><p id="potentialDeals">0</p></div>
                 <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">Top Governorate</h3><p id="topGov">-</p></div>
             </div>
-            <div class="chart-box"><canvas id="statusChart"></canvas></div>
+            <div class="chart-box">
+                <canvas id="statusChart"></canvas>
+            </div>
         </div>
 
         <div id="recycleTab" class="tab-content">
@@ -205,7 +212,15 @@ if (sessionStorage.getItem('isLoggedIn') === 'true') { document.getElementById('
 
 function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
 
-function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); if(id === 'dashboardTab') updateDashboard(); }
+function showTab(id, btn) { 
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+    btn.classList.add('active'); 
+    if(id === 'dashboardTab') { 
+        setTimeout(updateDashboard, 100); // تأخير بسيط لضمان ظهور الـ Canvas
+    } 
+}
 
 function fillGovs() { const s = document.getElementById('gov'); s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); }
 
@@ -258,31 +273,27 @@ function updateDashboard() {
     document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
     document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
     const gc = {}; clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
-    document.getElementById('topGov').innerText = Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b, '-');
-}
+    document.getElementById('topGov').innerText = Object.keys(gc).length > 0 ? Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b) : '-';
 
-function exportData(type) {
-    let data = type === 'clients' ? clients : tasks;
-    if(data.length === 0) return notify('No data to export', 'error');
-    let csvContent = "\uFEFF"; 
-    csvContent += (type === 'clients' ? "Name,Phone,Governorate,Status,Notes,Agent,Date\n" : "Client,Task,Deadline,Stage\n");
-    data.forEach(item => {
-        let row = type === 'clients' ? 
-            `"${item.name}","${item.phone}","${item.gov}","${item.status}","${item.notes}","${item.agent}","${item.date}"` :
-            `"${item.client}","${item.text}","${item.date}","${item.stage}"`;
-        csvContent += row + "\n";
+    // تهيئة الرسم البياني
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    const counts = { 'Interested': 0, 'In Progress': 0, 'Hold': 0, 'Completed': 0 };
+    clients.forEach(c => { if(counts[c.status] !== undefined) counts[c.status]++; });
+
+    if (statusChart) statusChart.destroy();
+    statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(counts),
+            datasets: [{
+                data: Object.values(counts),
+                backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
     });
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Utopia_${type}_${new Date().toLocaleDateString()}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
 
-// دالة استيراد ذكية جداً تقبل أي ملف CSV
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -291,57 +302,47 @@ function importData(event) {
         try {
             const text = e.target.result;
             const rows = text.split(/\r?\n/).filter(row => row.trim() !== "");
-            if (rows.length < 2) return notify('File is empty or invalid', 'error');
-
             const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
-            const dataRows = rows.slice(1);
             let importedCount = 0;
-
-            dataRows.forEach(row => {
+            rows.slice(1).forEach(row => {
                 const cols = row.split(',').map(c => c.replace(/"/g, '').trim());
                 if (cols.length > 0) {
-                    let clientObj = {
-                        name: "Unknown",
-                        phone: "",
-                        gov: "",
-                        status: "Interested",
-                        notes: "",
-                        agent: "Imported",
-                        date: new Date().toISOString().split('T')[0]
-                    };
-
-                    // البحث الذكي عن البيانات في الأعمدة
+                    let clientObj = { name: "Unknown", phone: "", gov: "", status: "Interested", notes: "", agent: "Imported", date: new Date().toISOString().split('T')[0] };
                     cols.forEach((val, idx) => {
-                        const headerName = headers[idx] || "";
-                        if (headerName.includes("name") || headerName.includes("الاسم") || idx === 0) clientObj.name = val || clientObj.name;
-                        else if (headerName.includes("phone") || headerName.includes("الهاتف") || headerName.includes("موبايل") || /^\d+$/.test(val)) clientObj.phone = val || clientObj.phone;
-                        else if (headerName.includes("gov") || headerName.includes("محافظة")) clientObj.gov = val || clientObj.gov;
-                        else if (headerName.includes("status") || headerName.includes("الحالة")) clientObj.status = val || clientObj.status;
-                        else if (headerName.includes("note") || headerName.includes("ملاحظات")) clientObj.notes = val || clientObj.notes;
-                        else if (headerName.includes("agent") || headerName.includes("مسؤول")) clientObj.agent = val || clientObj.agent;
-                        else if (headerName.includes("date") || headerName.includes("تاريخ")) clientObj.date = val || clientObj.date;
+                        const h = headers[idx] || "";
+                        if (h.includes("name") || h.includes("الاسم") || idx === 0) clientObj.name = val || clientObj.name;
+                        else if (h.includes("phone") || h.includes("الهاتف") || /^\d+$/.test(val)) clientObj.phone = val || clientObj.phone;
+                        else if (h.includes("gov") || h.includes("محافظة")) clientObj.gov = val || clientObj.gov;
+                        else if (h.includes("status") || h.includes("الحالة")) clientObj.status = val || clientObj.status;
+                        else if (h.includes("note") || h.includes("ملاحظات")) clientObj.notes = val || clientObj.notes;
+                        else if (h.includes("agent") || h.includes("مسؤول")) clientObj.agent = val || clientObj.agent;
                     });
-
-                    clients.push(clientObj);
-                    importedCount++;
+                    clients.push(clientObj); importedCount++;
                 }
             });
-
-            if (importedCount > 0) {
-                db.ref('clients').set({...clients});
-                notify(`Imported ${importedCount} records successfully`, 'success');
-            }
-        } catch (err) {
-            notify('Error reading file structure', 'error');
-            console.error(err);
-        }
+            if (importedCount > 0) { db.ref('clients').set({...clients}); notify(`Imported ${importedCount} successfully`, 'success'); }
+        } catch (err) { notify('Error reading file', 'error'); }
     };
     reader.readAsText(file);
-    event.target.value = ''; // إعادة تعيين لتمكين رفع نفس الملف مرة أخرى
+    event.target.value = '';
 }
 
-function delClient(i) { if(confirm(lang==='ar'?'نقل للسلة؟':'Move to Bin?')) { const d = clients.splice(i, 1)[0]; d.deletedAt = new Date().toLocaleDateString(); deletedClients.push(d); syncAll(); notify(lang==='ar'?'تم النقل':'Moved', 'info'); } }
-function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); }
+function exportData(type) {
+    let data = type === 'clients' ? clients : tasks;
+    if(data.length === 0) return notify('No data', 'error');
+    let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date\n" : "Client,Task,Deadline,Stage\n");
+    data.forEach(i => {
+        csv += type === 'clients' ? `"${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n` : `"${i.client}","${i.text}","${i.date}","${i.stage}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Utopia_${type}.csv`;
+    link.click();
+}
+
+function delClient(i) { if(confirm('Move to Bin?')) { const d = clients.splice(i, 1)[0]; d.deletedAt = new Date().toLocaleDateString(); deletedClients.push(d); syncAll(); } }
+function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); }
 function permanentDel(i) { if(confirm('Final Del?')) { deletedClients.splice(i, 1); syncAll(); } }
 function syncAll() { db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients}); }
 
