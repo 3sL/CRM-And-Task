@@ -77,6 +77,8 @@
 </head>
 <body>
 
+<audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
 <div id="notification"></div>
 
 <div id="loginOverlay">
@@ -235,15 +237,31 @@ const govs = [
     {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}
 ];
 
-// --- AI Security & Notifications ---
+// --- Audio & Notification System ---
+function playNotifySound() {
+    const audio = document.getElementById('notifySound');
+    if(audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("Sound enabled after user interaction"));
+    }
+}
+
 function checkDeadlines() {
     const today = new Date().toISOString().split('T')[0];
+    let hasAlert = false;
     tasks.forEach(t => {
-        if(t.date === today) notify(lang === 'ar' ? `تنبيه: مهمة اليوم - ${t.text}` : `Task Reminder: ${t.text}`, 'info');
+        if(t.date === today) {
+            notify(lang === 'ar' ? `تنبيه: مهمة اليوم - ${t.text}` : `Task Reminder: ${t.text}`, 'info');
+            hasAlert = true;
+        }
     });
     clients.forEach(c => {
-        if(c.followUp && c.date === today) notify(lang === 'ar' ? `تذكير متابعة: ${c.name}` : `Follow-up Reminder: ${c.name}`, 'success');
+        if(c.followUp && c.date === today) {
+            notify(lang === 'ar' ? `تذكير متابعة: ${c.name}` : `Follow-up Reminder: ${c.name}`, 'success');
+            hasAlert = true;
+        }
     });
+    if(hasAlert) playNotifySound();
 }
 
 // --- AI Tracking Logic ---
@@ -326,11 +344,11 @@ function syncAll() {
 function checkLogin() {
     const user = document.getElementById('userInput').value;
     const pass = document.getElementById('passInput').value;
-    // تم رفع مستوى الأمان ببيانات دخول مخصصة
     if (user === 'admin' && pass === 'admin123') {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         sessionStorage.setItem('isLoggedIn', 'true');
+        playNotifySound(); // صوت عند الدخول الناجح
         checkDeadlines();
     } else {
         document.getElementById('loginError').style.display = 'block';
@@ -348,6 +366,7 @@ function notify(m, t='info') {
     n.innerText = m; 
     n.style.display = 'block'; 
     n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
+    playNotifySound(); // تشغيل الصوت عند كل إشعار
     setTimeout(() => n.style.display = 'none', 4000); 
 }
 
@@ -382,13 +401,12 @@ function addOrUpdate() {
     if(editIdx > -1) { 
         clients[editIdx] = c; 
         editIdx = -1; 
-        notify('Updated'); 
+        notify('Updated', 'success'); 
     } else { 
         clients.push(c); 
         notify('Saved', 'success'); 
     }
     db.ref('clients').set({...clients});
-    // Clear inputs
     ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('gov').value = '';
     document.getElementById('status').value = 'Interested';
@@ -424,6 +442,7 @@ function renderCRM() {
 
 function updateTaskSelectors() {
     const s = document.getElementById('taskClientSelect');
+    if(!s) return;
     s.innerHTML = '<option value="">Client</option>';
     clients.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
 }
@@ -471,6 +490,7 @@ function addTask() {
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); b.innerHTML = '';
+    if(!b) return;
     const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => {
         if(q && !t.text.toLowerCase().includes(q) && !t.client.toLowerCase().includes(q)) return;
@@ -497,12 +517,13 @@ function changeLang(l) {
 
 function exportData(type) {
     let data = type === 'clients' ? clients : tasks;
+    if(data.length === 0) return notify('No data to export', 'error');
     let csv = "data:text/csv;charset=utf-8,";
     csv += (type === 'clients' ? "Name,Phone,Gov,Status,Notes\n" : "Client,Task,Date,Stage\n");
     data.forEach(item => {
         let row = type === 'clients' ? 
-            `${item.name},${item.phone},${item.gov},${item.status},${item.notes}` :
-            `${item.client},${item.text},${item.date},${item.stage}`;
+            `"${item.name}","${item.phone}","${item.gov}","${item.status}","${item.notes}"` :
+            `"${item.client}","${item.text}","${item.date}","${item.stage}"`;
         csv += row + "\n";
     });
     const encodedUri = encodeURI(csv);
