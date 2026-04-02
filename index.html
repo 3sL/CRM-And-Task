@@ -250,12 +250,11 @@ function checkLogin() {
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
     
-    // يمكنك هنا استبدال "visitorId" بـ ID جهازك الخاص لقفله عليك فقط
     if (u === 'admin' && p === 'admin123') { 
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
         sessionStorage.setItem('isLoggedIn', 'true'); 
-        sessionStorage.setItem('deviceId', visitorId); // حفظ بصمة الجهاز في الجلسة
+        sessionStorage.setItem('deviceId', visitorId); 
         notify('Welcome Admin', 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
@@ -278,7 +277,11 @@ function showTab(id, btn) {
     if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
 }
 
-function fillGovs() { const s = document.getElementById('gov'); s.innerHTML = <option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>; govs.forEach(g => s.innerHTML += <option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>); }
+function fillGovs() { 
+    const s = document.getElementById('gov'); 
+    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
+    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
+}
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
@@ -296,7 +299,7 @@ function renderCRM() {
     const q = document.getElementById('search').value.toLowerCase();
     let hCount = 0;
     clients.forEach((c, i) => {
-        if(q && !${c.name} ${c.phone} ${c.gov}.toLowerCase().includes(q)) return;
+        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
@@ -311,7 +314,11 @@ function renderCRM() {
     });
     document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
-    const ts = document.getElementById('taskClientSelect'); if(ts) { ts.innerHTML = '<option value="">Client</option>'; clients.forEach(c => ts.innerHTML += <option value="${c.name}">${c.name}</option>); }
+    const ts = document.getElementById('taskClientSelect'); 
+    if(ts) { 
+        ts.innerHTML = '<option value="">Client</option>'; 
+        clients.forEach(c => ts.innerHTML += `<option value="${c.name}">${c.name}</option>`); 
+    }
 }
 
 function getTrackingLabel(dateStr) {
@@ -386,12 +393,12 @@ function exportData(type) {
     if(data.length === 0) return notify('No data', 'error');
     let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date\n" : "Client,Phone,Task,Deadline,Stage\n");
     data.forEach(i => {
-        csv += type === 'clients' ? "${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n : "${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n;
+        csv += type === 'clients' ? `"${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n` : `"${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = Utopia_${type}.csv;
+    link.download = `Utopia_${type}.csv`;
     link.click();
 }
 
@@ -438,8 +445,8 @@ function renderTasks() {
     const b = document.getElementById('taskBody'); b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => { 
-        if(q && !${t.client} ${t.text}.toLowerCase().includes(q)) return;
-        b.innerHTML += <tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});">✕</button></td></tr>; 
+        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
+        b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button><button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});">✕</button></td></tr>`; 
     }); 
 }
 
@@ -449,7 +456,7 @@ db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) 
 db.ref('deletedClients').on('value', s => { 
     deletedClients = s.val() ? Object.values(s.val()) : []; 
     const rb = document.getElementById('recycleBody'); rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += <tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>; });
+    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; });
 });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
