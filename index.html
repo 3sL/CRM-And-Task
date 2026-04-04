@@ -86,6 +86,7 @@
         <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
+        <button id="btnUsers" class="tab-btn admin-only" onclick="showTab('usersTab', this)">🔐 Users Management</button>
         <button id="btnRecycle" class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
         <div class="dev-box">
             <b>Developer Info:</b>
@@ -178,6 +179,26 @@
             </div>
             <table><thead><tr><th>Client</th><th>Phone</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Actions</th></tr></thead><tbody id="taskBody"></tbody></table>
         </div>
+
+        <div id="usersTab" class="tab-content">
+            <h2>🔐 Users Management</h2>
+            <div class="row">
+                <input id="newUsername" placeholder="Username">
+                <input id="newPassword" placeholder="Password">
+                <input id="newDisplayName" placeholder="Display Name">
+                <select id="newRole">
+                    <option value="user">User / Employee</option>
+                    <option value="admin">Admin / Manager</option>
+                </select>
+                <button class="btn-save" onclick="addUser()" style="flex: 0.5;">Add User</button>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -191,41 +212,35 @@ async function initFingerprint() {
 }
 initFingerprint();
 
-// منع التلاعب بالكود أو فتح أدوات المطورين بشكل صارم
 document.onkeydown = function(e) {
-    if(event.keyCode == 123) return false; // F12
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
-    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
-    if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; // Ctrl+S
+    if(event.keyCode == 123) return false; 
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
 }
 
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- نظام المستخدمين (يمكنك تعديل الأسماء هنا) ---
-const authSystem = {
-    users: [
-        { u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' },
-        { u: 'user', p: 'user123', role: 'user', displayName: 'Employee Name' } // عدل الاسم هنا
-    ]
-};
+// --- نظام المستخدمين المطور ---
+let authSystem = { users: [] };
 
 function applyRolePermissions() {
     const role = sessionStorage.getItem('userRole');
     const dispName = sessionStorage.getItem('userDisplayName');
     const isAdmin = (role === 'admin');
     
-    // عرض اسم المستخدم في السايدبار
     document.getElementById('welcomeUser').innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
 
-    // إخفاء زر سلة المهملات عن اليوزر
     const recycleBtn = document.getElementById('btnRecycle');
     if(recycleBtn) recycleBtn.style.display = isAdmin ? 'block' : 'none';
 
-    // إخفاء أزرار الاستيراد والتصدير عن اليوزر
+    const usersBtn = document.getElementById('btnUsers');
+    if(usersBtn) usersBtn.style.display = isAdmin ? 'block' : 'none';
+
     document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = isAdmin ? 'inline-block' : 'none';
     });
@@ -246,11 +261,59 @@ function checkLogin() {
         applyRolePermissions();
         renderCRM(); 
         renderTasks();
+        renderUsers();
         notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
         notify('Login Failed', 'error'); 
     } 
+}
+
+function addUser() {
+    const u = document.getElementById('newUsername').value;
+    const p = document.getElementById('newPassword').value;
+    const d = document.getElementById('newDisplayName').value;
+    const r = document.getElementById('newRole').value;
+
+    if(!u || !p || !d) return notify('Fill all user data', 'error');
+    if(authSystem.users.find(user => user.u === u)) return notify('User already exists', 'error');
+
+    authSystem.users.push({ u: u, p: p, role: r, displayName: d });
+    db.ref('authSystem').set(authSystem);
+    notify('User Added Successfully', 'success');
+    document.getElementById('newUsername').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('newDisplayName').value = '';
+}
+
+function deleteUser(index) {
+    if(authSystem.users[index].u === 'admin') return notify('Cannot delete main admin', 'error');
+    if(confirm('Delete this user?')) {
+        authSystem.users.splice(index, 1);
+        db.ref('authSystem').set(authSystem);
+        notify('User Deleted', 'info');
+    }
+}
+
+function renderUsers() {
+    const tbody = document.getElementById('usersTableBody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    authSystem.users.forEach((user, i) => {
+        tbody.innerHTML += `<tr>
+            <td>${user.u}</td>
+            <td>${user.displayName}</td>
+            <td>${user.role}</td>
+            <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px;"></td>
+            <td><button onclick="deleteUser(${i})" style="background:var(--danger); color:white; border:none; padding:5px; border-radius:5px;">Remove</button></td>
+        </tr>`;
+    });
+}
+
+function updateUserPass(i, newPass) {
+    authSystem.users[i].p = newPass;
+    db.ref('authSystem').set(authSystem);
+    notify('Password Updated', 'success');
 }
 
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
@@ -284,10 +347,12 @@ function showTab(id, btn) {
     document.getElementById(id).classList.add('active'); 
     btn.classList.add('active'); 
     if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
+    if(id === 'usersTab') { renderUsers(); }
 }
 
 function fillGovs() { 
     const s = document.getElementById('gov'); 
+    if(!s) return;
     s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
     govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
 }
@@ -312,7 +377,7 @@ function openWhatsApp(phone) {
 }
 
 function renderCRM() {
-    const b = document.getElementById('tableBody'); b.innerHTML = '';
+    const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase();
     const role = sessionStorage.getItem('userRole');
     let hCount = 0;
@@ -320,8 +385,6 @@ function renderCRM() {
         if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
-        
-        // زر الحذف للآدمن فقط
         const delBtn = (role === 'admin') ? `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>` : '';
 
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
@@ -465,7 +528,7 @@ function addTask() {
 }
 
 function renderTasks() { 
-    const b = document.getElementById('taskBody'); b.innerHTML = ''; 
+    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
     const role = sessionStorage.getItem('userRole');
     tasks.forEach((t, i) => { 
@@ -476,6 +539,18 @@ function renderTasks() {
 }
 
 function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
+
+// --- تهيئة البيانات من Firebase ---
+db.ref('authSystem').on('value', s => {
+    if(s.val()) {
+        authSystem = s.val();
+    } else {
+        // إعداد افتراضي لأول مرة فقط
+        authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] };
+        db.ref('authSystem').set(authSystem);
+    }
+    renderUsers();
+});
 
 db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
 db.ref('deletedClients').on('value', s => { 
