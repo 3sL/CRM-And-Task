@@ -424,7 +424,20 @@ function renderCRM() {
         const track = getTrackingLabel(c.date);
         const delBtn = `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>`;
 
-        b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
+       b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
+            <td><b>${c.name}</b></td>
+            <td>${c.phone}</td>
+            <td>${c.gov}</td>
+            <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
+            <td>${c.status}</td>
+            <td>${c.notes || ''}</td>
+            <td>
+                <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
+                <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
+                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
+                ${delBtn}
+            </td>
+        </tr>`;
             <td><b>${c.name}</b></td>
 <td>${c.phone}</td>
 <td>${c.gov}</td>
@@ -715,6 +728,24 @@ db.ref('clients').on('value', s => {
     renderCRM();
     updateTaskClientList();
 });
+    function editClient(i) {
+    editIdx = i; // نحدد أننا الآن في وضع التعديل لهذا العميل
+    const c = clients[i];
+    
+    // وضع البيانات في الخانات العلوية
+    document.getElementById('name').value = c.name;
+    document.getElementById('phone').value = c.phone;
+    document.getElementById('gov').value = c.gov;
+    document.getElementById('status').value = c.status;
+    document.getElementById('notes').value = c.notes || '';
+    document.getElementById('agent').value = c.agent || '';
+    document.getElementById('followUp').value = c.followUp || '';
+    document.getElementById('date').value = c.date;
+    
+    // الطلوع بالشاشة للأعلى لترى البيانات وهي تُعدل
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    notify(lang === 'ar' ? 'تم تحويل البيانات للتعديل' : 'Ready to edit', 'info');
+}
 </script>
 </body>
 </html>
