@@ -9,70 +9,53 @@
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
-        
-        /* حماية إضافية: منع تحديد النصوص في الواجهة الأساسية */
         .no-select { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
-
-        /* --- Login Screen Styling --- */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; transition: 0.5s; }
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
         .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; box-sizing: border-box; outline: none; font-size: 16px; }
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .login-card button:hover { opacity: 0.9; transform: scale(1.02); }
-        
         .login-dev-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #3f3f6b; font-size: 0.85em; color: #bbb; }
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
-
-        /* --- Main App UI --- */
         #mainApp { display: none; width: 100%; height: 100vh; flex-direction: row; }
         .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; }
         .sidebar h2 { font-size:1.3em; margin-bottom:20px; color:var(--accent); text-align:center; border-bottom: 2px solid #2e2e4d; padding-bottom: 10px; }
         .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: left; }
         .sidebar button.active { background:var(--accent); color:var(--primary); }
-        
         .dev-box { margin-top:auto; font-size:0.8em; border-top:1px solid #3f3f6b; padding-top:15px; color:#bbb; }
         .dev-box b { color: var(--accent); display: block; margin-bottom: 5px; }
         .dev-link { color: #25D366; text-decoration: none; font-weight: bold; font-size: 1.1em; display: block; }
-
         .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; }
         .tab-content { display:none; animation:fadeIn 0.4s; }
         .tab-content.active { display:block; }
-        
         input, select, textarea, .btn-save { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #ccc; outline:none; font-size: 14px; }
         .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
         .row > * { flex: 1; min-width: 180px; }
         .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
-        
         .btn-export { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
         .btn-import { background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; margin-right: 5px; }
-        
         table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
-        
         .ai-card-container { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
         .ai-stat-card { background: #fff; padding: 20px; border-radius: 15px; flex: 1; min-width: 200px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
         .ai-stat-card h3 { margin: 0; font-size: 0.9em; color: #777; }
         .ai-stat-card p { margin: 10px 0 0; font-size: 1.8em; font-weight: bold; color: var(--primary); }
-        .chart-box { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: auto; }
-
+        .chart-box { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: auto; height: 300px; position: relative; }
         .status-interested { background: #e3f2fd !important; }
         .status-inprogress { background: #fff3e0 !important; }
         .status-hold { background: #ffebee !important; }
         .status-completed { background: #e8f5e9 !important; }
-        
         .track-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; display: inline-block; }
         .track-new { background: #17a2b8; box-shadow: 0 0 8px #17a2b8; }
         .track-active { background: #28a745; }
         .track-warning { background: #ffc107; color: #333; }
         .track-old { background: #dc3545; }
-
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.5s ease-out; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-
         @media (max-width: 768px) { body { flex-direction: column; overflow: auto; } #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; } .dev-box { display: none; } }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -103,7 +86,6 @@
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
         <button class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
-        
         <div class="dev-box">
             <b>Developer Info:</b>
             Eng. Mahmoud Mohamed Marie
@@ -121,7 +103,7 @@
             <h2 id="crmHeader">Clients Registry</h2>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
-                <button class="btn-import" onclick="document.getElementById('csvFileInput').click()">📥 Import Any CSV (Arabic/English)</button>
+                <button class="btn-import" onclick="document.getElementById('csvFileInput').click()">📥 Import Any CSV</button>
                 <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
                 <button class="btn-export" onclick="exportData('clients')">📤 Export Excel</button>
             </div>
@@ -152,7 +134,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking Status</th><th>Sales Status</th><th>Actions</th>
+                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking</th><th>Status</th><th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -172,7 +154,7 @@
         </div>
 
         <div id="recycleTab" class="tab-content">
-            <h2 style="color: var(--danger);">♻️ Deleted Clients (Recycle Bin)</h2>
+            <h2 style="color: var(--danger);">♻️ Recycle Bin</h2>
             <table>
                 <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr></thead>
                 <tbody id="recycleBody"></tbody>
@@ -199,7 +181,6 @@
 </div>
 
 <script>
-// --- إعدادات الأمان المضافة ---
 let visitorId = "";
 async function initFingerprint() {
     const fp = await FingerprintJS.load();
@@ -209,7 +190,6 @@ async function initFingerprint() {
 }
 initFingerprint();
 
-// منع فتح أدوات المطور (F12)
 document.onkeydown = function(e) {
     if(event.keyCode == 123) return false;
     if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
@@ -218,7 +198,6 @@ document.onkeydown = function(e) {
     if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
 }
 
-// --- كود Firebase الأصلي ---
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -226,8 +205,6 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
-
-// --- وظائف التطبيق الأصلية كما هي ---
 
 function autoFillTaskPhone() {
     const selectedName = document.getElementById('taskClientSelect').value;
@@ -237,29 +214,20 @@ function autoFillTaskPhone() {
 
 function playNotifySound() { 
     const audio = document.getElementById('notifySound'); 
-    if(audio) { 
-        audio.currentTime = 0; 
-        audio.play().catch(e => console.log("Audio blocked. Interaction needed.", e)); 
-    } 
+    if(audio) { audio.currentTime = 0; audio.play().catch(e => console.log("Audio blocked", e)); } 
 }
 
 function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; playNotifySound(); setTimeout(() => n.style.display = 'none', 4000); }
 
-// --- تعديل وظيفة checkLogin لزيادة الحماية ---
 function checkLogin() { 
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
-    
     if (u === 'admin' && p === 'admin123') { 
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
         sessionStorage.setItem('isLoggedIn', 'true'); 
-        sessionStorage.setItem('deviceId', visitorId); 
         notify('Welcome Admin', 'success'); 
-    } else { 
-        document.getElementById('loginError').style.display = 'block'; 
-        notify('Login Failed', 'error'); 
-    } 
+    } else { document.getElementById('loginError').style.display = 'block'; notify('Login Failed', 'error'); } 
 }
 
 if (sessionStorage.getItem('isLoggedIn') === 'true') { 
@@ -288,10 +256,19 @@ function addOrUpdate() {
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
     const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify(lang==='ar'?'تم التحديث بنجاح':'Updated Successfully', 'success'); } else { clients.push(c); notify(lang==='ar'?'تم الحفظ بنجاح':'Saved Successfully', 'success'); }
+    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify(lang==='ar'?'تم التحديث':'Updated', 'success'); } 
+    else { clients.push(c); notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); }
     db.ref('clients').set({...clients});
     ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('gov').value = '';
+}
+
+// دالة إصلاح رابط الواتساب
+function openWhatsApp(phone) {
+    if(!phone) return notify('No phone number', 'error');
+    let cleanPhone = phone.replace(/\D/g, ''); // إزالة أي رموز غير الأرقام
+    if(!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone; // إضافة مفتاح مصر إذا لم يوجد
+    window.open(`https://wa.me/${cleanPhone}`, '_blank');
 }
 
 function renderCRM() {
@@ -305,7 +282,7 @@ function renderCRM() {
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
             <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td><td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
             <td>
-                <button onclick="window.open('https://wa.me/${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
+                <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
                 <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
                 <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
                 <button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
@@ -314,11 +291,7 @@ function renderCRM() {
     });
     document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
-    const ts = document.getElementById('taskClientSelect'); 
-    if(ts) { 
-        ts.innerHTML = '<option value="">Client</option>'; 
-        clients.forEach(c => ts.innerHTML += `<option value="${c.name}">${c.name}</option>`); 
-    }
+    updateDashboard(); // تحديث تلقائي للتحليلات
 }
 
 function getTrackingLabel(dateStr) {
@@ -333,13 +306,16 @@ function getTrackingLabel(dateStr) {
 function updateDashboard() {
     const total = clients.length;
     const completed = clients.filter(c => c.status === 'Completed').length;
-    document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
-    document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
+    if(document.getElementById('convRate')) document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
+    if(document.getElementById('potentialDeals')) document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
+    
     const gc = {}; clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
     const top = Object.keys(gc).length > 0 ? Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b) : '-';
-    document.getElementById('topGov').innerText = top;
+    if(document.getElementById('topGov')) document.getElementById('topGov').innerText = top;
 
-    const ctx = document.getElementById('statusChart').getContext('2d');
+    const canvas = document.getElementById('statusChart');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
     const counts = { 'Interested': 0, 'In Progress': 0, 'Hold': 0, 'Completed': 0 };
     clients.forEach(c => { if(counts[c.status] !== undefined) counts[c.status]++; });
 
@@ -364,8 +340,7 @@ function importData(event) {
     reader.onload = function(e) {
         try {
             const arrayBuffer = e.target.result;
-            let text = new TextDecoder('windows-1256').decode(arrayBuffer);
-            if (!text.includes('')) { text = new TextDecoder('utf-8').decode(arrayBuffer); }
+            let text = new TextDecoder('utf-8').decode(arrayBuffer);
             const rows = text.split(/\r?\n/).filter(row => row.trim() !== "");
             const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
             rows.slice(1).forEach(row => {
@@ -455,8 +430,9 @@ function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? '
 db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
 db.ref('deletedClients').on('value', s => { 
     deletedClients = s.val() ? Object.values(s.val()) : []; 
-    const rb = document.getElementById('recycleBody'); rb.innerHTML = '';
+    const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
     deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; });
+    }
 });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
