@@ -137,9 +137,17 @@
             </div>
             <table>
                 <thead>
-                    <tr>
-                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking</th><th>Status</th><th>Actions</th>
-                    </tr>
+                   <tr>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Gov</th>
+    <th>Tracking</th>
+    <th>Status</th>
+
+    <th>Notes</th> <!-- 👈 أضف ده هنا -->
+
+    <th>Actions</th>
+</tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
@@ -164,7 +172,13 @@
                 <tbody id="recycleBody"></tbody>
             </table>
         </div>
-
+<select id="taskFilterStage" onchange="renderTasks()">
+<option value="">All</option>
+<option value="quote">Quote</option>
+<option value="follow">Follow</option>
+<option value="order">Order</option>
+<option value="bank">Bank</option>
+</select>
         <div id="tasksTab" class="tab-content">
             <h2>Operations Tasks</h2>
             <div style="display: flex; gap: 10px; align-items: center;">
@@ -172,6 +186,7 @@
                 <button class="btn-export admin-only" onclick="exportData('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
             </div>
             <div class="row">
+                <input id="taskNotes" placeholder="Task Notes">
                 <input id="taskText" placeholder="Task details">
                 <select id="taskClientSelect" onchange="autoFillTaskPhone()"><option value="">Client</option></select>
                 <input id="taskPhone" placeholder="Phone Number">
@@ -410,7 +425,15 @@ function renderCRM() {
         const delBtn = `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>`;
 
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
-            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td><td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
+            <td><b>${c.name}</b></td>
+<td>${c.phone}</td>
+<td>${c.gov}</td>
+<td><span class="track-badge ${track.cls}">${track.lab}</span></td>
+<td>${c.status}</td>
+
+<td>${c.notes || ''}</td> <!-- 👈 أضف ده -->
+
+<td>
             <td>
                 <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
                 <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
@@ -579,6 +602,119 @@ db.ref('deletedClients').on('value', s => {
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
 fillGovs();
+    // ================== 🔥 AI + CRM IMPROVEMENTS ==================
+
+// 1. ربط العملاء بالتاسكات
+function updateTaskClientList() {
+    const select = document.getElementById('taskClientSelect');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Client</option>';
+    clients.forEach(c => {
+        select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+    });
+}
+
+// 2. AI Suggestion
+function getAISuggestion(client) {
+    if(client.status === 'Interested') return '📞 Call within 24h';
+    if(client.status === 'In Progress') return '📄 Send quotation';
+    if(client.status === 'Hold') return '🔁 Retry later';
+    if(client.status === 'Completed') return '⭐ Ask referral';
+    return '-';
+}
+
+// 3. تنبيه بالتاسكات المتأخرة
+function checkOverdueTasks() {
+    const today = new Date().toISOString().split('T')[0];
+    const overdue = tasks.filter(t => t.date && t.date < today);
+
+    if(overdue.length > 0){
+        notify(`⚠️ ${overdue.length} Overdue Tasks`, 'error');
+    }
+}
+setInterval(checkOverdueTasks, 60000);
+
+// 4. تعديل addTask بدون حذف الأصل
+const oldAddTask = addTask;
+addTask = function() {
+    const notesInput = document.getElementById('taskNotes');
+
+    const t = { 
+        text: document.getElementById('taskText').value,
+        client: document.getElementById('taskClientSelect').value,
+        phone: document.getElementById('taskPhone').value,
+        date: document.getElementById('taskDate').value,
+        stage: document.getElementById('taskStage').value,
+        notes: notesInput ? notesInput.value : ''
+    };
+
+    if(!t.text) return notify('Task empty', 'error');
+
+    tasks.push(t);
+    db.ref('tasks').set({...tasks});
+    notify('Task Added', 'success');
+};
+
+// 5. تعديل renderTasks
+const oldRenderTasks = renderTasks;
+renderTasks = function() {
+    const b = document.getElementById('taskBody'); 
+    if(!b) return; 
+    b.innerHTML = '';
+
+    const q = document.getElementById('taskSearch').value.toLowerCase();
+    const stageFilter = document.getElementById('taskFilterStage')?.value || '';
+
+    tasks.forEach((t, i) => { 
+        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
+        if(stageFilter && t.stage !== stageFilter) return;
+
+        const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white;">✕</button>`;
+
+        b.innerHTML += `<tr>
+        <td>${t.client}</td>
+        <td>${t.phone || '-'}</td>
+        <td>${t.text}</td>
+        <td>${t.date}</td>
+        <td>${t.stage}</td>
+        <td>${t.notes || '-'}</td>
+        <td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td>
+        </tr>`;
+    });
+};
+
+// 6. Auto Task + منع التكرار
+const oldAddOrUpdate = addOrUpdate;
+addOrUpdate = function() {
+    const phone = document.getElementById('phone').value;
+
+    if(clients.find(cl => cl.phone === phone)){
+        return notify('Client already exists', 'error');
+    }
+
+    oldAddOrUpdate();
+
+    const lastClient = clients[clients.length - 1];
+    if(lastClient){
+        tasks.push({
+            text: 'Initial Follow Up',
+            client: lastClient.name,
+            phone: lastClient.phone,
+            date: lastClient.date,
+            stage: 'follow',
+            notes: 'Auto Generated 🤖'
+        });
+        db.ref('tasks').set({...tasks});
+    }
+};
+
+// 7. تحديث قائمة العملاء في tasks
+db.ref('clients').on('value', s => {
+    clients = s.val() ? Object.values(s.val()) : [];
+    renderCRM();
+    updateTaskClientList();
+});
 </script>
 </body>
 </html>
