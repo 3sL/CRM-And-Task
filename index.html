@@ -260,24 +260,30 @@ function applyRolePermissions() {
 function checkLogin() { 
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
+    
+    // البحث عن المستخدم في النظام
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
 
     if (user) { 
+        // إذا كان المستخدم صحيحاً، سيفتح البرنامج فوراً بغض النظر عن هوية الجهاز
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
         sessionStorage.setItem('isLoggedIn', 'true'); 
         sessionStorage.setItem('userRole', user.role);
         sessionStorage.setItem('userDisplayName', user.displayName);
-        sessionStorage.setItem('currentUserName', user.u); // حفظ اليوزر الحالى
+        sessionStorage.setItem('currentUserName', user.u);
+        
         applyRolePermissions();
         renderCRM(); 
-        renderTasks();
-        renderUsers();
+        if(typeof renderTasks === 'function') renderTasks();
+        if(typeof renderUsers === 'function') renderUsers();
+        
         notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
         notify('Login Failed', 'error'); 
     } 
+}
 }
 
 // وظيفة تغيير الباسورد للمستخدم الحالى
@@ -579,6 +585,55 @@ db.ref('deletedClients').on('value', s => {
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
 fillGovs();
+    // --- 1. إغلاق الدوال المقطوعة ليعود البرنامج للعمل ---
+function syncAll() {
+    db.ref('clients').set({...clients});
+    db.ref('deletedClients').set({...deletedClients});
+    renderCRM();
+    if(typeof renderRecycle === 'function') renderRecycle();
+}
+
+function permanentDel(i) {
+    if(confirm('Delete Forever?')) {
+        deletedClients.splice(i, 1);
+        syncAll();
+        notify('Permanently Deleted', 'error');
+    }
+}
+
+// --- 2. إضافة دالة التعديل (إصلاح مشكلة الزر) ---
+function editClient(i) {
+    editIdx = i; // تحديد الصف المراد تعديله
+    const c = clients[i];
+    
+    // نقل البيانات للحقول العلوية
+    document.getElementById('name').value = c.name || '';
+    document.getElementById('phone').value = c.phone || '';
+    document.getElementById('gov').value = c.gov || '';
+    document.getElementById('status').value = c.status || 'Interested';
+    document.getElementById('notes').value = c.notes || '';
+    document.getElementById('agent').value = c.agent || '';
+    document.getElementById('followUp').value = c.followUp || '';
+    
+    // ضبط التاريخ (إذا لم يوجد نضع تاريخ اليوم)
+    document.getElementById('date').value = c.date || new Date().toISOString().split('T')[0];
+    
+    // الصعود للأعلى لبدء التعديل
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    if(typeof notify === 'function') {
+        notify(lang === 'ar' ? 'وضع التعديل نشط' : 'Edit Mode Active', 'info');
+    }
+}
+
+// --- 3. جلب بيانات المستخدمين (لحل مشكلة الحماية) ---
+db.ref('authSystem').on('value', s => { 
+    if(s.val()) {
+        authSystem = s.val();
+        if(typeof renderUsers === 'function') renderUsers();
+    }
+});
+</script>
 </script>
 </body>
 </html>
