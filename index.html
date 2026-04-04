@@ -370,10 +370,61 @@ function showTab(id, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
     document.getElementById(id).classList.add('active'); 
     btn.classList.add('active'); 
+    
+    // الجزء المضاف لتصليح المشكلة
+    if(id === 'tasksTab') { 
+        updateTaskClientSelect(); 
+        renderTasks();
+    }
+    
     if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
     if(id === 'usersTab') { renderUsers(); }
 }
+// 1. دالة بتملى قائمة العملاء بأسماء الناس اللي في الـ CRM
+function updateTaskClientSelect() {
+    const select = document.getElementById('taskClientSelect');
+    if(!select) return;
+    const currentVal = select.value;
+    select.innerHTML = `<option value="">${lang==='ar'?'العميل':'Client'}</option>`;
+    
+    // بيلف على العملاء ويحط أساميهم في الـ Dropdown
+    clients.forEach(c => {
+        if(c.name) select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+    });
+    select.value = currentVal;
+}
 
+// 2. دالة بتجيب التليفون لوحده أول ما تختار الاسم
+function autoFillTaskPhone() {
+    const selectedName = document.getElementById('taskClientSelect').value;
+    const client = clients.find(c => c.name === selectedName);
+    if(client) { 
+        document.getElementById('taskPhone').value = client.phone || ""; 
+    }
+}
+
+// 3. دالة إضافة المهمة وحفظها في الفايربيز
+function addTask() {
+    const text = document.getElementById('taskText').value;
+    const client = document.getElementById('taskClientSelect').value;
+    const phone = document.getElementById('taskPhone').value;
+    const date = document.getElementById('taskDate').value;
+    const stage = document.getElementById('taskStage').value;
+    
+    if(!text || !client) return notify(lang==='ar'?'برجاء اختيار العميل وتفاصيل المهمة':'Task and Client required', 'error');
+    
+    const newTask = { text, client, phone, date, stage };
+    tasks.push(newTask);
+    
+    // حفظ في فايربيز وتحديث الجدول
+    db.ref('tasks').set({...tasks}).then(() => {
+        notify(lang==='ar'?'تمت إضافة المهمة':'Task Added', 'success');
+        document.getElementById('taskText').value = '';
+        document.getElementById('taskPhone').value = '';
+        document.getElementById('taskDate').value = '';
+        renderTasks(); 
+    });
+}
 function fillGovs() { 
     const s = document.getElementById('gov'); 
     if(!s) return;
@@ -401,9 +452,12 @@ function openWhatsApp(phone) {
 }
 
 function renderCRM() {
-    const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
+    const b = document.getElementById('tableBody'); 
+    if(!b) return; 
+    b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase();
     let hCount = 0;
+    
     clients.forEach((c, i) => {
         if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
@@ -420,11 +474,28 @@ function renderCRM() {
             </td>
         </tr>`;
     });
+
+    // تحديث العدادات
     document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
+    
     updateDashboard();
+
+    // تشغيل تحديث قائمة المهام
+    updateTaskClientSelect(); 
 }
 
+// دالة تحديث قائمة العملاء في صفحة المهام - لازم تكون لوحدها كدة
+function updateTaskClientSelect() {
+    const select = document.getElementById('taskClientSelect');
+    if(!select) return;
+    const val = select.value;
+    select.innerHTML = `<option value="">${lang==='ar'?'العميل':'Client'}</option>`;
+    clients.forEach(c => {
+        if(c.name) select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+    });
+    select.value = val;
+}
 function getTrackingLabel(dateStr) {
     if(!dateStr) return { lab: 'New', cls: 'track-new' };
     const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
