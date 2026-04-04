@@ -579,6 +579,16 @@ db.ref('deletedClients').on('value', s => {
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
 fillGovs();
+    function fillTaskClients() {
+    const select = document.getElementById('taskClientSelect');
+    if(!select) return;
+
+    select.innerHTML = `<option value="">Client</option>`;
+    
+    clients.forEach(c => {
+        select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+    });
+}
 </script>
 </body>
 </html>
