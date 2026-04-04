@@ -87,6 +87,7 @@
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
         <button id="btnRecycle" class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
+        <button id="btnSecurity" class="tab-btn" onclick="showTab('securityTab', this)">🛡️ Change Password</button>
         <button id="btnUsers" class="tab-btn admin-only" onclick="showTab('usersTab', this)">🔐 Users Management</button>
         
         <div class="dev-box">
@@ -200,6 +201,16 @@
                 <tbody id="usersTableBody"></tbody>
             </table>
         </div>
+
+        <div id="securityTab" class="tab-content">
+            <h2 id="secHeader">🛡️ Account Security</h2>
+            <div style="max-width: 400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <p id="secLabel">Change Your Access Password:</p>
+                <input type="password" id="changePassInput" placeholder="New Password" style="margin-bottom: 15px;">
+                <button class="btn-save" onclick="changeMyPassword()" style="background: var(--primary);">Update Password</button>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -235,11 +246,9 @@ function applyRolePermissions() {
     
     document.getElementById('welcomeUser').innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
 
-    // زر سلة المهملات متاح للجميع (أدمن وموظف)
     const recycleBtn = document.getElementById('btnRecycle');
     if(recycleBtn) recycleBtn.style.display = 'block';
 
-    // زر إدارة المستخدمين للأدمن فقط
     const usersBtn = document.getElementById('btnUsers');
     if(usersBtn) usersBtn.style.display = isAdmin ? 'block' : 'none';
 
@@ -258,7 +267,8 @@ function checkLogin() {
         document.getElementById('mainApp').style.display = 'flex'; 
         sessionStorage.setItem('isLoggedIn', 'true'); 
         sessionStorage.setItem('userRole', user.role);
-        sessionStorage.setItem('userDisplayName', user.displayName); 
+        sessionStorage.setItem('userDisplayName', user.displayName);
+        sessionStorage.setItem('currentUserName', user.u); // حفظ اليوزر الحالى
         applyRolePermissions();
         renderCRM(); 
         renderTasks();
@@ -268,6 +278,21 @@ function checkLogin() {
         document.getElementById('loginError').style.display = 'block'; 
         notify('Login Failed', 'error'); 
     } 
+}
+
+// وظيفة تغيير الباسورد للمستخدم الحالى
+function changeMyPassword() {
+    const newPass = document.getElementById('changePassInput').value;
+    const currentU = sessionStorage.getItem('currentUserName');
+    if(!newPass) return notify('Please enter new password', 'error');
+    
+    const userIdx = authSystem.users.findIndex(u => u.u === currentU);
+    if(userIdx > -1) {
+        authSystem.users[userIdx].p = newPass;
+        db.ref('authSystem').set(authSystem);
+        document.getElementById('changePassInput').value = '';
+        notify('Password Updated Successfully', 'success');
+    }
 }
 
 function addUser() {
@@ -303,7 +328,7 @@ function renderUsers() {
             <td>${user.u}</td>
             <td>${user.displayName}</td>
             <td>${user.role}</td>
-            <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px;"></td>
+            <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px; background: #fffbe6; font-weight: bold;"></td>
             <td><button onclick="deleteUser(${i})" style="background:var(--danger); color:white; border:none; padding:5px; border-radius:5px;">Remove</button></td>
         </tr>`;
     });
@@ -377,14 +402,11 @@ function openWhatsApp(phone) {
 function renderCRM() {
     const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase();
-    const role = sessionStorage.getItem('userRole');
     let hCount = 0;
     clients.forEach((c, i) => {
         if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
-        
-        // زر الحذف أصبح متاحاً الآن حتى للموظف طالما سيذهب للسلة
         const delBtn = `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>`;
 
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
@@ -495,7 +517,6 @@ function delClient(i) {
 }
 function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); }
 function permanentDel(i) { 
-    // الحذف النهائي متاح للجميع من السلة أو يمكنك قصر الحذف النهائي فقط للأدمن هنا
     if(confirm('Final Del?')) { 
         deletedClients.splice(i, 1); 
         syncAll(); 
@@ -533,7 +554,6 @@ function addTask() {
 function renderTasks() { 
     const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
-    const role = sessionStorage.getItem('userRole');
     tasks.forEach((t, i) => { 
         if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
         const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
