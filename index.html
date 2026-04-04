@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -366,35 +365,64 @@ if (sessionStorage.getItem('isLoggedIn') === 'true') {
 function logout() { sessionStorage.clear(); location.reload(); }
 
 function showTab(id, btn) { 
+    // 1. إخفاء كل التبويبات وإزالة اللون النشط من الأزرار
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-    document.getElementById(id).classList.add('active'); 
+    
+    // 2. إظهار التبويب المختار وتلوين الزر الخاص به
+    const targetTab = document.getElementById(id);
+    if(targetTab) targetTab.classList.add('active'); 
     btn.classList.add('active'); 
     
-    // الجزء المضاف لتصليح المشكلة
-    if(id === 'tasksTab') { 
-        updateTaskClientSelect(); 
-        renderTasks();
+    // 3. تحديث البيانات بناءً على التبويب المفتوح
+    if (id === 'tasksTab') { 
+        updateTaskClientSelect(); // تحديث أسامي العملاء
+        renderTasks();            // تحديث جدول المهام
     }
+    
+    if (id === 'dashboardTab') { 
+        setTimeout(updateDashboard, 100); 
+    } 
+    
+    if (id === 'usersTab') { 
+        if(typeof renderUsers === "function") renderUsers(); 
+    }
+}
+    
+    // تحديث الإحصائيات إذا كان التبويب هو لوحة التحليل
+    if (id === 'dashboardTab') { 
+        setTimeout(updateDashboard, 100); 
+    } 
+    
+    // تحديث قائمة المستخدمين (لو عندك نظام صلاحيات)
+    if (id === 'usersTab') { 
+        renderUsers(); 
+    }
+}
     
     if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
     if(id === 'usersTab') { renderUsers(); }
 }
 // 1. دالة بتملى قائمة العملاء بأسماء الناس اللي في الـ CRM
+// 1. ملء قائمة العملاء بأسماء من الـ CRM
 function updateTaskClientSelect() {
     const select = document.getElementById('taskClientSelect');
     if(!select) return;
+    
     const currentVal = select.value;
     select.innerHTML = `<option value="">${lang==='ar'?'العميل':'Client'}</option>`;
     
-    // بيلف على العملاء ويحط أساميهم في الـ Dropdown
+    // بيلف على مصفوفة العملاء ويضيفهم للقائمة
     clients.forEach(c => {
-        if(c.name) select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+        if(c.name) {
+            select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+        }
     });
-    select.value = currentVal;
+    
+    select.value = currentVal; // عشان لو كنت مختار اسم ميتشالش وقت التحديث
 }
 
-// 2. دالة بتجيب التليفون لوحده أول ما تختار الاسم
+// 2. سحب رقم التليفون تلقائياً
 function autoFillTaskPhone() {
     const selectedName = document.getElementById('taskClientSelect').value;
     const client = clients.find(c => c.name === selectedName);
@@ -403,7 +431,7 @@ function autoFillTaskPhone() {
     }
 }
 
-// 3. دالة إضافة المهمة وحفظها في الفايربيز
+// 3. إضافة مهمة جديدة وحفظها
 function addTask() {
     const text = document.getElementById('taskText').value;
     const client = document.getElementById('taskClientSelect').value;
@@ -416,13 +444,59 @@ function addTask() {
     const newTask = { text, client, phone, date, stage };
     tasks.push(newTask);
     
-    // حفظ في فايربيز وتحديث الجدول
     db.ref('tasks').set({...tasks}).then(() => {
         notify(lang==='ar'?'تمت إضافة المهمة':'Task Added', 'success');
+        // تفريغ الحقول
         document.getElementById('taskText').value = '';
         document.getElementById('taskPhone').value = '';
         document.getElementById('taskDate').value = '';
         renderTasks(); 
+    });
+}
+
+// 4. زر التعديل (بيطلع البيانات فوق عشان تعدلها)
+function editTask(i) {
+    const t = tasks[i];
+    document.getElementById('taskText').value = t.text;
+    document.getElementById('taskClientSelect').value = t.client;
+    document.getElementById('taskPhone').value = t.phone;
+    document.getElementById('taskDate').value = t.date;
+    document.getElementById('taskStage').value = t.stage;
+
+    // بنشيل المهمة القديمة عشان لما يدوس حفظ تنزل الجديدة مكانها
+    tasks.splice(i, 1);
+    db.ref('tasks').set({...tasks});
+    renderTasks();
+    notify(lang==='ar'?'يمكنك التعديل الآن':'Edit Mode', 'info');
+}
+
+// 5. زر المسح
+function deleteTask(i) {
+    if(confirm(lang==='ar'?'متأكد من الحذف؟':'Delete Task?')) {
+        tasks.splice(i, 1);
+        db.ref('tasks').set({...tasks});
+        renderTasks();
+    }
+}
+
+// 6. عرض جدول المهام (الرسم الفعلي للجدول والزراير)
+function renderTasks() {
+    const b = document.getElementById('taskBody');
+    if(!b) return;
+    b.innerHTML = '';
+    
+    tasks.forEach((t, i) => {
+        b.innerHTML += `<tr>
+            <td>${t.client}</td>
+            <td>${t.phone}</td>
+            <td>${t.text}</td>
+            <td>${t.date}</td>
+            <td>${t.stage}</td>
+            <td>
+                <button onclick="editTask(${i})" style="background:#ffc107; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">✏️</button>
+                <button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">✕</button>
+            </td>
+        </tr>`;
     });
 }
 function fillGovs() { 
