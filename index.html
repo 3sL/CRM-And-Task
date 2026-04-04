@@ -137,17 +137,9 @@
             </div>
             <table>
                 <thead>
-                   <tr>
-    <th>Name</th>
-    <th>Phone</th>
-    <th>Gov</th>
-    <th>Tracking</th>
-    <th>Status</th>
-
-    <th>Notes</th> <!-- 👈 أضف ده هنا -->
-
-    <th>Actions</th>
-</tr>
+                    <tr>
+                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking</th><th>Status</th><th>Actions</th>
+                    </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
@@ -172,13 +164,7 @@
                 <tbody id="recycleBody"></tbody>
             </table>
         </div>
-<select id="taskFilterStage" onchange="renderTasks()">
-<option value="">All</option>
-<option value="quote">Quote</option>
-<option value="follow">Follow</option>
-<option value="order">Order</option>
-<option value="bank">Bank</option>
-</select>
+
         <div id="tasksTab" class="tab-content">
             <h2>Operations Tasks</h2>
             <div style="display: flex; gap: 10px; align-items: center;">
@@ -186,7 +172,6 @@
                 <button class="btn-export admin-only" onclick="exportData('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
             </div>
             <div class="row">
-                <input id="taskNotes" placeholder="Task Notes">
                 <input id="taskText" placeholder="Task details">
                 <select id="taskClientSelect" onchange="autoFillTaskPhone()"><option value="">Client</option></select>
                 <input id="taskPhone" placeholder="Phone Number">
@@ -391,8 +376,8 @@ function showTab(id, btn) {
 function fillGovs() { 
     const s = document.getElementById('gov'); 
     if(!s) return;
-    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
-    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
+    s.innerHTML = <option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>; 
+    govs.forEach(g => s.innerHTML += <option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>); 
 }
 
 function addOrUpdate() {
@@ -411,7 +396,7 @@ function openWhatsApp(phone) {
     if(!phone) return notify('No phone number', 'error');
     let cleanPhone = phone.replace(/\D/g, ''); 
     if(!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone; 
-    window.open(`https://wa.me/${cleanPhone}`, '_blank');
+    window.open(https://wa.me/${cleanPhone}, '_blank');
 }
 
 function renderCRM() {
@@ -419,34 +404,13 @@ function renderCRM() {
     const q = document.getElementById('search').value.toLowerCase();
     let hCount = 0;
     clients.forEach((c, i) => {
-        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
+        if(q && !${c.name} ${c.phone} ${c.gov}.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
-        const delBtn = `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>`;
+        const delBtn = <button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>;
 
-       b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
-            <td><b>${c.name}</b></td>
-            <td>${c.phone}</td>
-            <td>${c.gov}</td>
-            <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
-            <td>${c.status}</td>
-            <td>${c.notes || ''}</td>
-            <td>
-                <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
-                <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
-                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
-                <button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
-            </td>
-        </tr>`;
-            <td><b>${c.name}</b></td>
-<td>${c.phone}</td>
-<td>${c.gov}</td>
-<td><span class="track-badge ${track.cls}">${track.lab}</span></td>
-<td>${c.status}</td>
-
-<td>${c.notes || ''}</td> <!-- 👈 أضف ده -->
-
-<td>
+        b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
+            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td><td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
             <td>
                 <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
                 <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
@@ -533,12 +497,12 @@ function exportData(type) {
     if(data.length === 0) return notify('No data', 'error');
     let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date\n" : "Client,Phone,Task,Deadline,Stage\n");
     data.forEach(i => {
-        csv += type === 'clients' ? `"${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n` : `"${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n`;
+        csv += type === 'clients' ? "${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n : "${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Utopia_${type}.csv`;
+    link.download = Utopia_${type}.csv;
     link.click();
 }
 
@@ -591,9 +555,9 @@ function renderTasks() {
     const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => { 
-        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>`; 
+        if(q && !${t.client} ${t.text}.toLowerCase().includes(q)) return;
+        const delBtn = <button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>;
+        b.innerHTML += <tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>; 
     }); 
 }
 
@@ -609,164 +573,12 @@ db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) 
 db.ref('deletedClients').on('value', s => { 
     deletedClients = s.val() ? Object.values(s.val()) : []; 
     const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; });
+    deletedClients.forEach((c, i) => { rb.innerHTML += <tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>; });
     }
 });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
 fillGovs();
-    // ================== 🔥 AI + CRM IMPROVEMENTS ==================
-
-// 1. ربط العملاء بالتاسكات
-function updateTaskClientList() {
-    const select = document.getElementById('taskClientSelect');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Client</option>';
-    clients.forEach(c => {
-        select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
-    });
-}
-
-// 2. AI Suggestion
-function getAISuggestion(client) {
-    if(client.status === 'Interested') return '📞 Call within 24h';
-    if(client.status === 'In Progress') return '📄 Send quotation';
-    if(client.status === 'Hold') return '🔁 Retry later';
-    if(client.status === 'Completed') return '⭐ Ask referral';
-    return '-';
-}
-
-// 3. تنبيه بالتاسكات المتأخرة
-function checkOverdueTasks() {
-    const today = new Date().toISOString().split('T')[0];
-    const overdue = tasks.filter(t => t.date && t.date < today);
-
-    if(overdue.length > 0){
-        notify(`⚠️ ${overdue.length} Overdue Tasks`, 'error');
-    }
-}
-setInterval(checkOverdueTasks, 60000);
-
-// 4. تعديل addTask بدون حذف الأصل
-const oldAddTask = addTask;
-addTask = function() {
-    const notesInput = document.getElementById('taskNotes');
-
-    const t = { 
-        text: document.getElementById('taskText').value,
-        client: document.getElementById('taskClientSelect').value,
-        phone: document.getElementById('taskPhone').value,
-        date: document.getElementById('taskDate').value,
-        stage: document.getElementById('taskStage').value,
-        notes: notesInput ? notesInput.value : ''
-    };
-
-    if(!t.text) return notify('Task empty', 'error');
-
-    tasks.push(t);
-    db.ref('tasks').set({...tasks});
-    notify('Task Added', 'success');
-};
-
-// 5. تعديل renderTasks
-const oldRenderTasks = renderTasks;
-renderTasks = function() {
-    const b = document.getElementById('taskBody'); 
-    if(!b) return; 
-    b.innerHTML = '';
-
-    const q = document.getElementById('taskSearch').value.toLowerCase();
-    const stageFilter = document.getElementById('taskFilterStage')?.value || '';
-
-    tasks.forEach((t, i) => { 
-        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        if(stageFilter && t.stage !== stageFilter) return;
-
-        const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white;">✕</button>`;
-
-        b.innerHTML += `<tr>
-        <td>${t.client}</td>
-        <td>${t.phone || '-'}</td>
-        <td>${t.text}</td>
-        <td>${t.date}</td>
-        <td>${t.stage}</td>
-        <td>${t.notes || '-'}</td>
-        <td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td>
-        </tr>`;
-    });
-};
-
-// 6. Auto Task + منع التكرار
-const oldAddOrUpdate = addOrUpdate;
-addOrUpdate = function() {
-    const phone = document.getElementById('phone').value;
-
-    if(clients.find(cl => cl.phone === phone)){
-        return notify('Client already exists', 'error');
-    }
-
-    oldAddOrUpdate();
-
-    const lastClient = clients[clients.length - 1];
-    if(lastClient){
-        tasks.push({
-            text: 'Initial Follow Up',
-            client: lastClient.name,
-            phone: lastClient.phone,
-            date: lastClient.date,
-            stage: 'follow',
-            notes: 'Auto Generated 🤖'
-        });
-        db.ref('tasks').set({...tasks});
-    }
-};
-
-// 7. تحديث قائمة العملاء في tasks
-db.ref('clients').on('value', s => {
-    clients = s.val() ? Object.values(s.val()) : [];
-    renderCRM();
-    updateTaskClientList();
-});
-    function editClient(i) {
-    editIdx = i; // نحدد أننا الآن في وضع التعديل لهذا العميل
-    const c = clients[i];
-    
-    // وضع البيانات في الخانات العلوية
-    document.getElementById('name').value = c.name;
-    document.getElementById('phone').value = c.phone;
-    document.getElementById('gov').value = c.gov;
-    document.getElementById('status').value = c.status;
-    document.getElementById('notes').value = c.notes || '';
-    document.getElementById('agent').value = c.agent || '';
-    document.getElementById('followUp').value = c.followUp || '';
-    document.getElementById('date').value = c.date;
-    
-    // الطلوع بالشاشة للأعلى لترى البيانات وهي تُعدل
-    window.scrollTo({top: 0, behavior: 'smooth'});
-    notify(lang === 'ar' ? 'تم تحويل البيانات للتعديل' : 'Ready to edit', 'info');
-}
-    function editClient(i) {
-    editIdx = i; // نحدد أننا الآن في وضع التعديل لهذا العميل
-    const c = clients[i];
-    
-    // وضع البيانات في الخانات العلوية
-    document.getElementById('name').value = c.name;
-    document.getElementById('phone').value = c.phone;
-    document.getElementById('gov').value = c.gov;
-    document.getElementById('status').value = c.status;
-    document.getElementById('notes').value = c.notes || '';
-    document.getElementById('agent').value = c.agent || '';
-    document.getElementById('followUp').value = c.followUp || '';
-    document.getElementById('date').value = c.date;
-    
-    // الطلوع بالشاشة للأعلى لترى البيانات وهي تُعدل
-    window.scrollTo({top: 0, behavior: 'smooth'});
-    
-    if(typeof notify === 'function') {
-        notify(lang === 'ar' ? 'تم تحويل البيانات للتعديل' : 'Ready to edit', 'info');
-    }
-} // <--- تأكد من وجود هذا القوس لإغلاق الدالة
 </script>
 </body>
 </html>
