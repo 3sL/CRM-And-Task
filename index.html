@@ -81,7 +81,8 @@
 
 <div id="mainApp">
     <div class="sidebar">
-        <h2>Utopia Trading For Export</h2>
+        <h2 id="appBrandName">Utopia Trading</h2>
+        <p id="welcomeUser" style="text-align: center; color: #fff; font-size: 0.9em; margin-bottom: 10px; border-bottom: 1px dashed #444; padding-bottom: 10px;"></p>
         <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
@@ -190,30 +191,36 @@ async function initFingerprint() {
 }
 initFingerprint();
 
+// منع التلاعب بالكود أو فتح أدوات المطورين بشكل صارم
 document.onkeydown = function(e) {
-    if(event.keyCode == 123) return false;
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+    if(event.keyCode == 123) return false; // F12
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+    if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; // Ctrl+S
 }
 
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- نظام المستخدمين المضاف ---
+// --- نظام المستخدمين (يمكنك تعديل الأسماء هنا) ---
 const authSystem = {
     users: [
-        { u: 'admin', p: 'admin123', role: 'admin' },
-        { u: 'user', p: 'user123', role: 'user' }
+        { u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' },
+        { u: 'user', p: 'user123', role: 'user', displayName: 'Employee Name' } // عدل الاسم هنا
     ]
 };
 
 function applyRolePermissions() {
     const role = sessionStorage.getItem('userRole');
+    const dispName = sessionStorage.getItem('userDisplayName');
     const isAdmin = (role === 'admin');
     
+    // عرض اسم المستخدم في السايدبار
+    document.getElementById('welcomeUser').innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
+
     // إخفاء زر سلة المهملات عن اليوزر
     const recycleBtn = document.getElementById('btnRecycle');
     if(recycleBtn) recycleBtn.style.display = isAdmin ? 'block' : 'none';
@@ -224,7 +231,6 @@ function applyRolePermissions() {
     });
 }
 
-// تعديل دالة تسجيل الدخول الأصلية لتدعم عدة مستخدمين
 function checkLogin() { 
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
@@ -235,17 +241,17 @@ function checkLogin() {
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
         sessionStorage.setItem('isLoggedIn', 'true'); 
-        sessionStorage.setItem('userRole', user.role); // حفظ الرتبة
+        sessionStorage.setItem('userRole', user.role);
+        sessionStorage.setItem('userDisplayName', user.displayName); 
         applyRolePermissions();
-        renderCRM(); // لإخفاء أزرار الحذف في الجداول
+        renderCRM(); 
         renderTasks();
-        notify('Welcome ' + u, 'success'); 
+        notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
         notify('Login Failed', 'error'); 
     } 
 }
-// --- نهاية نظام المستخدمين ---
 
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 
@@ -315,7 +321,7 @@ function renderCRM() {
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
         
-        // منطق إظهار زر الحذف فقط للآدمن
+        // زر الحذف للآدمن فقط
         const delBtn = (role === 'admin') ? `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>` : '';
 
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
@@ -464,12 +470,12 @@ function renderTasks() {
     const role = sessionStorage.getItem('userRole');
     tasks.forEach((t, i) => { 
         if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        const delBtn = (role === 'admin') ? `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});">✕</button>` : '';
+        const delBtn = (role === 'admin') ? `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>` : '';
         b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>`; 
     }); 
 }
 
-function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); }
+function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
 
 db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
 db.ref('deletedClients').on('value', s => { 
