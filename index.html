@@ -435,7 +435,7 @@ function renderCRM() {
                 <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
                 <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
                 <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
-                ${delBtn}
+                <button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
             </td>
         </tr>`;
             <td><b>${c.name}</b></td>
@@ -746,6 +746,27 @@ db.ref('clients').on('value', s => {
     window.scrollTo({top: 0, behavior: 'smooth'});
     notify(lang === 'ar' ? 'تم تحويل البيانات للتعديل' : 'Ready to edit', 'info');
 }
+    function editClient(i) {
+    editIdx = i; // نحدد أننا الآن في وضع التعديل لهذا العميل
+    const c = clients[i];
+    
+    // وضع البيانات في الخانات العلوية
+    document.getElementById('name').value = c.name;
+    document.getElementById('phone').value = c.phone;
+    document.getElementById('gov').value = c.gov;
+    document.getElementById('status').value = c.status;
+    document.getElementById('notes').value = c.notes || '';
+    document.getElementById('agent').value = c.agent || '';
+    document.getElementById('followUp').value = c.followUp || '';
+    document.getElementById('date').value = c.date;
+    
+    // الطلوع بالشاشة للأعلى لترى البيانات وهي تُعدل
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    
+    if(typeof notify === 'function') {
+        notify(lang === 'ar' ? 'تم تحويل البيانات للتعديل' : 'Ready to edit', 'info');
+    }
+} // <--- تأكد من وجود هذا القوس لإغلاق الدالة
 </script>
 </body>
 </html>
