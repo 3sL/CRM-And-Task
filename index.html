@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -260,30 +261,24 @@ function applyRolePermissions() {
 function checkLogin() { 
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
-    
-    // البحث عن المستخدم في النظام
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
 
     if (user) { 
-        // إذا كان المستخدم صحيحاً، سيفتح البرنامج فوراً بغض النظر عن هوية الجهاز
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
         sessionStorage.setItem('isLoggedIn', 'true'); 
         sessionStorage.setItem('userRole', user.role);
         sessionStorage.setItem('userDisplayName', user.displayName);
-        sessionStorage.setItem('currentUserName', user.u);
-        
+        sessionStorage.setItem('currentUserName', user.u); // حفظ اليوزر الحالى
         applyRolePermissions();
         renderCRM(); 
-        if(typeof renderTasks === 'function') renderTasks();
-        if(typeof renderUsers === 'function') renderUsers();
-        
+        renderTasks();
+        renderUsers();
         notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
         notify('Login Failed', 'error'); 
     } 
-}
 }
 
 // وظيفة تغيير الباسورد للمستخدم الحالى
@@ -382,8 +377,8 @@ function showTab(id, btn) {
 function fillGovs() { 
     const s = document.getElementById('gov'); 
     if(!s) return;
-    s.innerHTML = <option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>; 
-    govs.forEach(g => s.innerHTML += <option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>); 
+    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
+    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
 }
 
 function addOrUpdate() {
@@ -402,7 +397,7 @@ function openWhatsApp(phone) {
     if(!phone) return notify('No phone number', 'error');
     let cleanPhone = phone.replace(/\D/g, ''); 
     if(!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone; 
-    window.open(https://wa.me/${cleanPhone}, '_blank');
+    window.open(`https://wa.me/${cleanPhone}`, '_blank');
 }
 
 function renderCRM() {
@@ -410,10 +405,10 @@ function renderCRM() {
     const q = document.getElementById('search').value.toLowerCase();
     let hCount = 0;
     clients.forEach((c, i) => {
-        if(q && !${c.name} ${c.phone} ${c.gov}.toLowerCase().includes(q)) return;
+        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
-        const delBtn = <button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>;
+        const delBtn = `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>`;
 
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
             <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td><td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
@@ -503,12 +498,12 @@ function exportData(type) {
     if(data.length === 0) return notify('No data', 'error');
     let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date\n" : "Client,Phone,Task,Deadline,Stage\n");
     data.forEach(i => {
-        csv += type === 'clients' ? "${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n : "${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n;
+        csv += type === 'clients' ? `"${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n` : `"${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = Utopia_${type}.csv;
+    link.download = `Utopia_${type}.csv`;
     link.click();
 }
 
@@ -561,9 +556,9 @@ function renderTasks() {
     const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => { 
-        if(q && !${t.client} ${t.text}.toLowerCase().includes(q)) return;
-        const delBtn = <button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>;
-        b.innerHTML += <tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>; 
+        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
+        const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
+        b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>`; 
     }); 
 }
 
@@ -579,61 +574,12 @@ db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) 
 db.ref('deletedClients').on('value', s => { 
     deletedClients = s.val() ? Object.values(s.val()) : []; 
     const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += <tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>; });
+    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; });
     }
 });
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
 fillGovs();
-    // --- 1. إغلاق الدوال المقطوعة ليعود البرنامج للعمل ---
-function syncAll() {
-    db.ref('clients').set({...clients});
-    db.ref('deletedClients').set({...deletedClients});
-    renderCRM();
-    if(typeof renderRecycle === 'function') renderRecycle();
-}
-
-function permanentDel(i) {
-    if(confirm('Delete Forever?')) {
-        deletedClients.splice(i, 1);
-        syncAll();
-        notify('Permanently Deleted', 'error');
-    }
-}
-
-// --- 2. إضافة دالة التعديل (إصلاح مشكلة الزر) ---
-function editClient(i) {
-    editIdx = i; // تحديد الصف المراد تعديله
-    const c = clients[i];
-    
-    // نقل البيانات للحقول العلوية
-    document.getElementById('name').value = c.name || '';
-    document.getElementById('phone').value = c.phone || '';
-    document.getElementById('gov').value = c.gov || '';
-    document.getElementById('status').value = c.status || 'Interested';
-    document.getElementById('notes').value = c.notes || '';
-    document.getElementById('agent').value = c.agent || '';
-    document.getElementById('followUp').value = c.followUp || '';
-    
-    // ضبط التاريخ (إذا لم يوجد نضع تاريخ اليوم)
-    document.getElementById('date').value = c.date || new Date().toISOString().split('T')[0];
-    
-    // الصعود للأعلى لبدء التعديل
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    if(typeof notify === 'function') {
-        notify(lang === 'ar' ? 'وضع التعديل نشط' : 'Edit Mode Active', 'info');
-    }
-}
-
-// --- 3. جلب بيانات المستخدمين (لحل مشكلة الحماية) ---
-db.ref('authSystem').on('value', s => { 
-    if(s.val()) {
-        authSystem = s.val();
-        if(typeof renderUsers === 'function') renderUsers();
-    }
-});
-</script>
 </script>
 </body>
 </html>
