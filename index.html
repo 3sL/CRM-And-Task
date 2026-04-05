@@ -423,7 +423,21 @@ function renderCRM() {
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
     updateDashboard();
 }
+// بعد نهاية renderCRM()
+function fillTaskClientSelects() {
+    // هنا تحط كل select محتاجين يتحدث بقائمة العملاء
+    const selects = document.querySelectorAll('.clientSelect'); // كل select عنده class clientSelect
+    selects.forEach(select => {
+        if (!select) return;
+        select.innerHTML = '<option value="">Select Client</option>'; // اختياري: قيمة فارغة
+        clients.forEach(c => {
+            select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+        });
+    });
+}
 
+// استدعاء الدالة مباشرة بعد renderCRM()
+fillTaskClientSelects();
 function getTrackingLabel(dateStr) {
     if(!dateStr) return { lab: 'New', cls: 'track-new' };
     const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
@@ -537,8 +551,7 @@ function editClient(i) {
     document.getElementById('followUp').value = c.followUp; 
     document.getElementById('date').value = c.date; 
 }
-
-// تعديل العميل من قائمة المهام
+// --- تعديل العميل من قائمة المهام ---
 function editClientFromTask(clientNameEncoded) {
     const clientName = decodeURIComponent(clientNameEncoded);
     const idx = clients.findIndex(c => c.name === clientName);
@@ -550,12 +563,12 @@ function editClientFromTask(clientNameEncoded) {
     }
 }
 
-// إضافة مهمة جديدة
+// --- إضافة مهمة جديدة ---
 function addTask() { 
     const t = {
-        text: document.getElementById('taskText').value,
+        text: document.getElementById('taskText').value.trim(),
         client: document.getElementById('taskClientSelect').value,
-        phone: document.getElementById('taskPhone').value,
+        phone: document.getElementById('taskPhone').value.trim(),
         date: document.getElementById('taskDate').value,
         stage: document.getElementById('taskStage').value
     }; 
@@ -568,15 +581,18 @@ function addTask() {
 
     // تفريغ الحقول بعد الإضافة
     document.getElementById('taskText').value = '';
-    document.getElementById('taskClientSelect').value = '';
     document.getElementById('taskPhone').value = '';
     document.getElementById('taskDate').value = '';
     document.getElementById('taskStage').value = '';
+
+    // إعادة تحديد العميل الافتراضي (أول خيار)
+    const select = document.getElementById('taskClientSelect');
+    if(select.options.length) select.selectedIndex = 0;
     
     renderTasks(); 
 }
 
-// حذف مهمة
+// --- حذف مهمة ---
 function deleteTask(i) {
     if (confirm('Delete this task?')) {
         tasks.splice(i, 1);
@@ -586,7 +602,7 @@ function deleteTask(i) {
     }
 }
 
-// عرض قائمة المهام
+// --- عرض قائمة المهام ---
 function renderTasks() { 
     const b = document.getElementById('taskBody'); 
     if(!b) return; 
@@ -596,7 +612,7 @@ function renderTasks() {
     tasks.forEach((t, i) => { 
         if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
 
-        const delBtn = `<button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
+        const delBtn = `<button onclick="deleteTask(${i})" style="background:#f44336;color:white;border:none;padding:5px;border-radius:5px;cursor:pointer;">✕</button>`;
 
         b.innerHTML += `<tr>
             <td>${t.client}</td>
@@ -605,26 +621,39 @@ function renderTasks() {
             <td>${t.date}</td>
             <td>${t.stage}</td>
             <td>
-                <button onclick="editClientFromTask('${encodeURIComponent(t.client)}')" style="background:#ffc107; border:none; padding:5px; border-radius:5px; cursor:pointer;">✏️</button>
+                <button onclick="editClientFromTask('${encodeURIComponent(t.client)}')" style="background:#ffc107;border:none;padding:5px;border-radius:5px;cursor:pointer;">✏️</button>
                 ${delBtn}
             </td>
         </tr>`;
     }); 
 }
 
-// Listener لتحديث قائمة المهام تلقائياً
-db.ref('tasks').on('value', s => { 
-    tasks = s.val() ? Object.values(s.val()) : []; 
-    renderTasks(); 
+// --- تحديث الـ <select> تلقائياً عند تحميل أو تحديث العملاء ---
+function updateTaskClientSelect() {
+    const sel = document.getElementById('taskClientSelect');
+    if(!sel) return;
+    sel.innerHTML = '';
+    clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.name;
+        opt.text = c.name;
+        sel.appendChild(opt);
+    });
+}
+
+// --- Firebase Listener لتحديث العملاء والمهام تلقائياً ---
+db.ref('clients').on('value', s => {
+    clients = s.val() ? Object.values(s.val()) : [];
+    renderCRM();                 // افترض أن لديك دالة renderCRM()
+    updateTaskClientSelect();    // تحديث select للعملاء في المهام
 });
 
-// Listener لتحديث عملاء الـ CRM تلقائياً
-db.ref('clients').on('value', s => { 
-    clients = s.val() ? Object.values(s.val()) : []; 
-    renderCRM(); 
+db.ref('tasks').on('value', s => {
+    tasks = s.val() ? Object.values(s.val()) : [];
+    renderTasks();
 });
 
-// Listener للعملاء المحذوفين
+// --- Listener للعملاء المحذوفين ---
 db.ref('deletedClients').on('value', s => { 
     deletedClients = s.val() ? Object.values(s.val()) : []; 
     const rb = document.getElementById('recycleBody'); 
@@ -643,7 +672,6 @@ db.ref('deletedClients').on('value', s => {
         });
     }
 });
-
 // تغيير اللغة
 function changeLang(l) { 
     lang = l; 
