@@ -538,11 +538,23 @@ function editClient(i) {
     document.getElementById('date').value = c.date; 
 }
 
-function editClientFromTask(clientName) {
+function editClientFromTask(clientNameEncoded) {
+    const clientName = decodeURIComponent(clientNameEncoded);
     const idx = clients.findIndex(c => c.name === clientName);
-    if(idx > -1) { showTab('crmTab', document.getElementById('btnCrmTab')); editClient(idx); }
+    if (idx > -1) {
+        showTab('crmTab', document.getElementById('btnCrmTab'));
+        editClient(idx);
+    } else {
+        notify('Client not found', 'error');
+    }
 }
-
+function editClientFromTask(clientName) {
+    const idx = clients.findIndex(c => c.name === decodeURIComponent(clientName));
+    if(idx > -1) { 
+        showTab('crmTab', document.getElementById('btnCrmTab')); 
+        editClient(idx); 
+    }
+}
 function addTask() { 
     const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, phone: document.getElementById('taskPhone').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value }; 
     if(!t.text) return notify('Task empty', 'error'); 
@@ -552,15 +564,68 @@ function addTask() {
 }
 
 function renderTasks() { 
-    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
+    const b = document.getElementById('taskBody'); 
+    if(!b) return; 
+    b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
+    
     tasks.forEach((t, i) => { 
         if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>`; 
+        const delBtn = `<button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
+        b.innerHTML += `<tr>
+            <td>${t.client}</td>
+            <td>${t.phone || '-'}</td>
+            <td>${t.text}</td>
+            <td>${t.date}</td>
+            <td>${t.stage}</td>
+            <td>
+                <button onclick="editClientFromTask('${encodeURIComponent(t.client)}')">✏️</button>
+                ${delBtn}
+            </td>
+        </tr>`;
     }); 
 }
+    function addTask() { 
+    const t = {
+        text: document.getElementById('taskText').value,
+        client: document.getElementById('taskClientSelect').value,
+        phone: document.getElementById('taskPhone').value,
+        date: document.getElementById('taskDate').value,
+        stage: document.getElementById('taskStage').value
+    }; 
 
+    if (!t.text) return notify('Task empty', 'error'); 
+
+    tasks.push(t); 
+    db.ref('tasks').set({...tasks}); 
+    notify('Task Added', 'success'); 
+
+    document.getElementById('taskText').value = '';
+    document.getElementById('taskClientSelect').value = '';
+    document.getElementById('taskPhone').value = '';
+    document.getElementById('taskDate').value = '';
+    document.getElementById('taskStage').value = '';
+    
+    renderTasks(); 
+}
+
+function deleteTask(i) {
+    if (confirm('Delete this task?')) {
+        tasks.splice(i, 1);
+        db.ref('tasks').set({...tasks});
+        notify('Task deleted', 'info');
+        renderTasks(); 
+    }
+}
+db.ref('tasks').on('value', s => { 
+    tasks = s.val() ? Object.values(s.val()) : []; 
+    renderTasks(); 
+});
+
+db.ref('clients').on('value', s => { 
+    clients = s.val() ? Object.values(s.val()) : []; 
+    renderCRM(); 
+});
 function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
 
 db.ref('authSystem').on('value', s => {
