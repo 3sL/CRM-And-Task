@@ -144,79 +144,83 @@
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
+
+        <div id="dashboardTab" class="tab-content">
+            <h2>📊 Smart Analytics & AI Insight</h2>
+            <div class="ai-card-container">
+                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">Conversion Rate</h3><p id="convRate">0%</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">Potential Deals</h3><p id="potentialDeals">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">Top Governorate</h3><p id="topGov">-</p></div>
+            </div>
+            <div class="chart-box">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <div id="recycleTab" class="tab-content">
+            <h2 style="color: var(--danger);">♻️ Recycle Bin</h2>
+            <table>
+                <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr></thead>
+                <tbody id="recycleBody"></tbody>
+            </table>
+        </div>
+
+        <div id="tasksTab" class="tab-content">
+            <h2>Operations Tasks</h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input id="taskSearch" placeholder="🔍 Filter..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
+                <button class="btn-export admin-only" onclick="exportData('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
+            </div>
+            <div class="row">
+                <input id="taskText" placeholder="Task details">
+                <select id="taskClientSelect" onchange="autoFillTaskPhone()"><option value="">Client</option></select>
+                <input id="taskPhone" placeholder="Phone Number">
+                <input type="date" id="taskDate">
+                <select id="taskStage"><option value="quote">Quote</option><option value="follow">Follow Up</option><option value="order">Order</option><option value="bank">Bank</option></select>
+                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕</button>
+            </div>
+            <table><thead><tr><th>Client</th><th>Phone</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Actions</th></tr></thead><tbody id="taskBody"></tbody></table>
+        </div>
+
+        <div id="usersTab" class="tab-content">
+            <h2>🔐 Users Management</h2>
+            <div class="row">
+                <input id="newUsername" placeholder="Username">
+                <input id="newPassword" placeholder="Password">
+                <input id="newDisplayName" placeholder="Display Name">
+                <select id="newRole">
+                    <option value="user">User / Employee</option>
+                    <option value="admin">Admin / Manager</option>
+                </select>
+                <button class="btn-save" onclick="addUser()" style="flex: 0.5;">Add User</button>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="securityTab" class="tab-content">
+            <h2 id="secHeader">🛡️ Account Security</h2>
+            <div style="max-width: 400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <p id="secLabel">Change Your Access Password:</p>
+                <input type="password" id="changePassInput" placeholder="New Password" style="margin-bottom: 15px;">
+                <button class="btn-save" onclick="changeMyPassword()" style="background: var(--primary);">Update Password</button>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
-function showTab(tabId, btn) {
-  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-  document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-let clients = [];
-let editIndex = null;
-
-function addOrUpdate() {
-  const name = document.getElementById('name').value;
-  const phone = document.getElementById('phone').value;
-  const gov = document.getElementById('gov').value;
-  const status = document.getElementById('status').value;
-  const notes = document.getElementById('notes').value;
-  const agent = document.getElementById('agent').value;
-  const followUp = document.getElementById('followUp').value;
-  const date = document.getElementById('date').value;
-
-  if (editIndex !== null) {
-    clients[editIndex] = { name, phone, gov, status, notes, agent, followUp, date };
-    editIndex = null;
-  } else {
-    clients.push({ name, phone, gov, status, notes, agent, followUp, date });
-  }
-  renderCRM();
-}
-
-function renderCRM() {
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-  clients.forEach((client, index) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${client.name}</td>
-        <td>${client.phone}</td>
-        <td>${client.gov}</td>
-        <td>${client.followUp || ''}</td>
-        <td>${client.status}</td>
-        <td><button onclick="editClient(${index})">✏️ Edit</button></td>
-      </tr>
-    `;
-  });
-  document.getElementById('countAll').innerText = "Total: " + clients.length;
-  document.getElementById('countHold').innerText = "Hold: " + clients.filter(c => c.status === "Hold").length;
-}
-
-function editClient(index) {
-  const client = clients[index];
-  document.getElementById('name').value = client.name;
-  document.getElementById('phone').value = client.phone;
-  document.getElementById('gov').value = client.gov;
-  document.getElementById('status').value = client.status;
-  document.getElementById('notes').value = client.notes;
-  document.getElementById('agent').value = client.agent;
-  document.getElementById('followUp').value = client.followUp;
-  document.getElementById('date').value = client.date;
-  editIndex = index;
-}
-</script>
-
 let visitorId = "";
 async function initFingerprint() {
     const fp = await FingerprintJS.load();
     const result = await fp.get();
     visitorId = result.visitorId;
-    document.getElementById('deviceLockInfo').innerText = "Device Security Check Passed (ID: " + visitorId + ")";
-
+    document.getElementById('deviceLockInfo').innerText = "Device ID: " + visitorId;
 }
 initFingerprint();
 
