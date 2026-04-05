@@ -269,17 +269,20 @@ function checkLogin() {
         sessionStorage.setItem('userRole', user.role);
         sessionStorage.setItem('userDisplayName', user.displayName);
         sessionStorage.setItem('currentUserName', user.u); // حفظ اليوزر الحالى
+
         applyRolePermissions();
         renderCRM(); 
         renderTasks();
         renderUsers();
+
+        fillTaskClients(); // 🔥 السطر المهم
+
         notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
         notify('Login Failed', 'error'); 
     } 
 }
-
 // وظيفة تغيير الباسورد للمستخدم الحالى
 function changeMyPassword() {
     const newPass = document.getElementById('changePassInput').value;
@@ -385,9 +388,21 @@ function addOrUpdate() {
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
     const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify(lang==='ar'?'تم التحديث':'Updated', 'success'); } 
-    else { clients.push(c); notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); }
+    
+    if(editIdx > -1) { 
+        clients[editIdx] = c; 
+        editIdx = -1; 
+        notify(lang==='ar'?'تم التحديث':'Updated', 'success'); 
+    } 
+    else { 
+        clients.push(c); 
+        notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); 
+    }
+
     db.ref('clients').set({...clients});
+
+    fillTaskClients(); // 🔥 السطر الجديد المهم
+
     ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('gov').value = '';
 }
@@ -569,7 +584,11 @@ db.ref('authSystem').on('value', s => {
     renderUsers();
 });
 
-db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
+db.ref('clients').on('value', s => { 
+    clients = s.val() ? Object.values(s.val()) : []; 
+    renderCRM(); 
+    fillTaskClients(); // 🔥 ربط العملاء بالتاسك
+});
 db.ref('deletedClients').on('value', s => { 
     deletedClients = s.val() ? Object.values(s.val()) : []; 
     const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
