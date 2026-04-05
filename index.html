@@ -618,7 +618,8 @@ function startVoice(){
     rec.start();
 }
 
-// ⚡ Debounce لتحسين الأداء
+<script>
+// ⚡ Debounce
 function debounce(func, wait){
     let timeout;
     return function(...args){
@@ -626,58 +627,34 @@ function debounce(func, wait){
         timeout = setTimeout(()=>func.apply(this,args),wait);
     };
 }
+
+// دالة renderCRM موجودة هنا أو قبل
 const optimizedRenderCRM = debounce(renderCRM, 300);
 
+// 🌙 Dark Mode
+function toggleDarkMode(){ ... }
+if(localStorage.getItem("darkMode") === "true"){ ... }
+
+// 🎤 Voice Input
+function startVoice(){ ... }
+
 // 🧠 AI Suggestion
-function aiSuggest(){
-    let interested = clients.filter(c=>c.status==='Interested').length;
-    if(interested > 5){
-        notify('🔥 ركز على العملاء المهتمين','info');
-    }
-}
+function aiSuggest(){ ... }
 setInterval(aiSuggest, 15000);
 
-// 💾 Backup مشفر
-function backupData(){
-    let data = JSON.stringify({clients, tasks});
-    let encoded = btoa(data);
-    localStorage.setItem("backupCRM", encoded);
-}
+// 💾 Backup
+function backupData(){ ... }
 setInterval(backupData, 20000);
 
-// 📥 Restore Backup
-function restoreBackup(){
-    let data = localStorage.getItem("backupCRM");
-    if(data){
-        let decoded = JSON.parse(atob(data));
-        clients = decoded.clients || [];
-        tasks = decoded.tasks || [];
-        optimizedRenderCRM;
-        renderTasks();
-        notify('Backup Restored','success');
-    }
-}
+// 📥 Restore
+function restoreBackup(){ ... }
 
 // 🌙 Dark CSS
 const style = document.createElement('style');
-style.innerHTML = `
-.dark-mode {
-    background:#111 !important;
-    color:#eee !important;
-}
-.dark-mode table {
-    background:#1e1e1e !important;
-}
-.dark-mode input, .dark-mode textarea {
-    background:#333 !important;
-    color:#fff !important;
-}
-`;
+style.innerHTML = ` ... `;
 document.head.appendChild(style);
 
 </script>
-
-<!-- 🔥 ADDITIONS END -->
 ```
 
 </body>
