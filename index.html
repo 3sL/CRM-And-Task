@@ -563,26 +563,127 @@ function editClient(i) {
     document.getElementById('date').value = c.date; 
 }
 
-function editClientFromTask(clientName) {
-    const idx = clients.findIndex(c => c.name === clientName);
-    if(idx > -1) { showTab('crmTab', document.getElementById('btnCrmTab')); editClient(idx); }
-}
-
-function addTask() { 
-    const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, phone: document.getElementById('taskPhone').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value }; 
-    if(!t.text) return notify('Task empty', 'error'); 
-    tasks.push(t); 
-    db.ref('tasks').set({...tasks}); 
-    notify('Task Added', 'success'); 
-}
-
 function renderTasks() { 
     const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
     tasks.forEach((t, i) => { 
         if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
         const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>`; 
+        
+        // تعديل هنا: أضفنا زر لتعديل التاسك نفسه وزر لتعديل بيانات العميل
+        b.innerHTML += `<tr>
+            <td>${t.client}</td>
+            <td>${t.phone || '-'}</td>
+            <td>${t.text}</td>
+            <td>${t.date}</td>
+            <td>${t.stage}</td>
+            // 1. المتغير ده لازم يكون بره خالص عشان يفضل فاكر إحنا بنعدل أنهي مهمة
+let taskEditIdx = -1; 
+
+// 2. دالة رسم الجدول (بترسم الأزرار بس)
+function renderTasks() { 
+    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
+    const q = document.getElementById('taskSearch').value.toLowerCase();
+    
+    tasks.forEach((t, i) => { 
+        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
+        const delBtn = `<button onclick="if(confirm('Delete?')){tasks.splice(${i},1); db.ref('tasks').set({...tasks});}" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
+        
+        b.innerHTML += `<tr>
+            <td>${t.client}</td>
+            <td>${t.phone || '-'}</td>
+            <td>${t.text}</td>
+            <td>${t.date}</td>
+            <td>${t.stage}</td>
+            <td>
+                <button onclick="prepareTaskEdit(${i})" style="background:#ffc107; border:none; padding:5px; border-radius:5px; cursor:pointer; margin-right:2px;">✏️ Task</button>
+                <button onclick="editClientFromTask('${t.client}')" style="background:#17a2b8; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">👤 Client</button>
+                ${delBtn}
+            </td>
+        </tr>`;
+    }); 
+}
+
+// 3. دالة التجهيز للتعديل (دي دالة مستقلة بذاتها)
+function prepareTaskEdit(i) {
+    taskEditIdx = i; 
+    const t = tasks[i];
+    
+    // الأسطر دي بتملا الخانات اللي فوق بالبيانات القديمة عشان تعدلها
+    document.getElementById('taskText').value = t.text || "";
+    document.getElementById('taskClientSelect').value = t.client || "";
+    document.getElementById('taskPhone').value = t.phone || "";
+    document.getElementById('taskDate').value = t.date || "";
+    document.getElementById('taskStage').value = t.stage || "quote";
+    
+    notify(lang === 'ar' ? 'تم تجهيز البيانات للتعديل' : 'Ready to edit', 'info');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function addTask() { 
+    const t = { 
+        text: document.getElementById('taskText').value, 
+        client: document.getElementById('taskClientSelect').value, 
+        phone: document.getElementById('taskPhone').value, 
+        date: document.getElementById('taskDate').value, 
+        stage: document.getElementById('taskStage').value 
+    }; 
+    
+    if(!t.text) return notify(lang === 'ar' ? 'التفاصيل مطلوبة' : 'Task empty', 'error'); 
+
+    // فحص: هل نحن في وضع التعديل؟
+    if(taskEditIdx > -1) {
+        tasks[taskEditIdx] = t; // تحديث المهمة في مكانها
+        taskEditIdx = -1; // إعادة الضبط لوضع الإضافة
+        notify(lang === 'ar' ? 'تم تحديث المهمة' : 'Task Updated', 'success');
+    } else {
+        // وضع الإضافة العادي
+        tasks.push(t); 
+        notify(lang === 'ar' ? 'تم إضافة المهمة' : 'Task Added', 'success'); 
+    }
+
+    // حفظ في Firebase ومزامنة الجدول
+    db.ref('tasks').set({...tasks}); 
+    
+    // تنظيف الحقول بعد الحفظ
+    document.getElementById('taskText').value = '';
+    document.getElementById('taskPhone').value = '';
+    document.getElementById('taskDate').value = '';
+    document.getElementById('taskClientSelect').value = '';
+}
+    // حفظ في Firebase
+    db.ref('tasks').set({...tasks}); 
+    
+    // مسح الخانات عشان تكون جاهزة لإدخال جديد
+    document.getElementById('taskText').value = '';
+    document.getElementById('taskPhone').value = '';
+    document.getElementById('taskDate').value = '';
+    document.getElementById('taskClientSelect').value = '';
+}
+
+function renderTasks() { 
+    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
+    const q = document.getElementById('taskSearch').value.toLowerCase();
+    
+    tasks.forEach((t, i) => { 
+        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
+        
+        // زرار الحذف مع تأكيد
+        const delBtn = `<button onclick="if(confirm('Delete Task?')){tasks.splice(${i},1); db.ref('tasks').set({...tasks});}" style="background:#f44336; color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;">✕</button>`;
+        
+        b.innerHTML += `<tr>
+            <td>${t.client}</td>
+            <td>${t.phone || '-'}</td>
+            <td>${t.text}</td>
+            <td>${t.date}</td>
+            <td>${t.stage}</td>
+            <td>
+                <button onclick="prepareTaskEdit(${i})" style="background:#ffc107; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; margin-right:2px;">✏️</button>
+                
+                <button onclick="editClientFromTask('${t.client}')" style="background:#17a2b8; color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;">👤</button>
+                
+                ${delBtn}
+            </td>
+        </tr>`; 
     }); 
 }
 
