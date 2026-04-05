@@ -652,7 +652,7 @@ function restoreBackup(){
         let decoded = JSON.parse(atob(data));
         clients = decoded.clients || [];
         tasks = decoded.tasks || [];
-        renderCRM();
+        optimizedRenderCRM;
         renderTasks();
         notify('Backup Restored','success');
     }
