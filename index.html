@@ -619,6 +619,9 @@ function prepareTaskEdit(i) {
     notify(lang === 'ar' ? 'تم تجهيز البيانات للتعديل' : 'Ready to edit', 'info');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+// تأكد إن السطر ده موجود فوق الدالة بره خالص
+let taskEditIdx = -1; 
+
 function addTask() { 
     const t = { 
         text: document.getElementById('taskText').value, 
@@ -628,16 +631,16 @@ function addTask() {
         stage: document.getElementById('taskStage').value 
     }; 
     
+    // التحقق من أن النص ليس فارغاً
     if(!t.text) return notify(lang === 'ar' ? 'التفاصيل مطلوبة' : 'Task empty', 'error'); 
 
-    // فحص: هل نحن في وضع التعديل؟
+    // --- الجزء السحري للتعديل ---
     if(taskEditIdx > -1) {
         tasks[taskEditIdx] = t; // تحديث المهمة في مكانها
         taskEditIdx = -1; // إعادة الضبط لوضع الإضافة
         notify(lang === 'ar' ? 'تم تحديث المهمة' : 'Task Updated', 'success');
     } else {
-        // وضع الإضافة العادي
-        tasks.push(t); 
+        tasks.push(t); // إضافة مهمة جديدة
         notify(lang === 'ar' ? 'تم إضافة المهمة' : 'Task Added', 'success'); 
     }
 
@@ -649,17 +652,10 @@ function addTask() {
     document.getElementById('taskPhone').value = '';
     document.getElementById('taskDate').value = '';
     document.getElementById('taskClientSelect').value = '';
-}
-    // حفظ في Firebase
-    db.ref('tasks').set({...tasks}); 
     
-    // مسح الخانات عشان تكون جاهزة لإدخال جديد
-    document.getElementById('taskText').value = '';
-    document.getElementById('taskPhone').value = '';
-    document.getElementById('taskDate').value = '';
-    document.getElementById('taskClientSelect').value = '';
+    // تحديث الجدول فوراً
+    if(typeof renderTasks === 'function') renderTasks();
 }
-
 function renderTasks() { 
     const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
