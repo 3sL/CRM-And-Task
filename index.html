@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -106,7 +107,7 @@
         <div id="crmTab" class="tab-content active">
             <h2 id="crmHeader">Clients Registry</h2>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="optimizedRenderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
+                <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
                 <button class="btn-import admin-only" onclick="document.getElementById('csvFileInput').click()">📥 Import Any CSV</button>
                 <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
                 <button class="btn-export admin-only" onclick="exportData('clients')">📤 Export Excel</button>
@@ -580,82 +581,5 @@ db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []
 
 fillGovs();
 </script>
-    ```html
-<!-- 🔥 ADDITIONS START (تمت إضافتها بدون حذف أي كود من كودك) -->
-
-<!-- Dark Mode Button -->
-<button onclick="toggleDarkMode()" style="position:fixed;bottom:20px;left:20px;z-index:9999;padding:10px;border-radius:10px;border:none;background:#000;color:#fff;">
-🌙
-</button>
-
-<!-- Voice Input Button -->
-<button onclick="startVoice()" style="position:fixed;bottom:70px;left:20px;z-index:9999;padding:10px;border-radius:10px;border:none;background:#17a2b8;color:#fff;">
-🎤
-</button>
-
-<script>
-// 🌙 Dark Mode
-function toggleDarkMode(){
-    document.body.classList.toggle("dark-mode");
-    localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
-}
-if(localStorage.getItem("darkMode") === "true"){
-    document.body.classList.add("dark-mode");
-}
-
-// 🎤 Voice Input
-function startVoice(){
-    if (!('webkitSpeechRecognition' in window)) {
-        notify('Voice not supported','error');
-        return;
-    }
-    let rec = new webkitSpeechRecognition();
-    rec.lang = 'ar-EG';
-    rec.onresult = e => {
-        document.getElementById('name').value = e.results[0][0].transcript;
-        notify('Voice Captured','success');
-    };
-    rec.start();
-}
-
-<script>
-// ⚡ Debounce
-function debounce(func, wait){
-    let timeout;
-    return function(...args){
-        clearTimeout(timeout);
-        timeout = setTimeout(()=>func.apply(this,args),wait);
-    };
-}
-
-// دالة renderCRM موجودة هنا أو قبل
-const optimizedRenderCRM = debounce(renderCRM, 300);
-
-// 🌙 Dark Mode
-function toggleDarkMode(){ ... }
-if(localStorage.getItem("darkMode") === "true"){ ... }
-
-// 🎤 Voice Input
-function startVoice(){ ... }
-
-// 🧠 AI Suggestion
-function aiSuggest(){ ... }
-setInterval(aiSuggest, 15000);
-
-// 💾 Backup
-function backupData(){ ... }
-setInterval(backupData, 20000);
-
-// 📥 Restore
-function restoreBackup(){ ... }
-
-// 🌙 Dark CSS
-const style = document.createElement('style');
-style.innerHTML = ` ... `;
-document.head.appendChild(style);
-
-</script>
-```
-
 </body>
 </html>
