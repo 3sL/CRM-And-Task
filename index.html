@@ -555,6 +555,7 @@ function editClientFromTask(clientName) {
         editClient(idx); 
     }
 }
+    
 function addTask() { 
     const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, phone: document.getElementById('taskPhone').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value }; 
     if(!t.text) return notify('Task empty', 'error'); 
@@ -585,7 +586,7 @@ function renderTasks() {
         </tr>`;
     }); 
 }
-    function addTask() { 
+   function addTask() { 
     const t = {
         text: document.getElementById('taskText').value,
         client: document.getElementById('taskClientSelect').value,
@@ -617,7 +618,7 @@ function deleteTask(i) {
         renderTasks(); 
     }
 }
-db.ref('tasks').on('value', s => { 
+    db.ref('tasks').on('value', s => { 
     tasks = s.val() ? Object.values(s.val()) : []; 
     renderTasks(); 
 });
