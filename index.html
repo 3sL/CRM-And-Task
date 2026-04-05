@@ -619,69 +619,46 @@ function prepareTaskEdit(i) {
     notify(lang === 'ar' ? 'تم تجهيز البيانات للتعديل' : 'Ready to edit', 'info');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-// تأكد إن السطر ده موجود فوق الدالة بره خالص
-let taskEditIdx = -1; 
+<script>
+    // --- 1. المتغيرات العامة (فوق خالص) ---
+    let visitorId = "";
+    let taskEditIdx = -1; // <--- ده مكانه الصح هنا
 
-function addTask() { 
-    const t = { 
-        text: document.getElementById('taskText').value, 
-        client: document.getElementById('taskClientSelect').value, 
-        phone: document.getElementById('taskPhone').value, 
-        date: document.getElementById('taskDate').value, 
-        stage: document.getElementById('taskStage').value 
-    }; 
-    
-    // التحقق من أن النص ليس فارغاً
-    if(!t.text) return notify(lang === 'ar' ? 'التفاصيل مطلوبة' : 'Task empty', 'error'); 
+    // ... أي أكواد تانية عندك ...
 
-    // --- الجزء السحري للتعديل ---
-    if(taskEditIdx > -1) {
-        tasks[taskEditIdx] = t; // تحديث المهمة في مكانها
-        taskEditIdx = -1; // إعادة الضبط لوضع الإضافة
-        notify(lang === 'ar' ? 'تم تحديث المهمة' : 'Task Updated', 'success');
-    } else {
-        tasks.push(t); // إضافة مهمة جديدة
-        notify(lang === 'ar' ? 'تم إضافة المهمة' : 'Task Added', 'success'); 
+    // --- 2. الدالة (بتتحط في وسط الدوال التانية عادي) ---
+    function addTask() { 
+        const t = { 
+            text: document.getElementById('taskText').value, 
+            client: document.getElementById('taskClientSelect').value, 
+            phone: document.getElementById('taskPhone').value, 
+            date: document.getElementById('taskDate').value, 
+            stage: document.getElementById('taskStage').value 
+        }; 
+        
+        if(!t.text) return notify(lang === 'ar' ? 'التفاصيل مطلوبة' : 'Task empty', 'error'); 
+
+        if(taskEditIdx > -1) {
+            tasks[taskEditIdx] = t; 
+            taskEditIdx = -1; 
+            notify(lang === 'ar' ? 'تم تحديث المهمة' : 'Task Updated', 'success');
+        } else {
+            tasks.push(t); 
+            notify(lang === 'ar' ? 'تم إضافة المهمة' : 'Task Added', 'success'); 
+        }
+
+        db.ref('tasks').set({...tasks}); 
+        
+        document.getElementById('taskText').value = '';
+        document.getElementById('taskPhone').value = '';
+        document.getElementById('taskDate').value = '';
+        document.getElementById('taskClientSelect').value = '';
+
+        if(typeof renderTasks === 'function') renderTasks();
     }
-
-    // حفظ في Firebase ومزامنة الجدول
-    db.ref('tasks').set({...tasks}); 
     
-    // تنظيف الحقول بعد الحفظ
-    document.getElementById('taskText').value = '';
-    document.getElementById('taskPhone').value = '';
-    document.getElementById('taskDate').value = '';
-    document.getElementById('taskClientSelect').value = '';
-    
-    // تحديث الجدول فوراً
-    if(typeof renderTasks === 'function') renderTasks();
-}
-function renderTasks() { 
-    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
-    const q = document.getElementById('taskSearch').value.toLowerCase();
-    
-    tasks.forEach((t, i) => { 
-        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        
-        // زرار الحذف مع تأكيد
-        const delBtn = `<button onclick="if(confirm('Delete Task?')){tasks.splice(${i},1); db.ref('tasks').set({...tasks});}" style="background:#f44336; color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;">✕</button>`;
-        
-        b.innerHTML += `<tr>
-            <td>${t.client}</td>
-            <td>${t.phone || '-'}</td>
-            <td>${t.text}</td>
-            <td>${t.date}</td>
-            <td>${t.stage}</td>
-            <td>
-                <button onclick="prepareTaskEdit(${i})" style="background:#ffc107; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; margin-right:2px;">✏️</button>
-                
-                <button onclick="editClientFromTask('${t.client}')" style="background:#17a2b8; color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;">👤</button>
-                
-                ${delBtn}
-            </td>
-        </tr>`; 
-    }); 
-}
+    // ... باقي الدوال (renderTasks, prepareTaskEdit) ...
+</script>
 
 function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
 
