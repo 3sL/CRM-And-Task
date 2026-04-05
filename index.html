@@ -106,7 +106,7 @@
         <div id="crmTab" class="tab-content active">
             <h2 id="crmHeader">Clients Registry</h2>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
+                <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="optimizedRenderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
                 <button class="btn-import admin-only" onclick="document.getElementById('csvFileInput').click()">📥 Import Any CSV</button>
                 <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
                 <button class="btn-export admin-only" onclick="exportData('clients')">📤 Export Excel</button>
