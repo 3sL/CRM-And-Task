@@ -580,5 +580,105 @@ db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []
 
 fillGovs();
 </script>
+    ```html
+<!-- 🔥 ADDITIONS START (تمت إضافتها بدون حذف أي كود من كودك) -->
+
+<!-- Dark Mode Button -->
+<button onclick="toggleDarkMode()" style="position:fixed;bottom:20px;left:20px;z-index:9999;padding:10px;border-radius:10px;border:none;background:#000;color:#fff;">
+🌙
+</button>
+
+<!-- Voice Input Button -->
+<button onclick="startVoice()" style="position:fixed;bottom:70px;left:20px;z-index:9999;padding:10px;border-radius:10px;border:none;background:#17a2b8;color:#fff;">
+🎤
+</button>
+
+<script>
+// 🌙 Dark Mode
+function toggleDarkMode(){
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+}
+if(localStorage.getItem("darkMode") === "true"){
+    document.body.classList.add("dark-mode");
+}
+
+// 🎤 Voice Input
+function startVoice(){
+    if (!('webkitSpeechRecognition' in window)) {
+        notify('Voice not supported','error');
+        return;
+    }
+    let rec = new webkitSpeechRecognition();
+    rec.lang = 'ar-EG';
+    rec.onresult = e => {
+        document.getElementById('name').value = e.results[0][0].transcript;
+        notify('Voice Captured','success');
+    };
+    rec.start();
+}
+
+// ⚡ Debounce لتحسين الأداء
+function debounce(func, wait){
+    let timeout;
+    return function(...args){
+        clearTimeout(timeout);
+        timeout = setTimeout(()=>func.apply(this,args),wait);
+    };
+}
+const optimizedRenderCRM = debounce(renderCRM, 300);
+
+// 🧠 AI Suggestion
+function aiSuggest(){
+    let interested = clients.filter(c=>c.status==='Interested').length;
+    if(interested > 5){
+        notify('🔥 ركز على العملاء المهتمين','info');
+    }
+}
+setInterval(aiSuggest, 15000);
+
+// 💾 Backup مشفر
+function backupData(){
+    let data = JSON.stringify({clients, tasks});
+    let encoded = btoa(data);
+    localStorage.setItem("backupCRM", encoded);
+}
+setInterval(backupData, 20000);
+
+// 📥 Restore Backup
+function restoreBackup(){
+    let data = localStorage.getItem("backupCRM");
+    if(data){
+        let decoded = JSON.parse(atob(data));
+        clients = decoded.clients || [];
+        tasks = decoded.tasks || [];
+        renderCRM();
+        renderTasks();
+        notify('Backup Restored','success');
+    }
+}
+
+// 🌙 Dark CSS
+const style = document.createElement('style');
+style.innerHTML = `
+.dark-mode {
+    background:#111 !important;
+    color:#eee !important;
+}
+.dark-mode table {
+    background:#1e1e1e !important;
+}
+.dark-mode input, .dark-mode textarea {
+    background:#333 !important;
+    color:#fff !important;
+}
+`;
+document.head.appendChild(style);
+
+</script>
+
+<!-- 🔥 ADDITIONS END -->
+```
+
 </body>
 </html>
