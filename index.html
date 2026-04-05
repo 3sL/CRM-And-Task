@@ -387,7 +387,17 @@ function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
-    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
+const c = {
+    id: Date.now(),
+    name: n,
+    phone: document.getElementById('phone').value,
+    gov: document.getElementById('gov').value,
+    status: document.getElementById('status').value,
+    notes: document.getElementById('notes').value,
+    agent: document.getElementById('agent').value,
+    followUp: document.getElementById('followUp').value,
+    date: document.getElementById('date').value || today
+};
     
     if(editIdx > -1) { 
         clients[editIdx] = c; 
