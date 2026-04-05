@@ -233,11 +233,141 @@ document.onkeydown = function(e) {
     if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
 }
 
-const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
+const firebaseConfig = { 
+    apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", 
+    authDomain: "crm-tasking.firebaseapp.com", 
+    databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", 
+    projectId: "crm-tasking", 
+    storageBucket: "crm-tasking.appspot.com", 
+    messagingSenderId: "368062369619", 
+    appId: "1:368062369619:web:cd38383ab75ab473961ba6" 
+};
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let authSystem = { users: [] };
+// 1. تعريف المتغيرات العامة (Data State)
+let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, editIdx = -1, lang = 'en', statusChart = null;
+
+// 2. إدارة الصلاحيات (Permissions)
+function applyRolePermissions() {
+    const role = sessionStorage.getItem('userRole');
+    const dispName = sessionStorage.getItem('userDisplayName');
+    const isAdmin = (role === 'admin');
+    
+    if(document.getElementById('welcomeUser')) 
+        document.getElementById('welcomeUser').innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
+
+    if(document.getElementById('btnUsers')) 
+        document.getElementById('btnUsers').style.display = isAdmin ? 'block' : 'none';
+
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = isAdmin ? 'inline-block' : 'none';
+    });
+}
+
+// 3. تحديث الداشبورد والرسوم البيانية (Dashboard & Charts)
+function updateDashboard() {
+    const total = clients.length;
+    const completed = clients.filter(c => c.status === 'Completed').length;
+    
+    if(document.getElementById('convRate')) 
+        document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
+    
+    if(document.getElementById('potentialDeals')) 
+        document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
+    
+    const gc = {}; 
+    clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
+    
+    const top = Object.keys(gc).length > 0 ? Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b) : '-';
+    if(document.getElementById('topGov')) document.getElementById('topGov').innerText = top;
+    
+    const canvas = document.getElementById('statusChart');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const counts = { 'Interested': 0, 'In Progress': 0, 'Hold': 0, 'Completed': 0 };
+    clients.forEach(c => { if(counts[c.status] !== undefined) counts[c.status]++; });
+
+    if (statusChart instanceof Chart) { statusChart.destroy(); }
+
+    statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(counts),
+            datasets: [{
+                data: Object.values(counts),
+                backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+
+// 4. إدارة العملاء (CRM Logic)
+function renderCRM() {
+    const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
+    const q = document.getElementById('search') ? document.getElementById('search').value.toLowerCase() : '';
+    let hCount = 0;
+    
+    clients.forEach((c, i) => {
+        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
+        if(c.status === 'Hold') hCount++;
+        const track = getTrackingLabel(c.date);
+        
+        b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
+            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td><td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
+            <td>
+                <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
+                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
+                <button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
+            </td>
+        </tr>`;
+    });
+    
+    if(document.getElementById('countAll')) document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
+    if(document.getElementById('countHold')) document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
+    updateDashboard();
+}
+
+// 5. ربط البيانات المباشر مع Firebase (Realtime Listeners)
+db.ref('authSystem').on('value', s => {
+    authSystem = s.val() || { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] };
+    if(typeof renderUsers === 'function') renderUsers();
+});
+
+db.ref('clients').on('value', s => { 
+    clients = s.val() ? Object.values(s.val()) : []; 
+    renderCRM(); 
+});
+
+db.ref('tasks').on('value', s => { 
+    tasks = s.val() ? Object.values(s.val()) : []; 
+    if(typeof renderTasks === 'function') renderTasks(); 
+});
+
+// 6. وظائف مساعدة (Helpers)
+function getTrackingLabel(dateStr) {
+    if(!dateStr) return { lab: 'New', cls: 'track-new' };
+    const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 1) return { lab: (lang === 'ar' ? 'نشط' : 'Active'), cls: 'track-new' };
+    return { lab: (lang === 'ar' ? 'متابعة' : 'Old'), cls: 'track-old' };
+}
+
+function openWhatsApp(phone) {
+    if(!phone) return;
+    let cleanPhone = phone.replace(/\D/g, ''); 
+    if(!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone; 
+    window.open(`https://wa.me/${cleanPhone}`, '_blank');
+}
+
+function notify(m, t='info') { 
+    const n = document.getElementById('notification'); 
+    if(n) {
+        n.innerText = m; n.style.display = 'block'; 
+        n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
+        setTimeout(() => n.style.display = 'none', 4000); 
+    }
+}
 
 function applyRolePermissions() {
     const role = sessionStorage.getItem('userRole');
