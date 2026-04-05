@@ -627,6 +627,7 @@ function prepareTaskEdit(i) {
     // ... أي أكواد تانية عندك ...
 
     // --- 2. الدالة (بتتحط في وسط الدوال التانية عادي) ---
+   // --- 1. دالة إضافة وتحديث المهمة ---
     function addTask() { 
         const t = { 
             text: document.getElementById('taskText').value, 
@@ -638,7 +639,7 @@ function prepareTaskEdit(i) {
         
         if(!t.text) return notify(lang === 'ar' ? 'التفاصيل مطلوبة' : 'Task empty', 'error'); 
 
-        if(taskEditIdx > -1) {
+        if(typeof taskEditIdx !== 'undefined' && taskEditIdx > -1) {
             tasks[taskEditIdx] = t; 
             taskEditIdx = -1; 
             notify(lang === 'ar' ? 'تم تحديث المهمة' : 'Task Updated', 'success');
@@ -656,30 +657,47 @@ function prepareTaskEdit(i) {
 
         if(typeof renderTasks === 'function') renderTasks();
     }
-    
-    // ... باقي الدوال (renderTasks, prepareTaskEdit) ...
-</script>
 
-function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
-
-db.ref('authSystem').on('value', s => {
-    if(s.val()) { authSystem = s.val(); } 
-    else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] }; db.ref('authSystem').set(authSystem); }
-    renderUsers();
-});
-
-db.ref('clients').on('value', s => { 
-    clients = s.val() ? Object.values(s.val()) : []; 
-    renderCRM(); 
-    fillTaskClients(); // 🔥 ربط العملاء بالتاسك
-});
-db.ref('deletedClients').on('value', s => { 
-    deletedClients = s.val() ? Object.values(s.val()) : []; 
-    const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; });
+    // --- 2. دوال النظام الأساسية ---
+    function changeLang(l) { 
+        lang = l; 
+        document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
+        if(typeof fillGovs === 'function') fillGovs(); 
+        if(typeof renderCRM === 'function') renderCRM(); 
+        if(typeof applyRolePermissions === 'function') applyRolePermissions(); 
     }
-});
-db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+
+    // --- 3. الربط مع Firebase (المزامنة الحية) ---
+    db.ref('authSystem').on('value', s => {
+        if(s.val()) { authSystem = s.val(); } 
+        else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] }; db.ref('authSystem').set(authSystem); }
+        if(typeof renderUsers === 'function') renderUsers();
+    });
+
+    db.ref('clients').on('value', s => { 
+        clients = s.val() ? Object.values(s.val()) : []; 
+        if(typeof renderCRM === 'function') renderCRM(); 
+        if(typeof fillTaskClients === 'function') fillTaskClients(); 
+    });
+
+    db.ref('deletedClients').on('value', s => { 
+        deletedClients = s.val() ? Object.values(s.val()) : []; 
+        const rb = document.getElementById('recycleBody'); 
+        if(rb) { 
+            rb.innerHTML = '';
+            deletedClients.forEach((c, i) => { 
+                rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; 
+            });
+        }
+    });
+
+    db.ref('tasks').on('value', s => { 
+        tasks = s.val() ? Object.values(s.val()) : []; 
+        if(typeof renderTasks === 'function') renderTasks(); 
+    });
+
+// تأكد إن السكريبت بيقفل هنا بس في نهاية كل الأكواد
+</script>
 
 fillGovs();
     function fillTaskClients() {
