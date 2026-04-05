@@ -215,7 +215,8 @@ async function initFingerprint() {
     const fp = await FingerprintJS.load();
     const result = await fp.get();
     visitorId = result.visitorId;
-    document.getElementById('deviceLockInfo').innerText = "Device ID: " + visitorId;
+    document.getElementById('deviceLockInfo').innerText = "Device Security Check Passed (ID: " + visitorId + ")";
+
 }
 initFingerprint();
 
