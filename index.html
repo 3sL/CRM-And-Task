@@ -424,35 +424,63 @@ function applyRolePermissions() {
 function checkLogin() { 
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
-    const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
+    
+    // 1. البحث في البيانات القادمة من Firebase
+    let user = null;
+    if (typeof authSystem !== 'undefined' && authSystem.users) {
+        user = authSystem.users.find(acc => acc.u === u && acc.p === p);
+    }
+
+    // 2. خطة بديلة (دخول طوارئ) إذا لم تكن البيانات قد حملت بعد أو كانت القاعدة فارغة
+    if (!user && u === 'admin' && p === 'admin123') {
+        user = { 
+            u: 'admin', 
+            p: 'admin123', 
+            role: 'admin', 
+            displayName: 'المدير الرئيسي (نظام الطوارئ)' 
+        };
+    }
 
     if (user) { 
+        // إخفاء شاشة الدخول وإظهار التطبيق
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
+        
+        // تخزين بيانات الجلسة
         sessionStorage.setItem('isLoggedIn', 'true'); 
         sessionStorage.setItem('userRole', user.role);
         sessionStorage.setItem('userDisplayName', user.displayName);
         sessionStorage.setItem('currentUserName', user.u);
         
-        applyRolePermissions();
-        renderCRM(); 
-        renderTasks();
-        renderUsers();
-        updateClientSelect();
+        // تشغيل الوظائف الأساسية بعد الدخول
+        if (typeof applyRolePermissions === 'function') applyRolePermissions();
+        if (typeof renderCRM === 'function') renderCRM(); 
+        if (typeof renderTasks === 'function') renderTasks();
+        if (typeof renderUsers === 'function') renderUsers();
+        if (typeof updateClientSelect === 'function') updateClientSelect();
 
+        // تشغيل الخريطة بعد ثانية للتأكد من استقرار الواجهة
         setTimeout(() => { 
-            if (document.getElementById('customerMap')) {
+            if (document.getElementById('customerMap') && typeof initMap === 'function') {
                 initMap();
             }
-        }, 500);
+        }, 1000);
 
         notify('مرحباً ' + user.displayName, 'success'); 
+        
+        // إخفاء رسالة الخطأ إذا كانت ظاهرة
+        if (document.getElementById('loginError')) {
+            document.getElementById('loginError').style.display = 'none';
+        }
     } else { 
-        document.getElementById('loginError').style.display = 'block'; 
-        notify('فشل تسجيل الدخول', 'error'); 
+        // إظهار رسالة الخطأ في حالة فشل البيانات
+        if (document.getElementById('loginError')) {
+            document.getElementById('loginError').style.display = 'block'; 
+            document.getElementById('loginError').innerText = 'بيانات الدخول غير صحيحة';
+        }
+        notify('فشل تسجيل الدخول: تأكد من اسم المستخدم وكلمة المرور', 'error'); 
     } 
 }
-
 function changeMyPassword() {
     const newPass = document.getElementById('changePassInput').value;
     const currentU = sessionStorage.getItem('currentUserName');
