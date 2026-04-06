@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
+    <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng. Mahmoud Mohamed Marie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -13,7 +13,6 @@
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="console.log('Leaflet CSS failed')" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="console.log('Leaflet JS failed')"></script>
-    
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
@@ -23,7 +22,6 @@
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
         .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; box-sizing: border-box; outline: none; font-size: 16px; }
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .login-card button:hover { opacity: 0.9; transform: scale(1.02); }
         .login-dev-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #3f3f6b; font-size: 0.85em; color: #bbb; }
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
@@ -38,15 +36,6 @@
         .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; }
         .tab-content { display:none; animation:fadeIn 0.4s; }
         .tab-content.active { display:block; }
-        input, select, textarea, .btn-save { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #ccc; outline:none; font-size: 14px; }
-        .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
-        .row > * { flex: 1; min-width: 180px; }
-        .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
-        table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
-        th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
-        th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
-        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.5s ease-out; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body>
@@ -60,8 +49,8 @@
         <input type="password" id="passInput" placeholder="Password" value="admin123">
         <button onclick="checkLogin()">Login</button>
         <div class="login-dev-info">
-            <b>Developed By Eng. Mahmoud Marie</b>
-            <a href="https://wa.me/201016622416">WhatsApp: +201016622416</a>
+            <b>Developed By Eng. Mahmoud Mohamed Marie</b>
+            <a href="https://wa.me/201222153415">WhatsApp: +201222153415</a>
         </div>
     </div>
 </div>
@@ -74,80 +63,12 @@
         <button onclick="showTab('tasksTab', this)">Tasks</button>
         <button onclick="showTab('mapTab', this)">Map View</button>
         <div class="dev-box">
-            <b>Eng. Mahmoud Marie</b>
-            <a href="https://wa.me/201016622416" class="dev-link">Contact Developer</a>
+            <b>Eng. Mahmoud Mohamed Marie</b>
+            <a href="https://wa.me/201222153415" class="dev-link">Contact Developer</a>
         </div>
     </div>
     <div class="main">
-
-    <div class="main">
-        <div id="crmTab" class="tab-content active">
-            <h2 id="crmHeader">سجل العملاء</h2>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <div class="advanced-search-row">
-                    <input id="search" placeholder="🔍 بحث بالاسم أو الهاتف أو المحافظة..." oninput="renderCRM()" style="border: 2px solid var(--accent);">
-                    <select id="searchStatusFilter" onchange="renderCRM()">
-                        <option value="all">📌 جميع الحالات</option>
-                        <option value="Interested">🤝 مهتم</option>
-                        <option value="In Progress">🚀 قيد التقدم</option>
-                        <option value="Hold">⏸ قيد الانتظار</option>
-                        <option value="Completed">✅ مكتمل</option>
-                    </select>
-                    <button class="reset-search" onclick="resetSearch()">🔄 إعادة ضبط البحث</button>
-                </div>
-                <button class="btn-import admin-only" onclick="document.getElementById('csvFileInput').click()">📥 استيراد CSV</button>
-                <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
-                <button class="btn-export admin-only" onclick="exportData('clients')">📤 تصدير Excel</button>
-            </div>
-            <div class="row">
-                <input id="name" placeholder="اسم العميل">
-                <input id="phone" placeholder="رقم الهاتف">
-                <select id="gov"></select>
-                <select id="status">
-                    <option value="Interested">مهتم</option>
-                    <option value="In Progress">قيد التقدم</option>
-                    <option value="Hold">قيد الانتظار</option>
-                    <option value="Completed">مكتمل</option>
-                </select>
-            </div>
-            <div class="row">
-                <div style="flex:2; display:flex; gap:5px;">
-                    <textarea id="notes" placeholder="ملاحظات..." style="flex:1;"></textarea>
-                    <button id="voiceNotesBtn" class="voice-btn" onclick="startVoiceInput('notes')" title="🎤 إدخال بالصوت">🎤</button>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
-                    <input id="agent" placeholder="اسم المسؤول">
-                    <input id="followUp" placeholder="الإجراء التالي">
-                    <input type="date" id="date">
-                </div>
-            </div>
-            <div class="row">
-                <div style="flex:1;">
-                    <input id="locationAddress" placeholder="📍 عنوان العميل (اختياري)">
-                    <button type="button" class="location-btn" onclick="getCurrentLocation()">📍 تحديد موقعي الحالي</button>
-                </div>
-            </div>
-            <div id="locationPreview" class="map-preview" style="display:none;"></div>
-            <button class="btn-save" onclick="addOrUpdate()">💾 حفظ البيانات</button>
-            <div class="row" style="margin-top: 20px;">
-                <div class="card" id="countAll">الإجمالي: 0</div>
-                <div class="card" id="countHold" style="border-top-color: var(--danger);">قيد الانتظار: 0</div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>الاسم</th><th>الهاتف</th><th>المحافظة</th><th>التتبع</th><th>الحالة</th><th>الموقع</th><th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-
-        <div id="dashboardTab" class="tab-content">
-            <h2>📊 التحليلات الذكية</h2>
-            <div class="ai-card-container">
-                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">نسبة التحويل</h3><p id="convRate">0%</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">الصفقات المحتملة</h3><p id="potentialDeals">0</p></div>
+3 id="lblPotential">الصفقات المحتملة</h3><p id="potentialDeals">0</p></div>
                 <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">أكثر محافظة</h3><p id="topGov">-</p></div>
             </div>
             <div class="chart-box">
