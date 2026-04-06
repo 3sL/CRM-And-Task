@@ -1,153 +1,92 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Leaflet Map Libraries with error handling -->
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="console.log('Leaflet CSS failed')" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="console.log('Leaflet JS failed')"></script>
+
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
         .no-select { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; transition: 0.5s; }
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
         .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; box-sizing: border-box; outline: none; font-size: 16px; }
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .login-card button:hover { opacity: 0.9; transform: scale(1.02); }
+        
         .login-dev-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #3f3f6b; font-size: 0.85em; color: #bbb; }
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
+
         #mainApp { display: none; width: 100%; height: 100vh; flex-direction: row; }
         .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; }
         .sidebar h2 { font-size:1.3em; margin-bottom:20px; color:var(--accent); text-align:center; border-bottom: 2px solid #2e2e4d; padding-bottom: 10px; }
-        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: left; }
+        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: right; }
         .sidebar button.active { background:var(--accent); color:var(--primary); }
+        
         .dev-box { margin-top:auto; font-size:0.8em; border-top:1px solid #3f3f6b; padding-top:15px; color:#bbb; }
         .dev-box b { color: var(--accent); display: block; margin-bottom: 5px; }
         .dev-link { color: #25D366; text-decoration: none; font-weight: bold; font-size: 1.1em; display: block; }
+
         .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; }
         .tab-content { display:none; animation:fadeIn 0.4s; }
         .tab-content.active { display:block; }
+        
+        /* التنسيقات العامة للجداول والمدخلات */
         input, select, textarea, .btn-save { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #ccc; outline:none; font-size: 14px; }
-        .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
-        .row > * { flex: 1; min-width: 180px; }
-        .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
-        .btn-export { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
-        .btn-import { background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; margin-right: 5px; }
         table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
-        .ai-card-container { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
-        .ai-stat-card { background: #fff; padding: 20px; border-radius: 15px; flex: 1; min-width: 200px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
-        .ai-stat-card h3 { margin: 0; font-size: 0.9em; color: #777; }
-        .ai-stat-card p { margin: 10px 0 0; font-size: 1.8em; font-weight: bold; color: var(--primary); }
-        .chart-box { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: auto; height: 300px; position: relative; }
-        .status-interested { background: #e3f2fd !important; }
-        .status-inprogress { background: #fff3e0 !important; }
-        .status-hold { background: #ffebee !important; }
-        .status-completed { background: #e8f5e9 !important; }
-        .track-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; display: inline-block; }
-        .track-new { background: #17a2b8; box-shadow: 0 0 8px #17a2b8; }
-        .track-active { background: #28a745; }
-        .track-warning { background: #ffc107; color: #333; }
-        .track-old { background: #dc3545; }
-        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.5s ease-out; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        @media (max-width: 768px) { body { flex-direction: column; overflow: auto; } #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; } .dev-box { display: none; } }
         
-        .advanced-search-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .advanced-search-row select, .advanced-search-row input {
-            flex: 1;
-            min-width: 150px;
-            margin: 0;
-        }
-        .advanced-search-row button {
-            padding: 12px 20px;
-            background: var(--accent);
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            color: var(--primary);
-        }
-        .advanced-search-row button.reset-search {
-            background: #6c757d;
-            color: white;
-        }
-        .edit-name-btn {
-            background: #ffc107;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 5px;
-        }
-        .show-client-task-btn {
-            background: #17a2b8;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 5px;
-            font-size: 11px;
-        }
-        .client-badge {
-            display: inline-block;
-            background: #e0e0e0;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            margin-top: 5px;
-        }
-        .voice-btn {
-            background: #9b59b6;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: 0.3s;
-            width: 50px;
-        }
-        .voice-btn.recording {
-            background: #e74c3c;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .map-container {
-            height: 300px;
-            width: 100%;
-            border-radius: 15px;
-            margin-top: 10px;
-            border: 2px solid var(--accent);
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .map-placeholder {
-            text-align: center;
-            color: #6c757d;
-        }
-        .location-btn {
+        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 768px) { body { flex-direction: column; overflow: auto; } #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; } .dev-box { display: none; } }
+    </style>
+</head>
+<body class="no-select">
+
+<div id="notification"></div>
+
+<div id="loginOverlay">
+    <div class="login-card">
+        <h2>Utopia CRM</h2>
+        <input type="text" id="userInput" placeholder="اسم المستخدم" value="admin">
+        <input type="password" id="passInput" placeholder="كلمة المرور" value="admin123">
+        <button onclick="checkLogin()">دخول النظام</button>
+        <p id="loginError" style="color:#ff4d4d; display:none; margin-top:10px;">بيانات الدخول غير صحيحة</p>
+        <div class="login-dev-info">
+            <b>Developed By Eng. Mahmoud Marie</b>
+            <a href="https://wa.me/201016622416">WhatsApp: +201016622416</a>
+        </div>
+    </div>
+</div>
+
+<div id="mainApp">
+    <div class="sidebar">
+        <h2>Utopia Pro AI</h2>
+        <button onclick="showTab('dashboardTab', this)" class="active">📊 لوحة التحكم</button>
+        <button onclick="showTab('crmTab', this)">👥 قاعدة العملاء</button>
+        <button onclick="showTab('tasksTab', this)">📝 المهام</button>
+        <button onclick="showTab('mapTab', this)">📍 الخريطة</button>
+        <div class="dev-box">
+            <b>Eng. Mahmoud Marie</b>
+            <a href="https://wa.me/201016622416" class="dev-link">Contact Developer</a>
+        </div>
+    </div>
+    <div class="main">
             background: #3498db;
             color: white;
             border: none;
