@@ -60,6 +60,12 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js" onerror="console.log('FP failed - using fallback')"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js" onerror="console.log('Chart failed')"></script>
+    
+    <!-- Firebase SDK (النسخة الصحيحة) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
@@ -222,34 +228,23 @@
             font-size: 12px;
             display: none;
         }
+        .sync-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            z-index: 9999;
+        }
     </style>
-    <!-- Firebase with fallback -->
-    <script>
-        // Firebase fallback - يعمل بدون إنترنت
-        window.db = {
-            ref: function(path) {
-                return {
-                    on: function(event, callback) {
-                        if (event === 'value') {
-                            setTimeout(() => callback({ val: () => null }), 100);
-                        }
-                        return this;
-                    },
-                    set: function(data) {
-                        console.log('Firebase fallback: data saved locally', data);
-                        return Promise.resolve();
-                    }
-                };
-            }
-        };
-        console.log('✅ نظام الحماية والتخزين المحلي يعمل');
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.log('Firebase failed - using local storage')"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" onerror="console.log('Firebase DB failed')"></script>
 </head>
 <body class="no-select">
 <audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 <div id="notification"></div>
+<div id="syncStatus" class="sync-status">🔄 جاري المزامنة...</div>
 
 <div id="loginOverlay">
     <div class="login-card">
@@ -444,6 +439,172 @@
 </div>
 
 <script>
+// ==================== إعدادات Firebase ====================
+// ⚠️ IMPORTANT: استبدل هذه الإعدادات بإعدادات مشروعك على Firebase
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// متغيرات Firebase
+let firebaseInitialized = false;
+let db = null;
+let syncInProgress = false;
+
+// تهيئة Firebase (مع fallback آمن)
+async function initFirebase() {
+    try {
+        // التحقق من وجود Firebase SDK
+        if (typeof firebase === 'undefined') {
+            throw new Error('Firebase SDK not loaded');
+        }
+        
+        // تهيئة التطبيق
+        let app;
+        try {
+            app = firebase.initializeApp(firebaseConfig);
+        } catch(e) {
+            // إذا كان التطبيق مهيأ مسبقاً
+            app = firebase.app();
+        }
+        
+        db = firebase.firestore(app);
+        
+        // اختبار الاتصال
+        await db.collection('test').doc('connection').set({ test: true }, { merge: true });
+        firebaseInitialized = true;
+        document.getElementById('syncStatus').innerHTML = '☁️ متصل بالسحابة';
+        document.getElementById('syncStatus').style.background = 'rgba(40,167,69,0.9)';
+        console.log('✅ Firebase connected successfully');
+        
+        // مزامنة البيانات بعد التهيئة
+        setTimeout(() => syncAllDataWithCloud(), 1000);
+        return true;
+    } catch(e) {
+        console.warn('⚠️ Firebase connection failed:', e.message);
+        firebaseInitialized = false;
+        document.getElementById('syncStatus').innerHTML = '📱 وضع غير متصل (محلي فقط)';
+        document.getElementById('syncStatus').style.background = 'rgba(220,53,69,0.8)';
+        notify('⚠️ لا يمكن الاتصال بالسحابة - سيتم العمل محلياً فقط', 'error');
+        return false;
+    }
+}
+
+// ==================== دوال المزامنة مع Firebase ====================
+async function syncCollectionToCloud(collectionName, localData) {
+    if (!firebaseInitialized || !db) return false;
+    try {
+        const batch = db.batch();
+        const collectionRef = db.collection(collectionName);
+        
+        for (const item of localData) {
+            const docRef = collectionRef.doc(String(item.id));
+            batch.set(docRef, item, { merge: true });
+        }
+        await batch.commit();
+        return true;
+    } catch(e) {
+        console.error(Sync failed for ${collectionName}:, e);
+        return false;
+    }
+}
+
+async function syncCollectionFromCloud(collectionName) {
+    if (!firebaseInitialized || !db) return null;
+    try {
+        const snapshot = await db.collection(collectionName).get();
+        const data = [];
+        snapshot.forEach(doc => {
+            data.push(doc.data());
+        });
+        return data;
+    } catch(e) {
+        console.error(Fetch failed for ${collectionName}:, e);
+        return null;
+    }
+}
+
+async function syncAllDataWithCloud() {
+    if (syncInProgress) return;
+    syncInProgress = true;
+    
+    try {
+        // رفع البيانات المحلية إلى السحابة
+        await syncCollectionToCloud('clients', clients);
+        await syncCollectionToCloud('tasks', tasks);
+        await syncCollectionToCloud('users', authSystem.users);
+        await syncCollectionToCloud('deletedClients', deletedClients);
+        
+        // جلب البيانات من السحابة ودمجها (السحابة لها الأولوية)
+        const cloudClients = await syncCollectionFromCloud('clients');
+        const cloudTasks = await syncCollectionFromCloud('tasks');
+        const cloudUsers = await syncCollectionFromCloud('users');
+        const cloudDeleted = await syncCollectionFromCloud('deletedClients');
+        
+        if (cloudClients && cloudClients.length > 0) {
+            // دمج البيانات: سحابة أولاً، ثم محلي
+            const mergedClients = [...cloudClients];
+            for (const localClient of clients) {
+                if (!cloudClients.find(c => c.id === localClient.id)) {
+                    mergedClients.push(localClient);
+                }
+            }
+            clients.length = 0;
+            clients.push(...mergedClients);
+            saveToLocalStorage('utopia_clients', clients);
+        }
+        
+        if (cloudTasks && cloudTasks.length > 0) {
+            const mergedTasks = [...cloudTasks];
+            for (const localTask of tasks) {
+                if (!cloudTasks.find(t => t.id === localTask.id)) {
+                    mergedTasks.push(localTask);
+                }
+            }
+            tasks.length = 0;
+            tasks.push(...mergedTasks);
+            saveToLocalStorage('utopia_tasks', tasks);
+        }
+        
+        if (cloudUsers && cloudUsers.length > 0) {
+            authSystem.users = cloudUsers;
+            saveToLocalStorage('utopia_users', authSystem);
+        }
+        
+        if (cloudDeleted && cloudDeleted.length > 0) {
+            deletedClients = cloudDeleted;
+            saveToLocalStorage('utopia_deleted', deletedClients);
+        }
+        
+        console.log('✅ Sync completed');
+        document.getElementById('syncStatus').innerHTML = '✅ متزامن مع السحابة';
+        setTimeout(() => {
+            if (firebaseInitialized) {
+                document.getElementById('syncStatus').innerHTML = '☁️ متصل بالسحابة';
+            }
+        }, 3000);
+        
+    } catch(e) {
+        console.error('Sync error:', e);
+    } finally {
+        syncInProgress = false;
+    }
+}
+
+// تعديل دوال الحفظ لتشمل المزامنة
+const originalSaveAllData = saveAllData;
+function saveAllData() {
+    originalSaveAllData();
+    // مزامنة غير متزامنة مع السحابة (بدون انتظار)
+    if (firebaseInitialized && !syncInProgress) {
+        setTimeout(() => syncAllDataWithCloud(), 100);
+    }
+}
+
 // ==================== نظام حماية وحفظ البيانات المتقدم ====================
 let visitorId = "SECURE_DEVICE_" + Math.random().toString(36).substr(2, 9);
 let deviceVerified = true;
@@ -545,13 +706,6 @@ function loadAllData() {
         deletedClients = [];
         saveToLocalStorage('utopia_deleted', deletedClients);
     }
-}
-
-function saveAllData() {
-    saveToLocalStorage('utopia_clients', clients);
-    saveToLocalStorage('utopia_tasks', tasks);
-    saveToLocalStorage('utopia_deleted', deletedClients);
-    saveToLocalStorage('utopia_users', authSystem);
 }
 
 // ==================== دوال تسجيل الدخول ====================
@@ -755,8 +909,8 @@ function renderCRM() {
                 <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button>
                 <button onclick="editClient(${originalIndex})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button>
                 <button onclick="delClient(${originalIndex})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
-             </td>
-         </tr>`;
+              </div>
+          </tr>`;
     });
     
     document.getElementById('countAll').innerText = (lang === 'ar' ? 'الإجمالي: ' : 'Total: ') + filteredClients.length;
@@ -925,7 +1079,7 @@ function renderTasks() {
             <td>${t.date || 'Not set'}</td>
             <td><span style="background:#e0e0e0; padding:3px 8px; border-radius:15px; font-size:12px;">${t.stage}</span></td>
             <td>${delBtn}</td>
-        </tr>`;
+        <tr>`;
     });
 }
 
@@ -964,8 +1118,8 @@ function renderRecycleBin() {
             <td>
                 <button onclick="restoreClient(${i})" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:5px;">Restore</button>
                 <button onclick="permanentDel(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;">X</button>
-            </td>
-        </tr>`;
+             </td>
+        <tr>`;
     });
 }
 
@@ -1046,7 +1200,7 @@ function importData(event) {
             renderCRM();
             updateClientSelect();
             notify('Imported Successfully', 'success');
-        } catch (err) { notify('Error reading file', 'error'); }
+        } catch(err) { notify('Error reading file', 'error'); }
     };
     reader.readAsText(file);
 }
@@ -1157,6 +1311,9 @@ function changeLang(l) {
 // ==================== تهيئة التطبيق ====================
 loadAllData();
 fillGovs();
+
+// تهيئة Firebase (لن تمنع التطبيق من العمل حتى لو فشلت)
+initFirebase().catch(e => console.log('Firebase init skipped'));
 
 if (sessionStorage.getItem('isLoggedIn') === 'true') {
     document.getElementById('loginOverlay').style.display = 'none';
