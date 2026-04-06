@@ -250,10 +250,13 @@ function applyRolePermissions() {
 
 function checkLogin() {
 
- function checkLogin() {
-
     if (!isAuthReady) {
         alert("System still loading...");
+        return;
+    }
+
+    if (!visitorId) {
+        alert("Device not detected yet...");
         return;
     }
 
@@ -263,6 +266,21 @@ function checkLogin() {
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
 
     if (user) {
+
+        // ✅ أول تسجيل (ربط الجهاز)
+        if (!user.deviceId) {
+            user.deviceId = visitorId;
+            db.ref('authSystem').set(authSystem);
+        }
+
+        // ❌ جهاز مختلف
+        if (user.deviceId !== visitorId) {
+            document.getElementById('loginError').style.display = 'block';
+            alert("Unauthorized Device!");
+            return;
+        }
+
+        // ✅ دخول طبيعي
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
 
@@ -274,6 +292,8 @@ function checkLogin() {
         renderCRM();
         renderTasks();
         renderUsers();
+
+        notify('Welcome ' + user.displayName, 'success');
 
     } else {
         document.getElementById('loginError').style.display = 'block';
@@ -288,14 +308,17 @@ function addUser() {
     const r = document.getElementById('newRole').value;
 
     if(!u || !p || !d) return notify('Fill all user data', 'error');
-    if(authSystem.users.find(user => user.u === u)) return notify('User already exists', 'error');
 
-    authSystem.users.push({ u: u, p: p, role: r, displayName: d });
+    authSystem.users.push({ 
+        u: u, 
+        p: p, 
+        role: r, 
+        displayName: d,
+        deviceId: '' // 👈 مهم
+    });
+
     db.ref('authSystem').set(authSystem);
-    notify('User Added Successfully', 'success');
-    document.getElementById('newUsername').value = '';
-    document.getElementById('newPassword').value = '';
-    document.getElementById('newDisplayName').value = '';
+    notify('User Added', 'success');
 }
 
 function deleteUser(index) {
@@ -564,7 +587,13 @@ db.ref('authSystem').on('value', s => {
         // إعداد افتراضي لأول مرة فقط
         authSystem = {
             users: [
-                { u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }
+                { 
+  u: 'admin', 
+  p: 'admin123', 
+  role: 'admin', 
+  displayName: 'Manager Admin',
+  deviceId: '' // 👈 جديد
+}
             ]
         };
         db.ref('authSystem').set(authSystem);
