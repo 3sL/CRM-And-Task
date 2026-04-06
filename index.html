@@ -637,7 +637,7 @@ function initMap() {
 }
 
 function refreshMap() {
-    if (!currentMap || typeof L === 'undefined') {
+   if (!currentMap || typeof L === 'undefined') {
         initMap();
         return;
     }
@@ -654,7 +654,9 @@ function refreshMap() {
     clients.forEach(client => {
         if (client.lat && client.lng) {
             hasLocations = true;
-            if(select) select.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}">📍 ${client.name} - ${client.status}</option>;
+            if(select) {
+                select.innerHTML += `<option value="${client.name.replace(/"/g, '&quot;')}">📍 ${client.name} - ${client.status}</option>`;
+            }
             
             const marker = L.marker([client.lat, client.lng]).addTo(currentMap);
             marker.bindPopup(`
@@ -668,14 +670,13 @@ function refreshMap() {
         }
     });
     
+    const infoDiv = document.getElementById('mapInfo');
     if (hasLocations && mapMarkers.length > 0) {
         const group = L.featureGroup(mapMarkers);
         currentMap.fitBounds(group.getBounds().pad(0.2));
-        const infoDiv = document.getElementById('mapInfo');
-        if(infoDiv) infoDiv.innerHTML = ✅ تم عرض ${mapMarkers.length} عميل على الخريطة;
+        if(infoDiv) infoDiv.innerHTML = `✅ تم عرض ${mapMarkers.length} عميل على الخريطة`;
     } else {
-        const infoDiv = document.getElementById('mapInfo');
-        if(infoDiv) infoDiv.innerHTML = ⚠️ لا يوجد عملاء لديهم مواقع محددة. قم بإضافة موقع للعملاء في صفحة CRM;
+        if(infoDiv) infoDiv.innerHTML = `⚠️ لا يوجد عملاء لديهم مواقع محددة. قم بإضافة موقع للعملاء في صفحة CRM`;
         currentMap.setView([30.0444, 31.2357], 6);
     }
 }
@@ -690,7 +691,7 @@ function showCustomerOnMap() {
         const marker = mapMarkers.find(m => m.getPopup()?.getContent()?.includes(client.name));
         if (marker) marker.openPopup();
         const infoDiv = document.getElementById('mapInfo');
-        if(infoDiv) infoDiv.innerHTML = 📍 <strong>${client.name}</strong><br>العنوان: ${client.address || 'غير محدد'}<br>الحالة: ${client.status};
+        if(infoDiv) infoDiv.innerHTML = `📍 <strong>${client.name}</strong><br>العنوان: ${client.address || 'غير محدد'}<br>الحالة: ${client.status}`;
     } else {
         notify('⚠️ هذا العميل ليس لديه موقع محدد', 'error');
     }
@@ -711,7 +712,7 @@ function updateClientSelect() {
         taskSelect.innerHTML = '<option value="">-- اختر عميل --</option>';
         clients.forEach(client => {
             const selected = (currentVal === client.name) ? 'selected' : '';
-            taskSelect.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>;
+            taskSelect.innerHTML += `<option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>`;
         });
     }
 }
@@ -748,7 +749,7 @@ if (sessionStorage.getItem('isLoggedIn') === 'true') {
     document.getElementById('loginOverlay').style.display = 'none'; 
     document.getElementById('mainApp').style.display = 'flex'; 
     setTimeout(() => {
-        applyRolePermissions();
+        if(typeof applyRolePermissions === 'function') applyRolePermissions();
         initMap();
     }, 100);
 }
@@ -761,7 +762,7 @@ function showTab(id, btn) {
     document.getElementById(id).classList.add('active'); 
     btn.classList.add('active'); 
     if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
-    if(id === 'usersTab') { renderUsers(); }
+    if(id === 'usersTab') { if(typeof renderUsers === 'function') renderUsers(); }
     if(id === 'tasksTab') { updateClientSelect(); renderTasks(); }
     if(id === 'mapTab') { 
         setTimeout(() => {
@@ -774,8 +775,10 @@ function showTab(id, btn) {
 function fillGovs() { 
     const s = document.getElementById('gov'); 
     if(!s) return;
-    s.innerHTML = <option value="">اختر المحافظة</option>; 
-    govs.forEach(g => s.innerHTML += <option value="${g.en}">${g.ar}</option>); 
+    s.innerHTML = '<option value="">اختر المحافظة</option>'; 
+    if(typeof govs !== 'undefined') {
+        govs.forEach(g => s.innerHTML += `<option value="${g.en}">${g.ar}</option>`); 
+    }
 }
 
 function addOrUpdate() {
@@ -795,13 +798,21 @@ function addOrUpdate() {
         lat: window.tempLat || null,
         lng: window.tempLng || null
     };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('تم التحديث', 'success'); } 
-    else { clients.push(c); notify('تم الحفظ', 'success'); }
+    if(typeof editIdx !== 'undefined' && editIdx > -1) { 
+        clients[editIdx] = c; 
+        window.editIdx = -1; 
+        notify('تم التحديث', 'success'); 
+    } 
+    else { 
+        clients.push(c); 
+        notify('تم الحفظ', 'success'); 
+    }
     db.ref('clients').set({...clients});
     ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('gov').value = '';
     document.getElementById('locationAddress').value = '';
-    document.getElementById('locationPreview').style.display = 'none';
+    const lp = document.getElementById('locationPreview');
+    if(lp) lp.style.display = 'none';
     delete window.tempLat;
     delete window.tempLng;
     renderCRM();
@@ -813,7 +824,7 @@ function openWhatsApp(phone) {
     if(!phone) return notify('لا يوجد رقم هاتف', 'error');
     let cleanPhone = phone.replace(/\D/g, ''); 
     if(!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone; 
-    window.open(https://wa.me/${cleanPhone}, '_blank');
+    window.open(`https://wa.me/${cleanPhone}`, '_blank');
 }
 
 function renderCRM() {
@@ -826,7 +837,7 @@ function renderCRM() {
         let matchName = true;
         let matchStatus = true;
         if(searchQuery) {
-            matchName = ${c.name} ${c.phone} ${c.gov}.toLowerCase().includes(searchQuery);
+            matchName = `${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(searchQuery);
         }
         if(statusFilter !== 'all') {
             matchStatus = c.status === statusFilter;
@@ -912,13 +923,15 @@ function updateDashboard() {
     const gc = {}; clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
     const top = Object.keys(gc).length > 0 ? Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b) : '-';
     if(document.getElementById('topGov')) document.getElementById('topGov').innerText = top;
+    
     const canvas = document.getElementById('statusChart');
-    if(!canvas) return;
+    if(!canvas || typeof Chart === 'undefined') return;
     const ctx = canvas.getContext('2d');
     const counts = { 'Interested': 0, 'In Progress': 0, 'Hold': 0, 'Completed': 0 };
     clients.forEach(c => { if(counts[c.status] !== undefined) counts[c.status]++; });
-    if (statusChart) statusChart.destroy();
-    statusChart = new Chart(ctx, {
+    
+    if (window.statusChart) window.statusChart.destroy();
+    window.statusChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: ['مهتم', 'قيد التقدم', 'قيد الانتظار', 'مكتمل'],
@@ -931,50 +944,18 @@ function updateDashboard() {
     });
 }
 
-function importData(event) {
-    if(sessionStorage.getItem('userRole') !== 'admin') return notify('للمدير فقط', 'error');
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const arrayBuffer = e.target.result;
-            let text = new TextDecoder('utf-8').decode(arrayBuffer);
-            const rows = text.split(/\r?\n/).filter(row => row.trim() !== "");
-            const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
-            rows.slice(1).forEach(row => {
-                const cols = row.split(',').map(c => c.replace(/"/g, '').trim());
-                if (cols.length > 0) {
-                    let obj = { name: "Unknown", phone: "", gov: "", status: "Interested", notes: "Imported", agent: "System", date: new Date().toISOString().split('T')[0] };
-                    cols.forEach((val, idx) => {
-                        const h = headers[idx] || "";
-                        if (h.includes("name") || h.includes("الاسم") || idx === 0) obj.name = val;
-                        else if (h.includes("phone") || h.includes("هاتف")) obj.phone = val;
-                        else if (h.includes("gov") || h.includes("محافظة")) obj.gov = val;
-                    });
-                    clients.push(obj);
-                }
-            });
-            db.ref('clients').set({...clients});
-            notify('تم الاستيراد بنجاح', 'success');
-            updateClientSelect();
-        } catch (err) { notify('خطأ في قراءة الملف', 'error'); }
-    };
-    reader.readAsArrayBuffer(file);
-}
-
 function exportData(type) {
     if(sessionStorage.getItem('userRole') !== 'admin') return notify('للمدير فقط', 'error');
     let data = type === 'clients' ? clients : tasks;
     if(data.length === 0) return notify('لا توجد بيانات', 'error');
     let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date,Address,Lat,Lng\n" : "Client,Phone,Task,Deadline,Stage\n");
     data.forEach(i => {
-        csv += type === 'clients' ? "${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}","${i.address || ''}","${i.lat || ''}","${i.lng || ''}"\n : "${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n;
+        csv += type === 'clients' ? `"${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}","${i.address || ''}","${i.lat || ''}","${i.lng || ''}"\n` : `"${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = Utopia_${type}.csv;
+    link.download = `Utopia_${type}.csv`;
     link.click();
 }
 
@@ -990,18 +971,14 @@ function delClient(i) {
         if(currentMap) refreshMap();
     } 
 }
-function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('تم الاستعادة', 'success'); updateClientSelect(); if(currentMap) refreshMap(); }
-function permanentDel(i) { 
-    if(confirm('حذف نهائي؟')) { 
-        deletedClients.splice(i, 1); 
-        syncAll(); 
-        notify('تم الحذف النهائي', 'error'); 
-    } 
+
+function syncAll() { 
+    db.ref('clients').set({...clients}); 
+    db.ref('deletedClients').set({...deletedClients}); 
 }
-function syncAll() { db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients}); }
 
 function editClient(i) { 
-    editIdx = i; 
+    window.editIdx = i; 
     const c = clients[i]; 
     document.getElementById('name').value = c.name; 
     document.getElementById('phone').value = c.phone; 
@@ -1012,38 +989,22 @@ function editClient(i) {
     document.getElementById('followUp').value = c.followUp; 
     document.getElementById('date').value = c.date;
     document.getElementById('locationAddress').value = c.address || '';
+    const preview = document.getElementById('locationPreview');
     if(c.lat && c.lng) {
         window.tempLat = c.lat;
         window.tempLng = c.lng;
-        const preview = document.getElementById('locationPreview');
-        preview.style.display = 'block';
-        preview.innerHTML = 📍 <strong>الموقع المخزن:</strong><br>${c.address || `${c.lat}, ${c.lng}}<br><button onclick="removeLocation()" style="background:#dc3545; color:white; border:none; padding:3px 8px; border-radius:5px;">❌ إزالة</button>`;
+        if(preview) {
+            preview.style.display = 'block';
+            preview.innerHTML = `📍 <strong>الموقع المخزن:</strong><br>${c.address || `${c.lat}, ${c.lng}`}<br><button onclick="removeLocation()" style="background:#dc3545; color:white; border:none; padding:3px 8px; border-radius:5px;">❌ إزالة</button>`;
+        }
     } else {
-        removeLocation();
-    }
-}
-
-function editClientFromTask(clientName) {
-    if(!clientName) {
-        notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
-        return;
-    }
-    const idx = clients.findIndex(c => c.name === clientName);
-    if(idx > -1) { 
-        showTab('crmTab', document.getElementById('btnCrmTab')); 
-        editClient(idx);
-        notify(جاري تعديل بيانات العميل: ${clientName}, 'success');
-    } else {
-        notify(العميل "${clientName}" غير موجود, 'error');
+        if(typeof removeLocation === 'function') removeLocation();
     }
 }
 
 function addTask() { 
     const selectedClient = document.getElementById('taskClientSelect').value;
-    if(!selectedClient) {
-        notify('الرجاء اختيار عميل أولاً', 'error');
-        return;
-    }
+    if(!selectedClient) return notify('الرجاء اختيار عميل أولاً', 'error');
     const taskText = document.getElementById('taskText').value;
     if(!taskText) return notify('الرجاء إدخال تفاصيل المهمة', 'error');
     
@@ -1072,7 +1033,7 @@ function renderTasks() {
     }
     
     tasks.forEach((t, i) => { 
-        if(q && !${t.client} ${t.text}.toLowerCase().includes(q)) return;
+        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
         
         const clientData = clients.find(c => c.name === t.client);
         let clientDisplay = '';
@@ -1081,39 +1042,35 @@ function renderTasks() {
         if(clientData) {
             let bgColor = clientData.status === 'Interested' ? '#3498db' : clientData.status === 'In Progress' ? '#2ecc71' : clientData.status === 'Hold' ? '#e74c3c' : '#27ae60';
             let statusText = {Interested:'مهتم', 'In Progress':'قيد التقدم', Hold:'قيد الانتظار', Completed:'مكتمل'}[clientData.status] || clientData.status;
-            statusBadge = <span class="client-badge" style="background:${bgColor}; color:white;">${statusText}</span>;
-            clientDisplay = <strong>${t.client}</strong><br>${statusBadge};
+            statusBadge = `<span class="client-badge" style="background:${bgColor}; color:white;">${statusText}</span>`;
+            clientDisplay = `<strong>${t.client}</strong><br>${statusBadge}`;
         } else {
-            clientDisplay = <strong style="color:red;">${t.client || 'غير معروف'}</strong><br><span class="client-badge" style="background:gray;">غير موجود</span>;
+            clientDisplay = `<strong style="color:red;">${t.client || 'غير معروف'}</strong><br><span class="client-badge" style="background:gray;">غير موجود</span>`;
         }
         
         let stageText = {quote:'عرض سعر', follow:'متابعة', order:'طلب', bank:'بنك'}[t.stage] || t.stage;
         
-        const delBtn = <button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">🗑️</button>;
-        const editClientBtn = <button onclick="editClientFromTask('${t.client.replace(/'/g, "\\'")}')" style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">✏️ تعديل العميل</button>;
-        const showClientBtn = <button class="show-client-task-btn" onclick="showClientDetails('${t.client.replace(/'/g, "\\'")}')">👤 عرض البيانات</button>;
-        
         b.innerHTML += `<tr>
-            <td>${clientDisplay}<br>${showClientBtn}${editClientBtn}</td>
+            <td>${clientDisplay}<br>
+                <button class="show-client-task-btn" onclick="showClientDetails('${t.client.replace(/'/g, "\\'")}')">👤 عرض البيانات</button>
+                <button onclick="editClientFromTask('${t.client.replace(/'/g, "\\'")}')" style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">✏️ تعديل</button>
+            </td>
             <td>${t.phone || clientData?.phone || '-'}</td>
             <td>${t.text}</td>
             <td>${t.date || 'لم يحدد'}</td>
             <td><span style="background:#e0e0e0; padding:3px 8px; border-radius:15px; font-size:12px;">${stageText}</span></td>
-            <td>${delBtn}</td>
+            <td><button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">🗑️</button></td>
         </tr>`; 
     }); 
 }
 
 function showClientDetails(clientName) {
-    if(!clientName) {
-        notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
-        return;
-    }
+    if(!clientName) return notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
     const client = clients.find(c => c.name === clientName);
     if(client) {
-        alert(🔍 بيانات العميل:\n━━━━━━━━━━━━━━━━━━━━━━\n📛 الاسم: ${client.name}\n📞 الهاتف: ${client.phone}\n🏠 المحافظة: ${client.gov}\n📌 الحالة: ${client.status}\n📍 العنوان: ${client.address || 'غير محدد'}\n📝 ملاحظات: ${client.notes || 'لا توجد'}\n👤 المسؤول: ${client.agent || 'غير محدد'}\n📅 تاريخ الإضافة: ${client.date || 'غير محدد'}\n━━━━━━━━━━━━━━━━━━━━━━);
+        alert(`🔍 بيانات العميل:\n━━━━━━━━━━━━━━━━━━━━━━\n📛 الاسم: ${client.name}\n📞 الهاتف: ${client.phone}\n🏠 المحافظة: ${client.gov}\n📌 الحالة: ${client.status}\n📍 العنوان: ${client.address || 'غير محدد'}\n📝 ملاحظات: ${client.notes || 'لا توجد'}\n👤 المسؤول: ${client.agent || 'غير محدد'}\n📅 تاريخ الإضافة: ${client.date || 'غير محدد'}\n━━━━━━━━━━━━━━━━━━━━━━`);
     } else {
-        notify(⚠️ العميل "${clientName}" غير موجود في قاعدة البيانات, 'error');
+        notify(`⚠️ العميل "${clientName}" غير موجود`, 'error');
     }
 }
 
@@ -1126,21 +1083,7 @@ function deleteTask(index) {
     }
 }
 
-function changeLang(l) { 
-    lang = l; 
-    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
-    fillGovs(); 
-    renderCRM(); 
-    applyRolePermissions(); 
-}
-
 // Firebase Listeners
-db.ref('authSystem').on('value', s => {
-    if(s.val()) { authSystem = s.val(); } 
-    else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'المدير الرئيسي' }] }; db.ref('authSystem').set(authSystem); }
-    renderUsers();
-});
-
 db.ref('clients').on('value', s => { 
     clients = s.val() ? Object.values(s.val()) : []; 
     renderCRM(); 
@@ -1148,25 +1091,15 @@ db.ref('clients').on('value', s => {
     if(currentMap && document.getElementById('mapTab')?.classList.contains('active')) refreshMap();
 });
 
-db.ref('deletedClients').on('value', s => { 
-    deletedClients = s.val() ? Object.values(s.val()) : []; 
-    const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr>
-        <td>${c.name}</td>
-        <td>${c.phone}</td>
-        <td>${c.deletedAt}</td>
-        <td><button onclick="restoreClient(${i})" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:5px;">استعادة</button> 
-                <button onclick="permanentDel(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;">حذف نهائي</button></td>
-        </tr>`; });
-    }
+db.ref('tasks').on('value', s => { 
+    tasks = s.val() ? Object.values(s.val()) : []; 
+    renderTasks(); 
 });
-
-db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
 fillGovs();
 updateClientSelect();
 
-// Auto fill login fields with demo credentials
+// Auto fill login
 document.getElementById('userInput').value = 'admin';
 document.getElementById('passInput').value = 'admin123';
 </script>
