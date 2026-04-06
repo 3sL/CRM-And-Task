@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Leaflet Map Libraries -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Map Libraries with error handling -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="console.log('Leaflet CSS failed')" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="console.log('Leaflet JS failed')"></script>
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
@@ -112,7 +112,6 @@
             font-size: 11px;
             margin-top: 5px;
         }
-        /* Voice and Map Styles */
         .voice-btn {
             background: #9b59b6;
             color: white;
@@ -139,6 +138,14 @@
             border-radius: 15px;
             margin-top: 10px;
             border: 2px solid var(--accent);
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .map-placeholder {
+            text-align: center;
+            color: #6c757d;
         }
         .location-btn {
             background: #3498db;
@@ -167,11 +174,11 @@
 <div id="loginOverlay">
     <div class="login-card">
         <h2>Utopia Trading For Export</h2>
-        <div id="deviceLockInfo" style="font-size: 10px; color: #888; margin-bottom: 10px;">Checking Device Security...</div>
-        <input type="text" id="userInput" placeholder="Username">
-        <input type="password" id="passInput" placeholder="Password">
+        <div id="deviceLockInfo" style="font-size: 10px; color: #888; margin-bottom: 10px;">جاري التحقق من الجهاز...</div>
+        <input type="text" id="userInput" placeholder="Username" value="admin">
+        <input type="password" id="passInput" placeholder="Password" value="admin123">
         <button id="loginBtn" onclick="checkLogin()">Login</button>
-        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Invalid Credentials or Unauthorized Device!</p>
+        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">بيانات دخول غير صحيحة أو جهاز غير مصرح به!</p>
         <div class="login-dev-info">
             <b>Dev By: Eng. Mahmoud Mohamed Marie</b>
             <a href="https://wa.me/201222153415">🟢 +201222153415</a>
@@ -198,49 +205,49 @@
             <button onclick="logout()" style="background: var(--danger); margin-top: 10px; width: 100%; text-align: center; border-radius: 8px; color:white; border:none; padding:10px; cursor:pointer;">Logout</button>
             <select id="language" onchange="changeLang(this.value)" style="margin-top: 15px; background: #2e2e4d; color: white; border: none; padding: 5px;">
                 <option value="en">English</option>
-                <option value="ar">العربية</option>
+                <option value="ar" selected>العربية</option>
             </select>
         </div>
     </div>
 
     <div class="main">
         <div id="crmTab" class="tab-content active">
-            <h2 id="crmHeader">Clients Registry</h2>
+            <h2 id="crmHeader">سجل العملاء</h2>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <div class="advanced-search-row">
                     <input id="search" placeholder="🔍 بحث بالاسم أو الهاتف أو المحافظة..." oninput="renderCRM()" style="border: 2px solid var(--accent);">
                     <select id="searchStatusFilter" onchange="renderCRM()">
                         <option value="all">📌 جميع الحالات</option>
-                        <option value="Interested">🤝 Interested</option>
-                        <option value="In Progress">🚀 In Progress</option>
-                        <option value="Hold">⏸ Hold</option>
-                        <option value="Completed">✅ Completed</option>
+                        <option value="Interested">🤝 مهتم</option>
+                        <option value="In Progress">🚀 قيد التقدم</option>
+                        <option value="Hold">⏸ قيد الانتظار</option>
+                        <option value="Completed">✅ مكتمل</option>
                     </select>
                     <button class="reset-search" onclick="resetSearch()">🔄 إعادة ضبط البحث</button>
                 </div>
-                <button class="btn-import admin-only" onclick="document.getElementById('csvFileInput').click()">📥 Import Any CSV</button>
+                <button class="btn-import admin-only" onclick="document.getElementById('csvFileInput').click()">📥 استيراد CSV</button>
                 <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
-                <button class="btn-export admin-only" onclick="exportData('clients')">📤 Export Excel</button>
+                <button class="btn-export admin-only" onclick="exportData('clients')">📤 تصدير Excel</button>
             </div>
             <div class="row">
-                <input id="name" placeholder="Client Name">
-                <input id="phone" placeholder="Phone Number">
+                <input id="name" placeholder="اسم العميل">
+                <input id="phone" placeholder="رقم الهاتف">
                 <select id="gov"></select>
                 <select id="status">
-                    <option value="Interested">Interested</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Hold">Hold</option>
-                    <option value="Completed">Completed</option>
+                    <option value="Interested">مهتم</option>
+                    <option value="In Progress">قيد التقدم</option>
+                    <option value="Hold">قيد الانتظار</option>
+                    <option value="Completed">مكتمل</option>
                 </select>
             </div>
             <div class="row">
                 <div style="flex:2; display:flex; gap:5px;">
-                    <textarea id="notes" placeholder="Notes..." style="flex:1;"></textarea>
+                    <textarea id="notes" placeholder="ملاحظات..." style="flex:1;"></textarea>
                     <button id="voiceNotesBtn" class="voice-btn" onclick="startVoiceInput('notes')" title="🎤 إدخال بالصوت">🎤</button>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
-                    <input id="agent" placeholder="Agent Name">
-                    <input id="followUp" placeholder="Next Action">
+                    <input id="agent" placeholder="اسم المسؤول">
+                    <input id="followUp" placeholder="الإجراء التالي">
                     <input type="date" id="date">
                 </div>
             </div>
@@ -251,15 +258,15 @@
                 </div>
             </div>
             <div id="locationPreview" class="map-preview" style="display:none;"></div>
-            <button class="btn-save" onclick="addOrUpdate()">💾 Save Data</button>
+            <button class="btn-save" onclick="addOrUpdate()">💾 حفظ البيانات</button>
             <div class="row" style="margin-top: 20px;">
-                <div class="card" id="countAll">Total: 0</div>
-                <div class="card" id="countHold" style="border-top-color: var(--danger);">Hold: 0</div>
+                <div class="card" id="countAll">الإجمالي: 0</div>
+                <div class="card" id="countHold" style="border-top-color: var(--danger);">قيد الانتظار: 0</div>
             </div>
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking</th><th>Status</th><th>Location</th><th>Actions</th>
+                        <th>الاسم</th><th>الهاتف</th><th>المحافظة</th><th>التتبع</th><th>الحالة</th><th>الموقع</th><th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -267,11 +274,11 @@
         </div>
 
         <div id="dashboardTab" class="tab-content">
-            <h2>📊 Smart Analytics & AI Insight</h2>
+            <h2>📊 التحليلات الذكية</h2>
             <div class="ai-card-container">
-                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">Conversion Rate</h3><p id="convRate">0%</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">Potential Deals</h3><p id="potentialDeals">0</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">Top Governorate</h3><p id="topGov">-</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">نسبة التحويل</h3><p id="convRate">0%</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">الصفقات المحتملة</h3><p id="potentialDeals">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">أكثر محافظة</h3><p id="topGov">-</p></div>
             </div>
             <div class="chart-box">
                 <canvas id="statusChart"></canvas>
@@ -279,44 +286,46 @@
         </div>
 
         <div id="mapTab" class="tab-content">
-            <h2>🗺️ Customer Locations Map</h2>
+            <h2>🗺️ خريطة مواقع العملاء</h2>
             <div class="row">
                 <select id="mapCustomerSelect" onchange="showCustomerOnMap()">
                     <option value="">-- اختر عميل لعرض موقعه --</option>
                 </select>
                 <button onclick="refreshMap()" style="background:var(--info); color:white; border:none; padding:10px; border-radius:8px;">🔄 تحديث الخريطة</button>
             </div>
-            <div id="customerMap" class="map-container"></div>
+            <div id="customerMap" class="map-container">
+                <div class="map-placeholder">🗺️ جاري تحميل الخريطة... <br> <small>قد تحتاج إلى اتصال بالإنترنت</small></div>
+            </div>
             <div id="mapInfo" style="margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 10px; text-align: center;"></div>
         </div>
 
         <div id="recycleTab" class="tab-content">
-            <h2 style="color: var(--danger);">♻️ Recycle Bin</h2>
+            <h2 style="color: var(--danger);">♻️ سلة المحذوفات</h2>
             <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr></thead>
+                <thead><tr><th>الاسم</th><th>الهاتف</th><th>تاريخ الحذف</th><th>الإجراءات</th></tr></thead>
                 <tbody id="recycleBody"></tbody>
             </table>
         </div>
 
         <div id="tasksTab" class="tab-content">
-            <h2>Operations Tasks</h2>
+            <h2>قائمة المهام</h2>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <input id="taskSearch" placeholder="🔍 Filter tasks..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
-                <button class="btn-export admin-only" onclick="exportData('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
+                <input id="taskSearch" placeholder="🔍 بحث..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
+                <button class="btn-export admin-only" onclick="exportData('tasks')" style="background: #17a2b8;">📤 تصدير المهام</button>
             </div>
             <div class="row">
-                <input id="taskText" placeholder="Task details" style="flex: 2;">
+                <input id="taskText" placeholder="تفاصيل المهمة" style="flex: 2;">
                 <button class="voice-btn" onclick="startVoiceInput('taskText')" style="width:50px;">🎤</button>
                 <select id="taskClientSelect" onchange="autoFillTaskPhone()" style="flex: 2;">
                     <option value="">-- اختر عميل --</option>
                 </select>
-                <input id="taskPhone" placeholder="Phone Number" readonly style="background: #f5f5f5;">
+                <input id="taskPhone" placeholder="رقم الهاتف" readonly style="background: #f5f5f5;">
                 <input type="date" id="taskDate">
                 <select id="taskStage">
-                    <option value="quote">📄 Quote</option>
-                    <option value="follow">📞 Follow Up</option>
-                    <option value="order">🛒 Order</option>
-                    <option value="bank">🏦 Bank</option>
+                    <option value="quote">📄 عرض سعر</option>
+                    <option value="follow">📞 متابعة</option>
+                    <option value="order">🛒 طلب</option>
+                    <option value="bank">🏦 بنك</option>
                 </select>
                 <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕ إضافة</button>
             </div>
@@ -324,12 +333,12 @@
                 <table style="min-width: 800px;">
                     <thead>
                         <tr>
-                            <th>👤 Client Info</th>
-                            <th>📞 Phone</th>
-                            <th>📋 Task</th>
-                            <th>📅 Deadline</th>
-                            <th>🎯 Stage</th>
-                            <th>⚙️ Actions</th>
+                            <th>👤 معلومات العميل</th>
+                            <th>📞 الهاتف</th>
+                            <th>📋 المهمة</th>
+                            <th>📅 الموعد</th>
+                            <th>🎯 المرحلة</th>
+                            <th>⚙️ الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="taskBody"></tbody>
@@ -338,31 +347,31 @@
         </div>
 
         <div id="usersTab" class="tab-content">
-            <h2>🔐 Users Management</h2>
+            <h2>🔐 إدارة المستخدمين</h2>
             <div class="row">
-                <input id="newUsername" placeholder="Username">
-                <input id="newPassword" placeholder="Password">
-                <input id="newDisplayName" placeholder="Display Name">
+                <input id="newUsername" placeholder="اسم المستخدم">
+                <input id="newPassword" placeholder="كلمة المرور">
+                <input id="newDisplayName" placeholder="الاسم المعروض">
                 <select id="newRole">
-                    <option value="user">User / Employee</option>
-                    <option value="admin">Admin / Manager</option>
+                    <option value="user">موظف</option>
+                    <option value="admin">مدير</option>
                 </select>
-                <button class="btn-save" onclick="addUser()" style="flex: 0.5;">Add User</button>
+                <button class="btn-save" onclick="addUser()" style="flex: 0.5;">إضافة مستخدم</button>
             </div>
             <table>
                 <thead>
-                    <tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password</th><th>Actions</th></tr>
+                    <tr><th>اسم المستخدم</th><th>الاسم المعروض</th><th>الصلاحية</th><th>كلمة المرور</th><th>الإجراءات</th></tr>
                 </thead>
                 <tbody id="usersTableBody"></tbody>
             </table>
         </div>
 
         <div id="securityTab" class="tab-content">
-            <h2 id="secHeader">🛡️ Account Security</h2>
+            <h2 id="secHeader">🛡️ أمان الحساب</h2>
             <div style="max-width: 400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <p id="secLabel">Change Your Access Password:</p>
-                <input type="password" id="changePassInput" placeholder="New Password" style="margin-bottom: 15px;">
-                <button class="btn-save" onclick="changeMyPassword()" style="background: var(--primary);">Update Password</button>
+                <p id="secLabel">تغيير كلمة المرور:</p>
+                <input type="password" id="changePassInput" placeholder="كلمة المرور الجديدة" style="margin-bottom: 15px;">
+                <button class="btn-save" onclick="changeMyPassword()" style="background: var(--primary);">تحديث كلمة المرور</button>
             </div>
         </div>
 
@@ -372,10 +381,15 @@
 <script>
 let visitorId = "";
 async function initFingerprint() {
-    const fp = await FingerprintJS.load();
-    const result = await fp.get();
-    visitorId = result.visitorId;
-    document.getElementById('deviceLockInfo').innerText = "Device ID: " + visitorId;
+    try {
+        const fp = await FingerprintJS.load();
+        const result = await fp.get();
+        visitorId = result.visitorId;
+        document.getElementById('deviceLockInfo').innerText = "Device ID: " + visitorId;
+    } catch(e) {
+        console.log("Fingerprint error:", e);
+        document.getElementById('deviceLockInfo').innerText = "✓ Device ready";
+    }
 }
 initFingerprint();
 
@@ -423,24 +437,24 @@ function checkLogin() {
         renderTasks();
         renderUsers();
         updateClientSelect();
-        initMap();
-        notify('Welcome ' + user.displayName, 'success'); 
+        setTimeout(() => { if(document.getElementById('customerMap')) initMap(); }, 500);
+        notify('مرحباً ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
-        notify('Login Failed', 'error'); 
+        notify('فشل تسجيل الدخول', 'error'); 
     } 
 }
 
 function changeMyPassword() {
     const newPass = document.getElementById('changePassInput').value;
     const currentU = sessionStorage.getItem('currentUserName');
-    if(!newPass) return notify('Please enter new password', 'error');
+    if(!newPass) return notify('الرجاء إدخال كلمة مرور جديدة', 'error');
     const userIdx = authSystem.users.findIndex(u => u.u === currentU);
     if(userIdx > -1) {
         authSystem.users[userIdx].p = newPass;
         db.ref('authSystem').set(authSystem);
         document.getElementById('changePassInput').value = '';
-        notify('Password Updated Successfully', 'success');
+        notify('تم تحديث كلمة المرور بنجاح', 'success');
     }
 }
 
@@ -449,22 +463,22 @@ function addUser() {
     const p = document.getElementById('newPassword').value;
     const d = document.getElementById('newDisplayName').value;
     const r = document.getElementById('newRole').value;
-    if(!u || !p || !d) return notify('Fill all user data', 'error');
-    if(authSystem.users.find(user => user.u === u)) return notify('User already exists', 'error');
+    if(!u || !p || !d) return notify('املأ جميع البيانات', 'error');
+    if(authSystem.users.find(user => user.u === u)) return notify('المستخدم موجود مسبقاً', 'error');
     authSystem.users.push({ u: u, p: p, role: r, displayName: d });
     db.ref('authSystem').set(authSystem);
-    notify('User Added Successfully', 'success');
+    notify('تم إضافة المستخدم بنجاح', 'success');
     document.getElementById('newUsername').value = '';
     document.getElementById('newPassword').value = '';
     document.getElementById('newDisplayName').value = '';
 }
 
 function deleteUser(index) {
-    if(authSystem.users[index].u === 'admin') return notify('Cannot delete main admin', 'error');
-    if(confirm('Delete this user?')) {
+    if(authSystem.users[index].u === 'admin') return notify('لا يمكن حذف المدير الرئيسي', 'error');
+    if(confirm('حذف هذا المستخدم؟')) {
         authSystem.users.splice(index, 1);
         db.ref('authSystem').set(authSystem);
-        notify('User Deleted', 'info');
+        notify('تم حذف المستخدم', 'info');
     }
 }
 
@@ -476,9 +490,9 @@ function renderUsers() {
         tbody.innerHTML += `<tr>
             <td>${user.u}</td>
             <td>${user.displayName}</td>
-            <td>${user.role}</td>
+            <td>${user.role === 'admin' ? 'مدير' : 'موظف'}</td>
             <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px; background: #fffbe6; font-weight: bold;"></td>
-            <td><button onclick="deleteUser(${i})" style="background:var(--danger); color:white; border:none; padding:5px; border-radius:5px;">Remove</button></td>
+            <td><button onclick="deleteUser(${i})" style="background:var(--danger); color:white; border:none; padding:5px; border-radius:5px;">حذف</button></td>
         </tr>`;
     });
 }
@@ -486,20 +500,16 @@ function renderUsers() {
 function updateUserPass(i, newPass) {
     authSystem.users[i].p = newPass;
     db.ref('authSystem').set(authSystem);
-    notify('Password Updated', 'success');
+    notify('تم تحديث كلمة المرور', 'success');
 }
 
-let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
+let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'ar', statusChart = null;
 let currentMap = null;
 let mapMarkers = [];
 
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
 
-// ========== Voice Input Function ==========
-let mediaRecorder;
-let audioChunks = [];
-let isRecording = false;
-
+// Voice Input Function
 function startVoiceInput(fieldId) {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
         notify('❌ المتصفح لا يدعم الإدخال الصوتي', 'error');
@@ -534,7 +544,7 @@ function startVoiceInput(fieldId) {
     };
     
     recognition.onerror = function(event) {
-        notify('❌ خطأ في التعرف على الصوت: ' + event.error, 'error');
+        notify('❌ خطأ في التعرف على الصوت', 'error');
         btn.classList.remove('recording');
         btn.textContent = '🎤';
     };
@@ -545,7 +555,7 @@ function startVoiceInput(fieldId) {
     };
 }
 
-// ========== Location / Map Functions ==========
+// Location Functions
 function getCurrentLocation() {
     if (!navigator.geolocation) {
         notify('❌ المتصفح لا يدعم تحديد الموقع', 'error');
@@ -558,18 +568,17 @@ function getCurrentLocation() {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         
-        // Reverse geocoding to get address
+        // Store coordinates
+        window.tempLat = lat;
+        window.tempLng = lng;
+        
+        // Try reverse geocoding
         fetch(https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1)
             .then(response => response.json())
             .then(data => {
                 const address = data.display_name || ${lat}, ${lng};
-                document.getElementById('locationAddress').value = address;
+                document.getElementById('locationAddress').value = address.substring(0, 200);
                 
-                // Store coordinates
-                window.tempLat = lat;
-                window.tempLng = lng;
-                
-                // Show preview
                 const preview = document.getElementById('locationPreview');
                 preview.style.display = 'block';
                 preview.innerHTML = `
@@ -578,14 +587,11 @@ function getCurrentLocation() {
                     <small>خط العرض: ${lat.toFixed(6)} | خط الطول: ${lng.toFixed(6)}</small>
                     <button onclick="removeLocation()" style="background:#dc3545; color:white; border:none; padding:3px 8px; border-radius:5px; margin-left:10px;">❌ إزالة</button>
                 `;
-                
                 notify('✅ تم تحديد الموقع بنجاح', 'success');
             })
             .catch(() => {
                 document.getElementById('locationAddress').value = ${lat}, ${lng};
-                window.tempLat = lat;
-                window.tempLng = lng;
-                notify('✅ تم تحديد الموقع (بدون عنوان)', 'success');
+                notify('✅ تم تحديد الموقع', 'success');
             });
     }, function(error) {
         notify('❌ فشل تحديد الموقع: ' + error.message, 'error');
@@ -599,45 +605,56 @@ function removeLocation() {
     delete window.tempLng;
 }
 
-let mapInitialized = false;
-
+// Map Functions
 function initMap() {
-    if (!mapInitialized && document.getElementById('customerMap')) {
-        currentMap = L.map('customerMap').setView([30.0444, 31.2357], 6);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB'
-        }).addTo(currentMap);
-        mapInitialized = true;
+    const mapContainer = document.getElementById('customerMap');
+    if (!mapContainer) return;
+    
+    if (typeof L !== 'undefined') {
+        try {
+            if (currentMap) currentMap.remove();
+            currentMap = L.map('customerMap').setView([30.0444, 31.2357], 6);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+            }).addTo(currentMap);
+            refreshMap();
+        } catch(e) {
+            console.log("Map error:", e);
+            mapContainer.innerHTML = '<div class="map-placeholder">🗺️ تعذر تحميل الخريطة<br><small>تحقق من اتصال الإنترنت</small></div>';
+        }
+    } else {
+        mapContainer.innerHTML = '<div class="map-placeholder">🗺️ جاري تحميل الخريطة...<br><small>قد تحتاج إلى تحديث الصفحة</small></div>';
+        setTimeout(initMap, 1000);
     }
 }
 
 function refreshMap() {
-    if (!currentMap) {
+    if (!currentMap || typeof L === 'undefined') {
         initMap();
+        return;
     }
     
-    // Clear existing markers
     mapMarkers.forEach(marker => currentMap.removeLayer(marker));
     mapMarkers = [];
     
-    // Update customer select dropdown
     const select = document.getElementById('mapCustomerSelect');
-    select.innerHTML = '<option value="">-- اختر عميل لعرض موقعه --</option>';
+    if(select) {
+        select.innerHTML = '<option value="">-- اختر عميل لعرض موقعه --</option>';
+    }
     
     let hasLocations = false;
     clients.forEach(client => {
         if (client.lat && client.lng) {
             hasLocations = true;
-            select.innerHTML += <option value="${client.name}">📍 ${client.name} - ${client.status}</option>;
+            if(select) select.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}">📍 ${client.name} - ${client.status}</option>;
             
-            // Add marker to map
             const marker = L.marker([client.lat, client.lng]).addTo(currentMap);
             marker.bindPopup(`
                 <b>${client.name}</b><br>
                 📞 ${client.phone}<br>
                 📌 ${client.status}<br>
                 📍 ${client.address || 'عنوان غير محدد'}<br>
-                <button onclick="editClientFromMap('${client.name}')" style="background:#ffc107; border:none; padding:5px; border-radius:5px;">✏️ تعديل</button>
+                <button onclick="editClientFromMap('${client.name.replace(/'/g, "\\'")}')" style="background:#ffc107; border:none; padding:5px; border-radius:5px;">✏️ تعديل</button>
             `);
             mapMarkers.push(marker);
         }
@@ -646,27 +663,26 @@ function refreshMap() {
     if (hasLocations && mapMarkers.length > 0) {
         const group = L.featureGroup(mapMarkers);
         currentMap.fitBounds(group.getBounds().pad(0.2));
-        document.getElementById('mapInfo').innerHTML = ✅ تم عرض ${mapMarkers.length} عميل على الخريطة;
+        const infoDiv = document.getElementById('mapInfo');
+        if(infoDiv) infoDiv.innerHTML = ✅ تم عرض ${mapMarkers.length} عميل على الخريطة;
     } else {
-        document.getElementById('mapInfo').innerHTML = ⚠️ لا يوجد عملاء لديهم مواقع محددة. قم بإضافة موقع للعملاء في صفحة CRM;
+        const infoDiv = document.getElementById('mapInfo');
+        if(infoDiv) infoDiv.innerHTML = ⚠️ لا يوجد عملاء لديهم مواقع محددة. قم بإضافة موقع للعملاء في صفحة CRM;
         currentMap.setView([30.0444, 31.2357], 6);
     }
 }
 
 function showCustomerOnMap() {
-    const selectedName = document.getElementById('mapCustomerSelect').value;
-    if (!selectedName) return;
+    const selectedName = document.getElementById('mapCustomerSelect')?.value;
+    if (!selectedName || !currentMap) return;
     
     const client = clients.find(c => c.name === selectedName);
     if (client && client.lat && client.lng) {
         currentMap.setView([client.lat, client.lng], 15);
         const marker = mapMarkers.find(m => m.getPopup()?.getContent()?.includes(client.name));
         if (marker) marker.openPopup();
-        document.getElementById('mapInfo').innerHTML = `
-            📍 <strong>${client.name}</strong><br>
-            العنوان: ${client.address || 'غير محدد'}<br>
-            الحالة: ${client.status}
-        `;
+        const infoDiv = document.getElementById('mapInfo');
+        if(infoDiv) infoDiv.innerHTML = 📍 <strong>${client.name}</strong><br>العنوان: ${client.address || 'غير محدد'}<br>الحالة: ${client.status};
     } else {
         notify('⚠️ هذا العميل ليس لديه موقع محدد', 'error');
     }
@@ -682,22 +698,12 @@ function editClientFromMap(clientName) {
 
 function updateClientSelect() {
     const taskSelect = document.getElementById('taskClientSelect');
-    if(!taskSelect) return;
-    const currentVal = taskSelect.value;
-    taskSelect.innerHTML = '<option value="">-- اختر عميل --</option>';
-    clients.forEach(client => {
-        const selected = (currentVal === client.name) ? 'selected' : '';
-        taskSelect.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>;
-    });
-    
-    // Also update map select
-    const mapSelect = document.getElementById('mapCustomerSelect');
-    if(mapSelect) {
-        mapSelect.innerHTML = '<option value="">-- اختر عميل لعرض موقعه --</option>';
+    if(taskSelect) {
+        const currentVal = taskSelect.value;
+        taskSelect.innerHTML = '<option value="">-- اختر عميل --</option>';
         clients.forEach(client => {
-            if(client.lat && client.lng) {
-                mapSelect.innerHTML += <option value="${client.name}">📍 ${client.name} - ${client.status}</option>;
-            }
+            const selected = (currentVal === client.name) ? 'selected' : '';
+            taskSelect.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>;
         });
     }
 }
@@ -719,7 +725,16 @@ function playNotifySound() {
     if(audio) { audio.currentTime = 0; audio.play().catch(e => console.log("Audio blocked", e)); } 
 }
 
-function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; playNotifySound(); setTimeout(() => n.style.display = 'none', 4000); }
+function notify(m, t='info') { 
+    const n = document.getElementById('notification'); 
+    if(n) {
+        n.innerText = m; 
+        n.style.display = 'block'; 
+        n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
+        playNotifySound(); 
+        setTimeout(() => n.style.display = 'none', 4000);
+    }
+}
 
 if (sessionStorage.getItem('isLoggedIn') === 'true') { 
     document.getElementById('loginOverlay').style.display = 'none'; 
@@ -751,13 +766,13 @@ function showTab(id, btn) {
 function fillGovs() { 
     const s = document.getElementById('gov'); 
     if(!s) return;
-    s.innerHTML = <option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>; 
-    govs.forEach(g => s.innerHTML += <option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>); 
+    s.innerHTML = <option value="">اختر المحافظة</option>; 
+    govs.forEach(g => s.innerHTML += <option value="${g.en}">${g.ar}</option>); 
 }
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
-    if(!n) return notify('Name required', 'error');
+    if(!n) return notify('الاسم مطلوب', 'error');
     const today = new Date().toISOString().split('T')[0];
     const c = { 
         name: n, 
@@ -772,8 +787,8 @@ function addOrUpdate() {
         lat: window.tempLat || null,
         lng: window.tempLng || null
     };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify(lang==='ar'?'تم التحديث':'Updated', 'success'); } 
-    else { clients.push(c); notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); }
+    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('تم التحديث', 'success'); } 
+    else { clients.push(c); notify('تم الحفظ', 'success'); }
     db.ref('clients').set({...clients});
     ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('gov').value = '';
@@ -787,7 +802,7 @@ function addOrUpdate() {
 }
 
 function openWhatsApp(phone) {
-    if(!phone) return notify('No phone number', 'error');
+    if(!phone) return notify('لا يوجد رقم هاتف', 'error');
     let cleanPhone = phone.replace(/\D/g, ''); 
     if(!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone; 
     window.open(https://wa.me/${cleanPhone}, '_blank');
@@ -816,12 +831,15 @@ function renderCRM() {
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
         const hasLocation = (c.lat && c.lng) ? '📍' : '';
+        
+        let statusText = {Interested:'مهتم', 'In Progress':'قيد التقدم', Hold:'قيد الانتظار', Completed:'مكتمل'}[c.status] || c.status;
+        
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
             <td><b>${c.name}</b><br><button class="edit-name-btn" onclick="editClientName(${originalIndex})" style="font-size:11px;">✏️ تعديل الاسم</button></td>
             <td>${c.phone}</td>
             <td>${c.gov}</td>
             <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
-            <td>${c.status}</td>
+            <td>${statusText}</td>
             <td>${hasLocation}</td>
             <td>
                 <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
@@ -829,17 +847,17 @@ function renderCRM() {
                 <button onclick="editClient(${originalIndex})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
                 <button onclick="delClient(${originalIndex})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
             </td>
-        </table>`;
+        </tr>`;
     });
     
-    document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + filteredClients.length;
-    document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
+    document.getElementById('countAll').innerText = 'الإجمالي: ' + filteredClients.length;
+    document.getElementById('countHold').innerText = 'قيد الانتظار: ' + hCount;
     updateDashboard();
 }
 
 function editClientName(index) {
     if(index === undefined || index < 0 || index >= clients.length) {
-        notify('Client not found', 'error');
+        notify('العميل غير موجود', 'error');
         return;
     }
     const client = clients[index];
@@ -870,12 +888,12 @@ function resetSearch() {
 }
 
 function getTrackingLabel(dateStr) {
-    if(!dateStr) return { lab: 'New', cls: 'track-new' };
+    if(!dateStr) return { lab: 'جديد', cls: 'track-new' };
     const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
-    if (diffDays <= 1) return { lab: (lang === 'ar' ? 'نشط جداً' : 'V. Active'), cls: 'track-new' };
-    if (diffDays <= 3) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-active' };
-    if (diffDays <= 7) return { lab: (lang === 'ar' ? 'تحذير' : 'Warning'), cls: 'track-warning' };
-    return { lab: (lang === 'ar' ? 'بارد' : 'Cold'), cls: 'track-old' };
+    if (diffDays <= 1) return { lab: 'نشط جداً', cls: 'track-new' };
+    if (diffDays <= 3) return { lab: 'متابعة', cls: 'track-active' };
+    if (diffDays <= 7) return { lab: 'تحذير', cls: 'track-warning' };
+    return { lab: 'بارد', cls: 'track-old' };
 }
 
 function updateDashboard() {
@@ -895,9 +913,9 @@ function updateDashboard() {
     statusChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: Object.keys(counts),
+            labels: ['مهتم', 'قيد التقدم', 'قيد الانتظار', 'مكتمل'],
             datasets: [{
-                data: Object.values(counts),
+                data: [counts.Interested, counts['In Progress'], counts.Hold, counts.Completed],
                 backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745']
             }]
         },
@@ -906,7 +924,7 @@ function updateDashboard() {
 }
 
 function importData(event) {
-    if(sessionStorage.getItem('userRole') !== 'admin') return notify('Admin only', 'error');
+    if(sessionStorage.getItem('userRole') !== 'admin') return notify('للمدير فقط', 'error');
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
@@ -930,17 +948,17 @@ function importData(event) {
                 }
             });
             db.ref('clients').set({...clients});
-            notify('Imported Successfully', 'success');
+            notify('تم الاستيراد بنجاح', 'success');
             updateClientSelect();
-        } catch (err) { notify('Error reading file', 'error'); }
+        } catch (err) { notify('خطأ في قراءة الملف', 'error'); }
     };
     reader.readAsArrayBuffer(file);
 }
 
 function exportData(type) {
-    if(sessionStorage.getItem('userRole') !== 'admin') return notify('Admin only', 'error');
+    if(sessionStorage.getItem('userRole') !== 'admin') return notify('للمدير فقط', 'error');
     let data = type === 'clients' ? clients : tasks;
-    if(data.length === 0) return notify('No data', 'error');
+    if(data.length === 0) return notify('لا توجد بيانات', 'error');
     let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date,Address,Lat,Lng\n" : "Client,Phone,Task,Deadline,Stage\n");
     data.forEach(i => {
         csv += type === 'clients' ? "${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}","${i.address || ''}","${i.lat || ''}","${i.lng || ''}"\n : "${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n;
@@ -953,23 +971,23 @@ function exportData(type) {
 }
 
 function delClient(i) { 
-    if(confirm('Move to Bin?')) { 
+    if(confirm('نقل إلى سلة المحذوفات؟')) { 
         const d = clients.splice(i, 1)[0]; 
         d.deletedAt = new Date().toLocaleDateString(); 
         deletedClients.push(d); 
         syncAll(); 
-        notify('Moved to Bin', 'info');
+        notify('تم النقل إلى سلة المحذوفات', 'info');
         renderCRM();
         updateClientSelect();
         if(currentMap) refreshMap();
     } 
 }
-function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); updateClientSelect(); if(currentMap) refreshMap(); }
+function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('تم الاستعادة', 'success'); updateClientSelect(); if(currentMap) refreshMap(); }
 function permanentDel(i) { 
-    if(confirm('Final Del?')) { 
+    if(confirm('حذف نهائي؟')) { 
         deletedClients.splice(i, 1); 
         syncAll(); 
-        notify('Deleted Permanently', 'error'); 
+        notify('تم الحذف النهائي', 'error'); 
     } 
 }
 function syncAll() { db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients}); }
@@ -1053,11 +1071,15 @@ function renderTasks() {
         let statusBadge = '';
         
         if(clientData) {
-            statusBadge = <span class="client-badge" style="background:${clientData.status === 'VIP' ? '#f1c40f' : clientData.status === 'In Progress' ? '#2ecc71' : clientData.status === 'Hold' ? '#e74c3c' : '#3498db'}; color:white;">${clientData.status}</span>;
+            let bgColor = clientData.status === 'Interested' ? '#3498db' : clientData.status === 'In Progress' ? '#2ecc71' : clientData.status === 'Hold' ? '#e74c3c' : '#27ae60';
+            let statusText = {Interested:'مهتم', 'In Progress':'قيد التقدم', Hold:'قيد الانتظار', Completed:'مكتمل'}[clientData.status] || clientData.status;
+            statusBadge = <span class="client-badge" style="background:${bgColor}; color:white;">${statusText}</span>;
             clientDisplay = <strong>${t.client}</strong><br>${statusBadge};
         } else {
             clientDisplay = <strong style="color:red;">${t.client || 'غير معروف'}</strong><br><span class="client-badge" style="background:gray;">غير موجود</span>;
         }
+        
+        let stageText = {quote:'عرض سعر', follow:'متابعة', order:'طلب', bank:'بنك'}[t.stage] || t.stage;
         
         const delBtn = <button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">🗑️</button>;
         const editClientBtn = <button onclick="editClientFromTask('${t.client.replace(/'/g, "\\'")}')" style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">✏️ تعديل العميل</button>;
@@ -1068,7 +1090,7 @@ function renderTasks() {
             <td>${t.phone || clientData?.phone || '-'}</td>
             <td>${t.text}</td>
             <td>${t.date || 'لم يحدد'}</td>
-            <td><span style="background:#e0e0e0; padding:3px 8px; border-radius:15px; font-size:12px;">${t.stage}</span></td>
+            <td><span style="background:#e0e0e0; padding:3px 8px; border-radius:15px; font-size:12px;">${stageText}</span></td>
             <td>${delBtn}</td>
         </tr>`; 
     }); 
@@ -1096,12 +1118,18 @@ function deleteTask(index) {
     }
 }
 
-function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
+function changeLang(l) { 
+    lang = l; 
+    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
+    fillGovs(); 
+    renderCRM(); 
+    applyRolePermissions(); 
+}
 
 // Firebase Listeners
 db.ref('authSystem').on('value', s => {
     if(s.val()) { authSystem = s.val(); } 
-    else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] }; db.ref('authSystem').set(authSystem); }
+    else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'المدير الرئيسي' }] }; db.ref('authSystem').set(authSystem); }
     renderUsers();
 });
 
@@ -1109,7 +1137,7 @@ db.ref('clients').on('value', s => {
     clients = s.val() ? Object.values(s.val()) : []; 
     renderCRM(); 
     updateClientSelect();
-    if(currentMap) refreshMap();
+    if(currentMap && document.getElementById('mapTab')?.classList.contains('active')) refreshMap();
 });
 
 db.ref('deletedClients').on('value', s => { 
@@ -1129,6 +1157,10 @@ db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []
 
 fillGovs();
 updateClientSelect();
+
+// Auto fill login fields with demo credentials
+document.getElementById('userInput').value = 'admin';
+document.getElementById('passInput').value = 'admin123';
 </script>
 </body>
 </html>
