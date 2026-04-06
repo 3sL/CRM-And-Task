@@ -425,6 +425,7 @@ function checkLogin() {
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
+
     if (user) { 
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
@@ -432,12 +433,19 @@ function checkLogin() {
         sessionStorage.setItem('userRole', user.role);
         sessionStorage.setItem('userDisplayName', user.displayName);
         sessionStorage.setItem('currentUserName', user.u);
+        
         applyRolePermissions();
         renderCRM(); 
         renderTasks();
         renderUsers();
         updateClientSelect();
-        setTimeout(() => { if(document.getElementById('customerMap')) initMap(); }, 500);
+
+        setTimeout(() => { 
+            if (document.getElementById('customerMap')) {
+                initMap();
+            }
+        }, 500);
+
         notify('مرحباً ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
