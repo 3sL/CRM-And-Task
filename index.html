@@ -71,7 +71,7 @@
         <input type="text" id="userInput" placeholder="Username">
         <input type="password" id="passInput" placeholder="Password">
         <button id="loginBtn" onclick="checkLogin()">Login</button>
-        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Invalid Credentials or Unauthorized Device!</p>
+        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Wrong data or unauthorized device!</p>
         <div class="login-dev-info">
             <b>Dev By: Eng. Mahmoud Mohamed Marie</b>
             <a href="https://wa.me/201222153415">🟢 +201222153415</a>
@@ -256,7 +256,7 @@ function checkLogin() {
     }
 
     if (!visitorId) {
-        alert("Device not detected yet...");
+        alert("Detecting device...");
         return;
     }
 
@@ -267,20 +267,26 @@ function checkLogin() {
 
     if (user) {
 
-        // ✅ أول تسجيل (ربط الجهاز)
-        if (!user.deviceId) {
-            user.deviceId = visitorId;
+        // لو مفيش devices (تحديث من النظام القديم)
+        if (!user.devices) {
+            user.devices = [];
+        }
+
+        // ✅ لو الجهاز جديد
+        if (!user.devices.includes(visitorId)) {
+            user.devices.push(visitorId);
+
+            // ❗ حد أقصى للأجهزة (اختياري)
+            const MAX_DEVICES = 3;
+            if (user.devices.length > MAX_DEVICES) {
+                alert("Device limit reached!");
+                return;
+            }
+
             db.ref('authSystem').set(authSystem);
         }
 
-        // ❌ جهاز مختلف
-        if (user.deviceId !== visitorId) {
-            document.getElementById('loginError').style.display = 'block';
-            alert("Unauthorized Device!");
-            return;
-        }
-
-        // ✅ دخول طبيعي
+        // ✅ دخول عادي
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
 
@@ -314,7 +320,7 @@ function addUser() {
         p: p, 
         role: r, 
         displayName: d,
-        deviceId: '' // 👈 مهم
+        devices: [] // 👈 هنا
     });
 
     db.ref('authSystem').set(authSystem);
@@ -587,12 +593,12 @@ db.ref('authSystem').on('value', s => {
         // إعداد افتراضي لأول مرة فقط
         authSystem = {
             users: [
-                { 
-  u: 'admin', 
-  p: 'admin123', 
-  role: 'admin', 
+              {
+  u: 'admin',
+  p: 'admin123',
+  role: 'admin',
   displayName: 'Manager Admin',
-  deviceId: '' // 👈 جديد
+  devices: [] // 👈 بدل deviceId
 }
             ]
         };
