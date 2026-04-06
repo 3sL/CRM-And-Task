@@ -351,16 +351,20 @@ db.ref('authSystem').on('value', s => {
 
     renderUsers();
 });
+// 🔹 دالة فحص أمان الجهاز
+function checkDeviceSecurity() {
+    if (!authSystem || !isAuthReady) return false;
 
-// --- دالة إعادة تعيين الأجهزة لمستخدم معين ---
-function resetDevices(index) {
-    if (confirm("Reset all devices for this user?")) {
-        authSystem.users[index].devices = [];
-        db.ref('authSystem').set(authSystem);
-        notify('Devices Reset Successfully', 'success');
+    const currentUser = authSystem.users.find(u => u.u === currentLoggedInUser);
+    if (!currentUser) return false;
+
+    if (currentUser.role !== 'admin') {
+        alert("Access Denied: Admins only");
+        return false;
     }
-}
 
+    return true;
+}
 // --- دالة عرض المستخدمين مع زرار Reset Devices ---
 function renderUsers() {
     const tbody = document.getElementById('usersTableBody');
