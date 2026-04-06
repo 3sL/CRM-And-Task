@@ -4,68 +4,11 @@
     <meta charset="UTF-8">
     <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- تحميل المكتبات مع معالجة الأخطاء -->
-    <script>
-        // ========== نظام حماية متقدم يعمل محلياً ==========
-        // منع فتح أدوات المطور
-        (function() {
-            // منع F12 و Ctrl+Shift+I و Ctrl+U و Ctrl+S
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'F12' || 
-                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-                    (e.ctrlKey && e.key === 'u') ||
-                    (e.ctrlKey && e.key === 's')) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-            
-            // منع النقر بزر الماوس الأيمن
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
-            // كشف أدوات المطور
-            let devToolsDetected = false;
-            function detectDevTools() {
-                const threshold = 160;
-                const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-                const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-                if (widthThreshold || heightThreshold) {
-                    if (!devToolsDetected) {
-                        devToolsDetected = true;
-                        document.body.innerHTML = '<div style="text-align:center; padding:50px; background:#1e1e2f; color:white; height:100vh;"><h1>🔒 تم اكتشاف أدوات المطور</h1><p>الرجاء إغلاق أدوات المطور لإعادة تحميل التطبيق</p><button onclick="location.reload()" style="padding:10px 20px; background:#ffcc00; border:none; border-radius:10px;">إعادة تحميل</button></div>';
-                    }
-                }
-            }
-            setInterval(detectDevTools, 1000);
-            
-            // تشويش الكود (حماية بسيطة)
-            window.__protected = true;
-        })();
-        
-        // حفظ البيانات مشفرة
-        const encryptionKey = 'Utopia2024SecureKey';
-        function encryptData(data) {
-            try {
-                return btoa(encodeURIComponent(JSON.stringify(data)));
-            } catch(e) { return JSON.stringify(data); }
-        }
-        function decryptData(encrypted) {
-            try {
-                return JSON.parse(decodeURIComponent(atob(encrypted)));
-            } catch(e) { return null; }
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js" onerror="console.log('FP failed - using fallback')"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" onerror="console.log('Chart failed')"></script>
-    
-    <!-- Firebase SDK (النسخة الصحيحة) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet Map Libraries with error handling -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="console.log('Leaflet CSS failed')" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="console.log('Leaflet JS failed')"></script>
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
@@ -74,14 +17,13 @@
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
         .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; box-sizing: border-box; outline: none; font-size: 16px; }
-        .login-card input::placeholder { color: #aaa; }
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .login-card button:hover { opacity: 0.9; transform: scale(1.02); }
         .login-dev-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #3f3f6b; font-size: 0.85em; color: #bbb; }
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
         #mainApp { display: none; width: 100%; height: 100vh; flex-direction: row; }
-        .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; overflow-y: auto; }
+        .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; }
         .sidebar h2 { font-size:1.3em; margin-bottom:20px; color:var(--accent); text-align:center; border-bottom: 2px solid #2e2e4d; padding-bottom: 10px; }
         .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: left; }
         .sidebar button.active { background:var(--accent); color:var(--primary); }
@@ -96,7 +38,7 @@
         .row > * { flex: 1; min-width: 180px; }
         .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
         .btn-export { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
-        .btn-import { background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; margin-right: 5px; }
+        .btn-import { background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; margin-right: 5px; }
         table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
@@ -116,7 +58,6 @@
         .track-old { background: #dc3545; }
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.5s ease-out; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         @media (max-width: 768px) { body { flex-direction: column; overflow: auto; } #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; } .dev-box { display: none; } }
         
@@ -202,6 +143,10 @@
             align-items: center;
             justify-content: center;
         }
+        .map-placeholder {
+            text-align: center;
+            color: #6c757d;
+        }
         .location-btn {
             background: #3498db;
             color: white;
@@ -219,41 +164,21 @@
             border-radius: 10px;
             font-size: 12px;
         }
-        .fallback-notice {
-            background: #fff3cd;
-            color: #856404;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 12px;
-            display: none;
-        }
-        .sync-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            z-index: 9999;
-        }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
-<body class="no-select">
-<audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+<body class="no-select" oncontextmenu="return false;"> <audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 <div id="notification"></div>
-<div id="syncStatus" class="sync-status">🔄 جاري المزامنة...</div>
 
 <div id="loginOverlay">
     <div class="login-card">
         <h2>Utopia Trading For Export</h2>
-        <div id="deviceLockInfo" style="font-size: 12px; color: #ffcc00; margin-bottom: 10px;">✓ النظام جاهز - محمي بالكامل</div>
-        <input type="text" id="userInput" placeholder="Username" autocomplete="off">
-        <input type="password" id="passInput" placeholder="Password" autocomplete="off">
+        <div id="deviceLockInfo" style="font-size: 10px; color: #888; margin-bottom: 10px;">جاري التحقق من الجهاز...</div>
+        <input type="text" id="userInput" placeholder="Username" value="admin">
+        <input type="password" id="passInput" placeholder="Password" value="admin123">
         <button id="loginBtn" onclick="checkLogin()">Login</button>
-        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">Invalid Credentials!</p>
+        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">بيانات دخول غير صحيحة أو جهاز غير مصرح به!</p>
         <div class="login-dev-info">
             <b>Dev By: Eng. Mahmoud Mohamed Marie</b>
             <a href="https://wa.me/201222153415">🟢 +201222153415</a>
@@ -268,6 +193,7 @@
         <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
+        <button class="tab-btn" onclick="showTab('mapTab', this)">🗺️ Customer Map</button>
         <button id="btnRecycle" class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
         <button id="btnSecurity" class="tab-btn" onclick="showTab('securityTab', this)">🛡️ Change Password</button>
         <button id="btnUsers" class="tab-btn admin-only" onclick="showTab('usersTab', this)">🔐 Users Management</button>
@@ -279,68 +205,68 @@
             <button onclick="logout()" style="background: var(--danger); margin-top: 10px; width: 100%; text-align: center; border-radius: 8px; color:white; border:none; padding:10px; cursor:pointer;">Logout</button>
             <select id="language" onchange="changeLang(this.value)" style="margin-top: 15px; background: #2e2e4d; color: white; border: none; padding: 5px;">
                 <option value="en">English</option>
-                <option value="ar">العربية</option>
+                <option value="ar" selected>العربية</option>
             </select>
         </div>
     </div>
 
     <div class="main">
         <div id="crmTab" class="tab-content active">
-            <h2 id="crmHeader">Clients Registry</h2>
+            <h2 id="crmHeader">سجل العملاء</h2>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <div class="advanced-search-row">
-                    <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent);">
+                    <input id="search" placeholder="🔍 بحث بالاسم أو الهاتف أو المحافظة..." oninput="renderCRM()" style="border: 2px solid var(--accent);">
                     <select id="searchStatusFilter" onchange="renderCRM()">
-                        <option value="all">📌 All Status</option>
-                        <option value="Interested">🤝 Interested</option>
-                        <option value="In Progress">🚀 In Progress</option>
-                        <option value="Hold">⏸ Hold</option>
-                        <option value="Completed">✅ Completed</option>
+                        <option value="all">📌 جميع الحالات</option>
+                        <option value="Interested">🤝 مهتم</option>
+                        <option value="In Progress">🚀 قيد التقدم</option>
+                        <option value="Hold">⏸ قيد الانتظار</option>
+                        <option value="Completed">✅ مكتمل</option>
                     </select>
-                    <button class="reset-search" onclick="resetSearch()">🔄 Reset</button>
+                    <button class="reset-search" onclick="resetSearch()">🔄 إعادة ضبط البحث</button>
                 </div>
-                <button class="btn-import admin-only" onclick="document.getElementById('csvFileInput').click()">📥 Import CSV</button>
+                <button class="btn-import admin-only" onclick="document.getElementById('csvFileInput').click()">📥 استيراد CSV</button>
                 <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
-                <button class="btn-export admin-only" onclick="exportData('clients')">📤 Export Excel</button>
+                <button class="btn-export admin-only" onclick="exportData('clients')">📤 تصدير Excel</button>
             </div>
             <div class="row">
-                <input id="name" placeholder="Client Name">
-                <input id="phone" placeholder="Phone Number">
+                <input id="name" placeholder="اسم العميل">
+                <input id="phone" placeholder="رقم الهاتف">
                 <select id="gov"></select>
                 <select id="status">
-                    <option value="Interested">Interested</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Hold">Hold</option>
-                    <option value="Completed">Completed</option>
+                    <option value="Interested">مهتم</option>
+                    <option value="In Progress">قيد التقدم</option>
+                    <option value="Hold">قيد الانتظار</option>
+                    <option value="Completed">مكتمل</option>
                 </select>
             </div>
             <div class="row">
                 <div style="flex:2; display:flex; gap:5px;">
-                    <textarea id="notes" placeholder="Notes..." style="flex:1;"></textarea>
-                    <button id="voiceNotesBtn" class="voice-btn" onclick="startVoiceInput('notes')" title="🎤 Voice Input">🎤</button>
+                    <textarea id="notes" placeholder="ملاحظات..." style="flex:1;"></textarea>
+                    <button id="voiceNotesBtn" class="voice-btn" onclick="startVoiceInput('notes')" title="🎤 إدخال بالصوت">🎤</button>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
-                    <input id="agent" placeholder="Agent Name">
-                    <input id="followUp" placeholder="Next Action">
+                    <input id="agent" placeholder="اسم المسؤول">
+                    <input id="followUp" placeholder="الإجراء التالي">
                     <input type="date" id="date">
                 </div>
             </div>
             <div class="row">
                 <div style="flex:1;">
-                    <input id="locationAddress" placeholder="📍 Client Address (Optional)">
-                    <button type="button" class="location-btn" onclick="getCurrentLocation()">📍 Get My Location</button>
+                    <input id="locationAddress" placeholder="📍 عنوان العميل (اختياري)">
+                    <button type="button" class="location-btn" onclick="getCurrentLocation()">📍 تحديد موقعي الحالي</button>
                 </div>
             </div>
             <div id="locationPreview" class="map-preview" style="display:none;"></div>
-            <button class="btn-save" onclick="addOrUpdate()">💾 Save Data</button>
+            <button class="btn-save" onclick="addOrUpdate()">💾 حفظ البيانات</button>
             <div class="row" style="margin-top: 20px;">
-                <div class="card" id="countAll">Total: 0</div>
-                <div class="card" id="countHold" style="border-top-color: var(--danger);">Hold: 0</div>
+                <div class="card" id="countAll">الإجمالي: 0</div>
+                <div class="card" id="countHold" style="border-top-color: var(--danger);">قيد الانتظار: 0</div>
             </div>
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking</th><th>Status</th><th>Location</th><th>Actions</th>
+                        <th>الاسم</th><th>الهاتف</th><th>المحافظة</th><th>التتبع</th><th>الحالة</th><th>الموقع</th><th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -348,57 +274,71 @@
         </div>
 
         <div id="dashboardTab" class="tab-content">
-            <h2>📊 Smart Analytics & AI Insight</h2>
+            <h2>📊 التحليلات الذكية</h2>
             <div class="ai-card-container">
-                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">Conversion Rate</h3><p id="convRate">0%</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">Potential Deals</h3><p id="potentialDeals">0</p></div>
-                <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">Top Governorate</h3><p id="topGov">-</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--success);"><h3 id="lblConv">نسبة التحويل</h3><p id="convRate">0%</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--accent);"><h3 id="lblPotential">الصفقات المحتملة</h3><p id="potentialDeals">0</p></div>
+                <div class="ai-stat-card" style="border-left-color: var(--info);"><h3 id="lblTopGov">أكثر محافظة</h3><p id="topGov">-</p></div>
             </div>
             <div class="chart-box">
                 <canvas id="statusChart"></canvas>
             </div>
         </div>
 
+        <div id="mapTab" class="tab-content">
+            <h2>🗺️ خريطة مواقع العملاء</h2>
+            <div class="row">
+                <select id="mapCustomerSelect" onchange="showCustomerOnMap()">
+                    <option value="">-- اختر عميل لعرض موقعه --</option>
+                </select>
+                <button onclick="refreshMap()" style="background:var(--info); color:white; border:none; padding:10px; border-radius:8px;">🔄 تحديث الخريطة</button>
+            </div>
+            <div id="customerMap" class="map-container">
+                <div class="map-placeholder">🗺️ جاري تحميل الخريطة... <br> <small>قد تحتاج إلى اتصال بالإنترنت</small></div>
+            </div>
+            <div id="mapInfo" style="margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 10px; text-align: center;"></div>
+        </div>
+
         <div id="recycleTab" class="tab-content">
-            <h2 style="color: var(--danger);">♻️ Recycle Bin</h2>
+            <h2 style="color: var(--danger);">♻️ سلة المحذوفات</h2>
             <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Deleted Date</th><th>Actions</th></tr></thead>
+                <thead><tr><th>الاسم</th><th>الهاتف</th><th>تاريخ الحذف</th><th>الإجراءات</th></tr></thead>
                 <tbody id="recycleBody"></tbody>
             </table>
         </div>
 
         <div id="tasksTab" class="tab-content">
-            <h2>Operations Tasks</h2>
+            <h2>قائمة المهام</h2>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <input id="taskSearch" placeholder="🔍 Filter tasks..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
-                <button class="btn-export admin-only" onclick="exportData('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
+                <input id="taskSearch" placeholder="🔍 بحث..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
+                <button class="btn-export admin-only" onclick="exportData('tasks')" style="background: #17a2b8;">📤 تصدير المهام</button>
             </div>
             <div class="row">
-                <input id="taskText" placeholder="Task details" style="flex: 2;">
+                <input id="taskText" placeholder="تفاصيل المهمة" style="flex: 2;">
                 <button class="voice-btn" onclick="startVoiceInput('taskText')" style="width:50px;">🎤</button>
                 <select id="taskClientSelect" onchange="autoFillTaskPhone()" style="flex: 2;">
-                    <option value="">-- Select Client --</option>
+                    <option value="">-- اختر عميل --</option>
                 </select>
-                <input id="taskPhone" placeholder="Phone Number" readonly style="background: #f5f5f5;">
+                <input id="taskPhone" placeholder="رقم الهاتف" readonly style="background: #f5f5f5;">
                 <input type="date" id="taskDate">
                 <select id="taskStage">
-                    <option value="quote">📄 Quote</option>
-                    <option value="follow">📞 Follow Up</option>
-                    <option value="order">🛒 Order</option>
-                    <option value="bank">🏦 Bank</option>
+                    <option value="quote">📄 عرض سعر</option>
+                    <option value="follow">📞 متابعة</option>
+                    <option value="order">🛒 طلب</option>
+                    <option value="bank">🏦 بنك</option>
                 </select>
-                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕ Add</button>
+                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕ إضافة</button>
             </div>
             <div style="margin-top: 20px; overflow-x: auto;">
                 <table style="min-width: 800px;">
                     <thead>
                         <tr>
-                            <th>👤 Client Info</th>
-                            <th>📞 Phone</th>
-                            <th>📋 Task</th>
-                            <th>📅 Deadline</th>
-                            <th>🎯 Stage</th>
-                            <th>⚙️ Actions</th>
+                            <th>👤 معلومات العميل</th>
+                            <th>📞 الهاتف</th>
+                            <th>📋 المهمة</th>
+                            <th>📅 الموعد</th>
+                            <th>🎯 المرحلة</th>
+                            <th>⚙️ الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="taskBody"></tbody>
@@ -407,31 +347,31 @@
         </div>
 
         <div id="usersTab" class="tab-content">
-            <h2>🔐 Users Management</h2>
+            <h2>🔐 إدارة المستخدمين</h2>
             <div class="row">
-                <input id="newUsername" placeholder="Username">
-                <input id="newPassword" placeholder="Password">
-                <input id="newDisplayName" placeholder="Display Name">
+                <input id="newUsername" placeholder="اسم المستخدم">
+                <input id="newPassword" placeholder="كلمة المرور">
+                <input id="newDisplayName" placeholder="الاسم المعروض">
                 <select id="newRole">
-                    <option value="user">User / Employee</option>
-                    <option value="admin">Admin / Manager</option>
+                    <option value="user">موظف</option>
+                    <option value="admin">مدير</option>
                 </select>
-                <button class="btn-save" onclick="addUser()" style="flex: 0.5;">Add User</button>
+                <button class="btn-save" onclick="addUser()" style="flex: 0.5;">إضافة مستخدم</button>
             </div>
             <table>
                 <thead>
-                    <tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password</th><th>Actions</th></tr>
+                    <tr><th>اسم المستخدم</th><th>الاسم المعروض</th><th>الصلاحية</th><th>كلمة المرور</th><th>الإجراءات</th></tr>
                 </thead>
                 <tbody id="usersTableBody"></tbody>
             </table>
         </div>
 
         <div id="securityTab" class="tab-content">
-            <h2 id="secHeader">🛡️ Account Security</h2>
+            <h2 id="secHeader">🛡️ أمان الحساب</h2>
             <div style="max-width: 400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <p id="secLabel">Change Your Access Password:</p>
-                <input type="password" id="changePassInput" placeholder="New Password" style="margin-bottom: 15px;">
-                <button class="btn-save" onclick="changeMyPassword()" style="background: var(--primary);">Update Password</button>
+                <p id="secLabel">تغيير كلمة المرور:</p>
+                <input type="password" id="changePassInput" placeholder="كلمة المرور الجديدة" style="margin-bottom: 15px;">
+                <button class="btn-save" onclick="changeMyPassword()" style="background: var(--primary);">تحديث كلمة المرور</button>
             </div>
         </div>
 
@@ -439,335 +379,83 @@
 </div>
 
 <script>
-// ==================== إعدادات Firebase ====================
-// ⚠️ IMPORTANT: استبدل هذه الإعدادات بإعدادات مشروعك على Firebase
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
-// متغيرات Firebase
-let firebaseInitialized = false;
-let db = null;
-let syncInProgress = false;
-
-// تهيئة Firebase (مع fallback آمن)
-async function initFirebase() {
-    try {
-        // التحقق من وجود Firebase SDK
-        if (typeof firebase === 'undefined') {
-            throw new Error('Firebase SDK not loaded');
-        }
-        
-        // تهيئة التطبيق
-        let app;
-        try {
-            app = firebase.initializeApp(firebaseConfig);
-        } catch(e) {
-            // إذا كان التطبيق مهيأ مسبقاً
-            app = firebase.app();
-        }
-        
-        db = firebase.firestore(app);
-        
-        // اختبار الاتصال
-        await db.collection('test').doc('connection').set({ test: true }, { merge: true });
-        firebaseInitialized = true;
-        document.getElementById('syncStatus').innerHTML = '☁️ متصل بالسحابة';
-        document.getElementById('syncStatus').style.background = 'rgba(40,167,69,0.9)';
-        console.log('✅ Firebase connected successfully');
-        
-        // مزامنة البيانات بعد التهيئة
-        setTimeout(() => syncAllDataWithCloud(), 1000);
-        return true;
-    } catch(e) {
-        console.warn('⚠️ Firebase connection failed:', e.message);
-        firebaseInitialized = false;
-        document.getElementById('syncStatus').innerHTML = '📱 وضع غير متصل (محلي فقط)';
-        document.getElementById('syncStatus').style.background = 'rgba(220,53,69,0.8)';
-        notify('⚠️ لا يمكن الاتصال بالسحابة - سيتم العمل محلياً فقط', 'error');
-        return false;
-    }
-}
-
-// ==================== دوال المزامنة مع Firebase ====================
-async function syncCollectionToCloud(collectionName, localData) {
-    if (!firebaseInitialized || !db) return false;
-    try {
-        const batch = db.batch();
-        const collectionRef = db.collection(collectionName);
-        
-        for (const item of localData) {
-            const docRef = collectionRef.doc(String(item.id));
-            batch.set(docRef, item, { merge: true });
-        }
-        await batch.commit();
-        return true;
-    } catch(e) {
-        console.error(Sync failed for ${collectionName}:, e);
-        return false;
-    }
-}
-
-async function syncCollectionFromCloud(collectionName) {
-    if (!firebaseInitialized || !db) return null;
-    try {
-        const snapshot = await db.collection(collectionName).get();
-        const data = [];
-        snapshot.forEach(doc => {
-            data.push(doc.data());
-        });
-        return data;
-    } catch(e) {
-        console.error(Fetch failed for ${collectionName}:, e);
-        return null;
-    }
-}
-
-async function syncAllDataWithCloud() {
-    if (syncInProgress) return;
-    syncInProgress = true;
-    
-    try {
-        // رفع البيانات المحلية إلى السحابة
-        await syncCollectionToCloud('clients', clients);
-        await syncCollectionToCloud('tasks', tasks);
-        await syncCollectionToCloud('users', authSystem.users);
-        await syncCollectionToCloud('deletedClients', deletedClients);
-        
-        // جلب البيانات من السحابة ودمجها (السحابة لها الأولوية)
-        const cloudClients = await syncCollectionFromCloud('clients');
-        const cloudTasks = await syncCollectionFromCloud('tasks');
-        const cloudUsers = await syncCollectionFromCloud('users');
-        const cloudDeleted = await syncCollectionFromCloud('deletedClients');
-        
-        if (cloudClients && cloudClients.length > 0) {
-            // دمج البيانات: سحابة أولاً، ثم محلي
-            const mergedClients = [...cloudClients];
-            for (const localClient of clients) {
-                if (!cloudClients.find(c => c.id === localClient.id)) {
-                    mergedClients.push(localClient);
-                }
-            }
-            clients.length = 0;
-            clients.push(...mergedClients);
-            saveToLocalStorage('utopia_clients', clients);
-        }
-        
-        if (cloudTasks && cloudTasks.length > 0) {
-            const mergedTasks = [...cloudTasks];
-            for (const localTask of tasks) {
-                if (!cloudTasks.find(t => t.id === localTask.id)) {
-                    mergedTasks.push(localTask);
-                }
-            }
-            tasks.length = 0;
-            tasks.push(...mergedTasks);
-            saveToLocalStorage('utopia_tasks', tasks);
-        }
-        
-        if (cloudUsers && cloudUsers.length > 0) {
-            authSystem.users = cloudUsers;
-            saveToLocalStorage('utopia_users', authSystem);
-        }
-        
-        if (cloudDeleted && cloudDeleted.length > 0) {
-            deletedClients = cloudDeleted;
-            saveToLocalStorage('utopia_deleted', deletedClients);
-        }
-        
-        console.log('✅ Sync completed');
-        document.getElementById('syncStatus').innerHTML = '✅ متزامن مع السحابة';
-        setTimeout(() => {
-            if (firebaseInitialized) {
-                document.getElementById('syncStatus').innerHTML = '☁️ متصل بالسحابة';
-            }
-        }, 3000);
-        
-    } catch(e) {
-        console.error('Sync error:', e);
-    } finally {
-        syncInProgress = false;
-    }
-}
-
-// تعديل دوال الحفظ لتشمل المزامنة
-const originalSaveAllData = saveAllData;
-function saveAllData() {
-    originalSaveAllData();
-    // مزامنة غير متزامنة مع السحابة (بدون انتظار)
-    if (firebaseInitialized && !syncInProgress) {
-        setTimeout(() => syncAllDataWithCloud(), 100);
-    }
-}
-
-// ==================== نظام حماية وحفظ البيانات المتقدم ====================
-let visitorId = "SECURE_DEVICE_" + Math.random().toString(36).substr(2, 9);
-let deviceVerified = true;
-
-// Fingerprint with fallback
+let visitorId = "";
 async function initFingerprint() {
     try {
-        if (typeof FingerprintJS !== 'undefined') {
-            const fp = await FingerprintJS.load();
-            const result = await fp.get();
-            visitorId = result.visitorId;
-        }
+        const fp = await FingerprintJS.load();
+        const result = await fp.get();
+        visitorId = result.visitorId;
+        document.getElementById('deviceLockInfo').innerText = "Device ID: " + visitorId;
     } catch(e) {
-        console.log("Fingerprint fallback active");
+        console.log("Fingerprint error:", e);
+        document.getElementById('deviceLockInfo').innerText = "✓ Device ready";
     }
-    document.getElementById('deviceLockInfo').innerHTML = '✓ Device Secured | ID: ' + visitorId.substr(0, 15);
 }
 initFingerprint();
 
-// ==================== نظام التخزين المحلي المشفر ====================
-function saveToLocalStorage(key, data) {
-    try {
-        const encrypted = btoa(encodeURIComponent(JSON.stringify(data)));
-        localStorage.setItem(key, encrypted);
-        return true;
-    } catch(e) {
-        localStorage.setItem(key, JSON.stringify(data));
-        return false;
-    }
+document.onkeydown = function(e) {
+    if(event.keyCode == 123) return false; 
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
 }
 
-function loadFromLocalStorage(key) {
-    try {
-        const data = localStorage.getItem(key);
-        if (!data) return null;
-        try {
-            return JSON.parse(decodeURIComponent(atob(data)));
-        } catch(e) {
-            return JSON.parse(data);
-        }
-    } catch(e) {
-        return null;
-    }
-}
+const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-// ==================== البيانات الأساسية ====================
 let authSystem = { users: [] };
-let clients = [];
-let tasks = [];
-let deletedClients = [];
-let editIdx = -1;
-let lang = 'en';
-let statusChart = null;
-let currentMap = null;
-
-// ==================== تحميل البيانات المحفوظة ====================
-function loadAllData() {
-    // Load users
-    const savedUsers = loadFromLocalStorage('utopia_users');
-    if (savedUsers && savedUsers.users) {
-        authSystem = savedUsers;
-    } else {
-        authSystem = { 
-            users: [
-                { u: 'admin', p: 'admin123', role: 'admin', displayName: 'Master Admin' },
-                { u: 'user', p: 'user123', role: 'user', displayName: 'Regular User' }
-            ] 
-        };
-        saveToLocalStorage('utopia_users', authSystem);
-    }
-    
-    // Load clients
-    const savedClients = loadFromLocalStorage('utopia_clients');
-    if (savedClients) {
-        clients = savedClients;
-    } else {
-        clients = [
-            { id: 1, name: 'Ahmed Mohamed', phone: '01001234567', gov: 'Cairo', status: 'Interested', notes: 'Potential client', agent: 'Admin', followUp: 'Call tomorrow', date: new Date().toISOString().split('T')[0] },
-            { id: 2, name: 'Sara Ali', phone: '01112345678', gov: 'Giza', status: 'In Progress', notes: 'Negotiating', agent: 'Admin', followUp: 'Send offer', date: new Date().toISOString().split('T')[0] },
-            { id: 3, name: 'Mohamed Hassan', phone: '01223456789', gov: 'Alexandria', status: 'Hold', notes: 'Waiting for approval', agent: 'Admin', followUp: 'Follow up', date: new Date().toISOString().split('T')[0] }
-        ];
-        saveToLocalStorage('utopia_clients', clients);
-    }
-    
-    // Load tasks
-    const savedTasks = loadFromLocalStorage('utopia_tasks');
-    if (savedTasks) {
-        tasks = savedTasks;
-    } else {
-        tasks = [];
-        saveToLocalStorage('utopia_tasks', tasks);
-    }
-    
-    // Load deleted clients
-    const savedDeleted = loadFromLocalStorage('utopia_deleted');
-    if (savedDeleted) {
-        deletedClients = savedDeleted;
-    } else {
-        deletedClients = [];
-        saveToLocalStorage('utopia_deleted', deletedClients);
-    }
-}
-
-// ==================== دوال تسجيل الدخول ====================
-function checkLogin() {
-    const u = document.getElementById('userInput').value;
-    const p = document.getElementById('passInput').value;
-    const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
-    
-    if (user) {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userRole', user.role);
-        sessionStorage.setItem('userDisplayName', user.displayName);
-        sessionStorage.setItem('currentUserName', user.u);
-        applyRolePermissions();
-        renderCRM();
-        renderTasks();
-        renderUsers();
-        updateClientSelect();
-        updateDashboard();
-        renderRecycleBin();
-        notify('Welcome ' + user.displayName, 'success');
-    } else {
-        document.getElementById('loginError').style.display = 'block';
-        notify('Invalid Credentials!', 'error');
-    }
-}
-
-function logout() {
-    sessionStorage.clear();
-    location.reload();
-}
 
 function applyRolePermissions() {
     const role = sessionStorage.getItem('userRole');
     const dispName = sessionStorage.getItem('userDisplayName');
     const isAdmin = (role === 'admin');
     
-    document.getElementById('welcomeUser').innerHTML = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
+    document.getElementById('welcomeUser').innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
     const usersBtn = document.getElementById('btnUsers');
-    if (usersBtn) usersBtn.style.display = isAdmin ? 'block' : 'none';
-    
+    if(usersBtn) usersBtn.style.display = isAdmin ? 'block' : 'none';
     document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = isAdmin ? 'inline-block' : 'none';
     });
 }
 
-// ==================== دوال المستخدمين ====================
-function renderUsers() {
-    const tbody = document.getElementById('usersTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    authSystem.users.forEach((user, i) => {
-        tbody.innerHTML += `<tr>
-            <td>${user.u}</td>
-            <td>${user.displayName}</td>
-            <td>${user.role === 'admin' ? 'Admin' : 'User'}</td>
-            <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px; background:#fffbe6; font-weight:bold;"></td>
-            <td><button onclick="deleteUser(${i})" style="background:var(--danger); color:white; border:none; padding:5px; border-radius:5px;">Remove</button></td>
-        </tr>`;
-    });
+function checkLogin() { 
+    const u = document.getElementById('userInput').value;
+    const p = document.getElementById('passInput').value;
+    const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
+    if (user) { 
+        document.getElementById('loginOverlay').style.display = 'none'; 
+        document.getElementById('mainApp').style.display = 'flex'; 
+        sessionStorage.setItem('isLoggedIn', 'true'); 
+        sessionStorage.setItem('userRole', user.role);
+        sessionStorage.setItem('userDisplayName', user.displayName);
+        sessionStorage.setItem('currentUserName', user.u);
+        applyRolePermissions();
+        renderCRM(); 
+        renderTasks();
+        renderUsers();
+        updateClientSelect();
+        setTimeout(() => { if(document.getElementById('customerMap')) initMap(); }, 500);
+        notify('مرحباً ' + user.displayName, 'success'); 
+    } else { 
+        document.getElementById('loginError').style.display = 'block'; 
+        notify('فشل تسجيل الدخول', 'error'); 
+    } 
+}
+
+function changeMyPassword() {
+    const newPass = document.getElementById('changePassInput').value;
+    const currentU = sessionStorage.getItem('currentUserName');
+    if(!newPass) return notify('الرجاء إدخال كلمة مرور جديدة', 'error');
+    const userIdx = authSystem.users.findIndex(u => u.u === currentU);
+    if(userIdx > -1) {
+        authSystem.users[userIdx].p = newPass;
+        db.ref('authSystem').set(authSystem);
+        document.getElementById('changePassInput').value = '';
+        notify('تم تحديث كلمة المرور بنجاح', 'success');
+    }
 }
 
 function addUser() {
@@ -775,105 +463,353 @@ function addUser() {
     const p = document.getElementById('newPassword').value;
     const d = document.getElementById('newDisplayName').value;
     const r = document.getElementById('newRole').value;
-    if (!u || !p || !d) return notify('Fill all fields', 'error');
-    if (authSystem.users.find(user => user.u === u)) return notify('User exists', 'error');
+    if(!u || !p || !d) return notify('املأ جميع البيانات', 'error');
+    if(authSystem.users.find(user => user.u === u)) return notify('المستخدم موجود مسبقاً', 'error');
     authSystem.users.push({ u: u, p: p, role: r, displayName: d });
-    saveAllData();
-    renderUsers();
-    notify('User Added', 'success');
+    db.ref('authSystem').set(authSystem);
+    notify('تم إضافة المستخدم بنجاح', 'success');
     document.getElementById('newUsername').value = '';
     document.getElementById('newPassword').value = '';
     document.getElementById('newDisplayName').value = '';
 }
 
 function deleteUser(index) {
-    if (authSystem.users[index].u === 'admin') return notify('Cannot delete master admin', 'error');
-    if (confirm('Delete this user?')) {
+    if(authSystem.users[index].u === 'admin') return notify('لا يمكن حذف المدير الرئيسي', 'error');
+    if(confirm('حذف هذا المستخدم؟')) {
         authSystem.users.splice(index, 1);
-        saveAllData();
-        renderUsers();
-        notify('User Deleted', 'info');
+        db.ref('authSystem').set(authSystem);
+        notify('تم حذف المستخدم', 'info');
     }
+}
+
+function renderUsers() {
+    const tbody = document.getElementById('usersTableBody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    authSystem.users.forEach((user, i) => {
+        tbody.innerHTML += `<tr>
+            <td>${user.u}</td>
+            <td>${user.displayName}</td>
+            <td>${user.role === 'admin' ? 'مدير' : 'موظف'}</td>
+            <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px; background: #fffbe6; font-weight: bold;"></td>
+            <td><button onclick="deleteUser(${i})" style="background:var(--danger); color:white; border:none; padding:5px; border-radius:5px;">حذف</button></td>
+        </tr>`;
+    });
 }
 
 function updateUserPass(i, newPass) {
     authSystem.users[i].p = newPass;
-    saveAllData();
-    notify('Password Updated', 'success');
+    db.ref('authSystem').set(authSystem);
+    notify('تم تحديث كلمة المرور', 'success');
 }
 
-function changeMyPassword() {
-    const newPass = document.getElementById('changePassInput').value;
-    const currentU = sessionStorage.getItem('currentUserName');
-    if (!newPass) return notify('Enter new password', 'error');
-    const userIdx = authSystem.users.findIndex(u => u.u === currentU);
-    if (userIdx > -1) {
-        authSystem.users[userIdx].p = newPass;
-        saveAllData();
-        document.getElementById('changePassInput').value = '';
-        notify('Password Updated Successfully', 'success');
+let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'ar', statusChart = null;
+let currentMap = null;
+let mapMarkers = [];
+
+const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
+
+// Voice Input Function
+function startVoiceInput(fieldId) {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        notify('❌ المتصفح لا يدعم الإدخال الصوتي', 'error');
+        return;
     }
-}
-
-// ==================== دوال CRM ====================
-function fillGovs() {
-    const govs = ['Cairo', 'Giza', 'Alexandria', 'Dakahlia', 'Sharkia', 'Monufia', 'Gharbia', 'Qalyubia', 'Beheira', 'Damietta', 'Port Said', 'Ismailia', 'Suez', 'Beni Suef', 'Fayoum', 'Minya', 'Assiut', 'Sohag', 'Qena', 'Luxor', 'Aswan'];
-    const s = document.getElementById('gov');
-    if (!s) return;
-    s.innerHTML = '<option value="">Select Governorate</option>';
-    govs.forEach(g => s.innerHTML += <option value="${g}">${g}</option>);
-}
-
-function addOrUpdate() {
-    const n = document.getElementById('name').value;
-    if (!n) return notify('Name required', 'error');
-    const today = new Date().toISOString().split('T')[0];
-    const c = {
-        id: editIdx > -1 ? clients[editIdx].id : Date.now(),
-        name: n,
-        phone: document.getElementById('phone').value,
-        gov: document.getElementById('gov').value,
-        status: document.getElementById('status').value,
-        notes: document.getElementById('notes').value,
-        agent: document.getElementById('agent').value,
-        followUp: document.getElementById('followUp').value,
-        date: document.getElementById('date').value || today,
-        address: document.getElementById('locationAddress').value || '',
-        lat: window.tempLat || null,
-        lng: window.tempLng || null
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = lang === 'ar' ? 'ar-EG' : 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    
+    const btn = event.target;
+    btn.classList.add('recording');
+    btn.textContent = '⏺';
+    
+    recognition.start();
+    
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        const field = document.getElementById(fieldId);
+        if(field) {
+            if(field.value) {
+                field.value += ' ' + transcript;
+            } else {
+                field.value = transcript;
+            }
+            notify('🎤 تم إدخال: ' + transcript.substring(0, 50), 'success');
+        }
+        btn.classList.remove('recording');
+        btn.textContent = '🎤';
     };
     
-    if (editIdx > -1) {
-        clients[editIdx] = c;
-        editIdx = -1;
-        notify('Updated', 'success');
-    } else {
-        clients.push(c);
-        notify('Saved', 'success');
+    recognition.onerror = function(event) {
+        notify('❌ خطأ في التعرف على الصوت', 'error');
+        btn.classList.remove('recording');
+        btn.textContent = '🎤';
+    };
+    
+    recognition.onend = function() {
+        btn.classList.remove('recording');
+        btn.textContent = '🎤';
+    };
+}
+
+// Location Functions
+function getCurrentLocation() {
+    if (!navigator.geolocation) {
+        notify('❌ المتصفح لا يدعم تحديد الموقع', 'error');
+        return;
     }
     
-    saveAllData();
-    renderCRM();
-    updateClientSelect();
-    updateDashboard();
+    notify('📍 جاري تحديد موقعك...', 'info');
     
-    document.getElementById('name').value = '';
-    document.getElementById('phone').value = '';
-    document.getElementById('gov').value = '';
-    document.getElementById('notes').value = '';
-    document.getElementById('agent').value = '';
-    document.getElementById('followUp').value = '';
-    document.getElementById('date').value = '';
+    navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        // Store coordinates
+        window.tempLat = lat;
+        window.tempLng = lng;
+        
+        // Try reverse geocoding
+        fetch(https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1)
+            .then(response => response.json())
+            .then(data => {
+                const address = data.display_name || ${lat}, ${lng};
+                document.getElementById('locationAddress').value = address.substring(0, 200);
+                
+                const preview = document.getElementById('locationPreview');
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                    📍 <strong>الموقع المحدد:</strong><br>
+                    ${address.substring(0, 100)}<br>
+                    <small>خط العرض: ${lat.toFixed(6)} | خط الطول: ${lng.toFixed(6)}</small>
+                    <button onclick="removeLocation()" style="background:#dc3545; color:white; border:none; padding:3px 8px; border-radius:5px; margin-left:10px;">❌ إزالة</button>
+                `;
+                notify('✅ تم تحديد الموقع بنجاح', 'success');
+            })
+            .catch(() => {
+                document.getElementById('locationAddress').value = ${lat}, ${lng};
+                notify('✅ تم تحديد الموقع', 'success');
+            });
+    }, function(error) {
+        notify('❌ فشل تحديد الموقع: ' + error.message, 'error');
+    });
+}
+
+function removeLocation() {
     document.getElementById('locationAddress').value = '';
     document.getElementById('locationPreview').style.display = 'none';
     delete window.tempLat;
     delete window.tempLng;
 }
 
+// Map Functions
+function initMap() {
+    const mapContainer = document.getElementById('customerMap');
+    if (!mapContainer) return;
+    
+    if (typeof L !== 'undefined') {
+        try {
+            if (currentMap) currentMap.remove();
+            currentMap = L.map('customerMap').setView([30.0444, 31.2357], 6);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+            }).addTo(currentMap);
+            refreshMap();
+        } catch(e) {
+            console.log("Map error:", e);
+            mapContainer.innerHTML = '<div class="map-placeholder">🗺️ تعذر تحميل الخريطة<br><small>تحقق من اتصال الإنترنت</small></div>';
+        }
+    } else {
+        mapContainer.innerHTML = '<div class="map-placeholder">🗺️ جاري تحميل الخريطة...<br><small>قد تحتاج إلى تحديث الصفحة</small></div>';
+        setTimeout(initMap, 1000);
+    }
+}
+
+function refreshMap() {
+    if (!currentMap || typeof L === 'undefined') {
+        initMap();
+        return;
+    }
+    
+    mapMarkers.forEach(marker => currentMap.removeLayer(marker));
+    mapMarkers = [];
+    
+    const select = document.getElementById('mapCustomerSelect');
+    if(select) {
+        select.innerHTML = '<option value="">-- اختر عميل لعرض موقعه --</option>';
+    }
+    
+    let hasLocations = false;
+    clients.forEach(client => {
+        if (client.lat && client.lng) {
+            hasLocations = true;
+            if(select) select.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}">📍 ${client.name} - ${client.status}</option>;
+            
+            const marker = L.marker([client.lat, client.lng]).addTo(currentMap);
+            marker.bindPopup(`
+                <b>${client.name}</b><br>
+                📞 ${client.phone}<br>
+                📌 ${client.status}<br>
+                📍 ${client.address || 'عنوان غير محدد'}<br>
+                <button onclick="editClientFromMap('${client.name.replace(/'/g, "\\'")}')" style="background:#ffc107; border:none; padding:5px; border-radius:5px;">✏️ تعديل</button>
+            `);
+            mapMarkers.push(marker);
+        }
+    });
+    
+    if (hasLocations && mapMarkers.length > 0) {
+        const group = L.featureGroup(mapMarkers);
+        currentMap.fitBounds(group.getBounds().pad(0.2));
+        const infoDiv = document.getElementById('mapInfo');
+        if(infoDiv) infoDiv.innerHTML = ✅ تم عرض ${mapMarkers.length} عميل على الخريطة;
+    } else {
+        const infoDiv = document.getElementById('mapInfo');
+        if(infoDiv) infoDiv.innerHTML = ⚠️ لا يوجد عملاء لديهم مواقع محددة. قم بإضافة موقع للعملاء في صفحة CRM;
+        currentMap.setView([30.0444, 31.2357], 6);
+    }
+}
+
+function showCustomerOnMap() {
+    const selectedName = document.getElementById('mapCustomerSelect')?.value;
+    if (!selectedName || !currentMap) return;
+    
+    const client = clients.find(c => c.name === selectedName);
+    if (client && client.lat && client.lng) {
+        currentMap.setView([client.lat, client.lng], 15);
+        const marker = mapMarkers.find(m => m.getPopup()?.getContent()?.includes(client.name));
+        if (marker) marker.openPopup();
+        const infoDiv = document.getElementById('mapInfo');
+        if(infoDiv) infoDiv.innerHTML = 📍 <strong>${client.name}</strong><br>العنوان: ${client.address || 'غير محدد'}<br>الحالة: ${client.status};
+    } else {
+        notify('⚠️ هذا العميل ليس لديه موقع محدد', 'error');
+    }
+}
+
+function editClientFromMap(clientName) {
+    const idx = clients.findIndex(c => c.name === clientName);
+    if(idx > -1) {
+        showTab('crmTab', document.getElementById('btnCrmTab'));
+        editClient(idx);
+    }
+}
+
+function updateClientSelect() {
+    const taskSelect = document.getElementById('taskClientSelect');
+    if(taskSelect) {
+        const currentVal = taskSelect.value;
+        taskSelect.innerHTML = '<option value="">-- اختر عميل --</option>';
+        clients.forEach(client => {
+            const selected = (currentVal === client.name) ? 'selected' : '';
+            taskSelect.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>;
+        });
+    }
+}
+
+function autoFillTaskPhone() {
+    const selectedName = document.getElementById('taskClientSelect').value;
+    if(!selectedName) {
+        document.getElementById('taskPhone').value = '';
+        return;
+    }
+    const client = clients.find(c => c.name === selectedName);
+    if(client) { 
+        document.getElementById('taskPhone').value = client.phone || ""; 
+    }
+}
+
+function playNotifySound() { 
+    const audio = document.getElementById('notifySound'); 
+    if(audio) { audio.currentTime = 0; audio.play().catch(e => console.log("Audio blocked", e)); } 
+}
+
+function notify(m, t='info') { 
+    const n = document.getElementById('notification'); 
+    if(n) {
+        n.innerText = m; 
+        n.style.display = 'block'; 
+        n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
+        playNotifySound(); 
+        setTimeout(() => n.style.display = 'none', 4000);
+    }
+}
+
+if (sessionStorage.getItem('isLoggedIn') === 'true') { 
+    document.getElementById('loginOverlay').style.display = 'none'; 
+    document.getElementById('mainApp').style.display = 'flex'; 
+    setTimeout(() => {
+        applyRolePermissions();
+        initMap();
+    }, 100);
+}
+
+function logout() { sessionStorage.clear(); location.reload(); }
+
+function showTab(id, btn) { 
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+    btn.classList.add('active'); 
+    if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
+    if(id === 'usersTab') { renderUsers(); }
+    if(id === 'tasksTab') { updateClientSelect(); renderTasks(); }
+    if(id === 'mapTab') { 
+        setTimeout(() => {
+            initMap();
+            refreshMap();
+        }, 100);
+    }
+}
+
+function fillGovs() { 
+    const s = document.getElementById('gov'); 
+    if(!s) return;
+    s.innerHTML = <option value="">اختر المحافظة</option>; 
+    govs.forEach(g => s.innerHTML += <option value="${g.en}">${g.ar}</option>); 
+}
+
+function addOrUpdate() {
+    const n = document.getElementById('name').value;
+    if(!n) return notify('الاسم مطلوب', 'error');
+    const today = new Date().toISOString().split('T')[0];
+    const c = { 
+        name: n, 
+        phone: document.getElementById('phone').value, 
+        gov: document.getElementById('gov').value, 
+        status: document.getElementById('status').value, 
+        notes: document.getElementById('notes').value, 
+        agent: document.getElementById('agent').value, 
+        followUp: document.getElementById('followUp').value, 
+        date: document.getElementById('date').value || today,
+        address: document.getElementById('locationAddress').value || '',
+        lat: window.tempLat || null,
+        lng: window.tempLng || null
+    };
+    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify('تم التحديث', 'success'); } 
+    else { clients.push(c); notify('تم الحفظ', 'success'); }
+    db.ref('clients').set({...clients});
+    ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('gov').value = '';
+    document.getElementById('locationAddress').value = '';
+    document.getElementById('locationPreview').style.display = 'none';
+    delete window.tempLat;
+    delete window.tempLng;
+    renderCRM();
+    updateClientSelect();
+    if(currentMap) refreshMap();
+}
+
+function openWhatsApp(phone) {
+    if(!phone) return notify('لا يوجد رقم هاتف', 'error');
+    let cleanPhone = phone.replace(/\D/g, ''); 
+    if(!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone; 
+    window.open(https://wa.me/${cleanPhone}, '_blank');
+}
+
 function renderCRM() {
-    const b = document.getElementById('tableBody');
-    if (!b) return;
-    b.innerHTML = '';
+    const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
     const searchQuery = document.getElementById('search').value.toLowerCase();
     const statusFilter = document.getElementById('searchStatusFilter').value;
     let hCount = 0;
@@ -881,111 +817,68 @@ function renderCRM() {
     const filteredClients = clients.filter(c => {
         let matchName = true;
         let matchStatus = true;
-        if (searchQuery) {
+        if(searchQuery) {
             matchName = ${c.name} ${c.phone} ${c.gov}.toLowerCase().includes(searchQuery);
         }
-        if (statusFilter !== 'all') {
+        if(statusFilter !== 'all') {
             matchStatus = c.status === statusFilter;
         }
         return matchName && matchStatus;
     });
     
-    filteredClients.forEach((c, idx) => {
-        const originalIndex = clients.findIndex(cl => cl.id === c.id);
-        if (c.status === 'Hold') hCount++;
+    filteredClients.forEach((c, i) => {
+        const originalIndex = clients.indexOf(c);
+        if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
         const hasLocation = (c.lat && c.lng) ? '📍' : '';
-        let statusText = { Interested: 'Interested', 'In Progress': 'In Progress', Hold: 'Hold', Completed: 'Completed' }[c.status] || c.status;
+        
+        let statusText = {Interested:'مهتم', 'In Progress':'قيد التقدم', Hold:'قيد الانتظار', Completed:'مكتمل'}[c.status] || c.status;
         
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
-            <td><b>${c.name}</b><br><button class="edit-name-btn" onclick="editClientName(${originalIndex})" style="font-size:11px;">✏️ Edit Name</button></td>
+            <td><b>${c.name}</b><br><button class="edit-name-btn" onclick="editClientName(${originalIndex})" style="font-size:11px;">✏️ تعديل الاسم</button></td>
             <td>${c.phone}</td>
             <td>${c.gov}</td>
             <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
             <td>${statusText}</td>
             <td>${hasLocation}</td>
             <td>
-                <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button>
-                <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button>
-                <button onclick="editClient(${originalIndex})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button>
+                <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
+                <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
+                <button onclick="editClient(${originalIndex})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
                 <button onclick="delClient(${originalIndex})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
-              </div>
-          </tr>`;
+            </td>
+        </tr>`;
     });
     
-    document.getElementById('countAll').innerText = (lang === 'ar' ? 'الإجمالي: ' : 'Total: ') + filteredClients.length;
-    document.getElementById('countHold').innerText = (lang === 'ar' ? 'معلق: ' : 'Hold: ') + hCount;
+    document.getElementById('countAll').innerText = 'الإجمالي: ' + filteredClients.length;
+    document.getElementById('countHold').innerText = 'قيد الانتظار: ' + hCount;
+    updateDashboard();
 }
 
 function editClientName(index) {
-    if (index === undefined || index < 0 || index >= clients.length) {
-        notify('Client not found', 'error');
+    if(index === undefined || index < 0 || index >= clients.length) {
+        notify('العميل غير موجود', 'error');
         return;
     }
     const client = clients[index];
-    const newName = prompt('✏️ Enter new name:', client.name);
-    if (newName && newName.trim() !== '') {
+    const newName = prompt('✏️ أدخل الاسم الجديد:', client.name);
+    if(newName && newName.trim() !== '') {
         const oldName = client.name;
         client.name = newName.trim();
         tasks.forEach(task => {
-            if (task.client === oldName) {
+            if(task.client === oldName) {
                 task.client = newName.trim();
             }
         });
-        saveAllData();
+        db.ref('clients').set({...clients});
+        db.ref('tasks').set({...tasks});
         renderCRM();
         renderTasks();
         updateClientSelect();
-        notify('✅ Name updated successfully!', 'success');
+        notify('✅ تم تعديل الاسم بنجاح!', 'success');
+    } else if(newName === '') {
+        notify('❌ الاسم لا يمكن أن يكون فارغاً', 'error');
     }
-}
-
-function editClient(index) {
-    editIdx = index;
-    const c = clients[index];
-    document.getElementById('name').value = c.name;
-    document.getElementById('phone').value = c.phone;
-    document.getElementById('gov').value = c.gov;
-    document.getElementById('status').value = c.status;
-    document.getElementById('notes').value = c.notes || '';
-    document.getElementById('agent').value = c.agent || '';
-    document.getElementById('followUp').value = c.followUp || '';
-    document.getElementById('date').value = c.date || '';
-    document.getElementById('locationAddress').value = c.address || '';
-    if (c.lat && c.lng) {
-        window.tempLat = c.lat;
-        window.tempLng = c.lng;
-    }
-}
-
-function delClient(index) {
-    if (confirm('Move to Recycle Bin?')) {
-        const d = clients.splice(index, 1)[0];
-        d.deletedAt = new Date().toLocaleDateString();
-        deletedClients.push(d);
-        saveAllData();
-        renderCRM();
-        renderRecycleBin();
-        updateClientSelect();
-        updateDashboard();
-        notify('Moved to Recycle Bin', 'info');
-    }
-}
-
-function openWhatsApp(phone) {
-    if (!phone) return notify('No phone number', 'error');
-    let cleanPhone = phone.replace(/\D/g, '');
-    if (!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone;
-    window.open(https://wa.me/${cleanPhone}, '_blank');
-}
-
-function getTrackingLabel(dateStr) {
-    if (!dateStr) return { lab: 'New', cls: 'track-new' };
-    const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
-    if (diffDays <= 1) return { lab: 'V. Active', cls: 'track-new' };
-    if (diffDays <= 3) return { lab: 'Follow up', cls: 'track-active' };
-    if (diffDays <= 7) return { lab: 'Warning', cls: 'track-warning' };
-    return { lab: 'Cold', cls: 'track-old' };
 }
 
 function resetSearch() {
@@ -994,175 +887,33 @@ function resetSearch() {
     renderCRM();
 }
 
-// ==================== دوال المهام ====================
-function updateClientSelect() {
-    const taskSelect = document.getElementById('taskClientSelect');
-    if (!taskSelect) return;
-    const currentVal = taskSelect.value;
-    taskSelect.innerHTML = '<option value="">-- Select Client --</option>';
-    clients.forEach(client => {
-        const selected = (currentVal === client.name) ? 'selected' : '';
-        taskSelect.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>;
-    });
+function getTrackingLabel(dateStr) {
+    if(!dateStr) return { lab: 'جديد', cls: 'track-new' };
+    const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 1) return { lab: 'نشط جداً', cls: 'track-new' };
+    if (diffDays <= 3) return { lab: 'متابعة', cls: 'track-active' };
+    if (diffDays <= 7) return { lab: 'تحذير', cls: 'track-warning' };
+    return { lab: 'بارد', cls: 'track-old' };
 }
 
-function autoFillTaskPhone() {
-    const selectedName = document.getElementById('taskClientSelect').value;
-    if (!selectedName) {
-        document.getElementById('taskPhone').value = '';
-        return;
-    }
-    const client = clients.find(c => c.name === selectedName);
-    if (client) {
-        document.getElementById('taskPhone').value = client.phone || "";
-    }
-}
-
-function addTask() {
-    const selectedClient = document.getElementById('taskClientSelect').value;
-    if (!selectedClient) {
-        notify('Please select a client first', 'error');
-        return;
-    }
-    const taskText = document.getElementById('taskText').value;
-    if (!taskText) return notify('Please enter task details', 'error');
-    
-    const t = {
-        id: Date.now(),
-        text: taskText,
-        client: selectedClient,
-        phone: document.getElementById('taskPhone').value,
-        date: document.getElementById('taskDate').value,
-        stage: document.getElementById('taskStage').value
-    };
-    tasks.push(t);
-    saveAllData();
-    notify('✅ Task added successfully', 'success');
-    document.getElementById('taskText').value = '';
-    document.getElementById('taskDate').value = '';
-    renderTasks();
-}
-
-function renderTasks() {
-    const b = document.getElementById('taskBody');
-    if (!b) return;
-    b.innerHTML = '';
-    const q = document.getElementById('taskSearch').value.toLowerCase();
-    
-    if (tasks.length === 0) {
-        b.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 No tasks yet. Add a new task!</td></tr>';
-        return;
-    }
-    
-    tasks.forEach((t, i) => {
-        if (q && !${t.client} ${t.text}.toLowerCase().includes(q)) return;
-        
-        const clientData = clients.find(c => c.name === t.client);
-        let clientDisplay = '';
-        let statusBadge = '';
-        
-        if (clientData) {
-            let bgColor = clientData.status === 'Interested' ? '#3498db' : clientData.status === 'In Progress' ? '#2ecc71' : clientData.status === 'Hold' ? '#e74c3c' : '#27ae60';
-            statusBadge = <span class="client-badge" style="background:${bgColor}; color:white;">${clientData.status}</span>;
-            clientDisplay = <strong>${t.client}</strong><br>${statusBadge};
-        } else {
-            clientDisplay = <strong style="color:red;">${t.client || 'Unknown'}</strong><br><span class="client-badge" style="background:gray;">Not found</span>;
-        }
-        
-        const delBtn = <button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">🗑️</button>;
-        const showClientBtn = <button class="show-client-task-btn" onclick="showClientDetails('${t.client.replace(/'/g, "\\'")}')">👤 View Client</button>;
-        
-        b.innerHTML += `<tr>
-            <td>${clientDisplay}<br>${showClientBtn}</td>
-            <td>${t.phone || clientData?.phone || '-'}</td>
-            <td>${t.text}</td>
-            <td>${t.date || 'Not set'}</td>
-            <td><span style="background:#e0e0e0; padding:3px 8px; border-radius:15px; font-size:12px;">${t.stage}</span></td>
-            <td>${delBtn}</td>
-        <tr>`;
-    });
-}
-
-function deleteTask(index) {
-    if (confirm('Delete this task?')) {
-        tasks.splice(index, 1);
-        saveAllData();
-        renderTasks();
-        notify('Task deleted', 'info');
-    }
-}
-
-function showClientDetails(clientName) {
-    if (!clientName) {
-        notify('No client associated with this task', 'error');
-        return;
-    }
-    const client = clients.find(c => c.name === clientName);
-    if (client) {
-        alert(🔍 Client Details:\n━━━━━━━━━━━━━━━━━━━━━━\n📛 Name: ${client.name}\n📞 Phone: ${client.phone}\n🏠 Governorate: ${client.gov}\n📌 Status: ${client.status}\n📍 Address: ${client.address || 'Not set'}\n📝 Notes: ${client.notes || 'None'}\n👤 Agent: ${client.agent || 'Not assigned'}\n📅 Date Added: ${client.date || 'Not set'}\n━━━━━━━━━━━━━━━━━━━━━━);
-    } else {
-        notify(⚠️ Client "${clientName}" not found in database, 'error');
-    }
-}
-
-// ==================== دوال سلة المحذوفات ====================
-function renderRecycleBin() {
-    const rb = document.getElementById('recycleBody');
-    if (!rb) return;
-    rb.innerHTML = '';
-    deletedClients.forEach((c, i) => {
-        rb.innerHTML += `<tr>
-            <td>${c.name}</td>
-            <td>${c.phone}</td>
-            <td>${c.deletedAt}</td>
-            <td>
-                <button onclick="restoreClient(${i})" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:5px;">Restore</button>
-                <button onclick="permanentDel(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;">X</button>
-             </td>
-        <tr>`;
-    });
-}
-
-function restoreClient(i) {
-    clients.push(deletedClients.splice(i, 1)[0]);
-    saveAllData();
-    renderCRM();
-    renderRecycleBin();
-    updateClientSelect();
-    notify('Restored', 'success');
-}
-
-function permanentDel(i) {
-    if (confirm('Permanent delete? Cannot undo!')) {
-        deletedClients.splice(i, 1);
-        saveAllData();
-        renderRecycleBin();
-        notify('Permanently deleted', 'error');
-    }
-}
-
-// ==================== دوال التحليلات ====================
 function updateDashboard() {
     const total = clients.length;
     const completed = clients.filter(c => c.status === 'Completed').length;
-    if (document.getElementById('convRate')) document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
-    if (document.getElementById('potentialDeals')) document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
-    
-    const gc = {};
-    clients.forEach(c => { if (c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
+    if(document.getElementById('convRate')) document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
+    if(document.getElementById('potentialDeals')) document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
+    const gc = {}; clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
     const top = Object.keys(gc).length > 0 ? Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b) : '-';
-    if (document.getElementById('topGov')) document.getElementById('topGov').innerText = top;
-    
+    if(document.getElementById('topGov')) document.getElementById('topGov').innerText = top;
     const canvas = document.getElementById('statusChart');
-    if (!canvas) return;
+    if(!canvas) return;
     const ctx = canvas.getContext('2d');
     const counts = { 'Interested': 0, 'In Progress': 0, 'Hold': 0, 'Completed': 0 };
-    clients.forEach(c => { if (counts[c.status] !== undefined) counts[c.status]++; });
+    clients.forEach(c => { if(counts[c.status] !== undefined) counts[c.status]++; });
     if (statusChart) statusChart.destroy();
     statusChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Interested', 'In Progress', 'Hold', 'Completed'],
+            labels: ['مهتم', 'قيد التقدم', 'قيد الانتظار', 'مكتمل'],
             datasets: [{
                 data: [counts.Interested, counts['In Progress'], counts.Hold, counts.Completed],
                 backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745']
@@ -1172,43 +923,42 @@ function updateDashboard() {
     });
 }
 
-// ==================== دوال التصدير والاستيراد ====================
 function importData(event) {
-    if (sessionStorage.getItem('userRole') !== 'admin') return notify('Admin only', 'error');
+    if(sessionStorage.getItem('userRole') !== 'admin') return notify('للمدير فقط', 'error');
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            const text = e.target.result;
+            const arrayBuffer = e.target.result;
+            let text = new TextDecoder('utf-8').decode(arrayBuffer);
             const rows = text.split(/\r?\n/).filter(row => row.trim() !== "");
             const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
             rows.slice(1).forEach(row => {
                 const cols = row.split(',').map(c => c.replace(/"/g, '').trim());
                 if (cols.length > 0) {
-                    let obj = { id: Date.now() + Math.random(), name: "Unknown", phone: "", gov: "", status: "Interested", notes: "Imported", agent: "System", date: new Date().toISOString().split('T')[0] };
+                    let obj = { name: "Unknown", phone: "", gov: "", status: "Interested", notes: "Imported", agent: "System", date: new Date().toISOString().split('T')[0] };
                     cols.forEach((val, idx) => {
                         const h = headers[idx] || "";
-                        if (h.includes("name") || idx === 0) obj.name = val;
-                        else if (h.includes("phone")) obj.phone = val;
-                        else if (h.includes("gov")) obj.gov = val;
+                        if (h.includes("name") || h.includes("الاسم") || idx === 0) obj.name = val;
+                        else if (h.includes("phone") || h.includes("هاتف")) obj.phone = val;
+                        else if (h.includes("gov") || h.includes("محافظة")) obj.gov = val;
                     });
                     clients.push(obj);
                 }
             });
-            saveAllData();
-            renderCRM();
+            db.ref('clients').set({...clients});
+            notify('تم الاستيراد بنجاح', 'success');
             updateClientSelect();
-            notify('Imported Successfully', 'success');
-        } catch(err) { notify('Error reading file', 'error'); }
+        } catch (err) { notify('خطأ في قراءة الملف', 'error'); }
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
 }
 
 function exportData(type) {
-    if (sessionStorage.getItem('userRole') !== 'admin') return notify('Admin only', 'error');
+    if(sessionStorage.getItem('userRole') !== 'admin') return notify('للمدير فقط', 'error');
     let data = type === 'clients' ? clients : tasks;
-    if (data.length === 0) return notify('No data', 'error');
+    if(data.length === 0) return notify('لا توجد بيانات', 'error');
     let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date,Address,Lat,Lng\n" : "Client,Phone,Task,Deadline,Stage\n");
     data.forEach(i => {
         csv += type === 'clients' ? "${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}","${i.address || ''}","${i.lat || ''}","${i.lng || ''}"\n : "${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n;
@@ -1220,115 +970,197 @@ function exportData(type) {
     link.click();
 }
 
-// ==================== دوال الصوت والموقع ====================
-function startVoiceInput(fieldId) {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        notify('❌ Browser does not support voice input', 'error');
-        return;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = lang === 'ar' ? 'ar-EG' : 'en-US';
-    recognition.continuous = false;
-    
-    const btn = event.target;
-    btn.classList.add('recording');
-    recognition.start();
-    
-    recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        const field = document.getElementById(fieldId);
-        if (field) {
-            if (field.value) field.value += ' ' + transcript;
-            else field.value = transcript;
-            notify('🎤 Input: ' + transcript.substring(0, 50), 'success');
-        }
-        btn.classList.remove('recording');
-    };
-    recognition.onerror = function() {
-        btn.classList.remove('recording');
-        notify('❌ Voice recognition failed', 'error');
-    };
+function delClient(i) { 
+    if(confirm('نقل إلى سلة المحذوفات؟')) { 
+        const d = clients.splice(i, 1)[0]; 
+        d.deletedAt = new Date().toLocaleDateString(); 
+        deletedClients.push(d); 
+        syncAll(); 
+        notify('تم النقل إلى سلة المحذوفات', 'info');
+        renderCRM();
+        updateClientSelect();
+        if(currentMap) refreshMap();
+    } 
 }
+function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('تم الاستعادة', 'success'); updateClientSelect(); if(currentMap) refreshMap(); }
+function permanentDel(i) { 
+    if(confirm('حذف نهائي؟')) { 
+        deletedClients.splice(i, 1); 
+        syncAll(); 
+        notify('تم الحذف النهائي', 'error'); 
+    } 
+}
+function syncAll() { db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients}); }
 
-function getCurrentLocation() {
-    if (!navigator.geolocation) {
-        notify('❌ Browser does not support geolocation', 'error');
-        return;
-    }
-    notify('📍 Getting your location...', 'info');
-    navigator.geolocation.getCurrentPosition(function(position) {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        window.tempLat = lat;
-        window.tempLng = lng;
-        document.getElementById('locationAddress').value = ${lat.toFixed(6)}, ${lng.toFixed(6)};
+function editClient(i) { 
+    editIdx = i; 
+    const c = clients[i]; 
+    document.getElementById('name').value = c.name; 
+    document.getElementById('phone').value = c.phone; 
+    document.getElementById('gov').value = c.gov; 
+    document.getElementById('status').value = c.status; 
+    document.getElementById('notes').value = c.notes; 
+    document.getElementById('agent').value = c.agent; 
+    document.getElementById('followUp').value = c.followUp; 
+    document.getElementById('date').value = c.date;
+    document.getElementById('locationAddress').value = c.address || '';
+    if(c.lat && c.lng) {
+        window.tempLat = c.lat;
+        window.tempLng = c.lng;
         const preview = document.getElementById('locationPreview');
         preview.style.display = 'block';
-        preview.innerHTML = 📍 <strong>Location:</strong><br>Lat: ${lat.toFixed(6)} | Lng: ${lng.toFixed(6)}<br><button onclick="removeLocation()" style="background:#dc3545; color:white; border:none; padding:3px 8px; border-radius:5px;">❌ Remove</button>;
-        notify('✅ Location captured', 'success');
-    }, function(error) {
-        notify('❌ Failed to get location', 'error');
-    });
+        preview.innerHTML = 📍 <strong>الموقع المخزن:</strong><br>${c.address || `${c.lat}, ${c.lng}}<br><button onclick="removeLocation()" style="background:#dc3545; color:white; border:none; padding:3px 8px; border-radius:5px;">❌ إزالة</button>`;
+    } else {
+        removeLocation();
+    }
 }
 
-function removeLocation() {
-    document.getElementById('locationAddress').value = '';
-    document.getElementById('locationPreview').style.display = 'none';
-    delete window.tempLat;
-    delete window.tempLng;
+function editClientFromTask(clientName) {
+    if(!clientName) {
+        notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
+        return;
+    }
+    const idx = clients.findIndex(c => c.name === clientName);
+    if(idx > -1) { 
+        showTab('crmTab', document.getElementById('btnCrmTab')); 
+        editClient(idx);
+        notify(جاري تعديل بيانات العميل: ${clientName}, 'success');
+    } else {
+        notify(العميل "${clientName}" غير موجود, 'error');
+    }
 }
 
-// ==================== دوال عامة ====================
-function notify(msg, type = 'info') {
-    const n = document.getElementById('notification');
-    n.innerText = msg;
-    n.style.display = 'block';
-    n.style.backgroundColor = type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8';
-    const audio = document.getElementById('notifySound');
-    if (audio) audio.play().catch(e => console.log('Audio blocked'));
-    setTimeout(() => n.style.display = 'none', 3000);
-}
-
-function showTab(id, btn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
-    if (id === 'dashboardTab') setTimeout(updateDashboard, 100);
-    if (id === 'usersTab') renderUsers();
-    if (id === 'recycleTab') renderRecycleBin();
-}
-
-function changeLang(l) {
-    lang = l;
-    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-    fillGovs();
-    renderCRM();
-    applyRolePermissions();
-}
-
-// ==================== تهيئة التطبيق ====================
-loadAllData();
-fillGovs();
-
-// تهيئة Firebase (لن تمنع التطبيق من العمل حتى لو فشلت)
-initFirebase().catch(e => console.log('Firebase init skipped'));
-
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-    applyRolePermissions();
-    renderCRM();
+function addTask() { 
+    const selectedClient = document.getElementById('taskClientSelect').value;
+    if(!selectedClient) {
+        notify('الرجاء اختيار عميل أولاً', 'error');
+        return;
+    }
+    const taskText = document.getElementById('taskText').value;
+    if(!taskText) return notify('الرجاء إدخال تفاصيل المهمة', 'error');
+    
+    const t = { 
+        text: taskText, 
+        client: selectedClient, 
+        phone: document.getElementById('taskPhone').value, 
+        date: document.getElementById('taskDate').value, 
+        stage: document.getElementById('taskStage').value 
+    }; 
+    tasks.push(t); 
+    db.ref('tasks').set({...tasks}); 
+    notify('✅ تم إضافة المهمة بنجاح', 'success');
+    document.getElementById('taskText').value = '';
+    document.getElementById('taskDate').value = '';
     renderTasks();
-    renderUsers();
-    updateClientSelect();
-    updateDashboard();
-    renderRecycleBin();
-} else {
-    document.getElementById('userInput').value = 'admin';
-    document.getElementById('passInput').value = 'admin123';
 }
+
+function renderTasks() { 
+    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
+    const q = document.getElementById('taskSearch').value.toLowerCase();
+    
+    if(tasks.length === 0) {
+        b.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. أضف مهمة جديدة!</td></tr>';
+        return;
+    }
+    
+    tasks.forEach((t, i) => { 
+        if(q && !${t.client} ${t.text}.toLowerCase().includes(q)) return;
+        
+        const clientData = clients.find(c => c.name === t.client);
+        let clientDisplay = '';
+        let statusBadge = '';
+        
+        if(clientData) {
+            let bgColor = clientData.status === 'Interested' ? '#3498db' : clientData.status === 'In Progress' ? '#2ecc71' : clientData.status === 'Hold' ? '#e74c3c' : '#27ae60';
+            let statusText = {Interested:'مهتم', 'In Progress':'قيد التقدم', Hold:'قيد الانتظار', Completed:'مكتمل'}[clientData.status] || clientData.status;
+            statusBadge = <span class="client-badge" style="background:${bgColor}; color:white;">${statusText}</span>;
+            clientDisplay = <strong>${t.client}</strong><br>${statusBadge};
+        } else {
+            clientDisplay = <strong style="color:red;">${t.client || 'غير معروف'}</strong><br><span class="client-badge" style="background:gray;">غير موجود</span>;
+        }
+        
+        let stageText = {quote:'عرض سعر', follow:'متابعة', order:'طلب', bank:'بنك'}[t.stage] || t.stage;
+        
+        const delBtn = <button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">🗑️</button>;
+        const editClientBtn = <button onclick="editClientFromTask('${t.client.replace(/'/g, "\\'")}')" style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">✏️ تعديل العميل</button>;
+        const showClientBtn = <button class="show-client-task-btn" onclick="showClientDetails('${t.client.replace(/'/g, "\\'")}')">👤 عرض البيانات</button>;
+        
+        b.innerHTML += `<tr>
+            <td>${clientDisplay}<br>${showClientBtn}${editClientBtn}</td>
+            <td>${t.phone || clientData?.phone || '-'}</td>
+            <td>${t.text}</td>
+            <td>${t.date || 'لم يحدد'}</td>
+            <td><span style="background:#e0e0e0; padding:3px 8px; border-radius:15px; font-size:12px;">${stageText}</span></td>
+            <td>${delBtn}</td>
+        </tr>`; 
+    }); 
+}
+
+function showClientDetails(clientName) {
+    if(!clientName) {
+        notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
+        return;
+    }
+    const client = clients.find(c => c.name === clientName);
+    if(client) {
+        alert(🔍 بيانات العميل:\n━━━━━━━━━━━━━━━━━━━━━━\n📛 الاسم: ${client.name}\n📞 الهاتف: ${client.phone}\n🏠 المحافظة: ${client.gov}\n📌 الحالة: ${client.status}\n📍 العنوان: ${client.address || 'غير محدد'}\n📝 ملاحظات: ${client.notes || 'لا توجد'}\n👤 المسؤول: ${client.agent || 'غير محدد'}\n📅 تاريخ الإضافة: ${client.date || 'غير محدد'}\n━━━━━━━━━━━━━━━━━━━━━━);
+    } else {
+        notify(⚠️ العميل "${clientName}" غير موجود في قاعدة البيانات, 'error');
+    }
+}
+
+function deleteTask(index) {
+    if(confirm('هل تريد حذف هذه المهمة؟')) {
+        tasks.splice(index, 1);
+        db.ref('tasks').set({...tasks});
+        renderTasks();
+        notify('تم حذف المهمة', 'info');
+    }
+}
+
+function changeLang(l) { 
+    lang = l; 
+    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
+    fillGovs(); 
+    renderCRM(); 
+    applyRolePermissions(); 
+}
+
+// Firebase Listeners
+db.ref('authSystem').on('value', s => {
+    if(s.val()) { authSystem = s.val(); } 
+    else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'المدير الرئيسي' }] }; db.ref('authSystem').set(authSystem); }
+    renderUsers();
+});
+
+db.ref('clients').on('value', s => { 
+    clients = s.val() ? Object.values(s.val()) : []; 
+    renderCRM(); 
+    updateClientSelect();
+    if(currentMap && document.getElementById('mapTab')?.classList.contains('active')) refreshMap();
+});
+
+db.ref('deletedClients').on('value', s => { 
+    deletedClients = s.val() ? Object.values(s.val()) : []; 
+    const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
+    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr>
+        <td>${c.name}</td>
+        <td>${c.phone}</td>
+        <td>${c.deletedAt}</td>
+        <td><button onclick="restoreClient(${i})" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:5px;">استعادة</button> 
+                <button onclick="permanentDel(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;">حذف نهائي</button></td>
+        </tr>`; });
+    }
+});
+
+db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+
+fillGovs();
+updateClientSelect();
+
+// Auto fill login fields with demo credentials
+document.getElementById('userInput').value = 'admin';
+document.getElementById('passInput').value = 'admin123';
 </script>
 </body>
 </html>
