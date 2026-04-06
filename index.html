@@ -298,36 +298,93 @@
 </div>
 
 <script>
+// ========== متغيرات عامة ==========
 let visitorId = "";
+let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
+let authSystem = { users: [] };
+
+// ========== إعداد Firebase ==========
+const firebaseConfig = { 
+    apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", 
+    authDomain: "crm-tasking.firebaseapp.com", 
+    databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", 
+    projectId: "crm-tasking", 
+    storageBucket: "crm-tasking.appspot.com", 
+    messagingSenderId: "368062369619", 
+    appId: "1:368062369619:web:cd38383ab75ab473961ba6" 
+};
+
+// تهيئة Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ========== قائمة المحافظات ==========
+const govs = [
+    {en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, 
+    {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, 
+    {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, 
+    {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, 
+    {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, 
+    {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, 
+    {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, 
+    {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, 
+    {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}
+];
+
+// ========== وظائف البصمة والتسجيل ==========
 async function initFingerprint() {
-    const fp = await FingerprintJS.load();
-    const result = await fp.get();
-    visitorId = result.visitorId;
-    document.getElementById('deviceLockInfo').innerText = "Device ID: " + visitorId;
+    try {
+        const fp = await FingerprintJS.load();
+        const result = await fp.get();
+        visitorId = result.visitorId;
+        const deviceInfo = document.getElementById('deviceLockInfo');
+        if(deviceInfo) deviceInfo.innerText = "Device ID: " + visitorId;
+    } catch(e) {
+        console.log("Fingerprint error:", e);
+        const deviceInfo = document.getElementById('deviceLockInfo');
+        if(deviceInfo) deviceInfo.innerText = "Device: " + (navigator.userAgent.substring(0, 50));
+    }
 }
+
+// تشغيل البصمة عند تحميل الصفحة
 initFingerprint();
 
+// ========== منع أدوات المطور ==========
 document.onkeydown = function(e) {
-    if(event.keyCode == 123) return false; 
+    if(e.keyCode == 123) return false; 
     if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
     if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
     if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
     if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
-    if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
+    return true;
 }
 
-const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// ========== وظائف مساعدة ==========
+function playNotifySound() { 
+    const audio = document.getElementById('notifySound'); 
+    if(audio) { 
+        audio.currentTime = 0; 
+        audio.play().catch(e => console.log("Audio blocked", e)); 
+    } 
+}
 
-let authSystem = { users: [] };
+function notify(m, t='info') { 
+    const n = document.getElementById('notification'); 
+    if(!n) return;
+    n.innerText = m; 
+    n.style.display = 'block'; 
+    n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; 
+    playNotifySound(); 
+    setTimeout(() => n.style.display = 'none', 4000); 
+}
 
 function applyRolePermissions() {
     const role = sessionStorage.getItem('userRole');
     const dispName = sessionStorage.getItem('userDisplayName');
     const isAdmin = (role === 'admin');
-    
-    document.getElementById('welcomeUser').innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
+    const welcomeEl = document.getElementById('welcomeUser');
+    if(welcomeEl) welcomeEl.innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + (dispName || 'User');
     const usersBtn = document.getElementById('btnUsers');
     if(usersBtn) usersBtn.style.display = isAdmin ? 'block' : 'none';
     document.querySelectorAll('.admin-only').forEach(el => {
@@ -335,9 +392,17 @@ function applyRolePermissions() {
     });
 }
 
+// ========== وظيفة تسجيل الدخول الرئيسية ==========
 function checkLogin() { 
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
+    
+    if(!u || !p) {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('loginError').innerText = 'الرجاء إدخال اسم المستخدم وكلمة المرور';
+        return;
+    }
+    
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
     if (user) { 
         document.getElementById('loginOverlay').style.display = 'none'; 
@@ -350,14 +415,16 @@ function checkLogin() {
         renderCRM(); 
         renderTasks();
         renderUsers();
-        updateClientSelect(); // تحديث قائمة العملاء في المهام
+        updateClientSelect();
         notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
+        document.getElementById('loginError').innerText = 'Invalid Credentials or Unauthorized Device!';
         notify('Login Failed', 'error'); 
     } 
 }
 
+// ========== تغيير كلمة المرور ==========
 function changeMyPassword() {
     const newPass = document.getElementById('changePassInput').value;
     const currentU = sessionStorage.getItem('currentUserName');
@@ -371,6 +438,7 @@ function changeMyPassword() {
     }
 }
 
+// ========== إدارة المستخدمين ==========
 function addUser() {
     const u = document.getElementById('newUsername').value;
     const p = document.getElementById('newPassword').value;
@@ -384,6 +452,7 @@ function addUser() {
     document.getElementById('newUsername').value = '';
     document.getElementById('newPassword').value = '';
     document.getElementById('newDisplayName').value = '';
+    renderUsers();
 }
 
 function deleteUser(index) {
@@ -392,6 +461,7 @@ function deleteUser(index) {
         authSystem.users.splice(index, 1);
         db.ref('authSystem').set(authSystem);
         notify('User Deleted', 'info');
+        renderUsers();
     }
 }
 
@@ -416,58 +486,7 @@ function updateUserPass(i, newPass) {
     notify('Password Updated', 'success');
 }
 
-let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
-const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
-
-// ========== تحديث قائمة العملاء في مهام تسك ==========
-function updateClientSelect() {
-    const taskSelect = document.getElementById('taskClientSelect');
-    if(!taskSelect) return;
-    const currentVal = taskSelect.value;
-    taskSelect.innerHTML = '<option value="">-- اختر عميل --</option>';
-    clients.forEach(client => {
-        const selected = (currentVal === client.name) ? 'selected' : '';
-        taskSelect.innerHTML += `<option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>`;
-    });
-}
-
-function autoFillTaskPhone() {
-    const selectedName = document.getElementById('taskClientSelect').value;
-    if(!selectedName) {
-        document.getElementById('taskPhone').value = '';
-        return;
-    }
-    const client = clients.find(c => c.name === selectedName);
-    if(client) { 
-        document.getElementById('taskPhone').value = client.phone || ""; 
-    }
-}
-
-function playNotifySound() { 
-    const audio = document.getElementById('notifySound'); 
-    if(audio) { audio.currentTime = 0; audio.play().catch(e => console.log("Audio blocked", e)); } 
-}
-
-function notify(m, t='info') { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.backgroundColor = t === 'success' ? '#28a745' : t === 'error' ? '#dc3545' : '#17a2b8'; playNotifySound(); setTimeout(() => n.style.display = 'none', 4000); }
-
-if (sessionStorage.getItem('isLoggedIn') === 'true') { 
-    document.getElementById('loginOverlay').style.display = 'none'; 
-    document.getElementById('mainApp').style.display = 'flex'; 
-    setTimeout(applyRolePermissions, 100);
-}
-
-function logout() { sessionStorage.clear(); location.reload(); }
-
-function showTab(id, btn) { 
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-    document.getElementById(id).classList.add('active'); 
-    btn.classList.add('active'); 
-    if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
-    if(id === 'usersTab') { renderUsers(); }
-    if(id === 'tasksTab') { updateClientSelect(); renderTasks(); }
-}
-
+// ========== وظائف CRM ==========
 function fillGovs() { 
     const s = document.getElementById('gov'); 
     if(!s) return;
@@ -479,14 +498,33 @@ function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
-    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify(lang==='ar'?'تم التحديث':'Updated', 'success'); } 
-    else { clients.push(c); notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); }
-    db.ref('clients').set({...clients});
-    ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('gov').value = '';
+    const c = { 
+        name: n, 
+        phone: document.getElementById('phone').value, 
+        gov: document.getElementById('gov').value, 
+        status: document.getElementById('status').value, 
+        notes: document.getElementById('notes').value, 
+        agent: document.getElementById('agent').value, 
+        followUp: document.getElementById('followUp').value, 
+        date: document.getElementById('date').value || today 
+    };
+    if(editIdx > -1) { 
+        clients[editIdx] = c; 
+        editIdx = -1; 
+        notify(lang==='ar'?'تم التحديث':'Updated', 'success'); 
+    } else { 
+        clients.push(c); 
+        notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); 
+    }
+    db.ref('clients').set(clients);
+    ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = '';
+    });
+    const govEl = document.getElementById('gov');
+    if(govEl) govEl.value = '';
     renderCRM();
-    updateClientSelect(); // تحديث قائمة العملاء في المهام
+    updateClientSelect();
 }
 
 function openWhatsApp(phone) {
@@ -496,10 +534,21 @@ function openWhatsApp(phone) {
     window.open(`https://wa.me/${cleanPhone}`, '_blank');
 }
 
+function getTrackingLabel(dateStr) {
+    if(!dateStr) return { lab: 'New', cls: 'track-new' };
+    const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 1) return { lab: (lang === 'ar' ? 'نشط جداً' : 'V. Active'), cls: 'track-new' };
+    if (diffDays <= 3) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-active' };
+    if (diffDays <= 7) return { lab: (lang === 'ar' ? 'تحذير' : 'Warning'), cls: 'track-warning' };
+    return { lab: (lang === 'ar' ? 'بارد' : 'Cold'), cls: 'track-old' };
+}
+
 function renderCRM() {
-    const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
-    const searchQuery = document.getElementById('search').value.toLowerCase();
-    const statusFilter = document.getElementById('searchStatusFilter').value;
+    const b = document.getElementById('tableBody'); 
+    if(!b) return; 
+    b.innerHTML = '';
+    const searchQuery = document.getElementById('search')?.value.toLowerCase() || '';
+    const statusFilter = document.getElementById('searchStatusFilter')?.value || 'all';
     let hCount = 0;
     
     const filteredClients = clients.filter(c => {
@@ -533,8 +582,10 @@ function renderCRM() {
         </tr>`;
     });
     
-    document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + filteredClients.length;
-    document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
+    const countAll = document.getElementById('countAll');
+    const countHold = document.getElementById('countHold');
+    if(countAll) countAll.innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + filteredClients.length;
+    if(countHold) countHold.innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
     updateDashboard();
 }
 
@@ -548,14 +599,13 @@ function editClientName(index) {
     if(newName && newName.trim() !== '') {
         const oldName = client.name;
         client.name = newName.trim();
-        // تحديث المهام التي تشير到这个 العميل
         tasks.forEach(task => {
             if(task.client === oldName) {
                 task.client = newName.trim();
             }
         });
-        db.ref('clients').set({...clients});
-        db.ref('tasks').set({...tasks});
+        db.ref('clients').set(clients);
+        db.ref('tasks').set(tasks);
         renderCRM();
         renderTasks();
         updateClientSelect();
@@ -566,28 +616,28 @@ function editClientName(index) {
 }
 
 function resetSearch() {
-    document.getElementById('search').value = '';
-    document.getElementById('searchStatusFilter').value = 'all';
+    const search = document.getElementById('search');
+    const filter = document.getElementById('searchStatusFilter');
+    if(search) search.value = '';
+    if(filter) filter.value = 'all';
     renderCRM();
-}
-
-function getTrackingLabel(dateStr) {
-    if(!dateStr) return { lab: 'New', cls: 'track-new' };
-    const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
-    if (diffDays <= 1) return { lab: (lang === 'ar' ? 'نشط جداً' : 'V. Active'), cls: 'track-new' };
-    if (diffDays <= 3) return { lab: (lang === 'ar' ? 'متابعة' : 'Follow up'), cls: 'track-active' };
-    if (diffDays <= 7) return { lab: (lang === 'ar' ? 'تحذير' : 'Warning'), cls: 'track-warning' };
-    return { lab: (lang === 'ar' ? 'بارد' : 'Cold'), cls: 'track-old' };
 }
 
 function updateDashboard() {
     const total = clients.length;
     const completed = clients.filter(c => c.status === 'Completed').length;
-    if(document.getElementById('convRate')) document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
-    if(document.getElementById('potentialDeals')) document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
-    const gc = {}; clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
+    const convRate = document.getElementById('convRate');
+    const potentialDeals = document.getElementById('potentialDeals');
+    const topGov = document.getElementById('topGov');
+    
+    if(convRate) convRate.innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
+    if(potentialDeals) potentialDeals.innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
+    
+    const gc = {}; 
+    clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
     const top = Object.keys(gc).length > 0 ? Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b) : '-';
-    if(document.getElementById('topGov')) document.getElementById('topGov').innerText = top;
+    if(topGov) topGov.innerText = top;
+    
     const canvas = document.getElementById('statusChart');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -614,8 +664,7 @@ function importData(event) {
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            const arrayBuffer = e.target.result;
-            let text = new TextDecoder('utf-8').decode(arrayBuffer);
+            const text = e.target.result;
             const rows = text.split(/\r?\n/).filter(row => row.trim() !== "");
             const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
             rows.slice(1).forEach(row => {
@@ -631,12 +680,15 @@ function importData(event) {
                     clients.push(obj);
                 }
             });
-            db.ref('clients').set({...clients});
+            db.ref('clients').set(clients);
             notify('Imported Successfully', 'success');
             updateClientSelect();
-        } catch (err) { notify('Error reading file', 'error'); }
+            renderCRM();
+        } catch (err) { 
+            notify('Error reading file', 'error'); 
+        }
     };
-    reader.readAsArrayBuffer(file);
+    reader.readAsText(file, 'UTF-8');
 }
 
 function exportData(type) {
@@ -659,33 +711,64 @@ function delClient(i) {
         const d = clients.splice(i, 1)[0]; 
         d.deletedAt = new Date().toLocaleDateString(); 
         deletedClients.push(d); 
-        syncAll(); 
+        db.ref('clients').set(clients);
+        db.ref('deletedClients').set(deletedClients);
         notify('Moved to Bin', 'info');
         renderCRM();
         updateClientSelect();
     } 
 }
-function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); updateClientSelect(); }
+
+function restoreClient(i) { 
+    clients.push(deletedClients.splice(i, 1)[0]); 
+    db.ref('clients').set(clients);
+    db.ref('deletedClients').set(deletedClients);
+    notify('Restored', 'success'); 
+    updateClientSelect();
+    renderCRM();
+}
+
 function permanentDel(i) { 
     if(confirm('Final Del?')) { 
         deletedClients.splice(i, 1); 
-        syncAll(); 
+        db.ref('deletedClients').set(deletedClients);
         notify('Deleted Permanently', 'error'); 
+        const rb = document.getElementById('recycleBody');
+        if(rb) {
+            rb.innerHTML = '';
+            deletedClients.forEach((c, idx) => {
+                rb.innerHTML += `<tr>
+                    <td>${c.name}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.deletedAt}</td>
+                    <td><button onclick="restoreClient(${idx})" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:5px;">استعادة</button> 
+                            <button onclick="permanentDel(${idx})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;">حذف نهائي</button></td>
+                </tr>`;
+            });
+        }
     } 
 }
-function syncAll() { db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients}); }
 
 function editClient(i) { 
     editIdx = i; 
     const c = clients[i]; 
-    document.getElementById('name').value = c.name; 
-    document.getElementById('phone').value = c.phone; 
-    document.getElementById('gov').value = c.gov; 
-    document.getElementById('status').value = c.status; 
-    document.getElementById('notes').value = c.notes; 
-    document.getElementById('agent').value = c.agent; 
-    document.getElementById('followUp').value = c.followUp; 
-    document.getElementById('date').value = c.date; 
+    const nameEl = document.getElementById('name');
+    const phoneEl = document.getElementById('phone');
+    const govEl = document.getElementById('gov');
+    const statusEl = document.getElementById('status');
+    const notesEl = document.getElementById('notes');
+    const agentEl = document.getElementById('agent');
+    const followUpEl = document.getElementById('followUp');
+    const dateEl = document.getElementById('date');
+    
+    if(nameEl) nameEl.value = c.name;
+    if(phoneEl) phoneEl.value = c.phone;
+    if(govEl) govEl.value = c.gov;
+    if(statusEl) statusEl.value = c.status;
+    if(notesEl) notesEl.value = c.notes;
+    if(agentEl) agentEl.value = c.agent;
+    if(followUpEl) followUpEl.value = c.followUp;
+    if(dateEl) dateEl.value = c.date;
 }
 
 function editClientFromTask(clientName) {
@@ -700,6 +783,43 @@ function editClientFromTask(clientName) {
         notify(`جاري تعديل بيانات العميل: ${clientName}`, 'success');
     } else {
         notify(`العميل "${clientName}" غير موجود`, 'error');
+    }
+}
+
+function showClientDetails(clientName) {
+    if(!clientName) {
+        notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
+        return;
+    }
+    const client = clients.find(c => c.name === clientName);
+    if(client) {
+        alert(`🔍 بيانات العميل:\n━━━━━━━━━━━━━━━━━━━━━━\n📛 الاسم: ${client.name}\n📞 الهاتف: ${client.phone}\n🏠 المحافظة: ${client.gov}\n📌 الحالة: ${client.status}\n📝 ملاحظات: ${client.notes || 'لا توجد'}\n👤 المسؤول: ${client.agent || 'غير محدد'}\n📅 تاريخ الإضافة: ${client.date || 'غير محدد'}\n━━━━━━━━━━━━━━━━━━━━━━`);
+    } else {
+        notify(`⚠️ العميل "${clientName}" غير موجود في قاعدة البيانات`, 'error');
+    }
+}
+
+// ========== وظائف المهام ==========
+function updateClientSelect() {
+    const taskSelect = document.getElementById('taskClientSelect');
+    if(!taskSelect) return;
+    const currentVal = taskSelect.value;
+    taskSelect.innerHTML = '<option value="">-- اختر عميل --</option>';
+    clients.forEach(client => {
+        const selected = (currentVal === client.name) ? 'selected' : '';
+        taskSelect.innerHTML += `<option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>`;
+    });
+}
+
+function autoFillTaskPhone() {
+    const selectedName = document.getElementById('taskClientSelect').value;
+    if(!selectedName) {
+        document.getElementById('taskPhone').value = '';
+        return;
+    }
+    const client = clients.find(c => c.name === selectedName);
+    if(client) { 
+        document.getElementById('taskPhone').value = client.phone || ""; 
     }
 }
 
@@ -720,7 +840,7 @@ function addTask() {
         stage: document.getElementById('taskStage').value 
     }; 
     tasks.push(t); 
-    db.ref('tasks').set({...tasks}); 
+    db.ref('tasks').set(tasks); 
     notify('✅ تم إضافة المهمة بنجاح', 'success');
     document.getElementById('taskText').value = '';
     document.getElementById('taskDate').value = '';
@@ -728,8 +848,10 @@ function addTask() {
 }
 
 function renderTasks() { 
-    const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
-    const q = document.getElementById('taskSearch').value.toLowerCase();
+    const b = document.getElementById('taskBody'); 
+    if(!b) return; 
+    b.innerHTML = ''; 
+    const q = document.getElementById('taskSearch')?.value.toLowerCase() || '';
     
     if(tasks.length === 0) {
         b.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. أضف مهمة جديدة!</td></tr>';
@@ -744,14 +866,6 @@ function renderTasks() {
         let statusBadge = '';
         
         if(clientData) {
-            let statusClass = '';
-            switch(clientData.status) {
-                case 'VIP': statusClass = 'vip'; break;
-                case 'In Progress': statusClass = 'inprogress'; break;
-                case 'Hold': statusClass = 'hold'; break;
-                case 'Completed': statusClass = 'completed'; break;
-                default: statusClass = 'interested';
-            }
             statusBadge = `<span class="client-badge" style="background:${clientData.status === 'VIP' ? '#f1c40f' : clientData.status === 'In Progress' ? '#2ecc71' : clientData.status === 'Hold' ? '#e74c3c' : '#3498db'}; color:white;">${clientData.status}</span>`;
             clientDisplay = `<strong>${t.client}</strong><br>${statusBadge}`;
         } else {
@@ -759,12 +873,12 @@ function renderTasks() {
         }
         
         const delBtn = `<button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">🗑️</button>`;
-        const editClientBtn = `<button onclick="editClientFromTask('${t.client.replace(/'/g, "\\'")}')" style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">✏️ تعديل العميل</button>`;
-        const showClientBtn = `<button class="show-client-task-btn" onclick="showClientDetails('${t.client.replace(/'/g, "\\'")}')">👤 عرض البيانات</button>`;
+        const editClientBtn = `<button onclick="editClientFromTask('${(t.client || '').replace(/'/g, "\\'")}')" style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">✏️ تعديل العميل</button>`;
+        const showClientBtn = `<button class="show-client-task-btn" onclick="showClientDetails('${(t.client || '').replace(/'/g, "\\'")}')">👤 عرض البيانات</button>`;
         
         b.innerHTML += `<tr>
             <td>${clientDisplay}<br>${showClientBtn}${editClientBtn}</td>
-            <td>${t.phone || clientData?.phone || '-'}</td>
+            <td>${t.phone || (clientData ? clientData.phone : '-')}</td>
             <td>${t.text}</td>
             <td>${t.date || 'لم يحدد'}</td>
             <td><span style="background:#e0e0e0; padding:3px 8px; border-radius:15px; font-size:12px;">${t.stage}</span></td>
@@ -773,34 +887,63 @@ function renderTasks() {
     }); 
 }
 
-function showClientDetails(clientName) {
-    if(!clientName) {
-        notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
-        return;
-    }
-    const client = clients.find(c => c.name === clientName);
-    if(client) {
-        alert(`🔍 بيانات العميل:\n━━━━━━━━━━━━━━━━━━━━━━\n📛 الاسم: ${client.name}\n📞 الهاتف: ${client.phone}\n🏠 المحافظة: ${client.gov}\n📌 الحالة: ${client.status}\n📝 ملاحظات: ${client.notes || 'لا توجد'}\n👤 المسؤول: ${client.agent || 'غير محدد'}\n📅 تاريخ الإضافة: ${client.date || 'غير محدد'}\n━━━━━━━━━━━━━━━━━━━━━━`);
-    } else {
-        notify(`⚠️ العميل "${clientName}" غير موجود في قاعدة البيانات`, 'error');
-    }
-}
-
 function deleteTask(index) {
     if(confirm('هل تريد حذف هذه المهمة؟')) {
         tasks.splice(index, 1);
-        db.ref('tasks').set({...tasks});
+        db.ref('tasks').set(tasks);
         renderTasks();
         notify('تم حذف المهمة', 'info');
     }
 }
 
-function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
+// ========== وظائف عامة ==========
+function showTab(id, btn) { 
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+    const targetTab = document.getElementById(id);
+    if(targetTab) targetTab.classList.add('active'); 
+    if(btn) btn.classList.add('active'); 
+    if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
+    if(id === 'usersTab') { renderUsers(); }
+    if(id === 'tasksTab') { updateClientSelect(); renderTasks(); }
+    if(id === 'recycleTab') {
+        const rb = document.getElementById('recycleBody');
+        if(rb) {
+            rb.innerHTML = '';
+            deletedClients.forEach((c, i) => {
+                rb.innerHTML += `<tr>
+                    <td>${c.name}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.deletedAt}</td>
+                    <td><button onclick="restoreClient(${i})" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:5px;">استعادة</button> 
+                            <button onclick="permanentDel(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;">حذف نهائي</button></td>
+                </tr>`;
+            });
+        }
+    }
+}
 
-// Firebase Listeners
+function changeLang(l) { 
+    lang = l; 
+    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
+    fillGovs(); 
+    renderCRM(); 
+    applyRolePermissions(); 
+}
+
+function logout() { 
+    sessionStorage.clear(); 
+    location.reload(); 
+}
+
+// ========== Firebase Listeners ==========
 db.ref('authSystem').on('value', s => {
-    if(s.val()) { authSystem = s.val(); } 
-    else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] }; db.ref('authSystem').set(authSystem); }
+    if(s.val()) { 
+        authSystem = s.val(); 
+    } else { 
+        authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] }; 
+        db.ref('authSystem').set(authSystem); 
+    }
     renderUsers();
 });
 
@@ -812,21 +955,36 @@ db.ref('clients').on('value', s => {
 
 db.ref('deletedClients').on('value', s => { 
     deletedClients = s.val() ? Object.values(s.val()) : []; 
-    const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr>
-        <td>${c.name}</td>
-        <td>${c.phone}</td>
-        <td>${c.deletedAt}</td>
-        <td><button onclick="restoreClient(${i})" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:5px;">استعادة</button> 
-                <button onclick="permanentDel(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;">حذف نهائي</button></td>
-    </tr>`; });
-    }
 });
 
-db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+db.ref('tasks').on('value', s => { 
+    tasks = s.val() ? Object.values(s.val()) : []; 
+    renderTasks(); 
+});
 
+// ========== التحقق من حالة تسجيل الدخول عند التحميل ==========
+if (sessionStorage.getItem('isLoggedIn') === 'true') { 
+    document.getElementById('loginOverlay').style.display = 'none'; 
+    document.getElementById('mainApp').style.display = 'flex'; 
+    setTimeout(() => {
+        applyRolePermissions();
+        renderCRM();
+        renderTasks();
+        updateClientSelect();
+    }, 100);
+}
+
+// ========== تهيئة الواجهة ==========
 fillGovs();
 updateClientSelect();
+
+// إضافة مستمع Enter لحقول تسجيل الدخول
+document.getElementById('userInput')?.addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') checkLogin();
+});
+document.getElementById('passInput')?.addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') checkLogin();
+});
 </script>
 </body>
 </html>
