@@ -250,18 +250,15 @@ function applyRolePermissions() {
 
 function checkLogin() {
 
+ function checkLogin() {
+
     if (!isAuthReady) {
-        notify('System loading... try again', 'error');
+        alert("System still loading...");
         return;
     }
 
     const u = document.getElementById('userInput').value.trim();
     const p = document.getElementById('passInput').value.trim();
-
-    if (!u || !p) {
-        notify('Enter username & password', 'error');
-        return;
-    }
 
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
 
@@ -278,11 +275,9 @@ function checkLogin() {
         renderTasks();
         renderUsers();
 
-        notify('Welcome ' + user.displayName, 'success');
-
     } else {
         document.getElementById('loginError').style.display = 'block';
-        notify('Wrong username or password', 'error');
+        alert("Wrong username or password");
     }
 }
 
