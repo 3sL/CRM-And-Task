@@ -60,6 +60,7 @@
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="no-select" oncontextmenu="return false;"> <audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 <div id="notification"></div>
@@ -224,6 +225,35 @@ document.onkeydown = function(e) {
 const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", authDomain: "crm-tasking.firebaseapp.com", databaseURL: "https://crm-tasking-default-rtdb.firebaseio.com", projectId: "crm-tasking", storageBucket: "crm-tasking.appspot.com", messagingSenderId: "368062369619", appId: "1:368062369619:web:cd38383ab75ab473961ba6" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const firestore = firebase.firestore();
+
+// --- إعداد Firestore Collections لأرشفة البيانات القديمة وحفظ السجلات ---
+async function archiveToFirestore(collectionName, data) {
+    try {
+        const docRef = firestore.collection(collectionName).doc();
+        await docRef.set({
+            ...data,
+            archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            archivedBy: sessionStorage.getItem('userDisplayName') || 'system'
+        });
+        console.log(`Archived to ${collectionName}`);
+    } catch (error) {
+        console.error("Firestore archive error:", error);
+    }
+}
+
+async function saveActivityLog(action, details) {
+    try {
+        await firestore.collection('activityLogs').add({
+            action: action,
+            details: details,
+            user: sessionStorage.getItem('userDisplayName') || 'unknown',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Activity log error:", error);
+    }
+}
 
 // --- نظام المستخدمين المطور ---
 let authSystem = { users: [] };
@@ -262,6 +292,7 @@ function checkLogin() {
         renderCRM(); 
         renderTasks();
         renderUsers();
+        saveActivityLog('login', `User ${user.displayName} logged in`);
         notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
@@ -280,6 +311,7 @@ function addUser() {
 
     authSystem.users.push({ u: u, p: p, role: r, displayName: d });
     db.ref('authSystem').set(authSystem);
+    saveActivityLog('add_user', `Added user: ${u}`);
     notify('User Added Successfully', 'success');
     document.getElementById('newUsername').value = '';
     document.getElementById('newPassword').value = '';
@@ -289,8 +321,10 @@ function addUser() {
 function deleteUser(index) {
     if(authSystem.users[index].u === 'admin') return notify('Cannot delete main admin', 'error');
     if(confirm('Delete this user?')) {
+        const deletedUser = authSystem.users[index];
         authSystem.users.splice(index, 1);
         db.ref('authSystem').set(authSystem);
+        saveActivityLog('delete_user', `Deleted user: ${deletedUser.u}`);
         notify('User Deleted', 'info');
     }
 }
@@ -313,6 +347,7 @@ function renderUsers() {
 function updateUserPass(i, newPass) {
     authSystem.users[i].p = newPass;
     db.ref('authSystem').set(authSystem);
+    saveActivityLog('update_password', `Updated password for ${authSystem.users[i].u}`);
     notify('Password Updated', 'success');
 }
 
@@ -339,7 +374,11 @@ if (sessionStorage.getItem('isLoggedIn') === 'true') {
     setTimeout(applyRolePermissions, 100);
 }
 
-function logout() { sessionStorage.clear(); location.reload(); }
+function logout() { 
+    saveActivityLog('logout', `User logged out`);
+    sessionStorage.clear(); 
+    location.reload(); 
+}
 
 function showTab(id, btn) { 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
@@ -362,8 +401,19 @@ function addOrUpdate() {
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
     const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
-    if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify(lang==='ar'?'تم التحديث':'Updated', 'success'); } 
-    else { clients.push(c); notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); }
+    if(editIdx > -1) { 
+        const oldClient = clients[editIdx];
+        archiveToFirestore('clientHistory', { oldData: oldClient, newData: c, action: 'update' });
+        clients[editIdx] = c; 
+        editIdx = -1; 
+        saveActivityLog('update_client', `Updated client: ${n}`);
+        notify(lang==='ar'?'تم التحديث':'Updated', 'success'); 
+    } 
+    else { 
+        clients.push(c); 
+        saveActivityLog('add_client', `Added client: ${n}`);
+        notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); 
+    }
     db.ref('clients').set({...clients});
     ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('gov').value = '';
@@ -394,12 +444,23 @@ function renderCRM() {
                 <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
                 <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
                 ${delBtn}
-            </td>
+             </td>
         </tr>`;
     });
     document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
     updateDashboard();
+    
+    // تحديث قائمة العملاء في مهام المتابعة
+    const clientSelect = document.getElementById('taskClientSelect');
+    if(clientSelect) {
+        const currentVal = clientSelect.value;
+        clientSelect.innerHTML = '<option value="">Client</option>';
+        clients.forEach(c => {
+            clientSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+        });
+        if(currentVal) clientSelect.value = currentVal;
+    }
 }
 
 function getTrackingLabel(dateStr) {
@@ -452,9 +513,10 @@ function importData(event) {
             let text = new TextDecoder('utf-8').decode(arrayBuffer);
             const rows = text.split(/\r?\n/).filter(row => row.trim() !== "");
             const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
+            let importedCount = 0;
             rows.slice(1).forEach(row => {
                 const cols = row.split(',').map(c => c.replace(/"/g, '').trim());
-                if (cols.length > 0) {
+                if (cols.length > 0 && cols[0]) {
                     let obj = { name: "Unknown", phone: "", gov: "", status: "Interested", notes: "Imported", agent: "System", date: new Date().toISOString().split('T')[0] };
                     cols.forEach((val, idx) => {
                         const h = headers[idx] || "";
@@ -462,11 +524,15 @@ function importData(event) {
                         else if (h.includes("phone") || h.includes("هاتف")) obj.phone = val;
                         else if (h.includes("gov") || h.includes("محافظة")) obj.gov = val;
                     });
-                    clients.push(obj);
+                    if(obj.name && obj.name !== "Unknown") {
+                        clients.push(obj);
+                        importedCount++;
+                    }
                 }
             });
             db.ref('clients').set({...clients});
-            notify('Imported Successfully', 'success');
+            saveActivityLog('import_csv', `Imported ${importedCount} clients`);
+            notify(`Imported ${importedCount} clients successfully`, 'success');
         } catch (err) { notify('Error reading file', 'error'); }
     };
     reader.readAsArrayBuffer(file);
@@ -483,8 +549,9 @@ function exportData(type) {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Utopia_${type}.csv`;
+    link.download = `Utopia_${type}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
+    saveActivityLog('export_data', `Exported ${type} data`);
 }
 
 function delClient(i) { 
@@ -494,12 +561,33 @@ function delClient(i) {
         d.deletedAt = new Date().toLocaleDateString(); 
         deletedClients.push(d); 
         syncAll(); 
+        archiveToFirestore('deletedClients', d);
+        saveActivityLog('delete_client', `Moved client ${d.name} to bin`);
         notify('Moved to Bin', 'info');
     } 
 }
-function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); }
-function permanentDel(i) { if(confirm('Final Del?')) { deletedClients.splice(i, 1); syncAll(); notify('Deleted Permanently', 'error'); } }
-function syncAll() { db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients}); }
+function restoreClient(i) { 
+    const restored = deletedClients[i];
+    clients.push(restored); 
+    deletedClients.splice(i, 1); 
+    syncAll(); 
+    saveActivityLog('restore_client', `Restored client ${restored.name}`);
+    notify('Restored', 'success'); 
+}
+function permanentDel(i) { 
+    if(confirm('Final Delete? This action will be archived in Firestore.')) { 
+        const deleted = deletedClients[i];
+        archiveToFirestore('permanentlyDeleted', deleted);
+        deletedClients.splice(i, 1); 
+        syncAll(); 
+        saveActivityLog('permanent_delete', `Permanently deleted client ${deleted.name}`);
+        notify('Deleted Permanently', 'error'); 
+    } 
+}
+function syncAll() { 
+    db.ref('clients').set({...clients}); 
+    db.ref('deletedClients').set({...deletedClients}); 
+}
 
 function editClient(i) { 
     editIdx = i; 
@@ -520,11 +608,21 @@ function editClientFromTask(clientName) {
 }
 
 function addTask() { 
-    const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, phone: document.getElementById('taskPhone').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value }; 
+    const t = { 
+        text: document.getElementById('taskText').value, 
+        client: document.getElementById('taskClientSelect').value, 
+        phone: document.getElementById('taskPhone').value, 
+        date: document.getElementById('taskDate').value, 
+        stage: document.getElementById('taskStage').value,
+        createdAt: new Date().toISOString()
+    }; 
     if(!t.text) return notify('Task empty', 'error'); 
     tasks.push(t); 
     db.ref('tasks').set({...tasks}); 
+    saveActivityLog('add_task', `Added task: ${t.text} for ${t.client}`);
     notify('Task Added', 'success'); 
+    document.getElementById('taskText').value = '';
+    document.getElementById('taskDate').value = '';
 }
 
 function renderTasks() { 
@@ -533,35 +631,94 @@ function renderTasks() {
     const role = sessionStorage.getItem('userRole');
     tasks.forEach((t, i) => { 
         if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        const delBtn = (role === 'admin') ? `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>` : '';
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>`; 
+        const delBtn = (role === 'admin') ? `<button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>` : '';
+        b.innerHTML += `<tr>
+            <td><b>${t.client}</b></td>
+            <td>${t.phone || '-'}</td>
+            <td>${t.text}</td>
+            <td>${t.date || 'No date'}</td>
+            <td>${t.stage}</td>
+            <td><button onclick="editClientFromTask('${t.client}')" style="background:#ffc107; border:none; padding:5px; border-radius:5px; cursor:pointer;">✏️</button>${delBtn}</td>
+        </tr>`; 
     }); 
 }
 
-function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
+function deleteTask(index) {
+    if(confirm('Delete this task?')) {
+        const deletedTask = tasks[index];
+        tasks.splice(index, 1);
+        db.ref('tasks').set({...tasks});
+        archiveToFirestore('deletedTasks', deletedTask);
+        saveActivityLog('delete_task', `Deleted task: ${deletedTask.text}`);
+        notify('Task deleted', 'info');
+    }
+}
+
+function changeLang(l) { 
+    lang = l; 
+    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; 
+    fillGovs(); 
+    renderCRM(); 
+    applyRolePermissions(); 
+}
 
 // --- تهيئة البيانات من Firebase ---
 db.ref('authSystem').on('value', s => {
     if(s.val()) {
         authSystem = s.val();
     } else {
-        // إعداد افتراضي لأول مرة فقط
         authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] };
         db.ref('authSystem').set(authSystem);
     }
     renderUsers();
 });
 
-db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
+db.ref('clients').on('value', s => { 
+    const val = s.val();
+    clients = val ? Object.values(val) : []; 
+    renderCRM(); 
+});
+
 db.ref('deletedClients').on('value', s => { 
-    deletedClients = s.val() ? Object.values(s.val()) : []; 
-    const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; });
+    const val = s.val();
+    deletedClients = val ? Object.values(val) : []; 
+    const rb = document.getElementById('recycleBody'); 
+    if(rb) { 
+        rb.innerHTML = '';
+        deletedClients.forEach((c, i) => { 
+            rb.innerHTML += `<tr>
+                <td>${c.name}</td>
+                <td>${c.phone}</td>
+                <td>${c.deletedAt || 'Unknown'}</td>
+                <td><button onclick="restoreClient(${i})" style="background:#28a745; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">↩️ Restore</button> 
+                <button onclick="permanentDel(${i})" style="background:#dc3545; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">🗑️ X</button></td>
+            </tr>`;
+        });
     }
 });
-db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
+
+db.ref('tasks').on('value', s => { 
+    const val = s.val();
+    tasks = val ? Object.values(val) : []; 
+    renderTasks(); 
+});
 
 fillGovs();
+
+// تحديث قائمة العملاء في المهام بشكل دوري
+setInterval(() => {
+    if(clients.length > 0) {
+        const clientSelect = document.getElementById('taskClientSelect');
+        if(clientSelect && clientSelect.options.length <= 1) {
+            const currentVal = clientSelect.value;
+            clientSelect.innerHTML = '<option value="">Client</option>';
+            clients.forEach(c => {
+                clientSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+            });
+            if(currentVal) clientSelect.value = currentVal;
+        }
+    }
+}, 5000);
 </script>
 </body>
 </html>
