@@ -205,6 +205,7 @@
 
 <script>
 let visitorId = "";
+    let isAuthReady = false;
 async function initFingerprint() {
     const fp = await FingerprintJS.load();
     const result = await fp.get();
@@ -247,27 +248,42 @@ function applyRolePermissions() {
     });
 }
 
-function checkLogin() { 
-    const u = document.getElementById('userInput').value;
-    const p = document.getElementById('passInput').value;
-    
+function checkLogin() {
+
+    if (!isAuthReady) {
+        notify('System loading... try again', 'error');
+        return;
+    }
+
+    const u = document.getElementById('userInput').value.trim();
+    const p = document.getElementById('passInput').value.trim();
+
+    if (!u || !p) {
+        notify('Enter username & password', 'error');
+        return;
+    }
+
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
 
-    if (user) { 
-        document.getElementById('loginOverlay').style.display = 'none'; 
-        document.getElementById('mainApp').style.display = 'flex'; 
-        sessionStorage.setItem('isLoggedIn', 'true'); 
+    if (user) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+
+        sessionStorage.setItem('isLoggedIn', 'true');
         sessionStorage.setItem('userRole', user.role);
-        sessionStorage.setItem('userDisplayName', user.displayName); 
+        sessionStorage.setItem('userDisplayName', user.displayName);
+
         applyRolePermissions();
-        renderCRM(); 
+        renderCRM();
         renderTasks();
         renderUsers();
-        notify('Welcome ' + user.displayName, 'success'); 
-    } else { 
-        document.getElementById('loginError').style.display = 'block'; 
-        notify('Login Failed', 'error'); 
-    } 
+
+        notify('Welcome ' + user.displayName, 'success');
+
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        notify('Wrong username or password', 'error');
+    }
 }
 
 function addUser() {
