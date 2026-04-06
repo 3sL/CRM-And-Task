@@ -205,7 +205,7 @@
 
 <script>
 let visitorId = "";
-    let isAuthReady = false;
+let isAuthReady = false;
 async function initFingerprint() {
     const fp = await FingerprintJS.load();
     const result = await fp.get();
@@ -558,27 +558,63 @@ function renderTasks() {
 function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
 
 // --- تهيئة البيانات من Firebase ---
+let isAuthReady = false;
+    // --- تهيئة البيانات من Firebase ---
+let isAuthReady = false; // ✅ تعريف المتغير في البداية
+
 db.ref('authSystem').on('value', s => {
-    if(s.val()) {
+    if (s.val()) {
         authSystem = s.val();
     } else {
         // إعداد افتراضي لأول مرة فقط
-        authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] };
+        authSystem = {
+            users: [
+                { u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }
+            ]
+        };
         db.ref('authSystem').set(authSystem);
     }
+
+    isAuthReady = true; // ✅ النظام جاهز
+
+    const deviceInfo = document.getElementById('deviceLockInfo');
+    if (deviceInfo) {
+        deviceInfo.innerText = "System Ready ✔";
+    }
+
     renderUsers();
 });
 
-db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
-db.ref('deletedClients').on('value', s => { 
-    deletedClients = s.val() ? Object.values(s.val()) : []; 
-    const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; });
+// باقي الداتا
+db.ref('clients').on('value', s => {
+    clients = s.val() ? Object.values(s.val()) : [];
+    renderCRM();
+});
+
+db.ref('deletedClients').on('value', s => {
+    deletedClients = s.val() ? Object.values(s.val()) : [];
+    const rb = document.getElementById('recycleBody');
+    if (rb) {
+        rb.innerHTML = '';
+        deletedClients.forEach((c, i) => {
+            rb.innerHTML += `
+                <tr>
+                    <td>${c.name}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.deletedAt}</td>
+                    <td>
+                        <button onclick="restoreClient(${i})">Restore</button>
+                        <button onclick="permanentDel(${i})">X</button>
+                    </td>
+                </tr>`;
+        });
     }
 });
-db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
-fillGovs();
+db.ref('tasks').on('value', s => {
+    tasks = s.val() ? Object.values(s.val()) : [];
+    renderTasks();
+});
 </script>
 </body>
 </html>
