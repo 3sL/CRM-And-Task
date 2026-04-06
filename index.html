@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet Map Libraries -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
@@ -57,6 +60,103 @@
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .card { background:#fff; padding:20px; text-align:center; border-radius:12px; flex:1; font-weight:bold; border-top: 5px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         @media (max-width: 768px) { body { flex-direction: column; overflow: auto; } #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; } .dev-box { display: none; } }
+        
+        .advanced-search-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .advanced-search-row select, .advanced-search-row input {
+            flex: 1;
+            min-width: 150px;
+            margin: 0;
+        }
+        .advanced-search-row button {
+            padding: 12px 20px;
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--primary);
+        }
+        .advanced-search-row button.reset-search {
+            background: #6c757d;
+            color: white;
+        }
+        .edit-name-btn {
+            background: #ffc107;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .show-client-task-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+            font-size: 11px;
+        }
+        .client-badge {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+        /* Voice and Map Styles */
+        .voice-btn {
+            background: #9b59b6;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: 0.3s;
+            width: 50px;
+        }
+        .voice-btn.recording {
+            background: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .map-container {
+            height: 300px;
+            width: 100%;
+            border-radius: 15px;
+            margin-top: 10px;
+            border: 2px solid var(--accent);
+        }
+        .location-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .map-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 12px;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -86,6 +186,7 @@
         <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
+        <button class="tab-btn" onclick="showTab('mapTab', this)">🗺️ Customer Map</button>
         <button id="btnRecycle" class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
         <button id="btnSecurity" class="tab-btn" onclick="showTab('securityTab', this)">🛡️ Change Password</button>
         <button id="btnUsers" class="tab-btn admin-only" onclick="showTab('usersTab', this)">🔐 Users Management</button>
@@ -106,7 +207,17 @@
         <div id="crmTab" class="tab-content active">
             <h2 id="crmHeader">Clients Registry</h2>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input id="search" placeholder="🔍 Search by name, phone or gov..." oninput="renderCRM()" style="border: 2px solid var(--accent); margin-bottom: 20px; flex: 1;">
+                <div class="advanced-search-row">
+                    <input id="search" placeholder="🔍 بحث بالاسم أو الهاتف أو المحافظة..." oninput="renderCRM()" style="border: 2px solid var(--accent);">
+                    <select id="searchStatusFilter" onchange="renderCRM()">
+                        <option value="all">📌 جميع الحالات</option>
+                        <option value="Interested">🤝 Interested</option>
+                        <option value="In Progress">🚀 In Progress</option>
+                        <option value="Hold">⏸ Hold</option>
+                        <option value="Completed">✅ Completed</option>
+                    </select>
+                    <button class="reset-search" onclick="resetSearch()">🔄 إعادة ضبط البحث</button>
+                </div>
                 <button class="btn-import admin-only" onclick="document.getElementById('csvFileInput').click()">📥 Import Any CSV</button>
                 <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importData(event)">
                 <button class="btn-export admin-only" onclick="exportData('clients')">📤 Export Excel</button>
@@ -120,17 +231,26 @@
                     <option value="In Progress">In Progress</option>
                     <option value="Hold">Hold</option>
                     <option value="Completed">Completed</option>
-                    <option value="Completed">VIP</option>
                 </select>
             </div>
             <div class="row">
-                <textarea id="notes" placeholder="Notes..."></textarea>
+                <div style="flex:2; display:flex; gap:5px;">
+                    <textarea id="notes" placeholder="Notes..." style="flex:1;"></textarea>
+                    <button id="voiceNotesBtn" class="voice-btn" onclick="startVoiceInput('notes')" title="🎤 إدخال بالصوت">🎤</button>
+                </div>
                 <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
                     <input id="agent" placeholder="Agent Name">
                     <input id="followUp" placeholder="Next Action">
                     <input type="date" id="date">
                 </div>
             </div>
+            <div class="row">
+                <div style="flex:1;">
+                    <input id="locationAddress" placeholder="📍 عنوان العميل (اختياري)">
+                    <button type="button" class="location-btn" onclick="getCurrentLocation()">📍 تحديد موقعي الحالي</button>
+                </div>
+            </div>
+            <div id="locationPreview" class="map-preview" style="display:none;"></div>
             <button class="btn-save" onclick="addOrUpdate()">💾 Save Data</button>
             <div class="row" style="margin-top: 20px;">
                 <div class="card" id="countAll">Total: 0</div>
@@ -139,7 +259,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking</th><th>Status</th><th>Actions</th>
+                        <th>Name</th><th>Phone</th><th>Gov</th><th>Tracking</th><th>Status</th><th>Location</th><th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -158,6 +278,18 @@
             </div>
         </div>
 
+        <div id="mapTab" class="tab-content">
+            <h2>🗺️ Customer Locations Map</h2>
+            <div class="row">
+                <select id="mapCustomerSelect" onchange="showCustomerOnMap()">
+                    <option value="">-- اختر عميل لعرض موقعه --</option>
+                </select>
+                <button onclick="refreshMap()" style="background:var(--info); color:white; border:none; padding:10px; border-radius:8px;">🔄 تحديث الخريطة</button>
+            </div>
+            <div id="customerMap" class="map-container"></div>
+            <div id="mapInfo" style="margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 10px; text-align: center;"></div>
+        </div>
+
         <div id="recycleTab" class="tab-content">
             <h2 style="color: var(--danger);">♻️ Recycle Bin</h2>
             <table>
@@ -169,18 +301,40 @@
         <div id="tasksTab" class="tab-content">
             <h2>Operations Tasks</h2>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <input id="taskSearch" placeholder="🔍 Filter..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
+                <input id="taskSearch" placeholder="🔍 Filter tasks..." oninput="renderTasks()" style="border: 2px solid var(--info); margin-bottom: 20px; flex: 1;">
                 <button class="btn-export admin-only" onclick="exportData('tasks')" style="background: #17a2b8;">📤 Export Tasks</button>
             </div>
             <div class="row">
-                <input id="taskText" placeholder="Task details">
-                <select id="taskClientSelect" onchange="autoFillTaskPhone()"><option value="">Client</option></select>
-                <input id="taskPhone" placeholder="Phone Number">
+                <input id="taskText" placeholder="Task details" style="flex: 2;">
+                <button class="voice-btn" onclick="startVoiceInput('taskText')" style="width:50px;">🎤</button>
+                <select id="taskClientSelect" onchange="autoFillTaskPhone()" style="flex: 2;">
+                    <option value="">-- اختر عميل --</option>
+                </select>
+                <input id="taskPhone" placeholder="Phone Number" readonly style="background: #f5f5f5;">
                 <input type="date" id="taskDate">
-                <select id="taskStage"><option value="quote">Quote</option><option value="follow">Follow Up</option><option value="order">Order</option><option value="bank">Bank</option></select>
-                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕</button>
+                <select id="taskStage">
+                    <option value="quote">📄 Quote</option>
+                    <option value="follow">📞 Follow Up</option>
+                    <option value="order">🛒 Order</option>
+                    <option value="bank">🏦 Bank</option>
+                </select>
+                <button onclick="addTask()" style="background:var(--info); color:white; border:none; border-radius:10px; cursor:pointer; padding: 15px;">➕ إضافة</button>
             </div>
-            <table><thead><tr><th>Client</th><th>Phone</th><th>Task</th><th>Deadline</th><th>Stage</th><th>Actions</th></tr></thead><tbody id="taskBody"></tbody></table>
+            <div style="margin-top: 20px; overflow-x: auto;">
+                <table style="min-width: 800px;">
+                    <thead>
+                        <tr>
+                            <th>👤 Client Info</th>
+                            <th>📞 Phone</th>
+                            <th>📋 Task</th>
+                            <th>📅 Deadline</th>
+                            <th>🎯 Stage</th>
+                            <th>⚙️ Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taskBody"></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="usersTab" class="tab-content">
@@ -246,13 +400,8 @@ function applyRolePermissions() {
     const isAdmin = (role === 'admin');
     
     document.getElementById('welcomeUser').innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
-
-    const recycleBtn = document.getElementById('btnRecycle');
-    if(recycleBtn) recycleBtn.style.display = 'block';
-
     const usersBtn = document.getElementById('btnUsers');
     if(usersBtn) usersBtn.style.display = isAdmin ? 'block' : 'none';
-
     document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = isAdmin ? 'inline-block' : 'none';
     });
@@ -262,18 +411,19 @@ function checkLogin() {
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
-
     if (user) { 
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
         sessionStorage.setItem('isLoggedIn', 'true'); 
         sessionStorage.setItem('userRole', user.role);
         sessionStorage.setItem('userDisplayName', user.displayName);
-        sessionStorage.setItem('currentUserName', user.u); // حفظ اليوزر الحالى
+        sessionStorage.setItem('currentUserName', user.u);
         applyRolePermissions();
         renderCRM(); 
         renderTasks();
         renderUsers();
+        updateClientSelect();
+        initMap();
         notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
@@ -281,12 +431,10 @@ function checkLogin() {
     } 
 }
 
-// وظيفة تغيير الباسورد للمستخدم الحالى
 function changeMyPassword() {
     const newPass = document.getElementById('changePassInput').value;
     const currentU = sessionStorage.getItem('currentUserName');
     if(!newPass) return notify('Please enter new password', 'error');
-    
     const userIdx = authSystem.users.findIndex(u => u.u === currentU);
     if(userIdx > -1) {
         authSystem.users[userIdx].p = newPass;
@@ -342,12 +490,228 @@ function updateUserPass(i, newPass) {
 }
 
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
+let currentMap = null;
+let mapMarkers = [];
+
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
+
+// ========== Voice Input Function ==========
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+
+function startVoiceInput(fieldId) {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        notify('❌ المتصفح لا يدعم الإدخال الصوتي', 'error');
+        return;
+    }
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = lang === 'ar' ? 'ar-EG' : 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    
+    const btn = event.target;
+    btn.classList.add('recording');
+    btn.textContent = '⏺';
+    
+    recognition.start();
+    
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        const field = document.getElementById(fieldId);
+        if(field) {
+            if(field.value) {
+                field.value += ' ' + transcript;
+            } else {
+                field.value = transcript;
+            }
+            notify('🎤 تم إدخال: ' + transcript.substring(0, 50), 'success');
+        }
+        btn.classList.remove('recording');
+        btn.textContent = '🎤';
+    };
+    
+    recognition.onerror = function(event) {
+        notify('❌ خطأ في التعرف على الصوت: ' + event.error, 'error');
+        btn.classList.remove('recording');
+        btn.textContent = '🎤';
+    };
+    
+    recognition.onend = function() {
+        btn.classList.remove('recording');
+        btn.textContent = '🎤';
+    };
+}
+
+// ========== Location / Map Functions ==========
+function getCurrentLocation() {
+    if (!navigator.geolocation) {
+        notify('❌ المتصفح لا يدعم تحديد الموقع', 'error');
+        return;
+    }
+    
+    notify('📍 جاري تحديد موقعك...', 'info');
+    
+    navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        // Reverse geocoding to get address
+        fetch(https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1)
+            .then(response => response.json())
+            .then(data => {
+                const address = data.display_name || ${lat}, ${lng};
+                document.getElementById('locationAddress').value = address;
+                
+                // Store coordinates
+                window.tempLat = lat;
+                window.tempLng = lng;
+                
+                // Show preview
+                const preview = document.getElementById('locationPreview');
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                    📍 <strong>الموقع المحدد:</strong><br>
+                    ${address.substring(0, 100)}<br>
+                    <small>خط العرض: ${lat.toFixed(6)} | خط الطول: ${lng.toFixed(6)}</small>
+                    <button onclick="removeLocation()" style="background:#dc3545; color:white; border:none; padding:3px 8px; border-radius:5px; margin-left:10px;">❌ إزالة</button>
+                `;
+                
+                notify('✅ تم تحديد الموقع بنجاح', 'success');
+            })
+            .catch(() => {
+                document.getElementById('locationAddress').value = ${lat}, ${lng};
+                window.tempLat = lat;
+                window.tempLng = lng;
+                notify('✅ تم تحديد الموقع (بدون عنوان)', 'success');
+            });
+    }, function(error) {
+        notify('❌ فشل تحديد الموقع: ' + error.message, 'error');
+    });
+}
+
+function removeLocation() {
+    document.getElementById('locationAddress').value = '';
+    document.getElementById('locationPreview').style.display = 'none';
+    delete window.tempLat;
+    delete window.tempLng;
+}
+
+let mapInitialized = false;
+
+function initMap() {
+    if (!mapInitialized && document.getElementById('customerMap')) {
+        currentMap = L.map('customerMap').setView([30.0444, 31.2357], 6);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB'
+        }).addTo(currentMap);
+        mapInitialized = true;
+    }
+}
+
+function refreshMap() {
+    if (!currentMap) {
+        initMap();
+    }
+    
+    // Clear existing markers
+    mapMarkers.forEach(marker => currentMap.removeLayer(marker));
+    mapMarkers = [];
+    
+    // Update customer select dropdown
+    const select = document.getElementById('mapCustomerSelect');
+    select.innerHTML = '<option value="">-- اختر عميل لعرض موقعه --</option>';
+    
+    let hasLocations = false;
+    clients.forEach(client => {
+        if (client.lat && client.lng) {
+            hasLocations = true;
+            select.innerHTML += <option value="${client.name}">📍 ${client.name} - ${client.status}</option>;
+            
+            // Add marker to map
+            const marker = L.marker([client.lat, client.lng]).addTo(currentMap);
+            marker.bindPopup(`
+                <b>${client.name}</b><br>
+                📞 ${client.phone}<br>
+                📌 ${client.status}<br>
+                📍 ${client.address || 'عنوان غير محدد'}<br>
+                <button onclick="editClientFromMap('${client.name}')" style="background:#ffc107; border:none; padding:5px; border-radius:5px;">✏️ تعديل</button>
+            `);
+            mapMarkers.push(marker);
+        }
+    });
+    
+    if (hasLocations && mapMarkers.length > 0) {
+        const group = L.featureGroup(mapMarkers);
+        currentMap.fitBounds(group.getBounds().pad(0.2));
+        document.getElementById('mapInfo').innerHTML = ✅ تم عرض ${mapMarkers.length} عميل على الخريطة;
+    } else {
+        document.getElementById('mapInfo').innerHTML = ⚠️ لا يوجد عملاء لديهم مواقع محددة. قم بإضافة موقع للعملاء في صفحة CRM;
+        currentMap.setView([30.0444, 31.2357], 6);
+    }
+}
+
+function showCustomerOnMap() {
+    const selectedName = document.getElementById('mapCustomerSelect').value;
+    if (!selectedName) return;
+    
+    const client = clients.find(c => c.name === selectedName);
+    if (client && client.lat && client.lng) {
+        currentMap.setView([client.lat, client.lng], 15);
+        const marker = mapMarkers.find(m => m.getPopup()?.getContent()?.includes(client.name));
+        if (marker) marker.openPopup();
+        document.getElementById('mapInfo').innerHTML = `
+            📍 <strong>${client.name}</strong><br>
+            العنوان: ${client.address || 'غير محدد'}<br>
+            الحالة: ${client.status}
+        `;
+    } else {
+        notify('⚠️ هذا العميل ليس لديه موقع محدد', 'error');
+    }
+}
+
+function editClientFromMap(clientName) {
+    const idx = clients.findIndex(c => c.name === clientName);
+    if(idx > -1) {
+        showTab('crmTab', document.getElementById('btnCrmTab'));
+        editClient(idx);
+    }
+}
+
+function updateClientSelect() {
+    const taskSelect = document.getElementById('taskClientSelect');
+    if(!taskSelect) return;
+    const currentVal = taskSelect.value;
+    taskSelect.innerHTML = '<option value="">-- اختر عميل --</option>';
+    clients.forEach(client => {
+        const selected = (currentVal === client.name) ? 'selected' : '';
+        taskSelect.innerHTML += <option value="${client.name.replace(/"/g, '&quot;')}" ${selected}>${client.name} (${client.status})</option>;
+    });
+    
+    // Also update map select
+    const mapSelect = document.getElementById('mapCustomerSelect');
+    if(mapSelect) {
+        mapSelect.innerHTML = '<option value="">-- اختر عميل لعرض موقعه --</option>';
+        clients.forEach(client => {
+            if(client.lat && client.lng) {
+                mapSelect.innerHTML += <option value="${client.name}">📍 ${client.name} - ${client.status}</option>;
+            }
+        });
+    }
+}
 
 function autoFillTaskPhone() {
     const selectedName = document.getElementById('taskClientSelect').value;
+    if(!selectedName) {
+        document.getElementById('taskPhone').value = '';
+        return;
+    }
     const client = clients.find(c => c.name === selectedName);
-    if(client) { document.getElementById('taskPhone').value = client.phone || ""; }
+    if(client) { 
+        document.getElementById('taskPhone').value = client.phone || ""; 
+    }
 }
 
 function playNotifySound() { 
@@ -360,7 +724,10 @@ function notify(m, t='info') { const n = document.getElementById('notification')
 if (sessionStorage.getItem('isLoggedIn') === 'true') { 
     document.getElementById('loginOverlay').style.display = 'none'; 
     document.getElementById('mainApp').style.display = 'flex'; 
-    setTimeout(applyRolePermissions, 100);
+    setTimeout(() => {
+        applyRolePermissions();
+        initMap();
+    }, 100);
 }
 
 function logout() { sessionStorage.clear(); location.reload(); }
@@ -372,57 +739,134 @@ function showTab(id, btn) {
     btn.classList.add('active'); 
     if(id === 'dashboardTab') { setTimeout(updateDashboard, 100); } 
     if(id === 'usersTab') { renderUsers(); }
+    if(id === 'tasksTab') { updateClientSelect(); renderTasks(); }
+    if(id === 'mapTab') { 
+        setTimeout(() => {
+            initMap();
+            refreshMap();
+        }, 100);
+    }
 }
 
 function fillGovs() { 
     const s = document.getElementById('gov'); 
     if(!s) return;
-    s.innerHTML = `<option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>`; 
-    govs.forEach(g => s.innerHTML += `<option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>`); 
+    s.innerHTML = <option value="">${lang==='ar'?'اختر المحافظة':'Select Governorate'}</option>; 
+    govs.forEach(g => s.innerHTML += <option value="${g.en}">${lang==='ar'?g.ar:g.en}</option>); 
 }
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify('Name required', 'error');
     const today = new Date().toISOString().split('T')[0];
-    const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, followUp: document.getElementById('followUp').value, date: document.getElementById('date').value || today };
+    const c = { 
+        name: n, 
+        phone: document.getElementById('phone').value, 
+        gov: document.getElementById('gov').value, 
+        status: document.getElementById('status').value, 
+        notes: document.getElementById('notes').value, 
+        agent: document.getElementById('agent').value, 
+        followUp: document.getElementById('followUp').value, 
+        date: document.getElementById('date').value || today,
+        address: document.getElementById('locationAddress').value || '',
+        lat: window.tempLat || null,
+        lng: window.tempLng || null
+    };
     if(editIdx > -1) { clients[editIdx] = c; editIdx = -1; notify(lang==='ar'?'تم التحديث':'Updated', 'success'); } 
     else { clients.push(c); notify(lang==='ar'?'تم الحفظ':'Saved', 'success'); }
     db.ref('clients').set({...clients});
     ['name', 'phone', 'notes', 'agent', 'followUp', 'date'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('gov').value = '';
+    document.getElementById('locationAddress').value = '';
+    document.getElementById('locationPreview').style.display = 'none';
+    delete window.tempLat;
+    delete window.tempLng;
+    renderCRM();
+    updateClientSelect();
+    if(currentMap) refreshMap();
 }
 
 function openWhatsApp(phone) {
     if(!phone) return notify('No phone number', 'error');
     let cleanPhone = phone.replace(/\D/g, ''); 
     if(!cleanPhone.startsWith('2')) cleanPhone = '2' + cleanPhone; 
-    window.open(`https://wa.me/${cleanPhone}`, '_blank');
+    window.open(https://wa.me/${cleanPhone}, '_blank');
 }
 
 function renderCRM() {
     const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
-    const q = document.getElementById('search').value.toLowerCase();
+    const searchQuery = document.getElementById('search').value.toLowerCase();
+    const statusFilter = document.getElementById('searchStatusFilter').value;
     let hCount = 0;
-    clients.forEach((c, i) => {
-        if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
+    
+    const filteredClients = clients.filter(c => {
+        let matchName = true;
+        let matchStatus = true;
+        if(searchQuery) {
+            matchName = ${c.name} ${c.phone} ${c.gov}.toLowerCase().includes(searchQuery);
+        }
+        if(statusFilter !== 'all') {
+            matchStatus = c.status === statusFilter;
+        }
+        return matchName && matchStatus;
+    });
+    
+    filteredClients.forEach((c, i) => {
+        const originalIndex = clients.indexOf(c);
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
-        const delBtn = `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>`;
-
+        const hasLocation = (c.lat && c.lng) ? '📍' : '';
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
-            <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td><td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
+            <td><b>${c.name}</b><br><button class="edit-name-btn" onclick="editClientName(${originalIndex})" style="font-size:11px;">✏️ تعديل الاسم</button></td>
+            <td>${c.phone}</td>
+            <td>${c.gov}</td>
+            <td><span class="track-badge ${track.cls}">${track.lab}</span></td>
+            <td>${c.status}</td>
+            <td>${hasLocation}</td>
             <td>
                 <button onclick="openWhatsApp('${c.phone}')" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WA</button> 
                 <button onclick="window.location.href='tel:${c.phone}'" style="background:#007bff; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">📞</button> 
-                <button onclick="editClient(${i})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
-                ${delBtn}
+                <button onclick="editClient(${originalIndex})" style="background:#ffc107; border:none; padding:8px; border-radius:5px; cursor:pointer;">✏️</button> 
+                <button onclick="delClient(${originalIndex})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>
             </td>
-        </tr>`;
+        </table>`;
     });
-    document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + clients.length;
+    
+    document.getElementById('countAll').innerText = (lang==='ar'?'الإجمالي: ':'Total: ') + filteredClients.length;
     document.getElementById('countHold').innerText = (lang==='ar'?'معلق: ':'Hold: ') + hCount;
     updateDashboard();
+}
+
+function editClientName(index) {
+    if(index === undefined || index < 0 || index >= clients.length) {
+        notify('Client not found', 'error');
+        return;
+    }
+    const client = clients[index];
+    const newName = prompt('✏️ أدخل الاسم الجديد:', client.name);
+    if(newName && newName.trim() !== '') {
+        const oldName = client.name;
+        client.name = newName.trim();
+        tasks.forEach(task => {
+            if(task.client === oldName) {
+                task.client = newName.trim();
+            }
+        });
+        db.ref('clients').set({...clients});
+        db.ref('tasks').set({...tasks});
+        renderCRM();
+        renderTasks();
+        updateClientSelect();
+        notify('✅ تم تعديل الاسم بنجاح!', 'success');
+    } else if(newName === '') {
+        notify('❌ الاسم لا يمكن أن يكون فارغاً', 'error');
+    }
+}
+
+function resetSearch() {
+    document.getElementById('search').value = '';
+    document.getElementById('searchStatusFilter').value = 'all';
+    renderCRM();
 }
 
 function getTrackingLabel(dateStr) {
@@ -487,6 +931,7 @@ function importData(event) {
             });
             db.ref('clients').set({...clients});
             notify('Imported Successfully', 'success');
+            updateClientSelect();
         } catch (err) { notify('Error reading file', 'error'); }
     };
     reader.readAsArrayBuffer(file);
@@ -496,14 +941,14 @@ function exportData(type) {
     if(sessionStorage.getItem('userRole') !== 'admin') return notify('Admin only', 'error');
     let data = type === 'clients' ? clients : tasks;
     if(data.length === 0) return notify('No data', 'error');
-    let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date\n" : "Client,Phone,Task,Deadline,Stage\n");
+    let csv = "\uFEFF" + (type === 'clients' ? "Name,Phone,Gov,Status,Notes,Agent,Date,Address,Lat,Lng\n" : "Client,Phone,Task,Deadline,Stage\n");
     data.forEach(i => {
-        csv += type === 'clients' ? `"${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}"\n` : `"${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n`;
+        csv += type === 'clients' ? "${i.name}","${i.phone}","${i.gov}","${i.status}","${i.notes}","${i.agent}","${i.date}","${i.address || ''}","${i.lat || ''}","${i.lng || ''}"\n : "${i.client}","${i.phone}","${i.text}","${i.date}","${i.stage}"\n;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Utopia_${type}.csv`;
+    link.download = Utopia_${type}.csv;
     link.click();
 }
 
@@ -514,9 +959,12 @@ function delClient(i) {
         deletedClients.push(d); 
         syncAll(); 
         notify('Moved to Bin', 'info');
+        renderCRM();
+        updateClientSelect();
+        if(currentMap) refreshMap();
     } 
 }
-function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); }
+function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); updateClientSelect(); if(currentMap) refreshMap(); }
 function permanentDel(i) { 
     if(confirm('Final Del?')) { 
         deletedClients.splice(i, 1); 
@@ -536,50 +984,151 @@ function editClient(i) {
     document.getElementById('notes').value = c.notes; 
     document.getElementById('agent').value = c.agent; 
     document.getElementById('followUp').value = c.followUp; 
-    document.getElementById('date').value = c.date; 
+    document.getElementById('date').value = c.date;
+    document.getElementById('locationAddress').value = c.address || '';
+    if(c.lat && c.lng) {
+        window.tempLat = c.lat;
+        window.tempLng = c.lng;
+        const preview = document.getElementById('locationPreview');
+        preview.style.display = 'block';
+        preview.innerHTML = 📍 <strong>الموقع المخزن:</strong><br>${c.address || `${c.lat}, ${c.lng}}<br><button onclick="removeLocation()" style="background:#dc3545; color:white; border:none; padding:3px 8px; border-radius:5px;">❌ إزالة</button>`;
+    } else {
+        removeLocation();
+    }
 }
 
 function editClientFromTask(clientName) {
+    if(!clientName) {
+        notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
+        return;
+    }
     const idx = clients.findIndex(c => c.name === clientName);
-    if(idx > -1) { showTab('crmTab', document.getElementById('btnCrmTab')); editClient(idx); }
+    if(idx > -1) { 
+        showTab('crmTab', document.getElementById('btnCrmTab')); 
+        editClient(idx);
+        notify(جاري تعديل بيانات العميل: ${clientName}, 'success');
+    } else {
+        notify(العميل "${clientName}" غير موجود, 'error');
+    }
 }
 
 function addTask() { 
-    const t = { text: document.getElementById('taskText').value, client: document.getElementById('taskClientSelect').value, phone: document.getElementById('taskPhone').value, date: document.getElementById('taskDate').value, stage: document.getElementById('taskStage').value }; 
-    if(!t.text) return notify('Task empty', 'error'); 
+    const selectedClient = document.getElementById('taskClientSelect').value;
+    if(!selectedClient) {
+        notify('الرجاء اختيار عميل أولاً', 'error');
+        return;
+    }
+    const taskText = document.getElementById('taskText').value;
+    if(!taskText) return notify('الرجاء إدخال تفاصيل المهمة', 'error');
+    
+    const t = { 
+        text: taskText, 
+        client: selectedClient, 
+        phone: document.getElementById('taskPhone').value, 
+        date: document.getElementById('taskDate').value, 
+        stage: document.getElementById('taskStage').value 
+    }; 
     tasks.push(t); 
     db.ref('tasks').set({...tasks}); 
-    notify('Task Added', 'success'); 
+    notify('✅ تم إضافة المهمة بنجاح', 'success');
+    document.getElementById('taskText').value = '';
+    document.getElementById('taskDate').value = '';
+    renderTasks();
 }
 
 function renderTasks() { 
     const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
+    
+    if(tasks.length === 0) {
+        b.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. أضف مهمة جديدة!</td></tr>';
+        return;
+    }
+    
     tasks.forEach((t, i) => { 
-        if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
-        b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>`; 
+        if(q && !${t.client} ${t.text}.toLowerCase().includes(q)) return;
+        
+        const clientData = clients.find(c => c.name === t.client);
+        let clientDisplay = '';
+        let statusBadge = '';
+        
+        if(clientData) {
+            statusBadge = <span class="client-badge" style="background:${clientData.status === 'VIP' ? '#f1c40f' : clientData.status === 'In Progress' ? '#2ecc71' : clientData.status === 'Hold' ? '#e74c3c' : '#3498db'}; color:white;">${clientData.status}</span>;
+            clientDisplay = <strong>${t.client}</strong><br>${statusBadge};
+        } else {
+            clientDisplay = <strong style="color:red;">${t.client || 'غير معروف'}</strong><br><span class="client-badge" style="background:gray;">غير موجود</span>;
+        }
+        
+        const delBtn = <button onclick="deleteTask(${i})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">🗑️</button>;
+        const editClientBtn = <button onclick="editClientFromTask('${t.client.replace(/'/g, "\\'")}')" style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px;">✏️ تعديل العميل</button>;
+        const showClientBtn = <button class="show-client-task-btn" onclick="showClientDetails('${t.client.replace(/'/g, "\\'")}')">👤 عرض البيانات</button>;
+        
+        b.innerHTML += `<tr>
+            <td>${clientDisplay}<br>${showClientBtn}${editClientBtn}</td>
+            <td>${t.phone || clientData?.phone || '-'}</td>
+            <td>${t.text}</td>
+            <td>${t.date || 'لم يحدد'}</td>
+            <td><span style="background:#e0e0e0; padding:3px 8px; border-radius:15px; font-size:12px;">${t.stage}</span></td>
+            <td>${delBtn}</td>
+        </tr>`; 
     }); 
+}
+
+function showClientDetails(clientName) {
+    if(!clientName) {
+        notify('لا يوجد عميل مرتبط بهذه المهمة', 'error');
+        return;
+    }
+    const client = clients.find(c => c.name === clientName);
+    if(client) {
+        alert(🔍 بيانات العميل:\n━━━━━━━━━━━━━━━━━━━━━━\n📛 الاسم: ${client.name}\n📞 الهاتف: ${client.phone}\n🏠 المحافظة: ${client.gov}\n📌 الحالة: ${client.status}\n📍 العنوان: ${client.address || 'غير محدد'}\n📝 ملاحظات: ${client.notes || 'لا توجد'}\n👤 المسؤول: ${client.agent || 'غير محدد'}\n📅 تاريخ الإضافة: ${client.date || 'غير محدد'}\n━━━━━━━━━━━━━━━━━━━━━━);
+    } else {
+        notify(⚠️ العميل "${clientName}" غير موجود في قاعدة البيانات, 'error');
+    }
+}
+
+function deleteTask(index) {
+    if(confirm('هل تريد حذف هذه المهمة؟')) {
+        tasks.splice(index, 1);
+        db.ref('tasks').set({...tasks});
+        renderTasks();
+        notify('تم حذف المهمة', 'info');
+    }
 }
 
 function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
 
+// Firebase Listeners
 db.ref('authSystem').on('value', s => {
     if(s.val()) { authSystem = s.val(); } 
     else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] }; db.ref('authSystem').set(authSystem); }
     renderUsers();
 });
 
-db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
+db.ref('clients').on('value', s => { 
+    clients = s.val() ? Object.values(s.val()) : []; 
+    renderCRM(); 
+    updateClientSelect();
+    if(currentMap) refreshMap();
+});
+
 db.ref('deletedClients').on('value', s => { 
     deletedClients = s.val() ? Object.values(s.val()) : []; 
     const rb = document.getElementById('recycleBody'); if(rb) { rb.innerHTML = '';
-    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.deletedAt}</td><td><button onclick="restoreClient(${i})">Restore</button> <button onclick="permanentDel(${i})">X</button></td></tr>`; });
+    deletedClients.forEach((c, i) => { rb.innerHTML += `<tr>
+        <td>${c.name}</td>
+        <td>${c.phone}</td>
+        <td>${c.deletedAt}</td>
+        <td><button onclick="restoreClient(${i})" style="background:#28a745; color:white; border:none; padding:5px 10px; border-radius:5px;">استعادة</button> 
+                <button onclick="permanentDel(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:5px;">حذف نهائي</button></td>
+        </tr>`; });
     }
 });
+
 db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
 
 fillGovs();
+updateClientSelect();
 </script>
 </body>
 </html>
