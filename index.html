@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
@@ -13,60 +13,52 @@
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="console.log('Leaflet CSS failed')" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="console.log('Leaflet JS failed')"></script>
-
+    
     <style>
         :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f5f6fa; margin:0; display:flex; min-height:100vh; color:#333; overflow:hidden; }
         .no-select { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
-        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; transition: 0.5s; }
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white; }
         .login-card h2 { color: var(--accent); margin-bottom: 25px; font-size: 1.8em; }
         .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; box-sizing: border-box; outline: none; font-size: 16px; }
         .login-card button { background: var(--accent); color: var(--primary); border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .login-card button:hover { opacity: 0.9; transform: scale(1.02); }
-        
         .login-dev-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #3f3f6b; font-size: 0.85em; color: #bbb; }
         .login-dev-info b { color: var(--accent); display: block; margin-bottom: 5px; }
         .login-dev-info a { color: #25D366; text-decoration: none; font-weight: bold; }
-
         #mainApp { display: none; width: 100%; height: 100vh; flex-direction: row; }
         .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; flex-shrink: 0; }
         .sidebar h2 { font-size:1.3em; margin-bottom:20px; color:var(--accent); text-align:center; border-bottom: 2px solid #2e2e4d; padding-bottom: 10px; }
-        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: right; }
+        .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight:bold; transition: 0.3s; text-align: left; }
         .sidebar button.active { background:var(--accent); color:var(--primary); }
-        
         .dev-box { margin-top:auto; font-size:0.8em; border-top:1px solid #3f3f6b; padding-top:15px; color:#bbb; }
         .dev-box b { color: var(--accent); display: block; margin-bottom: 5px; }
         .dev-link { color: #25D366; text-decoration: none; font-weight: bold; font-size: 1.1em; display: block; }
-
         .main { flex:1; padding:25px; box-sizing:border-box; overflow-y:auto; }
         .tab-content { display:none; animation:fadeIn 0.4s; }
         .tab-content.active { display:block; }
-        
-        /* التنسيقات العامة للجداول والمدخلات */
         input, select, textarea, .btn-save { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:10px; border:1px solid #ccc; outline:none; font-size: 14px; }
+        .row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
+        .row > * { flex: 1; min-width: 180px; }
+        .btn-save { background: var(--success); color: white; font-weight: bold; cursor: pointer; border: none; font-size: 16px; transition: 0.3s; }
         table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
-        
-        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @media (max-width: 768px) { body { flex-direction: column; overflow: auto; } #mainApp { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; } .dev-box { display: none; } }
+        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight:bold; box-shadow:0 10px 20px rgba(0,0,0,0.2); animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
-<body class="no-select">
+<body>
 
 <div id="notification"></div>
 
 <div id="loginOverlay">
     <div class="login-card">
         <h2>Utopia CRM</h2>
-        <input type="text" id="userInput" placeholder="اسم المستخدم" value="admin">
-        <input type="password" id="passInput" placeholder="كلمة المرور" value="admin123">
-        <button onclick="checkLogin()">دخول النظام</button>
-        <p id="loginError" style="color:#ff4d4d; display:none; margin-top:10px;">بيانات الدخول غير صحيحة</p>
+        <input type="text" id="userInput" placeholder="Username" value="admin">
+        <input type="password" id="passInput" placeholder="Password" value="admin123">
+        <button onclick="checkLogin()">Login</button>
         <div class="login-dev-info">
             <b>Developed By Eng. Mahmoud Marie</b>
             <a href="https://wa.me/201016622416">WhatsApp: +201016622416</a>
@@ -77,77 +69,16 @@
 <div id="mainApp">
     <div class="sidebar">
         <h2>Utopia Pro AI</h2>
-        <button onclick="showTab('dashboardTab', this)" class="active">📊 لوحة التحكم</button>
-        <button onclick="showTab('crmTab', this)">👥 قاعدة العملاء</button>
-        <button onclick="showTab('tasksTab', this)">📝 المهام</button>
-        <button onclick="showTab('mapTab', this)">📍 الخريطة</button>
+        <button onclick="showTab('dashboardTab', this)" class="active">Dashboard</button>
+        <button onclick="showTab('crmTab', this)">CRM Clients</button>
+        <button onclick="showTab('tasksTab', this)">Tasks</button>
+        <button onclick="showTab('mapTab', this)">Map View</button>
         <div class="dev-box">
             <b>Eng. Mahmoud Marie</b>
             <a href="https://wa.me/201016622416" class="dev-link">Contact Developer</a>
         </div>
     </div>
     <div class="main">
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 5px;
-            font-size: 12px;
-        }
-        .map-preview {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            font-size: 12px;
-        }
-    </style>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-</head>
-<body class="no-select" oncontextmenu="return false;"> <audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
-<div id="notification"></div>
-
-<div id="loginOverlay">
-    <div class="login-card">
-        <h2>Utopia Trading For Export</h2>
-        <div id="deviceLockInfo" style="font-size: 10px; color: #888; margin-bottom: 10px;">جاري التحقق من الجهاز...</div>
-        <input type="text" id="userInput" placeholder="Username" value="admin">
-        <input type="password" id="passInput" placeholder="Password" value="admin123">
-        <button id="loginBtn" onclick="checkLogin()">Login</button>
-        <p id="loginError" style="color: var(--danger); margin-top: 10px; font-size: 0.8em; display: none;">بيانات دخول غير صحيحة أو جهاز غير مصرح به!</p>
-        <div class="login-dev-info">
-            <b>Dev By: Eng. Mahmoud Mohamed Marie</b>
-            <a href="https://wa.me/201222153415">🟢 +201222153415</a>
-        </div>
-    </div>
-</div>
-
-<div id="mainApp">
-    <div class="sidebar">
-        <h2 id="appBrandName">Utopia Trading</h2>
-        <p id="welcomeUser" style="text-align: center; color: #fff; font-size: 0.9em; margin-bottom: 10px; border-bottom: 1px dashed #444; padding-bottom: 10px;"></p>
-        <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
-        <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
-        <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
-        <button class="tab-btn" onclick="showTab('mapTab', this)">🗺️ Customer Map</button>
-        <button id="btnRecycle" class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
-        <button id="btnSecurity" class="tab-btn" onclick="showTab('securityTab', this)">🛡️ Change Password</button>
-        <button id="btnUsers" class="tab-btn admin-only" onclick="showTab('usersTab', this)">🔐 Users Management</button>
-        
-        <div class="dev-box">
-            <b>Developer Info:</b>
-            Eng. Mahmoud Mohamed Marie
-            <a href="https://wa.me/201222153415" class="dev-link">🟢 +201222153415</a>
-            <button onclick="logout()" style="background: var(--danger); margin-top: 10px; width: 100%; text-align: center; border-radius: 8px; color:white; border:none; padding:10px; cursor:pointer;">Logout</button>
-            <select id="language" onchange="changeLang(this.value)" style="margin-top: 15px; background: #2e2e4d; color: white; border: none; padding: 5px;">
-                <option value="en">English</option>
-                <option value="ar" selected>العربية</option>
-            </select>
-        </div>
-    </div>
 
     <div class="main">
         <div id="crmTab" class="tab-content active">
