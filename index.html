@@ -336,6 +336,32 @@ function deleteUser(index) {
     }
 }
 
+// --- تهيئة البيانات من Firebase ---
+db.ref('authSystem').on('value', s => {
+    if(s.val()) {
+        authSystem = s.val();
+    } else {
+        // إعداد افتراضي لأول مرة فقط
+        authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin', devices: [] }] };
+        db.ref('authSystem').set(authSystem);
+    }
+
+    isAuthReady = true; // مهم جدًا
+    document.getElementById('deviceLockInfo').innerText = "System Ready ✔";
+
+    renderUsers();
+});
+
+// --- دالة إعادة تعيين الأجهزة لمستخدم معين ---
+function resetDevices(index) {
+    if (confirm("Reset all devices for this user?")) {
+        authSystem.users[index].devices = [];
+        db.ref('authSystem').set(authSystem);
+        notify('Devices Reset Successfully', 'success');
+    }
+}
+
+// --- دالة عرض المستخدمين مع زرار Reset Devices ---
 function renderUsers() {
     const tbody = document.getElementById('usersTableBody');
     if(!tbody) return;
@@ -346,11 +372,15 @@ function renderUsers() {
             <td>${user.displayName}</td>
             <td>${user.role}</td>
             <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px;"></td>
-            <td><button onclick="deleteUser(${i})" style="background:var(--danger); color:white; border:none; padding:5px; border-radius:5px;">Remove</button></td>
+            <td><button onclick="resetDevices(${i})" style="background:#007bff; color:white;">Reset Devices</button></td>
         </tr>`;
     });
 }
 
+// --- مثال دالة notify (لو مش موجودة عندك) ---
+function notify(msg, type='info') {
+    alert(msg); // ممكن تبدله بنظام إشعارات أفضل
+}
 function updateUserPass(i, newPass) {
     authSystem.users[i].p = newPass;
     db.ref('authSystem').set(authSystem);
