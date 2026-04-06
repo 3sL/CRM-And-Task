@@ -581,10 +581,12 @@ function getCurrentLocation() {
         window.tempLng = lng;
         
         // Try reverse geocoding
-        fetch(https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1)
+        // تم تصحيح السطر التالي بإضافة علامات ` بدلاً من النص العادي
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
             .then(response => response.json())
             .then(data => {
-                const address = data.display_name || ${lat}, ${lng};
+                // تم تصحيح استخدام المتغيرات هنا أيضاً
+                const address = data.display_name || `${lat}, ${lng}`;
                 document.getElementById('locationAddress').value = address.substring(0, 200);
                 
                 const preview = document.getElementById('locationPreview');
@@ -598,7 +600,8 @@ function getCurrentLocation() {
                 notify('✅ تم تحديد الموقع بنجاح', 'success');
             })
             .catch(() => {
-                document.getElementById('locationAddress').value = ${lat}, ${lng};
+                // تم تصحيح السطر التالي
+                document.getElementById('locationAddress').value = `${lat}, ${lng}`;
                 notify('✅ تم تحديد الموقع', 'success');
             });
     }, function(error) {
