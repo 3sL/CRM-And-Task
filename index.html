@@ -86,10 +86,8 @@
         <button id="btnCrmTab" class="tab-btn active" onclick="showTab('crmTab', this)">👥 Clients Management</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)">📅 Tasks Board</button>
-        <button id="btnRecycle" class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
-        <button id="btnSecurity" class="tab-btn" onclick="showTab('securityTab', this)">🛡️ Change Password</button>
         <button id="btnUsers" class="tab-btn admin-only" onclick="showTab('usersTab', this)">🔐 Users Management</button>
-        
+        <button id="btnRecycle" class="tab-btn" onclick="showTab('recycleTab', this)" style="color: #ff9999;">♻️ Recycle Bin</button>
         <div class="dev-box">
             <b>Developer Info:</b>
             Eng. Mahmoud Mohamed Marie
@@ -120,7 +118,6 @@
                     <option value="In Progress">In Progress</option>
                     <option value="Hold">Hold</option>
                     <option value="Completed">Completed</option>
-                    <option value="Completed">VIP</option>
                 </select>
             </div>
             <div class="row">
@@ -202,16 +199,6 @@
                 <tbody id="usersTableBody"></tbody>
             </table>
         </div>
-
-        <div id="securityTab" class="tab-content">
-            <h2 id="secHeader">🛡️ Account Security</h2>
-            <div style="max-width: 400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <p id="secLabel">Change Your Access Password:</p>
-                <input type="password" id="changePassInput" placeholder="New Password" style="margin-bottom: 15px;">
-                <button class="btn-save" onclick="changeMyPassword()" style="background: var(--primary);">Update Password</button>
-            </div>
-        </div>
-
     </div>
 </div>
 
@@ -238,6 +225,7 @@ const firebaseConfig = { apiKey: "AIzaSyBmOQuIUzd2qYB28kPFFaGbSFJ5yXCiMLY", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// --- نظام المستخدمين المطور ---
 let authSystem = { users: [] };
 
 function applyRolePermissions() {
@@ -248,7 +236,7 @@ function applyRolePermissions() {
     document.getElementById('welcomeUser').innerText = (lang === 'ar' ? 'مرحباً: ' : 'Welcome: ') + dispName;
 
     const recycleBtn = document.getElementById('btnRecycle');
-    if(recycleBtn) recycleBtn.style.display = 'block';
+    if(recycleBtn) recycleBtn.style.display = isAdmin ? 'block' : 'none';
 
     const usersBtn = document.getElementById('btnUsers');
     if(usersBtn) usersBtn.style.display = isAdmin ? 'block' : 'none';
@@ -261,6 +249,7 @@ function applyRolePermissions() {
 function checkLogin() { 
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
+    
     const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
 
     if (user) { 
@@ -268,8 +257,7 @@ function checkLogin() {
         document.getElementById('mainApp').style.display = 'flex'; 
         sessionStorage.setItem('isLoggedIn', 'true'); 
         sessionStorage.setItem('userRole', user.role);
-        sessionStorage.setItem('userDisplayName', user.displayName);
-        sessionStorage.setItem('currentUserName', user.u); // حفظ اليوزر الحالى
+        sessionStorage.setItem('userDisplayName', user.displayName); 
         applyRolePermissions();
         renderCRM(); 
         renderTasks();
@@ -281,28 +269,15 @@ function checkLogin() {
     } 
 }
 
-// وظيفة تغيير الباسورد للمستخدم الحالى
-function changeMyPassword() {
-    const newPass = document.getElementById('changePassInput').value;
-    const currentU = sessionStorage.getItem('currentUserName');
-    if(!newPass) return notify('Please enter new password', 'error');
-    
-    const userIdx = authSystem.users.findIndex(u => u.u === currentU);
-    if(userIdx > -1) {
-        authSystem.users[userIdx].p = newPass;
-        db.ref('authSystem').set(authSystem);
-        document.getElementById('changePassInput').value = '';
-        notify('Password Updated Successfully', 'success');
-    }
-}
-
 function addUser() {
     const u = document.getElementById('newUsername').value;
     const p = document.getElementById('newPassword').value;
     const d = document.getElementById('newDisplayName').value;
     const r = document.getElementById('newRole').value;
+
     if(!u || !p || !d) return notify('Fill all user data', 'error');
     if(authSystem.users.find(user => user.u === u)) return notify('User already exists', 'error');
+
     authSystem.users.push({ u: u, p: p, role: r, displayName: d });
     db.ref('authSystem').set(authSystem);
     notify('User Added Successfully', 'success');
@@ -329,7 +304,7 @@ function renderUsers() {
             <td>${user.u}</td>
             <td>${user.displayName}</td>
             <td>${user.role}</td>
-            <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px; background: #fffbe6; font-weight: bold;"></td>
+            <td><input type="text" value="${user.p}" onchange="updateUserPass(${i}, this.value)" style="width:100px; padding:5px;"></td>
             <td><button onclick="deleteUser(${i})" style="background:var(--danger); color:white; border:none; padding:5px; border-radius:5px;">Remove</button></td>
         </tr>`;
     });
@@ -342,6 +317,7 @@ function updateUserPass(i, newPass) {
 }
 
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
+
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
 
 function autoFillTaskPhone() {
@@ -403,12 +379,13 @@ function openWhatsApp(phone) {
 function renderCRM() {
     const b = document.getElementById('tableBody'); if(!b) return; b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase();
+    const role = sessionStorage.getItem('userRole');
     let hCount = 0;
     clients.forEach((c, i) => {
         if(q && !`${c.name} ${c.phone} ${c.gov}`.toLowerCase().includes(q)) return;
         if(c.status === 'Hold') hCount++;
         const track = getTrackingLabel(c.date);
-        const delBtn = `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>`;
+        const delBtn = (role === 'admin') ? `<button onclick="delClient(${i})" style="background:#f44336; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">✕</button>` : '';
 
         b.innerHTML += `<tr class="status-${c.status.toLowerCase().replace(/\s/g, '')}">
             <td><b>${c.name}</b></td><td>${c.phone}</td><td>${c.gov}</td><td><span class="track-badge ${track.cls}">${track.lab}</span></td><td>${c.status}</td>
@@ -439,14 +416,17 @@ function updateDashboard() {
     const completed = clients.filter(c => c.status === 'Completed').length;
     if(document.getElementById('convRate')) document.getElementById('convRate').innerText = (total > 0 ? Math.round((completed / total) * 100) : 0) + '%';
     if(document.getElementById('potentialDeals')) document.getElementById('potentialDeals').innerText = clients.filter(c => c.status === 'Interested' || c.status === 'In Progress').length;
+    
     const gc = {}; clients.forEach(c => { if(c.gov) gc[c.gov] = (gc[c.gov] || 0) + 1; });
     const top = Object.keys(gc).length > 0 ? Object.keys(gc).reduce((a, b) => gc[a] > gc[b] ? a : b) : '-';
     if(document.getElementById('topGov')) document.getElementById('topGov').innerText = top;
+
     const canvas = document.getElementById('statusChart');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
     const counts = { 'Interested': 0, 'In Progress': 0, 'Hold': 0, 'Completed': 0 };
     clients.forEach(c => { if(counts[c.status] !== undefined) counts[c.status]++; });
+
     if (statusChart) statusChart.destroy();
     statusChart = new Chart(ctx, {
         type: 'doughnut',
@@ -508,6 +488,7 @@ function exportData(type) {
 }
 
 function delClient(i) { 
+    if(sessionStorage.getItem('userRole') !== 'admin') return notify('Admin Only', 'error');
     if(confirm('Move to Bin?')) { 
         const d = clients.splice(i, 1)[0]; 
         d.deletedAt = new Date().toLocaleDateString(); 
@@ -517,13 +498,7 @@ function delClient(i) {
     } 
 }
 function restoreClient(i) { clients.push(deletedClients.splice(i, 1)[0]); syncAll(); notify('Restored', 'success'); }
-function permanentDel(i) { 
-    if(confirm('Final Del?')) { 
-        deletedClients.splice(i, 1); 
-        syncAll(); 
-        notify('Deleted Permanently', 'error'); 
-    } 
-}
+function permanentDel(i) { if(confirm('Final Del?')) { deletedClients.splice(i, 1); syncAll(); notify('Deleted Permanently', 'error'); } }
 function syncAll() { db.ref('clients').set({...clients}); db.ref('deletedClients').set({...deletedClients}); }
 
 function editClient(i) { 
@@ -555,18 +530,25 @@ function addTask() {
 function renderTasks() { 
     const b = document.getElementById('taskBody'); if(!b) return; b.innerHTML = ''; 
     const q = document.getElementById('taskSearch').value.toLowerCase();
+    const role = sessionStorage.getItem('userRole');
     tasks.forEach((t, i) => { 
         if(q && !`${t.client} ${t.text}`.toLowerCase().includes(q)) return;
-        const delBtn = `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>`;
+        const delBtn = (role === 'admin') ? `<button onclick="tasks.splice(${i},1); db.ref('tasks').set({...tasks});" style="background:#f44336; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">✕</button>` : '';
         b.innerHTML += `<tr><td>${t.client}</td><td>${t.phone || '-'}</td><td>${t.text}</td><td>${t.date}</td><td>${t.stage}</td><td><button onclick="editClientFromTask('${t.client}')">✏️</button>${delBtn}</td></tr>`; 
     }); 
 }
 
 function changeLang(l) { lang = l; document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'; fillGovs(); renderCRM(); applyRolePermissions(); }
 
+// --- تهيئة البيانات من Firebase ---
 db.ref('authSystem').on('value', s => {
-    if(s.val()) { authSystem = s.val(); } 
-    else { authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] }; db.ref('authSystem').set(authSystem); }
+    if(s.val()) {
+        authSystem = s.val();
+    } else {
+        // إعداد افتراضي لأول مرة فقط
+        authSystem = { users: [{ u: 'admin', p: 'admin123', role: 'admin', displayName: 'Manager Admin' }] };
+        db.ref('authSystem').set(authSystem);
+    }
     renderUsers();
 });
 
