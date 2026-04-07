@@ -232,13 +232,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// مستخدم أدمن ثابت لا يعتمد على السيرفر (للطوارئ)
-let authSystem = { 
-    users: [
-        { u: "admin", p: "admin123", role: "admin", displayName: "Master Admin" }
-    ] 
-};
-
 // جلب بيانات المستخدمين الآخرين من السيرفر ودمجهم
 db.ref('authSystem').on('value', (snapshot) => {
     const data = snapshot.val();
@@ -289,28 +282,51 @@ function applyRolePermissions() {
     });
 }
 
-function checkLogin() { 
-    const u = document.getElementById('userInput').value;
-    const p = document.getElementById('passInput').value;
-    
-    // البحث في القائمة المدمجة
-    const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+async function checkLogin() { 
+    const u = document.getElementById('userInput').value.trim();
+    const p = document.getElementById('passInput').value.trim();
+
+    if(!u || !p) {
+        notify('Enter username & password', 'error');
+        return;
+    }
+
+    const hashedInput = await hashPassword(p);
+
+    const user = authSystem.users.find(acc => 
+        acc.u === u && (acc.p === hashedInput || acc.p === p)
+    );
 
     if (user) { 
         document.getElementById('loginOverlay').style.display = 'none'; 
         document.getElementById('mainApp').style.display = 'flex'; 
+        
         sessionStorage.setItem('isLoggedIn', 'true'); 
         sessionStorage.setItem('userRole', user.role);
         sessionStorage.setItem('userDisplayName', user.displayName); 
-        
+        sessionStorage.setItem('deviceId', visitorId);
+
         applyRolePermissions();
-        
-        // جلب البيانات من السيرفر فور الدخول
-        db.ref('clients').once('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); });
-        db.ref('tasks').once('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
-        
-        if (typeof renderUsers === "function") renderUsers();
-        
+
+        db.ref('clients').once('value', s => { 
+            clients = s.val() ? Object.values(s.val()) : []; 
+            renderCRM(); 
+        });
+
+        db.ref('tasks').once('value', s => { 
+            tasks = s.val() ? Object.values(s.val()) : []; 
+            renderTasks(); 
+        });
+
         notify('Welcome ' + user.displayName, 'success'); 
     } else { 
         document.getElementById('loginError').style.display = 'block'; 
@@ -318,7 +334,7 @@ function checkLogin() {
     } 
 }
 
-function addUser() {
+async function addUser() {
     const u = document.getElementById('newUsername').value;
     const p = document.getElementById('newPassword').value;
     const d = document.getElementById('newDisplayName').value;
@@ -327,21 +343,22 @@ function addUser() {
     if(!u || !p || !d) return notify('Fill all user data', 'error');
     if(authSystem.users.find(user => user.u === u)) return notify('User already exists', 'error');
 
-    authSystem.users.push({ u: u, p: p, role: r, displayName: d });
+    const hashedPass = await hashPassword(p);
+
+    authSystem.users.push({ 
+        u: u, 
+        p: hashedPass, 
+        role: r, 
+        displayName: d 
+    });
+
     db.ref('authSystem').set(authSystem);
-    notify('User Added Successfully', 'success');
+
+    notify('User Added Securely 🔐', 'success');
+
     document.getElementById('newUsername').value = '';
     document.getElementById('newPassword').value = '';
     document.getElementById('newDisplayName').value = '';
-}
-
-function deleteUser(index) {
-    if(authSystem.users[index].u === 'admin') return notify('Cannot delete main admin', 'error');
-    if(confirm('Delete this user?')) {
-        authSystem.users.splice(index, 1);
-        db.ref('authSystem').set(authSystem);
-        notify('User Deleted', 'info');
-    }
 }
 
 function renderUsers() {
