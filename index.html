@@ -227,7 +227,6 @@
         </div>
     </div>
 </div>
-
 <script>
 const firebaseConfig = { 
     apiKey: "AIzaSyCh3wFPo7mVeB_ccqufW5LyKgPFoeSO0J0", 
@@ -241,7 +240,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editKey = null, statusChart = null;
+let clients = [], tasks = [], deletedClients = [], logs = [], editKey = null, statusChart = null;
 let rawClients = {}, rawTasks = {}, rawUsers = {}, rawDeleted = {};
 
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
@@ -277,15 +276,19 @@ function init() {
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
     document.getElementById('userBadge').innerText = sessionStorage.getItem('userRole').toUpperCase();
     
-    // التعديل: إخفاء أدوات التحكم الحقيقية لليوزر مع ترك الصفحة مفتوحة له
+    // إيهام المستخدم بوجود صلاحيات أدمن مع تقييد العمليات الحساسة في السيرفر
     if(sessionStorage.getItem('userRole') !== 'admin') {
         document.getElementById('viewOnlyNotice').style.display = 'block';
         document.getElementById('addUserBtn').style.display = 'none';
+        // لا نحذف التبويبات ليظن أنه يمتلكها ولكن نكتفي بمنع الحفظ في السيرفر لاحقاً
     }
 
     const gSelect = document.getElementById('gov');
-    if(gSelect) govs.forEach(g => gSelect.innerHTML += `<option value="${g}">${g}</option>`);
+    if(gSelect) {
+        gSelect.innerHTML = govs.map(g => `<option value="${g}">${g}</option>`).join('');
+    }
 
+    // الربط مع Firebase
     db.ref('clients').on('value', s => { 
         rawClients = s.val() || {}; 
         clients = Object.values(rawClients); 
@@ -300,8 +303,7 @@ function init() {
 function renderCRM() {
     const b = document.getElementById('tableBody'); b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value;
-    const keys = Object.keys(rawClients);
-    keys.forEach((key) => {
+    Object.keys(rawClients).forEach((key) => {
         const c = rawClients[key];
         if((q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) || (fStatus !== 'All' && c.status !== fStatus)) return;
         let rowClass = c.status === 'VIP' ? 'vip-row' : (c.status === 'Hold' ? 'hold-row' : '');
@@ -336,6 +338,7 @@ function addOrUpdate() {
     }
     ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
     notify("Cloud Synced", "success");
+    playSound('soundSuccess');
 }
 
 function editClient(key) {
@@ -345,6 +348,7 @@ function editClient(key) {
     document.getElementById('phone').value = c.phone;
     document.getElementById('status').value = c.status;
     document.getElementById('notes').value = c.notes;
+    document.getElementById('gov').value = c.gov;
     document.getElementById('btnSave').innerText = "🔄 Update Client";
     showTab('crmTab', document.getElementById('m_crm'));
 }
@@ -353,14 +357,13 @@ function deleteClient(key) {
     if(!confirm('Move to recycle bin?')) return;
     db.ref('deletedClients').push(rawClients[key]);
     db.ref('clients/' + key).remove();
-    addLog(`Deleted: ${rawClients[key].name}`);
+    addLog(`Deleted to Trash: ${rawClients[key].name}`);
 }
 
-// تعديل: دالة إضافة اليوزر تم إصلاحها لتعمل مع الهيكل الجديد
 function addUser() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
     if(!u || !p) return alert("Fill all fields");
-    db.ref('authSystem/users').push({ u: u, p: p, displayName: d, role: r }).then(() => {
+    db.ref('authSystem/users').push({ u, p, displayName: d, role: r }).then(() => {
         addLog(`Admin created user: ${d}`);
         ['newU','newP','newD'].forEach(id => document.getElementById(id).value = '');
         notify("User Created Successfully", "success");
@@ -380,6 +383,7 @@ function addTask() {
     const t = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value };
     if(!t.client || !t.text) return alert("Missing data");
     db.ref('tasks').push(t);
+    addLog(`Task added for: ${t.client}`);
 }
 
 function renderTasks() {
@@ -394,15 +398,30 @@ function renderTasks() {
 function addLog(action) {
     db.ref('logs').push({ user: sessionStorage.getItem('userDisplayName') || "System", action, time: new Date().toLocaleString() });
 }
+
 function renderLogs() {
     const c = document.getElementById('logsContainer'); if(!c) return;
     c.innerHTML = logs.slice().reverse().map(l => `<div class="log-entry"><span class="log-user">[${l.user}]</span> ${l.action}<br><small>${l.time}</small></div>`).join('');
 }
+
 function calculateAIScore(c) { let s = 50; if (c.status === 'VIP') s += 40; if (c.status === 'Interested') s += 20; if (c.status === 'Hold') s -= 20; return Math.min(100, Math.max(0, s)); }
 function getStatusColor(s) { return { VIP:'#9b59b6', Completed:'#28a745', Hold:'#dc3545' }[s] || '#1e1e2f'; }
 function playSound(id) { const s = document.getElementById(id); if(s) s.play(); }
-function notify(m, t) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); }
-function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
+
+function notify(m, t) { 
+    const n = document.getElementById('notification'); 
+    n.innerText = m; n.style.display = 'block'; 
+    n.style.background = t==='success'?'#28a745':'#dc3545'; 
+    setTimeout(() => n.style.display = 'none', 3000); 
+}
+
+function showTab(id, btn) { 
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+    if(btn) btn.classList.add('active'); 
+}
+
 function updateDash() {
     document.getElementById('countVip').innerText = clients.filter(c => c.status === 'VIP').length;
     document.getElementById('countComp').innerText = clients.filter(c => c.status === 'Completed').length;
@@ -412,30 +431,37 @@ function updateDash() {
     if(statusChart) statusChart.destroy();
     statusChart = new Chart(ctx, { type:'doughnut', data:{ labels:Object.keys(counts), datasets:[{data:Object.values(counts), backgroundColor:['#17a2b8','#ffcc00','#dc3545','#28a745','#9b59b6']}] } });
 }
+
 function updateGeo() {
     const counts = {}; clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
     const gs = document.getElementById('geoStats');
     if(gs) gs.innerHTML = Object.entries(counts).map(([g, c]) => `<span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:11px;">${g}: ${c}</span>`).join('');
 }
+
 function fillTaskClients() {
     const s = document.getElementById('taskClientSelect');
     if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
 }
+
 function renderRecycle() {
     const b = document.getElementById('recycleBody'); 
     b.innerHTML = Object.keys(rawDeleted).map(key => `<tr><td>${rawDeleted[key].name}</td><td>${rawDeleted[key].phone}</td><td>${rawDeleted[key].status}</td>
     <td><button class="action-btn btn-wa" onclick="restore('${key}')">🔄 Restore</button></td></tr>`).join('');
 }
+
 function restore(key) {
     db.ref('clients').push(rawDeleted[key]);
     db.ref('deletedClients/' + key).remove();
+    addLog(`Restored from trash: ${rawDeleted[key].name}`);
 }
+
 function toggleLang() {
     const html = document.getElementById('htmlTag');
     const isLtr = html.getAttribute('dir') === 'ltr';
     html.setAttribute('dir', isLtr ? 'rtl' : 'ltr');
     document.getElementById('langBtn').innerText = isLtr ? 'EN' : 'AR';
 }
+
 function exportToCSV() {
     let csv = "\uFEFFName,Phone,Gov,Status,Agent\n";
     clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}"\n`);
@@ -443,6 +469,7 @@ function exportToCSV() {
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     link.download = `CRM_Export.csv`; link.click();
 }
+
 window.onload = init;
 </script>
 </body>
