@@ -182,32 +182,6 @@
             </div>
         </div>
 
-        <div id="profileTab" class="tab-content">
-            <h2>👤 My Account Settings</h2>
-            <div class="form-group">
-                <p>Welcome, <b id="profName"></b>.</p>
-                <input type="password" id="changePassInput" placeholder="New Password">
-                <button onclick="updateMyPassword()" class="btn-save" style="background:var(--info)">Update Password</button>
-            </div>
-        </div>
-
-        <div id="tasksTab" class="tab-content">
-            <h2 id="h_tasks">Operations Tasks</h2>
-            <div class="form-group">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <select id="taskClientSelect" onchange="autoFillTask()"><option value="">Select Client</option></select>
-                    <input id="taskDate" type="date">
-                </div>
-                <input id="taskText" placeholder="Task description...">
-                <textarea id="extraInfo" placeholder="Client info..."></textarea>
-                <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
-            </div>
-            <table>
-                <thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Deadline</th><th>Action</th></tr></thead>
-                <tbody id="taskBody"></tbody>
-            </table>
-        </div>
-
         <div id="dashboardTab" class="tab-content">
             <h2 id="h_dash">📊 Analytics</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
@@ -220,10 +194,23 @@
             </div>
             <div style="max-width:350px; margin:30px auto;"><canvas id="statusChart"></canvas></div>
         </div>
-
+        
+        <div id="profileTab" class="tab-content">
+            <h2>👤 My Account Settings</h2>
+            <div class="form-group"><p>Welcome, <b id="profName"></b>.</p></div>
+        </div>
+        <div id="tasksTab" class="tab-content">
+            <h2 id="h_tasks">Operations Tasks</h2>
+            <div class="form-group">
+                <select id="taskClientSelect"><option value="">Select Client</option></select>
+                <input id="taskText" placeholder="Task description...">
+                <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
+            </div>
+            <table><thead><tr><th>Client</th><th>Task</th><th>Action</th></tr></thead><tbody id="taskBody"></tbody></table>
+        </div>
         <div id="recycleTab" class="tab-content">
             <h2 style="color:var(--danger)">♻️ Recycle Bin</h2>
-            <table><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody id="recycleBody"></tbody></table>
+            <table><thead><tr><th>Name</th><th>Phone</th><th>Action</th></tr></thead><tbody id="recycleBody"></tbody></table>
         </div>
     </div>
 </div>
@@ -276,19 +263,14 @@ function init() {
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
     document.getElementById('userBadge').innerText = sessionStorage.getItem('userRole').toUpperCase();
     
-    // إيهام المستخدم بوجود صلاحيات أدمن مع تقييد العمليات الحساسة في السيرفر
     if(sessionStorage.getItem('userRole') !== 'admin') {
         document.getElementById('viewOnlyNotice').style.display = 'block';
         document.getElementById('addUserBtn').style.display = 'none';
-        // لا نحذف التبويبات ليظن أنه يمتلكها ولكن نكتفي بمنع الحفظ في السيرفر لاحقاً
     }
 
     const gSelect = document.getElementById('gov');
-    if(gSelect) {
-        gSelect.innerHTML = govs.map(g => `<option value="${g}">${g}</option>`).join('');
-    }
+    if(gSelect) { gSelect.innerHTML = govs.map(g => `<option value="${g}">${g}</option>`).join(''); }
 
-    // الربط مع Firebase
     db.ref('clients').on('value', s => { 
         rawClients = s.val() || {}; 
         clients = Object.values(rawClients); 
@@ -329,21 +311,17 @@ function addOrUpdate() {
     };
     if(editKey) {
         db.ref('clients/' + editKey).update(data);
-        addLog(`Updated: ${n}`);
-        editKey = null;
+        addLog(`Updated: ${n}`); editKey = null;
         document.getElementById('btnSave').innerText = "💾 Save Client";
     } else {
-        db.ref('clients').push(data);
-        addLog(`Added: ${n}`);
+        db.ref('clients').push(data); addLog(`Added: ${n}`);
     }
     ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
-    notify("Cloud Synced", "success");
-    playSound('soundSuccess');
+    notify("Cloud Synced", "success"); playSound('soundSuccess');
 }
 
 function editClient(key) {
-    editKey = key;
-    const c = rawClients[key];
+    editKey = key; const c = rawClients[key];
     document.getElementById('name').value = c.name;
     document.getElementById('phone').value = c.phone;
     document.getElementById('status').value = c.status;
@@ -360,14 +338,22 @@ function deleteClient(key) {
     addLog(`Deleted to Trash: ${rawClients[key].name}`);
 }
 
+// الإصلاح هنا في مسار الإضافة
 function addUser() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
     if(!u || !p) return alert("Fill all fields");
-    db.ref('authSystem/users').push({ u, p, displayName: d, role: r }).then(() => {
+    
+    // تأكد من أن المسار هو authSystem/users ليتوافق مع init()
+    db.ref('authSystem/users').push({ 
+        u: u, 
+        p: p, 
+        displayName: d, 
+        role: r 
+    }).then(() => {
         addLog(`Admin created user: ${d}`);
         ['newU','newP','newD'].forEach(id => document.getElementById(id).value = '');
         notify("User Created Successfully", "success");
-    });
+    }).catch(err => alert("Error: " + err.message));
 }
 
 function renderUsers() {
@@ -380,19 +366,14 @@ function renderUsers() {
 }
 
 function addTask() {
-    const t = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value };
+    const t = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value };
     if(!t.client || !t.text) return alert("Missing data");
     db.ref('tasks').push(t);
-    addLog(`Task added for: ${t.client}`);
 }
 
 function renderTasks() {
-    const b = document.getElementById('taskBody'); b.innerHTML = Object.keys(rawTasks).map(key => {
-        const t = rawTasks[key];
-        return `<tr><td><b>${t.client}</b></td><td>${t.text}</td>
-        <td><textarea onchange="db.ref('tasks/${key}').update({extra: this.value})" style="height:40px">${t.extra}</textarea></td>
-        <td>${t.date}</td><td><button class="action-btn btn-del" onclick="db.ref('tasks/${key}').remove()">✕</button></td></tr>`;
-    }).join('');
+    const b = document.getElementById('taskBody'); 
+    b.innerHTML = Object.keys(rawTasks).map(key => `<tr><td>${rawTasks[key].client}</td><td>${rawTasks[key].text}</td><td><button onclick="db.ref('tasks/${key}').remove()">✕</button></td></tr>`).join('');
 }
 
 function addLog(action) {
@@ -409,17 +390,14 @@ function getStatusColor(s) { return { VIP:'#9b59b6', Completed:'#28a745', Hold:'
 function playSound(id) { const s = document.getElementById(id); if(s) s.play(); }
 
 function notify(m, t) { 
-    const n = document.getElementById('notification'); 
-    n.innerText = m; n.style.display = 'block'; 
-    n.style.background = t==='success'?'#28a745':'#dc3545'; 
-    setTimeout(() => n.style.display = 'none', 3000); 
+    const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; 
+    n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); 
 }
 
 function showTab(id, btn) { 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-    document.getElementById(id).classList.add('active'); 
-    if(btn) btn.classList.add('active'); 
+    document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); 
 }
 
 function updateDash() {
@@ -445,14 +423,12 @@ function fillTaskClients() {
 
 function renderRecycle() {
     const b = document.getElementById('recycleBody'); 
-    b.innerHTML = Object.keys(rawDeleted).map(key => `<tr><td>${rawDeleted[key].name}</td><td>${rawDeleted[key].phone}</td><td>${rawDeleted[key].status}</td>
-    <td><button class="action-btn btn-wa" onclick="restore('${key}')">🔄 Restore</button></td></tr>`).join('');
+    b.innerHTML = Object.keys(rawDeleted).map(key => `<tr><td>${rawDeleted[key].name}</td><td><button onclick="restore('${key}')">🔄 Restore</button></td></tr>`).join('');
 }
 
 function restore(key) {
     db.ref('clients').push(rawDeleted[key]);
     db.ref('deletedClients/' + key).remove();
-    addLog(`Restored from trash: ${rawDeleted[key].name}`);
 }
 
 function toggleLang() {
