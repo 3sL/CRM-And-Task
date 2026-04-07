@@ -70,13 +70,36 @@
         .mask-pass { filter: blur(4px); transition: 0.3s; cursor: pointer; }
         .mask-pass:hover { filter: blur(0); }
         
-        .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; z-index: 99999; display: none; }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+        .loading-spinner {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;"> 
 <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
-<div class="loading" id="loading">جاري التحميل...</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div>⏳ جاري التحميل...</div>
+    </div>
+</div>
+
 <div id="notification"></div>
 
 <div id="loginOverlay">
@@ -262,6 +285,13 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null;
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
+function showLoading(show) {
+    const overlay = document.getElementById('loadingOverlay');
+    if(overlay) {
+        overlay.style.display = show ? 'flex' : 'none';
+    }
+}
+
 // 2. Authentication System (Enhanced)
 function checkLogin() {
     const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
@@ -314,15 +344,23 @@ function init() {
 
     showLoading(true);
     
-    // Real-time Database Listeners - Using array format
+    // Real-time Database Listeners - Using proper array conversion
     db.ref('clients').on('value', (snapshot) => { 
         const data = snapshot.val();
-        clients = data ? Object.values(data) : [];
+        if(data && typeof data === 'object') {
+            clients = Object.values(data);
+        } else {
+            clients = [];
+        }
         renderCRM(); 
         updateDash(); 
         fillTaskClients(); 
         updateGeo();
         showLoading(false);
+    }, (error) => {
+        console.error("Error loading clients:", error);
+        showLoading(false);
+        notify("Error loading data: " + error.message, "error");
     });
     
     db.ref('tasks').on('value', (snapshot) => { 
@@ -337,9 +375,9 @@ function init() {
         renderRecycle(); 
     });
     
-    db.ref('authSystem/users').on('value', (snapshot) => { 
+    db.ref('authSystem/users').once('value', (snapshot) => { 
         const data = snapshot.val();
-        if(data) {
+        if(data && typeof data === 'object') {
             authSystem.users = Object.values(data);
         } else {
             // Initialize default users if none exist
@@ -356,10 +394,6 @@ function init() {
         logs = data ? Object.values(data) : []; 
         renderLogs(); 
     });
-}
-
-function showLoading(show) {
-    document.getElementById('loading').style.display = show ? 'flex' : 'none';
 }
 
 // 4. Data Management Functions
@@ -383,15 +417,16 @@ function renderCRM() {
                 <button class="action-btn btn-wa" onclick="window.open('https://wa.me/2${c.phone}')">💬</button>
                 <button class="action-btn btn-call" style="background:var(--accent);color:black" onclick="editClient(${i})">✏️</button>
                 <button class="action-btn btn-del" onclick="deleteClient(${i})">✕</button>
-             </td>
-         </tr>`;
+              </td>
+          </tr>`;
     });
 }
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify("Name required", "error");
-    const c = { 
+    
+    const clientData = { 
         name: n, 
         phone: document.getElementById('phone').value, 
         gov: document.getElementById('gov').value, 
@@ -399,28 +434,31 @@ function addOrUpdate() {
         notes: document.getElementById('notes').value, 
         agent: document.getElementById('agent').value, 
         date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-        lastModifiedBy: sessionStorage.getItem('userDisplayName'),
-        id: Date.now() // Add unique ID
+        lastModifiedBy: sessionStorage.getItem('userDisplayName')
     };
     
     showLoading(true);
+    
     if(editIdx > -1 && clients[editIdx]) { 
-        addLog(`Updated client: ${c.name}`); 
-        clients[editIdx] = c; 
+        addLog(`Updated client: ${clientData.name}`); 
+        clients[editIdx] = clientData; 
     } else { 
-        addLog(`Added new client: ${c.name}`); 
-        clients.push(c); 
+        addLog(`Added new client: ${clientData.name}`); 
+        clients.push(clientData); 
     }
     
-    // Save as array to Firebase
+    // Save as object to Firebase (Firebase handles arrays as objects with numeric keys)
     db.ref('clients').set(clients, (error) => {
         showLoading(false);
         if(error) {
             notify("Error saving data: " + error.message, "error");
         } else {
             editIdx = -1;
-            ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
-            notify("Database Secured & Saved", "success");
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('agent').value = '';
+            notify("Data saved successfully!", "success");
         }
     });
 }
@@ -431,13 +469,17 @@ function deleteClient(i) {
     deletedClients.push(clients[i]);
     clients.splice(i, 1);
     showLoading(true);
-    db.ref('clients').set(clients, () => showLoading(false));
-    db.ref('deletedClients').set(deletedClients);
+    db.ref('clients').set(clients, () => {
+        db.ref('deletedClients').set(deletedClients, () => {
+            showLoading(false);
+            notify("Client moved to recycle bin", "success");
+        });
+    });
 }
 
 // 5. Admin & Logs Logic
 function addLog(action) {
-    const log = { user: sessionStorage.getItem('userDisplayName') || "Unknown", action: action, time: new Date().toLocaleString(), timestamp: Date.now() };
+    const log = { user: sessionStorage.getItem('userDisplayName') || "Unknown", action: action, time: new Date().toLocaleString() };
     db.ref('logs').push(log);
 }
 
@@ -454,16 +496,16 @@ function renderLogs() {
 
 function addUser() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
-    if(!u || !p) return alert("Fill all security fields");
-    if(!d) return alert("Please enter display name");
+    if(!u || !p) return notify("Fill all security fields", "error");
+    if(!d) return notify("Please enter display name", "error");
     
-    const newUser = { u, p, displayName: d, role: r, id: Date.now() };
+    const newUser = { u, p, displayName: d, role: r };
     authSystem.users.push(newUser);
     showLoading(true);
     db.ref('authSystem/users').set(authSystem.users, (error) => {
         showLoading(false);
         if(error) {
-            alert("Error adding user: " + error.message);
+            notify("Error adding user: " + error.message, "error");
         } else {
             addLog(`Admin created user: ${d}`);
             document.getElementById('newU').value = '';
@@ -491,16 +533,16 @@ function renderUsers() {
 function updateMyPassword() {
     const newP = document.getElementById('changePassInput').value;
     const idx = sessionStorage.getItem('userIdx');
-    if(!newP) return alert("Enter new secure password");
-    if(idx == -1) return alert("Master Admin password is hardcoded.");
-    if(!authSystem.users[idx]) return alert("User not found");
+    if(!newP) return notify("Enter new secure password", "error");
+    if(idx == -1) return notify("Master Admin password is hardcoded.", "error");
+    if(!authSystem.users[idx]) return notify("User not found", "error");
     
     authSystem.users[idx].p = newP;
     showLoading(true);
     db.ref('authSystem/users').set(authSystem.users, (error) => {
         showLoading(false);
         if(error) {
-            alert("Error updating password: " + error.message);
+            notify("Error updating password: " + error.message, "error");
         } else {
             addLog(`Updated own password`);
             notify("Password Updated Securely", "success");
@@ -516,22 +558,21 @@ function autoFillTask() {
 }
 
 function addTask() {
-    const t = { 
+    const taskData = { 
         client: document.getElementById('taskClientSelect').value, 
         text: document.getElementById('taskText').value, 
         extra: document.getElementById('extraInfo').value, 
-        date: document.getElementById('taskDate').value,
-        id: Date.now()
+        date: document.getElementById('taskDate').value
     };
-    if(!t.client || !t.text) return alert("Missing data");
-    tasks.push(t);
+    if(!taskData.client || !taskData.text) return notify("Missing data", "error");
+    tasks.push(taskData);
     showLoading(true);
     db.ref('tasks').set(tasks, (error) => {
         showLoading(false);
         if(error) {
-            alert("Error adding task: " + error.message);
+            notify("Error adding task: " + error.message, "error");
         } else {
-            addLog(`Task created for: ${t.client}`);
+            addLog(`Task created for: ${taskData.client}`);
             document.getElementById('taskText').value = '';
             document.getElementById('extraInfo').value = '';
             document.getElementById('taskDate').value = '';
@@ -659,8 +700,12 @@ function restore(i) {
     clients.push(deletedClients[i]); 
     deletedClients.splice(i,1); 
     showLoading(true);
-    db.ref('clients').set(clients, () => showLoading(false));
-    db.ref('deletedClients').set(deletedClients);
+    db.ref('clients').set(clients, () => {
+        db.ref('deletedClients').set(deletedClients, () => {
+            showLoading(false);
+            notify("Client restored successfully", "success");
+        });
+    });
 }
 
 function fillTaskClients() { 
@@ -676,7 +721,7 @@ function delU(i) {
         db.ref('authSystem/users').set(authSystem.users, (error) => {
             showLoading(false);
             if(error) {
-                alert("Error deleting user: " + error.message);
+                notify("Error deleting user: " + error.message, "error");
             } else {
                 notify("User deleted successfully", "success");
             }
