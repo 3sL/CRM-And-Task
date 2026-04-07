@@ -204,18 +204,29 @@
 
 <script>
 // --- نظام الحماية الجديد (المعدل) ---
-let visitorId = "BYPASS_MODE"; 
+let visitorId = "BYPASS_MODE";
+
 async function initFingerprint() {
     try {
-        const fp = await FingerprintJS.load();
-        const result = await fp.get();
-        visitorId = result.visitorId;
-        document.getElementById('deviceLockInfo').innerText = "Device ID: " + visitorId;
+        // لو FingerprintJS موجود
+        if (typeof FingerprintJS !== "undefined") {
+            const fp = await FingerprintJS.load();
+            const result = await fp.get();
+            visitorId = result.visitorId;
+            document.getElementById('deviceLockInfo').innerText = "Device ID: " + visitorId;
+        } else {
+            throw new Error("FingerprintJS not loaded");
+        }
     } catch(e) {
-        document.getElementById('deviceLockInfo').innerText = "Secure Mode Active";
+        // fallback ذكي: معرف جهاز عشوائي
+        visitorId = "UNKNOWN_DEVICE_" + Math.random().toString(36).substring(2, 8);
+        document.getElementById('deviceLockInfo').innerText = "Secure Mode Active ⚠️ (" + visitorId + ")";
     }
 }
+
+// استدعاء الدالة
 initFingerprint();
+</script>
 
 // السماح باستخدام لوحة المفاتيح بشكل طبيعي (اختياري)
 document.onkeydown = function(e) { return true; };
