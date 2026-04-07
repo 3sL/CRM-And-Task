@@ -308,14 +308,14 @@ const BACKUP_ADMIN = {
     role: "admin",
     displayName: "System Owner"
 };
-async function checkLogin() { 
-    const u = document.getElementById('userInput').value.trim();
-    const p = document.getElementById('passInput').value.trim();
+const hashedInput = await hashPassword(p);
 
-    if(!u || !p) {
-        notify('Enter username & password', 'error');
-        return;
-    }
+let user = authSystem.users.find(acc => acc.u === u && acc.p === hashedInput);
+
+// fallback admin
+if (!user && u === BACKUP_ADMIN.u && p === BACKUP_ADMIN.p) {
+    user = BACKUP_ADMIN;
+}
 
     const hashedInput = await hashPassword(p);
 
@@ -396,18 +396,18 @@ function renderUsers() {
 }
 
 // --- تحديث كلمة المرور مع تشفير SHA-256 ---
+// --- تحديث كلمة المرور مع تشفير SHA-256 ---
 async function updateUserPass(i, newPass) {
     if(!newPass) return notify('Password cannot be empty', 'error');
-    
+
     // تشفير كلمة المرور
     const hashedPass = await hashPassword(newPass);
-    
+
     // حفظ الكلمة المشفرة في قاعدة البيانات
     authSystem.users[i].p = hashedPass;
     await db.ref('authSystem').set(authSystem);
-    
+
     notify('Password Updated Securely 🔐', 'success');
-}
 }
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 
@@ -418,7 +418,14 @@ function autoFillTaskPhone() {
     const client = clients.find(c => c.name === selectedName);
     if(client) { document.getElementById('taskPhone').value = client.phone || ""; }
 }
-
+// --- دالة لتشفير كلمة المرور ---
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 function playNotifySound() { 
     const audio = document.getElementById('notifySound'); 
     if(audio) { audio.currentTime = 0; audio.play().catch(e => console.log("Audio blocked", e)); } 
