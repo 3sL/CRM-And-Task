@@ -45,7 +45,6 @@
         input:focus { border-color: var(--info); }
         
         .btn-save { background: var(--success); color: white; font-weight: bold; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; font-size: 16px; transition: 0.3s; }
-        .btn-save:hover { opacity: 0.9; }
         
         table { width:100%; border-collapse:collapse; background:#fff; margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         th, td { padding:12px; text-align:center; border-bottom:1px solid #eee; }
@@ -55,7 +54,6 @@
         .hold-row { background: #fff5f5 !important; border-left: 5px solid var(--danger); }
         
         .action-btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; color: white; margin: 2px; transition: 0.2s; }
-        .action-btn:hover { transform: scale(1.1); }
         .btn-call { background: var(--info); }
         .btn-wa { background: #25D366; }
         .btn-del { background: var(--danger); }
@@ -64,12 +62,10 @@
 
         .log-entry { font-size: 0.8em; padding: 8px; border-bottom: 1px solid #eee; text-align: left; background: #fff; margin-bottom: 5px; border-radius: 5px; }
         .log-user { color: var(--info); font-weight: bold; }
-        .log-action { color: var(--danger); }
         
         .mask-pass { filter: blur(4px); transition: 0.3s; cursor: pointer; }
         .mask-pass:hover { filter: blur(0); }
         
-        /* New Tracking Style */
         .track-box { font-size: 10px; background: #f9f9f9; padding: 4px; border-radius: 4px; margin-top: 5px; color: #666; max-height: 40px; overflow-y: auto; text-align: left; border: 1px solid #eee; }
     </style>
 </head>
@@ -110,7 +106,7 @@
         <button class="tab-btn" onclick="showTab('dashboardTab', this)" id="m_dash">📊 AI Analytics</button>
         <button class="tab-btn" onclick="showTab('profileTab', this)" id="m_profile">👤 My Profile</button>
         <button class="tab-btn" onclick="showTab('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ Recycle Bin</button>
-        <button class="tab-btn" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:block; background: #3a3a5a; border: 1px solid var(--accent);">👑 Admin Master</button>
+        <button class="tab-btn" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent);">👑 Admin Master</button>
         <button onclick="logout()" style="margin-top:auto; background:var(--danger); color:white;" id="m_logout">🚪 Logout Securely</button>
     </div>
     <div class="main">
@@ -154,7 +150,6 @@
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
-
         <div id="adminControlTab" class="tab-content">
             <h2 style="color:var(--vip)">👑 Admin Master Control</h2>
             <p id="viewOnlyNotice" style="display:none; color:var(--danger); font-weight:bold;">⚠️ VIEW ONLY MODE</p>
@@ -266,14 +261,17 @@ function logout() { sessionStorage.clear(); location.reload(); }
 
 function init() {
     if(!sessionStorage.getItem('isLoggedIn')) return;
+    const role = sessionStorage.getItem('userRole');
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
-    document.getElementById('userBadge').innerText = sessionStorage.getItem('userRole').toUpperCase();
+    document.getElementById('userBadge').innerText = role.toUpperCase();
     
-    if(sessionStorage.getItem('userRole') !== 'admin') {
-        document.getElementById('viewOnlyNotice').style.display = 'block';
-        document.getElementById('addUserBtn').style.display = 'none';
+    // إظهار تبويب الأدمن فقط للأدمن
+    if(role === 'admin') {
+        document.getElementById('m_admin').style.display = 'block';
+    } else {
+        document.getElementById('m_admin').style.display = 'none';
         const userBox = document.getElementById('userFormBox');
         if(userBox){ userBox.style.pointerEvents = 'none'; userBox.style.opacity = '0.7'; }
     }
@@ -299,8 +297,6 @@ function renderCRM() {
         const c = rawClients[key];
         if((q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) || (fStatus !== 'All' && c.status !== fStatus)) return;
         let rowClass = c.status === 'VIP' ? 'vip-row' : (c.status === 'Hold' ? 'hold-row' : '');
-        
-        // جلب آخر تاسك للعميل (تتبع)
         const clientTasks = Object.values(rawTasks).filter(t => t.client === c.name);
         const lastTask = clientTasks.length > 0 ? clientTasks[clientTasks.length-1].text : 'No active tasks';
 
@@ -366,10 +362,9 @@ function addUser() {
 
 function renderUsers() {
     const b = document.getElementById('usersBody'); if(!b) return;
-    const isMaster = sessionStorage.getItem('userRole') === 'admin';
     b.innerHTML = Object.keys(rawUsers).map(key => `
-        <tr><td>${rawUsers[key].u}</td><td class="mask-pass">****</td><td>${rawUsers[key].displayName}</td>
-        <td>${isMaster ? `<button class="action-btn btn-del" onclick="db.ref('authSystem/users/${key}').remove()">✕</button>` : 'View Only'}</td></tr>
+        <tr><td>${rawUsers[key].u}</td><td class="mask-pass">${rawUsers[key].p}</td><td>${rawUsers[key].displayName}</td>
+        <td><button class="action-btn btn-del" onclick="db.ref('authSystem/users/${key}').remove()">✕</button></td></tr>
     `).join('');
 }
 
@@ -379,9 +374,7 @@ function addOrUpdateTask() {
     const nVal = document.getElementById('taskNotes').value;
     const dVal = document.getElementById('taskDate').value;
     if(!cVal || !tVal) return alert("Missing data");
-    
     const taskData = { client: cVal, text: tVal, notes: nVal, date: dVal };
-    
     if(taskEditKey) {
         db.ref('tasks/' + taskEditKey).update(taskData);
         addLog(`Updated Task for: ${cVal}`);
@@ -391,18 +384,8 @@ function addOrUpdateTask() {
         db.ref('tasks').push(taskData);
         addLog(`Added Task for: ${cVal}`);
     }
-    
     ['taskText','taskNotes','taskDate'].forEach(id => document.getElementById(id).value = '');
     notify("Task Saved", "success");
-}
-
-function editTask(key) {
-    taskEditKey = key; const t = rawTasks[key];
-    document.getElementById('taskClientSelect').value = t.client;
-    document.getElementById('taskText').value = t.text;
-    document.getElementById('taskNotes').value = t.notes || '';
-    document.getElementById('taskDate').value = t.date || '';
-    document.getElementById('btnSaveTask').innerText = "🔄 Update Task";
 }
 
 function renderTasks() {
@@ -416,6 +399,15 @@ function renderTasks() {
                 <button class="action-btn btn-del" onclick="db.ref('tasks/${key}').remove()">✕</button>
             </td></tr>`;
     }).join('');
+}
+
+function editTask(key) {
+    taskEditKey = key; const t = rawTasks[key];
+    document.getElementById('taskClientSelect').value = t.client;
+    document.getElementById('taskText').value = t.text;
+    document.getElementById('taskNotes').value = t.notes || '';
+    document.getElementById('taskDate').value = t.date || '';
+    document.getElementById('btnSaveTask').innerText = "🔄 Update Task";
 }
 
 function addLog(action) {
