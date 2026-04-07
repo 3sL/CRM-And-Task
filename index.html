@@ -68,6 +68,9 @@
         
         .mask-pass { filter: blur(4px); transition: 0.3s; cursor: pointer; }
         .mask-pass:hover { filter: blur(0); }
+        
+        /* New Tracking Style */
+        .track-box { font-size: 10px; background: #f9f9f9; padding: 4px; border-radius: 4px; margin-top: 5px; color: #666; max-height: 40px; overflow-y: auto; text-align: left; border: 1px solid #eee; }
     </style>
 </head>
 <body oncontextmenu="return false;"> 
@@ -110,7 +113,6 @@
         <button class="tab-btn" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:block; background: #3a3a5a; border: 1px solid var(--accent);">👑 Admin Master</button>
         <button onclick="logout()" style="margin-top:auto; background:var(--danger); color:white;" id="m_logout">🚪 Logout Securely</button>
     </div>
-
     <div class="main">
         <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
@@ -148,7 +150,7 @@
                 <button class="btn-save" onclick="addOrUpdate()" id="btnSave">💾 Save Client</button>
             </div>
             <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>AI Score</th><th>Status</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>AI Score</th><th>Status</th><th>Tracing & Tasks</th><th>Actions</th></tr></thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
@@ -199,21 +201,28 @@
             <h2>👤 My Account Settings</h2>
             <div class="form-group"><p>Welcome, <b id="profName"></b>.</p></div>
         </div>
+
         <div id="tasksTab" class="tab-content">
             <h2 id="h_tasks">Operations Tasks</h2>
             <div class="form-group">
-                <select id="taskClientSelect"><option value="">Select Client</option></select>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <select id="taskClientSelect"><option value="">Select Client</option></select>
+                    <input type="date" id="taskDate">
+                </div>
                 <input id="taskText" placeholder="Task description...">
-                <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
+                <textarea id="taskNotes" placeholder="Task Details/Notes..."></textarea>
+                <button onclick="addOrUpdateTask()" class="btn-save" id="btnSaveTask" style="background:var(--info)">➕ Add Task</button>
             </div>
-            <table><thead><tr><th>Client</th><th>Task</th><th>Action</th></tr></thead><tbody id="taskBody"></tbody></table>
+            <table><thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Date</th><th>Action</th></tr></thead><tbody id="taskBody"></tbody></table>
         </div>
+
         <div id="recycleTab" class="tab-content">
             <h2 style="color:var(--danger)">♻️ Recycle Bin</h2>
             <table><thead><tr><th>Name</th><th>Phone</th><th>Action</th></tr></thead><tbody id="recycleBody"></tbody></table>
         </div>
     </div>
 </div>
+
 <script>
 const firebaseConfig = { 
     apiKey: "AIzaSyCh3wFPo7mVeB_ccqufW5LyKgPFoeSO0J0", 
@@ -227,7 +236,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], deletedClients = [], logs = [], editKey = null, statusChart = null;
+let clients = [], tasks = [], deletedClients = [], logs = [], editKey = null, taskEditKey = null, statusChart = null;
 let rawClients = {}, rawTasks = {}, rawUsers = {}, rawDeleted = {};
 
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
@@ -235,7 +244,6 @@ const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "
 function checkLogin() {
     const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
     if (u === "admin" && p === "@Mody6699") { loginSuccess("admin", "Master Admin", "MASTER"); return; }
-    
     let found = false;
     Object.keys(rawUsers).forEach(key => {
         if(rawUsers[key].u === u && rawUsers[key].p === p) {
@@ -266,8 +274,8 @@ function init() {
     if(sessionStorage.getItem('userRole') !== 'admin') {
         document.getElementById('viewOnlyNotice').style.display = 'block';
         document.getElementById('addUserBtn').style.display = 'none';
-        document.getElementById('userFormBox').style.pointerEvents = 'none';
-        document.getElementById('userFormBox').style.opacity = '0.7';
+        const userBox = document.getElementById('userFormBox');
+        if(userBox){ userBox.style.pointerEvents = 'none'; userBox.style.opacity = '0.7'; }
     }
 
     const gSelect = document.getElementById('gov');
@@ -278,7 +286,7 @@ function init() {
         clients = Object.values(rawClients); 
         renderCRM(); updateDash(); fillTaskClients(); updateGeo(); 
     });
-    db.ref('tasks').on('value', s => { rawTasks = s.val() || {}; tasks = Object.values(rawTasks); renderTasks(); });
+    db.ref('tasks').on('value', s => { rawTasks = s.val() || {}; tasks = Object.values(rawTasks); renderTasks(); renderCRM(); });
     db.ref('deletedClients').on('value', s => { rawDeleted = s.val() || {}; deletedClients = Object.values(rawDeleted); renderRecycle(); });
     db.ref('authSystem/users').on('value', s => { rawUsers = s.val() || {}; renderUsers(); });
     db.ref('logs').limitToLast(50).on('value', s => { logs = s.val() ? Object.values(s.val()) : []; renderLogs(); });
@@ -291,9 +299,15 @@ function renderCRM() {
         const c = rawClients[key];
         if((q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) || (fStatus !== 'All' && c.status !== fStatus)) return;
         let rowClass = c.status === 'VIP' ? 'vip-row' : (c.status === 'Hold' ? 'hold-row' : '');
+        
+        // جلب آخر تاسك للعميل (تتبع)
+        const clientTasks = Object.values(rawTasks).filter(t => t.client === c.name);
+        const lastTask = clientTasks.length > 0 ? clientTasks[clientTasks.length-1].text : 'No active tasks';
+
         b.innerHTML += `<tr class="${rowClass}">
             <td>${c.name}</td><td>${c.phone}</td><td>${c.gov}</td>
             <td>${calculateAIScore(c)}%</td><td><b style="color:${getStatusColor(c.status)}">${c.status}</b></td>
+            <td><div class="track-box">Recent: ${lastTask}</div></td>
             <td>
                 <button class="action-btn btn-call" onclick="window.open('tel:${c.phone}')">📞</button>
                 <button class="action-btn btn-wa" onclick="window.open('https://wa.me/2${c.phone}')">💬</button>
@@ -313,10 +327,10 @@ function addOrUpdate() {
     };
     if(editKey) {
         db.ref('clients/' + editKey).update(data);
-        addLog(`Updated: ${n}`); editKey = null;
+        addLog(`Updated Client: ${n}`); editKey = null;
         document.getElementById('btnSave').innerText = "💾 Save Client";
     } else {
-        db.ref('clients').push(data); addLog(`Added: ${n}`);
+        db.ref('clients').push(data); addLog(`Added Client: ${n}`);
     }
     ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
     notify("Cloud Synced", "success"); playSound('soundSuccess');
@@ -340,27 +354,14 @@ function deleteClient(key) {
     addLog(`Deleted to Trash: ${rawClients[key].name}`);
 }
 
-// دالة إضافة اليوزرات المعدلة والمؤمنة
 function addUser() {
-    const u = document.getElementById('newU').value, 
-          p = document.getElementById('newP').value, 
-          d = document.getElementById('newD').value, 
-          r = document.getElementById('newR').value;
-          
+    const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
     if(!u || !p || !d) return alert("Fill all fields");
-    
-    db.ref('authSystem/users').push({ 
-        u: u, 
-        p: p, 
-        displayName: d, 
-        role: r 
-    }).then(() => {
+    db.ref('authSystem/users').push({ u, p, displayName: d, role: r }).then(() => {
         addLog(`Admin created user: ${d}`);
-        document.getElementById('newU').value = '';
-        document.getElementById('newP').value = '';
-        document.getElementById('newD').value = '';
-        notify("User Created Successfully", "success");
-    }).catch(err => alert("Error: " + err.message));
+        ['newU','newP','newD'].forEach(id => document.getElementById(id).value = '');
+        notify("User Created", "success");
+    });
 }
 
 function renderUsers() {
@@ -372,18 +373,49 @@ function renderUsers() {
     `).join('');
 }
 
-function addTask() {
+function addOrUpdateTask() {
     const cVal = document.getElementById('taskClientSelect').value;
     const tVal = document.getElementById('taskText').value;
+    const nVal = document.getElementById('taskNotes').value;
+    const dVal = document.getElementById('taskDate').value;
     if(!cVal || !tVal) return alert("Missing data");
-    db.ref('tasks').push({ client: cVal, text: tVal });
-    document.getElementById('taskText').value = '';
-    notify("Task Added", "success");
+    
+    const taskData = { client: cVal, text: tVal, notes: nVal, date: dVal };
+    
+    if(taskEditKey) {
+        db.ref('tasks/' + taskEditKey).update(taskData);
+        addLog(`Updated Task for: ${cVal}`);
+        taskEditKey = null;
+        document.getElementById('btnSaveTask').innerText = "➕ Add Task";
+    } else {
+        db.ref('tasks').push(taskData);
+        addLog(`Added Task for: ${cVal}`);
+    }
+    
+    ['taskText','taskNotes','taskDate'].forEach(id => document.getElementById(id).value = '');
+    notify("Task Saved", "success");
+}
+
+function editTask(key) {
+    taskEditKey = key; const t = rawTasks[key];
+    document.getElementById('taskClientSelect').value = t.client;
+    document.getElementById('taskText').value = t.text;
+    document.getElementById('taskNotes').value = t.notes || '';
+    document.getElementById('taskDate').value = t.date || '';
+    document.getElementById('btnSaveTask').innerText = "🔄 Update Task";
 }
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); 
-    b.innerHTML = Object.keys(rawTasks).map(key => `<tr><td>${rawTasks[key].client}</td><td>${rawTasks[key].text}</td><td><button class="action-btn btn-del" onclick="db.ref('tasks/${key}').remove()">✕</button></td></tr>`).join('');
+    b.innerHTML = Object.keys(rawTasks).map(key => {
+        const t = rawTasks[key];
+        return `<tr>
+            <td>${t.client}</td><td>${t.text}</td><td>${t.notes || '-'}</td><td>${t.date || '-'}</td>
+            <td>
+                <button class="action-btn btn-call" onclick="editTask('${key}')">✏️</button>
+                <button class="action-btn btn-del" onclick="db.ref('tasks/${key}').remove()">✕</button>
+            </td></tr>`;
+    }).join('');
 }
 
 function addLog(action) {
