@@ -2,7 +2,7 @@
 <html lang="en" id="htmlTag" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading Pro AI CRM - Full Operation Mode - Dev By Eng.Mahmoud Marie</title>
+    <title>Utopia Trading Pro AI CRM - Full Operation Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -15,6 +15,7 @@
         [dir="rtl"] .sidebar { border-left: 1px solid #333; border-right: none; }
         [dir="rtl"] .sidebar button { text-align: right; }
 
+        /* Login Screen */
         #loginOverlay { position: fixed; inset: 0; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 20000; }
         .login-card { background: #2e2e4d; padding: 40px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 5px solid var(--accent); }
         .login-card input { background: #3f3f6b; border: none; color: white; margin-bottom: 15px; padding: 15px; border-radius: 10px; width: 100%; box-sizing: border-box; }
@@ -24,7 +25,7 @@
         .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; flex-shrink: 0; }
         .sidebar h2 { font-size: 1.2em; margin-bottom: 5px; color: var(--accent); }
         
-        /* روابط المطور واتساب واتصال */
+        /* Developer Links & WhatsApp */
         .dev-link { color: #888; text-decoration: none; font-size: 0.75em; display: block; margin-top: 5px; transition: 0.3s; }
         .dev-link:hover { color: var(--accent); transform: scale(1.02); }
         .dev-info { font-size: 0.75em; color: #888; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
@@ -54,11 +55,9 @@
         .btn-wa { background: #25D366; }
         .btn-del { background: var(--danger); }
         
-        /* تنبيهات النظام */
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        /* سجل العمليات للأدمن */
-        .log-entry { font-size: 0.8em; padding: 8px; border-bottom: 1px solid #eee; }
+        .log-entry { font-size: 0.8em; padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
         .log-user { color: var(--info); font-weight: bold; }
         .log-action { color: var(--danger); }
     </style>
@@ -79,8 +78,8 @@
         <p id="loginError" style="color:var(--danger); display:none; margin-top:10px;">Login Failed!</p>
         <div style="margin-top:20px; font-size:0.75em; color:#bbb;">
             Developed By: Eng. Mahmoud Marie<br>
-            <a href="tel:+201222153415" class="dev-link">📞 Call Support: +201222153415</a>
-            <a href="https://wa.me/201222153415" class="dev-link">💬 WhatsApp Support</a>
+            <a href="tel:+201222153415" class="dev-link">📞 Call: +201222153415</a>
+            <a href="https://wa.me/201222153415" class="dev-link">💬 WhatsApp Chat</a>
         </div>
     </div>
 </div>
@@ -93,19 +92,19 @@
         </div>
         <div class="dev-info">
             <b>Eng. Mahmoud Marie</b><br>
-            <a href="tel:+201222153415" class="dev-link">📞 +201222153415</a>
-            <a href="https://wa.me/201222153415" class="dev-link">💬 Direct WhatsApp</a>
+            <a href="tel:+201222153415" class="dev-link">📞 Call Support</a>
+            <a href="https://wa.me/201222153415" class="dev-link">💬 WhatsApp Support</a>
         </div>
         
         <button class="tab-btn active" onclick="showTab('crmTab', this)" id="m_crm">👥 Clients Registry</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)" id="m_dash">📊 AI Analytics</button>
-        <button class="tab-btn" onclick="showTab('profileTab', this)" id="m_profile">👤 My Account</button>
+        <button class="tab-btn" onclick="showTab('profileTab', this)" id="m_profile">👤 My Profile</button>
         <button class="tab-btn" onclick="showTab('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ Recycle Bin</button>
         
-        <button class="tab-btn admin-only" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:none; background: #4a4a6a; border: 1px solid var(--accent);">👑 Admin Control</button>
+        <button class="tab-btn admin-only" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent);">👑 Admin Control</button>
         
-        <button onclick="logout()" style="margin-top:auto; background:var(--danger)" id="m_logout">Logout</button>
+        <button onclick="logout()" style="margin-top:auto; background:var(--danger); color:white;" id="m_logout">🚪 Logout System</button>
     </div>
 
     <div class="main">
@@ -121,7 +120,7 @@
                     <option value="Completed">Completed</option>
                     <option value="VIP">VIP</option>
                 </select>
-                <button onclick="exportToCSV()" style="background:#2c3e50; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">📥 Export Excel</button>
+                <button onclick="exportToCSV()" style="background:#2c3e50; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">📥 Export Data</button>
             </div>
             
             <div class="form-group">
@@ -141,33 +140,33 @@
                     <input id="agent" placeholder="Assigned Agent">
                     <input type="date" id="date">
                 </div>
-                <textarea id="notes" placeholder="Detailed Notes & AI Feedback..."></textarea>
-                <button class="btn-save" onclick="addOrUpdate()" id="btnSave">💾 Save & Sync Data</button>
+                <textarea id="notes" placeholder="Notes & AI Insights..."></textarea>
+                <button class="btn-save" onclick="addOrUpdate()" id="btnSave">💾 Save Client</button>
             </div>
 
             <table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>AI Lead</th><th>Status</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>AI Score</th><th>Status</th><th>Actions</th></tr></thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
         <div id="adminControlTab" class="tab-content">
-            <h2 style="color:var(--vip)">👑 Admin Master Control</h2>
+            <h2 style="color:var(--vip)">👑 Admin Master Control & Supervision</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                 <div class="form-group">
-                    <h3>👥 Manage System Users</h3>
+                    <h3>👥 User Management</h3>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                         <input id="newU" placeholder="Username">
                         <input id="newP" placeholder="Password">
                     </div>
                     <input id="newD" placeholder="Display Name">
                     <select id="newR">
-                        <option value="user">User (Full Access + Supervised)</option>
-                        <option value="admin">Admin (Master Access)</option>
+                        <option value="user">Standard User (Full Operation)</option>
+                        <option value="admin">System Admin (Full Control)</option>
                     </select>
-                    <button onclick="addUser()" class="btn-save" style="background:var(--primary)">Add New User</button>
+                    <button onclick="addUser()" class="btn-save" style="background:var(--primary)">Add User</button>
                     <hr>
-                    <table style="font-size: 0.85em;">
-                        <thead><tr><th>User</th><th>Pass</th><th>Name</th><th>Role</th><th>Action</th></tr></thead>
+                    <table style="font-size: 0.8em;">
+                        <thead><tr><th>User</th><th>Current Pass</th><th>Name</th><th>Role</th><th>Action</th></tr></thead>
                         <tbody id="usersBody"></tbody>
                     </table>
                 </div>
@@ -181,21 +180,21 @@
         <div id="profileTab" class="tab-content">
             <h2>👤 My Account Settings</h2>
             <div class="form-group">
-                <p>Hello, <b id="profName"></b>. You can update your password below:</p>
-                <input type="password" id="changePassInput" placeholder="Enter New Password">
-                <button onclick="updateMyPassword()" class="btn-save" style="background:var(--info)">Update My Password</button>
+                <p>Welcome, <b id="profName"></b>. You can update your access password below:</p>
+                <input type="password" id="changePassInput" placeholder="New Password">
+                <button onclick="updateMyPassword()" class="btn-save" style="background:var(--info)">Update Password</button>
             </div>
         </div>
 
         <div id="tasksTab" class="tab-content">
-            <h2 id="h_tasks">Operations & Tasks</h2>
+            <h2 id="h_tasks">Operations Tasks</h2>
             <div class="form-group">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <select id="taskClientSelect" onchange="autoFillTask()"><option value="">Select Client</option></select>
                     <input id="taskDate" type="date">
                 </div>
-                <input id="taskText" placeholder="What needs to be done?">
-                <textarea id="extraInfo" placeholder="Auto-filled client info (Editable)"></textarea>
+                <input id="taskText" placeholder="Task description...">
+                <textarea id="extraInfo" placeholder="Client info (Phone, Notes, etc.)"></textarea>
                 <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
             </div>
             <table>
@@ -207,18 +206,18 @@
         <div id="dashboardTab" class="tab-content">
             <h2 id="h_dash">📊 AI Performance</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--vip); text-align:center;"><h3>VIP Clients</h3><p id="countVip" style="font-size:2em; color:var(--vip)">0</p></div>
-                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--success); text-align:center;"><h3>Completed</h3><p id="countComp" style="font-size:2em; color:var(--success)">0</p></div>
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--vip); text-align:center;"><h3>VIP</h3><p id="countVip" style="font-size:2em">0</p></div>
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--success); text-align:center;"><h3>Done</h3><p id="countComp" style="font-size:2em">0</p></div>
             </div>
             <div style="margin-top:20px; background:#fff; padding:15px; border-radius:15px;">
-                <h4>📍 Clients Geo-Distribution</h4>
+                <h4>📍 Geo-Distribution</h4>
                 <div id="geoStats" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
             </div>
             <div style="max-width:350px; margin:30px auto;"><canvas id="statusChart"></canvas></div>
         </div>
 
         <div id="recycleTab" class="tab-content">
-            <h2 style="color:var(--danger)">♻️ Recycle Bin (Deleted Clients)</h2>
+            <h2 style="color:var(--danger)">♻️ Recycle Bin</h2>
             <table><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody id="recycleBody"></tbody></table>
         </div>
     </div>
@@ -238,10 +237,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null, currentLang = 'en';
+let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null;
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
-// 2. نظام الدخول والرقابة
+// 2. نظام الدخول والخروج والرقابة المطور
 function checkLogin() {
     const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
     if (u === "admin" && p === "@Mody6699") { loginSuccess("admin", "Master Admin", -1); return; }
@@ -260,14 +259,20 @@ function loginSuccess(role, name, idx) {
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
-    addLog(`Logged into the system`);
+    addLog(`Logged in`);
     playSound('soundSuccess');
     setTimeout(() => location.reload(), 500);
 }
 
-function logout() { addLog("Logged out"); sessionStorage.clear(); location.reload(); }
+function logout() {
+    if(confirm("Logout from system?")) {
+        addLog("Logged out");
+        sessionStorage.clear();
+        location.reload();
+    }
+}
 
-// 3. إدارة البيانات (Clients)
+// 3. إدارة البيانات الأساسية
 function init() {
     if(!sessionStorage.getItem('isLoggedIn')) return;
     document.getElementById('loginOverlay').style.display = 'none';
@@ -309,16 +314,11 @@ function renderCRM() {
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
-    if(!n) return notify("Name is required", "error");
+    if(!n) return notify("Name required", "error");
     const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0] };
     
-    if(editIdx > -1) {
-        addLog(`Updated client: ${c.name}`);
-        clients[editIdx] = c; 
-    } else {
-        addLog(`Added new client: ${c.name}`);
-        clients.push(c);
-    }
+    if(editIdx > -1) { addLog(`Updated client: ${c.name}`); clients[editIdx] = c; } 
+    else { addLog(`Added new client: ${c.name}`); clients.push(c); }
     db.ref('clients').set(clients);
     editIdx = -1;
     ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
@@ -326,7 +326,7 @@ function addOrUpdate() {
 }
 
 function deleteClient(i) {
-    if(!confirm('Delete this client?')) return;
+    if(!confirm('Move to recycle bin?')) return;
     addLog(`Deleted client: ${clients[i].name}`);
     deletedClients.push(clients[i]);
     clients.splice(i, 1);
@@ -334,19 +334,16 @@ function deleteClient(i) {
     db.ref('deletedClients').set(deletedClients);
 }
 
-// 4. نظام سجل العمليات (Logs)
+// 4. نظام الرقابة وسجل العمليات
 function addLog(action) {
-    const log = {
-        user: sessionStorage.getItem('userDisplayName') || "Unknown",
-        action: action,
-        time: new Date().toLocaleString()
-    };
+    const log = { user: sessionStorage.getItem('userDisplayName') || "User", action: action, time: new Date().toLocaleString() };
     db.ref('logs').push(log);
 }
 
 function renderLogs() {
     const container = document.getElementById('logsContainer');
-    container.innerHTML = logs.reverse().map(l => `
+    if(!container) return;
+    container.innerHTML = [...logs].reverse().map(l => `
         <div class="log-entry">
             <span class="log-user">[${l.user}]</span> <span class="log-action">${l.action}</span> <br>
             <small style="color:#999">${l.time}</small>
@@ -354,13 +351,12 @@ function renderLogs() {
     `).join('');
 }
 
-// 5. إدارة المستخدمين (لأدمن السوبر)
 function addUser() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
-    if(!u || !p) return alert("Fill all fields");
+    if(!u || !p) return alert("Fill all data");
     authSystem.users.push({ u, p, displayName: d, role: r });
     db.ref('authSystem/users').set(authSystem.users);
-    addLog(`Created new user: ${d}`);
+    addLog(`Created user: ${d}`);
 }
 
 function renderUsers() {
@@ -375,15 +371,14 @@ function updateMyPassword() {
     const newP = document.getElementById('changePassInput').value;
     const idx = sessionStorage.getItem('userIdx');
     if(!newP) return alert("Enter new password");
-    if(idx == -1) return alert("Master Admin password is fixed");
-    
+    if(idx == -1) return alert("Master admin password cannot be changed here");
     authSystem.users[idx].p = newP;
     db.ref('authSystem/users').set(authSystem.users);
-    addLog(`Changed their own password`);
-    notify("Password Updated", "success");
+    addLog(`Updated their own password`);
+    notify("Password Updated Successfully", "success");
 }
 
-// 6. وظائف مساعدة
+// 5. المهام والتحليلات
 function autoFillTask() {
     const client = clients.find(c => c.name === document.getElementById('taskClientSelect').value);
     if(client) document.getElementById('extraInfo').value = `Agent: ${client.agent} | Gov: ${client.gov}\nNotes: ${client.notes}`;
@@ -394,7 +389,7 @@ function addTask() {
     if(!t.client) return alert("Select client");
     tasks.push(t);
     db.ref('tasks').set(tasks);
-    addLog(`Added task for: ${t.client}`);
+    addLog(`Added task for ${t.client}`);
 }
 
 function renderTasks() {
@@ -410,7 +405,7 @@ function delT(i) { tasks.splice(i,1); db.ref('tasks').set(tasks); }
 function updateGeo() {
     const counts = {}; clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
     document.getElementById('geoStats').innerHTML = Object.entries(counts).map(([g, c]) => 
-        `<span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:12px;">${g}: ${c}</span>`
+        `<span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:11px;">${g}: ${c}</span>`
     ).join('');
 }
 
@@ -429,7 +424,7 @@ function exportToCSV() {
     clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}"\n`);
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-    link.download = `Utopia_Data.csv`; link.click();
+    link.download = `Utopia_CRM_Data.csv`; link.click();
 }
 
 function calculateAIScore(c) {
@@ -441,9 +436,10 @@ function getStatusColor(s) { return { VIP:'#9b59b6', Completed:'#28a745', Hold:'
 function playSound(id) { document.getElementById(id).play(); }
 function notify(m, t) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); }
 function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
+function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; showTab('crmTab', document.getElementById('m_crm')); }
 function renderRecycle() { const b = document.getElementById('recycleBody'); b.innerHTML = deletedClients.map((c, i) => `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button></td></tr>`).join(''); }
 function restore(i) { clients.push(deletedClients[i]); deletedClients.splice(i,1); db.ref('clients').set(clients); db.ref('deletedClients').set(deletedClients); }
-function fillTaskClients() { const s = document.getElementById('taskClientSelect'); s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); }
+function fillTaskClients() { const s = document.getElementById('taskClientSelect'); if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); }
 function delU(i) { if(confirm('Delete user?')) { authSystem.users.splice(i, 1); db.ref('authSystem/users').set(authSystem.users); } }
 
 window.onload = init;
