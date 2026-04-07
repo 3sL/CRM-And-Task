@@ -94,7 +94,7 @@
 <div id="mainApp">
     <div class="sidebar">
         <div style="display:flex; justify-content: space-between; align-items: center;">
-            <h2 id="side_title">Utopia For Trading And Export</h2>
+            <h2 id="side_title">Utopia Trading</h2>
             <button onclick="toggleLang()" style="padding:4px 8px; font-size:10px; background:var(--accent); color:var(--primary);" id="langBtn">AR</button>
         </div>
         <div class="dev-info">
@@ -155,7 +155,7 @@
 
         <div id="adminControlTab" class="tab-content">
             <h2 style="color:var(--vip)">👑 Admin Master Control</h2>
-            <p id="viewOnlyNotice" style="display:none; color:var(--danger); font-weight:bold;">⚠️ VIEW ONLY MODE: Administrative actions are restricted.</p>
+            <p id="viewOnlyNotice" style="display:none; color:var(--danger); font-weight:bold;">⚠️ VIEW ONLY MODE</p>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                 <div class="form-group" id="userFormBox">
                     <h3>👥 User Management</h3>
@@ -266,6 +266,8 @@ function init() {
     if(sessionStorage.getItem('userRole') !== 'admin') {
         document.getElementById('viewOnlyNotice').style.display = 'block';
         document.getElementById('addUserBtn').style.display = 'none';
+        document.getElementById('userFormBox').style.pointerEvents = 'none';
+        document.getElementById('userFormBox').style.opacity = '0.7';
     }
 
     const gSelect = document.getElementById('gov');
@@ -338,12 +340,15 @@ function deleteClient(key) {
     addLog(`Deleted to Trash: ${rawClients[key].name}`);
 }
 
-// الإصلاح هنا في مسار الإضافة
+// دالة إضافة اليوزرات المعدلة والمؤمنة
 function addUser() {
-    const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
-    if(!u || !p) return alert("Fill all fields");
+    const u = document.getElementById('newU').value, 
+          p = document.getElementById('newP').value, 
+          d = document.getElementById('newD').value, 
+          r = document.getElementById('newR').value;
+          
+    if(!u || !p || !d) return alert("Fill all fields");
     
-    // تأكد من أن المسار هو authSystem/users ليتوافق مع init()
     db.ref('authSystem/users').push({ 
         u: u, 
         p: p, 
@@ -351,7 +356,9 @@ function addUser() {
         role: r 
     }).then(() => {
         addLog(`Admin created user: ${d}`);
-        ['newU','newP','newD'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('newU').value = '';
+        document.getElementById('newP').value = '';
+        document.getElementById('newD').value = '';
         notify("User Created Successfully", "success");
     }).catch(err => alert("Error: " + err.message));
 }
@@ -366,14 +373,17 @@ function renderUsers() {
 }
 
 function addTask() {
-    const t = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value };
-    if(!t.client || !t.text) return alert("Missing data");
-    db.ref('tasks').push(t);
+    const cVal = document.getElementById('taskClientSelect').value;
+    const tVal = document.getElementById('taskText').value;
+    if(!cVal || !tVal) return alert("Missing data");
+    db.ref('tasks').push({ client: cVal, text: tVal });
+    document.getElementById('taskText').value = '';
+    notify("Task Added", "success");
 }
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); 
-    b.innerHTML = Object.keys(rawTasks).map(key => `<tr><td>${rawTasks[key].client}</td><td>${rawTasks[key].text}</td><td><button onclick="db.ref('tasks/${key}').remove()">✕</button></td></tr>`).join('');
+    b.innerHTML = Object.keys(rawTasks).map(key => `<tr><td>${rawTasks[key].client}</td><td>${rawTasks[key].text}</td><td><button class="action-btn btn-del" onclick="db.ref('tasks/${key}').remove()">✕</button></td></tr>`).join('');
 }
 
 function addLog(action) {
@@ -401,6 +411,7 @@ function showTab(id, btn) {
 }
 
 function updateDash() {
+    if(!document.getElementById('statusChart')) return;
     document.getElementById('countVip').innerText = clients.filter(c => c.status === 'VIP').length;
     document.getElementById('countComp').innerText = clients.filter(c => c.status === 'Completed').length;
     const ctx = document.getElementById('statusChart').getContext('2d');
@@ -423,12 +434,13 @@ function fillTaskClients() {
 
 function renderRecycle() {
     const b = document.getElementById('recycleBody'); 
-    b.innerHTML = Object.keys(rawDeleted).map(key => `<tr><td>${rawDeleted[key].name}</td><td><button onclick="restore('${key}')">🔄 Restore</button></td></tr>`).join('');
+    b.innerHTML = Object.keys(rawDeleted).map(key => `<tr><td>${rawDeleted[key].name}</td><td>${rawDeleted[key].phone}</td><td><button class="action-btn" style="background:var(--success)" onclick="restore('${key}')">🔄 Restore</button></td></tr>`).join('');
 }
 
 function restore(key) {
     db.ref('clients').push(rawDeleted[key]);
     db.ref('deletedClients/' + key).remove();
+    notify("Client Restored", "success");
 }
 
 function toggleLang() {
@@ -443,7 +455,7 @@ function exportToCSV() {
     clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}"\n`);
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-    link.download = `CRM_Export.csv`; link.click();
+    link.download = `CRM_Export_${new Date().toLocaleDateString()}.csv`; link.click();
 }
 
 window.onload = init;
