@@ -319,14 +319,15 @@ async function checkLogin() {
 
     const hashedInput = await hashPassword(p);
 
-   let user = authSystem.users.find(acc => 
-    acc.u === u && (acc.p === hashedInput || acc.p === p)
-);
+  // تشفير كلمة المرور المدخلة قبل المقارنة
+const hashedInput = await hashPassword(p);
 
-// fallback admin
-if (!user && u === BACKUP_ADMIN.u && p === BACKUP_ADMIN.p) {
-    user = BACKUP_ADMIN;
-}
+// البحث عن المستخدم بالمقارنة مع الكلمة المشفرة
+// تشفير كلمة المرور المدخلة قبل المقارنة
+const hashedInput = await hashPassword(p);
+
+// البحث عن المستخدم بالمقارنة مع الكلمة المشفرة
+let user = authSystem.users.find(acc => acc.u === u && acc.p === hashedInput);
 
     if (user) { 
         document.getElementById('loginOverlay').style.display = 'none'; 
@@ -367,14 +368,10 @@ async function addUser() {
 
     const hashedPass = await hashPassword(p);
 
-    authSystem.users.push({ 
-        u: u, 
-        p: hashedPass, 
-        role: r, 
-        displayName: d 
-    });
-
-    db.ref('authSystem').set(authSystem);
+   // تشفير كلمة المرور قبل الحفظ
+const hashedPass = await hashPassword(p);
+authSystem.users.push({ u: u, p: hashedPass, role: r, displayName: d });
+await db.ref('authSystem').set(authSystem);
 
     notify('User Added Securely 🔐', 'success');
 
@@ -398,12 +395,20 @@ function renderUsers() {
     });
 }
 
-function updateUserPass(i, newPass) {
-    authSystem.users[i].p = newPass;
-    db.ref('authSystem').set(authSystem);
-    notify('Password Updated', 'success');
+// --- تحديث كلمة المرور مع تشفير SHA-256 ---
+async function updateUserPass(i, newPass) {
+    if(!newPass) return notify('Password cannot be empty', 'error');
+    
+    // تشفير كلمة المرور
+    const hashedPass = await hashPassword(newPass);
+    
+    // حفظ الكلمة المشفرة في قاعدة البيانات
+    authSystem.users[i].p = hashedPass;
+    await db.ref('authSystem').set(authSystem);
+    
+    notify('Password Updated Securely 🔐', 'success');
 }
-
+}
 let clients = [], tasks = [], deletedClients = [], editIdx = -1, lang = 'en', statusChart = null;
 
 const govs = [{en:"Cairo", ar:"القاهرة"}, {en:"Giza", ar:"الجيزة"}, {en:"Alexandria", ar:"الإسكندرية"}, {en:"Dakahlia", ar:"الدقهلية"}, {en:"Sharkia", ar:"الشرقية"}, {en:"Monufia", ar:"المنوفية"}, {en:"Gharbia", ar:"الغربية"}, {en:"Kafr El Sheikh", ar:"كفر الشيخ"}, {en:"Beheira", ar:"البحيرة"}, {en:"Damietta", ar:"دمياط"}, {en:"Port Said", ar:"بورسعيد"}, {en:"Ismailia", ar:"الإسماعيلية"}, {en:"Suez", ar:"السويس"}, {en:"Beni Suef", ar:"بني سويف"}, {en:"Fayoum", ar:"الفيوم"}, {en:"Minya", ar:"المنيا"}, {en:"Assiut", ar:"أسيوط"}, {en:"Sohag", ar:"سوهاج"}, {en:"Qena", ar:"قنا"}, {en:"Luxor", ar:"الأقصر"}, {en:"Aswan", ar:"أسوان"}, {en:"Red Sea", ar:"البحر الأحمر"}, {en:"New Valley", ar:"الوادي الجديد"}, {en:"Matrouh", ar:"مطروح"}, {en:"North Sinai", ar:"شمال سيناء"}, {en:"South Sinai", ar:"جنوب سيناء"}, {en:"Qalyubia", ar:"القليوبية"}];
