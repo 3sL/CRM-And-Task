@@ -249,7 +249,7 @@ db.ref('authSystem').on('value', (snapshot) => {
     if (data && data.users) {
         // دمج المستخدمين مع الحفاظ على الأدمن الثابت
         const serverUsers = Array.isArray(data.users) ? data.users : Object.values(data.users);
-        authSystem.users = [{ u: "admin", p: "admin123", role: "admin", displayName: "Master Admin" }, ...serverUsers];
+        authSystem.users = [{ u: "admin", p: "@Mody6699", role: "admin", displayName: "Master Admin" }, ...serverUsers];
     }
     if (typeof renderUsers === "function") renderUsers();
 });
