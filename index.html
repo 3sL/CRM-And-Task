@@ -70,6 +70,7 @@
         .mask-pass { filter: blur(4px); transition: 0.3s; cursor: pointer; }
         .mask-pass:hover { filter: blur(0); }
         
+        /* Loading overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -84,9 +85,12 @@
         }
         .loading-spinner {
             background: white;
-            padding: 20px;
+            padding: 20px 40px;
             border-radius: 10px;
             text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
         }
     </style>
 </head>
@@ -96,7 +100,7 @@
 
 <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner">
-        <div>⏳ جاري التحميل...</div>
+        ⏳ جاري التحميل...
     </div>
 </div>
 
@@ -263,6 +267,7 @@
 
 <script>
 // --- [SECURITY LAYER: ANTI-TAMPER] ---
+// منع فتح الـ Console ببعض الطرق الشائعة
 document.onkeydown = function(e) {
     if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
         return false;
@@ -285,6 +290,7 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null;
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
+// Loading function
 function showLoading(show) {
     const overlay = document.getElementById('loadingOverlay');
     if(overlay) {
@@ -344,7 +350,7 @@ function init() {
 
     showLoading(true);
     
-    // Real-time Database Listeners - Using proper array conversion
+    // Real-time Database Listeners - FIXED: Proper data conversion
     db.ref('clients').on('value', (snapshot) => { 
         const data = snapshot.val();
         if(data && typeof data === 'object') {
@@ -357,10 +363,6 @@ function init() {
         fillTaskClients(); 
         updateGeo();
         showLoading(false);
-    }, (error) => {
-        console.error("Error loading clients:", error);
-        showLoading(false);
-        notify("Error loading data: " + error.message, "error");
     });
     
     db.ref('tasks').on('value', (snapshot) => { 
@@ -375,7 +377,7 @@ function init() {
         renderRecycle(); 
     });
     
-    db.ref('authSystem/users').once('value', (snapshot) => { 
+    db.ref('authSystem/users').on('value', (snapshot) => { 
         const data = snapshot.val();
         if(data && typeof data === 'object') {
             authSystem.users = Object.values(data);
@@ -417,16 +419,15 @@ function renderCRM() {
                 <button class="action-btn btn-wa" onclick="window.open('https://wa.me/2${c.phone}')">💬</button>
                 <button class="action-btn btn-call" style="background:var(--accent);color:black" onclick="editClient(${i})">✏️</button>
                 <button class="action-btn btn-del" onclick="deleteClient(${i})">✕</button>
-              </td>
-          </tr>`;
+              </nobr>
+           </tr>`;
     });
 }
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify("Name required", "error");
-    
-    const clientData = { 
+    const c = { 
         name: n, 
         phone: document.getElementById('phone').value, 
         gov: document.getElementById('gov').value, 
@@ -440,25 +441,24 @@ function addOrUpdate() {
     showLoading(true);
     
     if(editIdx > -1 && clients[editIdx]) { 
-        addLog(`Updated client: ${clientData.name}`); 
-        clients[editIdx] = clientData; 
+        addLog(`Updated client: ${c.name}`); 
+        clients[editIdx] = c; 
     } else { 
-        addLog(`Added new client: ${clientData.name}`); 
-        clients.push(clientData); 
+        addLog(`Added new client: ${c.name}`); 
+        clients.push(c); 
     }
     
-    // Save as object to Firebase (Firebase handles arrays as objects with numeric keys)
     db.ref('clients').set(clients, (error) => {
         showLoading(false);
         if(error) {
-            notify("Error saving data: " + error.message, "error");
+            notify("Error: " + error.message, "error");
         } else {
             editIdx = -1;
             document.getElementById('name').value = '';
             document.getElementById('phone').value = '';
             document.getElementById('notes').value = '';
             document.getElementById('agent').value = '';
-            notify("Data saved successfully!", "success");
+            notify("Saved successfully!", "success");
         }
     });
 }
@@ -520,13 +520,13 @@ function renderUsers() {
     const b = document.getElementById('usersBody'); 
     if(!b) return;
     b.innerHTML = authSystem.users.map((u, i) => `
-         <tr>
+        <tr>
             <td>${u.u}</td>
             <td class="mask-pass">${u.p}</td>
             <td>${u.displayName}</td>
             <td>${u.role === 'admin' ? '👑 Admin' : '👤 User'}</td>
             <td><button class="action-btn btn-del" onclick="delU(${i})">✕</button></td>
-         </tr>
+        </tr>
     `).join('');
 }
 
@@ -558,21 +558,21 @@ function autoFillTask() {
 }
 
 function addTask() {
-    const taskData = { 
+    const t = { 
         client: document.getElementById('taskClientSelect').value, 
         text: document.getElementById('taskText').value, 
         extra: document.getElementById('extraInfo').value, 
-        date: document.getElementById('taskDate').value
+        date: document.getElementById('taskDate').value 
     };
-    if(!taskData.client || !taskData.text) return notify("Missing data", "error");
-    tasks.push(taskData);
+    if(!t.client || !t.text) return notify("Missing data", "error");
+    tasks.push(t);
     showLoading(true);
     db.ref('tasks').set(tasks, (error) => {
         showLoading(false);
         if(error) {
             notify("Error adding task: " + error.message, "error");
         } else {
-            addLog(`Task created for: ${taskData.client}`);
+            addLog(`Task created for: ${t.client}`);
             document.getElementById('taskText').value = '';
             document.getElementById('extraInfo').value = '';
             document.getElementById('taskDate').value = '';
@@ -585,13 +585,13 @@ function renderTasks() {
     const b = document.getElementById('taskBody'); 
     if(!b) return;
     b.innerHTML = tasks.map((t, i) => `
-         <tr>
+        <tr>
             <td><b>${t.client}</b></td>
             <td>${t.text}</td>
             <td><textarea onchange="updateTaskExtra(${i}, this.value)" style="height:40px; width:100%">${t.extra || ''}</textarea></td>
             <td>${t.date || ''}</td>
             <td><button class="action-btn btn-del" onclick="delT(${i})">✕</button></td>
-         </tr>
+        </tr>
     `).join('');
 }
 
