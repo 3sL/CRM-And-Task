@@ -69,11 +69,14 @@
         /* لإخفاء كلمات المرور تلقائياً في الجدول */
         .mask-pass { filter: blur(4px); transition: 0.3s; cursor: pointer; }
         .mask-pass:hover { filter: blur(0); }
+        
+        .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; z-index: 99999; display: none; }
     </style>
 </head>
-<body oncontextmenu="return false;"> <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<body oncontextmenu="return false;"> 
+<audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
-
+<div class="loading" id="loading">جاري التحميل...</div>
 <div id="notification"></div>
 
 <div id="loginOverlay">
@@ -114,7 +117,7 @@
     </div>
 
     <div class="main">
-<div id="crmTab" class="tab-content active">
+        <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
             <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
                 <input id="search" placeholder="🔍 Search Name or Phone..." oninput="renderCRM()" style="flex:2">
@@ -171,10 +174,12 @@
                     </select>
                     <button onclick="addUser()" class="btn-save" style="background:var(--primary)">Add User</button>
                     <hr>
-                    <table>
-                        <thead><tr><th>User</th><th>Pass</th><th>Name</th><th>Role</th><th>Action</th></tr></thead>
-                        <tbody id="usersBody"></tbody>
-                    </table>
+                    <div style="overflow-x: auto;">
+                        <table style="min-width: 500px;">
+                            <thead><tr><th>User</th><th>Pass</th><th>Name</th><th>Role</th><th>Action</th></tr></thead>
+                            <tbody id="usersBody"></tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="form-group" style="max-height: 500px; overflow-y: auto;">
                     <h3>📜 Secure Activity Logs</h3>
@@ -203,10 +208,12 @@
                 <textarea id="extraInfo" placeholder="Client info..."></textarea>
                 <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
             </div>
-            <table>
-                <thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Deadline</th><th>Action</th></tr></thead>
-                <tbody id="taskBody"></tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table style="min-width: 600px;">
+                    <thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Deadline</th><th>Action</th></tr></thead>
+                    <tbody id="taskBody"></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="dashboardTab" class="tab-content">
@@ -224,14 +231,15 @@
 
         <div id="recycleTab" class="tab-content">
             <h2 style="color:var(--danger)">♻️ Recycle Bin</h2>
-            <table><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody id="recycleBody"></tbody></table>
+            <div style="overflow-x: auto;">
+                <table style="min-width: 400px;"><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody id="recycleBody"></tbody></table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
 // --- [SECURITY LAYER: ANTI-TAMPER] ---
-// منع فتح الـ Console ببعض الطرق الشائعة
 document.onkeydown = function(e) {
     if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
         return false;
@@ -269,7 +277,7 @@ function checkLogin() {
 }
 
 function loginSuccess(role, name, idx) {
-    const sessionToken = btoa(name + Date.now()); // تشفير بسيط للتوكن
+    const sessionToken = btoa(name + Date.now());
     sessionStorage.setItem('u_token', sessionToken);
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userRole', role);
@@ -304,32 +312,79 @@ function init() {
     const gSelect = document.getElementById('gov');
     if(gSelect) govs.forEach(g => gSelect.innerHTML += `<option value="${g}">${g}</option>`);
 
-    // Real-time Database Listeners
-    db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDash(); fillTaskClients(); updateGeo(); });
-    db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
-    db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
-    db.ref('authSystem/users').on('value', s => { authSystem.users = s.val() ? Object.values(s.val()) : []; renderUsers(); });
-    db.ref('logs').limitToLast(50).on('value', s => { logs = s.val() ? Object.values(s.val()) : []; renderLogs(); });
+    showLoading(true);
+    
+    // Real-time Database Listeners - Using array format
+    db.ref('clients').on('value', (snapshot) => { 
+        const data = snapshot.val();
+        clients = data ? Object.values(data) : [];
+        renderCRM(); 
+        updateDash(); 
+        fillTaskClients(); 
+        updateGeo();
+        showLoading(false);
+    });
+    
+    db.ref('tasks').on('value', (snapshot) => { 
+        const data = snapshot.val();
+        tasks = data ? Object.values(data) : []; 
+        renderTasks(); 
+    });
+    
+    db.ref('deletedClients').on('value', (snapshot) => { 
+        const data = snapshot.val();
+        deletedClients = data ? Object.values(data) : []; 
+        renderRecycle(); 
+    });
+    
+    db.ref('authSystem/users').on('value', (snapshot) => { 
+        const data = snapshot.val();
+        if(data) {
+            authSystem.users = Object.values(data);
+        } else {
+            // Initialize default users if none exist
+            authSystem.users = [
+                { u: "user1", p: "123456", displayName: "Standard User", role: "user" }
+            ];
+            db.ref('authSystem/users').set(authSystem.users);
+        }
+        renderUsers(); 
+    });
+    
+    db.ref('logs').limitToLast(50).on('value', (snapshot) => { 
+        const data = snapshot.val();
+        logs = data ? Object.values(data) : []; 
+        renderLogs(); 
+    });
+}
+
+function showLoading(show) {
+    document.getElementById('loading').style.display = show ? 'flex' : 'none';
 }
 
 // 4. Data Management Functions
 function renderCRM() {
-    const b = document.getElementById('tableBody'); b.innerHTML = '';
+    const b = document.getElementById('tableBody'); 
+    if(!b) return;
+    b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value;
 
     clients.forEach((c, i) => {
         if((q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) || (fStatus !== 'All' && c.status !== fStatus)) return;
         let rowClass = c.status === 'VIP' ? 'vip-row' : (c.status === 'Hold' ? 'hold-row' : '');
         b.innerHTML += `<tr class="${rowClass}">
-            <td>${c.name}</td></td>${c.phone}</td><td>${c.gov}</td>
-            <td>${calculateAIScore(c)}%</td><td><b style="color:${getStatusColor(c.status)}">${c.status}</b></td>
+            <td>${c.name}</td>
+            <td>${c.phone}</td>
+            <td>${c.gov}</td>
+            <td>${calculateAIScore(c)}%</td>
+            <td><b style="color:${getStatusColor(c.status)}">${c.status}</b></td>
             <td>
                 <button class="action-btn btn-call" onclick="window.open('tel:${c.phone}')">📞</button>
                 <button class="action-btn btn-wa" onclick="window.open('https://wa.me/2${c.phone}')">💬</button>
                 <button class="action-btn btn-call" style="background:var(--accent);color:black" onclick="editClient(${i})">✏️</button>
                 <button class="action-btn btn-del" onclick="deleteClient(${i})">✕</button>
-            </td>
-        </tr>`;
+             </td>
+         </tr>`;
     });
 }
 
@@ -344,20 +399,30 @@ function addOrUpdate() {
         notes: document.getElementById('notes').value, 
         agent: document.getElementById('agent').value, 
         date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-        lastModifiedBy: sessionStorage.getItem('userDisplayName')
+        lastModifiedBy: sessionStorage.getItem('userDisplayName'),
+        id: Date.now() // Add unique ID
     };
     
-    if(editIdx > -1) { 
+    showLoading(true);
+    if(editIdx > -1 && clients[editIdx]) { 
         addLog(`Updated client: ${c.name}`); 
         clients[editIdx] = c; 
     } else { 
         addLog(`Added new client: ${c.name}`); 
         clients.push(c); 
     }
-    db.ref('clients').set(clients);
-    editIdx = -1;
-    ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
-    notify("Database Secured & Saved", "success");
+    
+    // Save as array to Firebase
+    db.ref('clients').set(clients, (error) => {
+        showLoading(false);
+        if(error) {
+            notify("Error saving data: " + error.message, "error");
+        } else {
+            editIdx = -1;
+            ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
+            notify("Database Secured & Saved", "success");
+        }
+    });
 }
 
 function deleteClient(i) {
@@ -365,13 +430,14 @@ function deleteClient(i) {
     addLog(`Deleted client: ${clients[i].name}`);
     deletedClients.push(clients[i]);
     clients.splice(i, 1);
-    db.ref('clients').set(clients);
+    showLoading(true);
+    db.ref('clients').set(clients, () => showLoading(false));
     db.ref('deletedClients').set(deletedClients);
 }
 
 // 5. Admin & Logs Logic
 function addLog(action) {
-    const log = { user: sessionStorage.getItem('userDisplayName') || "Unknown", action: action, time: new Date().toLocaleString() };
+    const log = { user: sessionStorage.getItem('userDisplayName') || "Unknown", action: action, time: new Date().toLocaleString(), timestamp: Date.now() };
     db.ref('logs').push(log);
 }
 
@@ -389,25 +455,36 @@ function renderLogs() {
 function addUser() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
     if(!u || !p) return alert("Fill all security fields");
-    authSystem.users.push({ u, p, displayName: d, role: r });
-    db.ref('authSystem/users').set(authSystem.users);
-    addLog(`Admin created user: ${d}`);
-    // Clear input fields after adding user
-    document.getElementById('newU').value = '';
-    document.getElementById('newP').value = '';
-    document.getElementById('newD').value = '';
+    if(!d) return alert("Please enter display name");
+    
+    const newUser = { u, p, displayName: d, role: r, id: Date.now() };
+    authSystem.users.push(newUser);
+    showLoading(true);
+    db.ref('authSystem/users').set(authSystem.users, (error) => {
+        showLoading(false);
+        if(error) {
+            alert("Error adding user: " + error.message);
+        } else {
+            addLog(`Admin created user: ${d}`);
+            document.getElementById('newU').value = '';
+            document.getElementById('newP').value = '';
+            document.getElementById('newD').value = '';
+            notify("User added successfully!", "success");
+        }
+    });
 }
 
 function renderUsers() {
-    const b = document.getElementById('usersBody'); if(!b) return;
+    const b = document.getElementById('usersBody'); 
+    if(!b) return;
     b.innerHTML = authSystem.users.map((u, i) => `
-        <tr>
+         <tr>
             <td>${u.u}</td>
             <td class="mask-pass">${u.p}</td>
             <td>${u.displayName}</td>
-            <td>${u.role}</td>
+            <td>${u.role === 'admin' ? '👑 Admin' : '👤 User'}</td>
             <td><button class="action-btn btn-del" onclick="delU(${i})">✕</button></td>
-        </tr>
+         </tr>
     `).join('');
 }
 
@@ -416,11 +493,20 @@ function updateMyPassword() {
     const idx = sessionStorage.getItem('userIdx');
     if(!newP) return alert("Enter new secure password");
     if(idx == -1) return alert("Master Admin password is hardcoded.");
+    if(!authSystem.users[idx]) return alert("User not found");
+    
     authSystem.users[idx].p = newP;
-    db.ref('authSystem/users').set(authSystem.users);
-    addLog(`Updated own password`);
-    notify("Password Updated Securely", "success");
-    document.getElementById('changePassInput').value = '';
+    showLoading(true);
+    db.ref('authSystem/users').set(authSystem.users, (error) => {
+        showLoading(false);
+        if(error) {
+            alert("Error updating password: " + error.message);
+        } else {
+            addLog(`Updated own password`);
+            notify("Password Updated Securely", "success");
+            document.getElementById('changePassInput').value = '';
+        }
+    });
 }
 
 // 6. Tasks & Analytics
@@ -430,75 +516,171 @@ function autoFillTask() {
 }
 
 function addTask() {
-    const t = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value };
+    const t = { 
+        client: document.getElementById('taskClientSelect').value, 
+        text: document.getElementById('taskText').value, 
+        extra: document.getElementById('extraInfo').value, 
+        date: document.getElementById('taskDate').value,
+        id: Date.now()
+    };
     if(!t.client || !t.text) return alert("Missing data");
     tasks.push(t);
-    db.ref('tasks').set(tasks);
-    addLog(`Task created for: ${t.client}`);
-    // Clear input fields after adding task
-    document.getElementById('taskText').value = '';
-    document.getElementById('extraInfo').value = '';
-    document.getElementById('taskDate').value = '';
+    showLoading(true);
+    db.ref('tasks').set(tasks, (error) => {
+        showLoading(false);
+        if(error) {
+            alert("Error adding task: " + error.message);
+        } else {
+            addLog(`Task created for: ${t.client}`);
+            document.getElementById('taskText').value = '';
+            document.getElementById('extraInfo').value = '';
+            document.getElementById('taskDate').value = '';
+            notify("Task added successfully!", "success");
+        }
+    });
 }
 
 function renderTasks() {
-    const b = document.getElementById('taskBody'); b.innerHTML = tasks.map((t, i) => `
-        <tr>
+    const b = document.getElementById('taskBody'); 
+    if(!b) return;
+    b.innerHTML = tasks.map((t, i) => `
+         <tr>
             <td><b>${t.client}</b></td>
             <td>${t.text}</td>
-            <td><textarea onchange="updateTaskExtra(${i}, this.value)" style="height:40px">${t.extra}</textarea></td>
-            <td>${t.date}</td>
+            <td><textarea onchange="updateTaskExtra(${i}, this.value)" style="height:40px; width:100%">${t.extra || ''}</textarea></td>
+            <td>${t.date || ''}</td>
             <td><button class="action-btn btn-del" onclick="delT(${i})">✕</button></td>
-        </tr>
+         </tr>
     `).join('');
 }
-function updateTaskExtra(i, v) { tasks[i].extra = v; db.ref('tasks').set(tasks); }
-function delT(i) { tasks.splice(i,1); db.ref('tasks').set(tasks); }
+
+function updateTaskExtra(i, v) { 
+    if(tasks[i]) {
+        tasks[i].extra = v; 
+        db.ref('tasks').set(tasks);
+    }
+}
+
+function delT(i) { 
+    tasks.splice(i,1); 
+    db.ref('tasks').set(tasks);
+}
 
 function updateDash() {
-    document.getElementById('countVip').innerText = clients.filter(c => c.status === 'VIP').length;
-    document.getElementById('countComp').innerText = clients.filter(c => c.status === 'Completed').length;
-    const ctx = document.getElementById('statusChart').getContext('2d');
+    const vipCount = document.getElementById('countVip');
+    const compCount = document.getElementById('countComp');
+    if(vipCount) vipCount.innerText = clients.filter(c => c.status === 'VIP').length;
+    if(compCount) compCount.innerText = clients.filter(c => c.status === 'Completed').length;
+    
+    const ctx = document.getElementById('statusChart');
+    if(!ctx) return;
     const counts = { Interested:0, "In Progress":0, Hold:0, Completed:0, VIP:0 };
     clients.forEach(c => counts[c.status]++);
     if(statusChart) statusChart.destroy();
-    statusChart = new Chart(ctx, { type:'doughnut', data:{ labels:Object.keys(counts), datasets:[{data:Object.values(counts), backgroundColor:['#17a2b8','#ffcc00','#dc3545','#28a745','#9b59b6']}] } });
+    statusChart = new Chart(ctx.getContext('2d'), { type:'doughnut', data:{ labels:Object.keys(counts), datasets:[{data:Object.values(counts), backgroundColor:['#17a2b8','#ffcc00','#dc3545','#28a745','#9b59b6']}] } });
 }
 
 function updateGeo() {
-    const counts = {}; clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
+    const counts = {}; 
+    clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
     const gs = document.getElementById('geoStats');
     if(gs) gs.innerHTML = Object.entries(counts).map(([g, c]) => `<span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:11px;">${g}: ${c}</span>`).join('');
 }
 
 function exportToCSV() {
     let csv = "\uFEFFName,Phone,Gov,Status,Agent,Notes\n";
-    clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}"\n`);
+    clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes || ''}"\n`);
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-    link.download = `Secure_Utopia_Export.csv`; link.click();
+    link.download = `Secure_Utopia_Export_${new Date().toISOString().split('T')[0]}.csv`; 
+    link.click();
     addLog(`Exported database to CSV`);
 }
 
 // 7. Helper Utilities
 function calculateAIScore(c) {
-    let s = 50; if (c.status === 'VIP') s += 40; if (c.status === 'Interested') s += 20; if (c.status === 'Hold') s -= 20;
+    let s = 50; 
+    if (c.status === 'VIP') s += 40; 
+    if (c.status === 'Interested') s += 20; 
+    if (c.status === 'Hold') s -= 20;
+    if (c.status === 'Completed') s += 10;
     return Math.min(100, Math.max(0, s));
 }
-function getStatusColor(s) { return { VIP:'#9b59b6', Completed:'#28a745', Hold:'#dc3545' }[s] || '#1e1e2f'; }
-function playSound(id) { const s = document.getElementById(id); if(s) s.play(); }
-function notify(m, t) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); }
-function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
-function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; showTab('crmTab', document.getElementById('m_crm')); }
-function renderRecycle() { const b = document.getElementById('recycleBody'); b.innerHTML = deletedClients.map((c, i) => `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button></td></tr>`).join(''); }
-function restore(i) { addLog(`Restored client: ${deletedClients[i].name}`); clients.push(deletedClients[i]); deletedClients.splice(i,1); db.ref('clients').set(clients); db.ref('deletedClients').set(deletedClients); }
-function fillTaskClients() { const s = document.getElementById('taskClientSelect'); if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); }
+
+function getStatusColor(s) { 
+    return { VIP:'#9b59b6', Completed:'#28a745', Hold:'#dc3545', 'In Progress':'#ffcc00', Interested:'#17a2b8' }[s] || '#1e1e2f'; 
+}
+
+function playSound(id) { 
+    const s = document.getElementById(id); 
+    if(s) s.play().catch(e => console.log('Sound play error:', e)); 
+}
+
+function notify(m, t) { 
+    const n = document.getElementById('notification'); 
+    n.innerText = m; 
+    n.style.display = 'block'; 
+    n.style.background = t === 'success' ? '#28a745' : '#dc3545'; 
+    setTimeout(() => n.style.display = 'none', 3000); 
+}
+
+function showTab(id, btn) { 
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+    const tab = document.getElementById(id);
+    if(tab) tab.classList.add('active'); 
+    if(btn) btn.classList.add('active'); 
+}
+
+function editClient(i) { 
+    editIdx = i; 
+    const c = clients[i]; 
+    if(c) {
+        document.getElementById('name').value = c.name; 
+        document.getElementById('phone').value = c.phone; 
+        document.getElementById('status').value = c.status; 
+        document.getElementById('notes').value = c.notes || '';
+        document.getElementById('agent').value = c.agent || '';
+        document.getElementById('gov').value = c.gov || '';
+        document.getElementById('date').value = c.date || '';
+        showTab('crmTab', document.getElementById('m_crm'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function renderRecycle() { 
+    const b = document.getElementById('recycleBody'); 
+    if(!b) return;
+    b.innerHTML = deletedClients.map((c, i) => `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button></td></tr>`).join(''); 
+}
+
+function restore(i) { 
+    addLog(`Restored client: ${deletedClients[i].name}`); 
+    clients.push(deletedClients[i]); 
+    deletedClients.splice(i,1); 
+    showLoading(true);
+    db.ref('clients').set(clients, () => showLoading(false));
+    db.ref('deletedClients').set(deletedClients);
+}
+
+function fillTaskClients() { 
+    const s = document.getElementById('taskClientSelect'); 
+    if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); 
+}
+
 function delU(i) { 
     if(confirm('Permanently delete this user?')) { 
         addLog(`Deleted user account: ${authSystem.users[i].displayName}`); 
         authSystem.users.splice(i, 1); 
-        db.ref('authSystem/users').set(authSystem.users);
-        // No need to call renderUsers() here as the Firebase listener will trigger it automatically
+        showLoading(true);
+        db.ref('authSystem/users').set(authSystem.users, (error) => {
+            showLoading(false);
+            if(error) {
+                alert("Error deleting user: " + error.message);
+            } else {
+                notify("User deleted successfully", "success");
+            }
+        });
     } 
 }
 
