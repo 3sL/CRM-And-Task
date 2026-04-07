@@ -2,7 +2,7 @@
 <html lang="en" id="htmlTag" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading For Export Pro AI CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
+    <title>Utopia Trading Pro AI CRM - Full Operation Mode - Dev By Eng.Mahmoud Marie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -23,10 +23,13 @@
         #mainApp { display: none; width: 100%; height: 100vh; }
         .sidebar { width:260px; background:var(--primary); color:#fff; display:flex; flex-direction:column; padding:20px; flex-shrink: 0; }
         .sidebar h2 { font-size: 1.2em; margin-bottom: 5px; color: var(--accent); }
-        .dev-info { font-size: 0.75em; color: #888; margin-bottom: 20px; line-height: 1.4; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        /* روابط المطور واتساب واتصال */
+        .dev-link { color: #888; text-decoration: none; font-size: 0.75em; display: block; margin-top: 5px; transition: 0.3s; }
+        .dev-link:hover { color: var(--accent); transform: scale(1.02); }
+        .dev-info { font-size: 0.75em; color: #888; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         
         .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
-        .sidebar button:hover { background: #3d3d5c; }
         .sidebar button.active { background:var(--accent); color:var(--primary); }
         
         .main { flex:1; padding:25px; overflow-y:auto; background: #f0f2f5; }
@@ -36,48 +39,48 @@
 
         .form-group { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         input, select, textarea { padding:12px; margin:5px 0; width:100%; border-radius:10px; border:1px solid #ddd; box-sizing: border-box; font-size: 14px; outline: none; }
-        input:focus { border-color: var(--accent); }
         
-        .btn-save { background: var(--success); color: white; font-weight: bold; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); font-size: 16px; }
+        .btn-save { background: var(--success); color: white; font-weight: bold; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; font-size: 16px; }
         
         table { width:100%; border-collapse:collapse; background:#fff; margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        th, td { padding:15px; text-align:center; border-bottom:1px solid #eee; }
-        th { background:var(--primary); color:var(--accent); text-transform: uppercase; font-size: 12px; }
+        th, td { padding:12px; text-align:center; border-bottom:1px solid #eee; }
+        th { background:var(--primary); color:var(--accent); font-size: 12px; }
         
         .vip-row { background: #fffcf0 !important; border-left: 5px solid var(--vip); }
         .hold-row { background: #fff5f5 !important; border-left: 5px solid var(--danger); }
         
-        .action-btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; color: white; margin: 2px; transition: 0.2s; }
+        .action-btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; color: white; margin: 2px; }
         .btn-call { background: var(--info); }
         .btn-wa { background: #25D366; }
-        .btn-edit { background: var(--accent); color: var(--primary); }
         .btn-del { background: var(--danger); }
-        .btn-export { background: #2c3e50; color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; }
-
-        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
-        .search-container { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
-        .search-container input, .search-container select { flex: 1; min-width: 150px; }
+        /* تنبيهات النظام */
+        #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:10000; color:#fff; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* سجل العمليات للأدمن */
+        .log-entry { font-size: 0.8em; padding: 8px; border-bottom: 1px solid #eee; }
+        .log-user { color: var(--info); font-weight: bold; }
+        .log-action { color: var(--danger); }
     </style>
 </head>
 <body>
 
 <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
-<audio id="soundLogin" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
 <div id="notification"></div>
 
 <div id="loginOverlay">
     <div class="login-card">
-        <h2 id="loginTitle">Utopia Trading For Export</h2>
+        <h2>Utopia Trading AI</h2>
         <input type="text" id="userInput" placeholder="Username">
         <input type="password" id="passInput" placeholder="Password">
-        <button onclick="checkLogin()" id="loginBtn">Login</button>
+        <button onclick="checkLogin()">Login</button>
         <p id="loginError" style="color:var(--danger); display:none; margin-top:10px;">Login Failed!</p>
-        <div style="margin-top:20px; font-size:0.7em; color:#bbb;">
-            Developed By: Eng. Mahmoud Mohamed Marie<br>
-            Contact: +201222153415
+        <div style="margin-top:20px; font-size:0.75em; color:#bbb;">
+            Developed By: Eng. Mahmoud Marie<br>
+            <a href="tel:+201222153415" class="dev-link">📞 Call Support: +201222153415</a>
+            <a href="https://wa.me/201222153415" class="dev-link">💬 WhatsApp Support</a>
         </div>
     </div>
 </div>
@@ -89,16 +92,18 @@
             <button onclick="toggleLang()" style="padding:4px 8px; font-size:10px; background:var(--accent); color:var(--primary);" id="langBtn">AR</button>
         </div>
         <div class="dev-info">
-            <b>Dev: Eng. Mahmoud Marie</b><br>
-            <span>+201222153415</span>
+            <b>Eng. Mahmoud Marie</b><br>
+            <a href="tel:+201222153415" class="dev-link">📞 +201222153415</a>
+            <a href="https://wa.me/201222153415" class="dev-link">💬 Direct WhatsApp</a>
         </div>
-        <p id="welcomeUser" style="font-size: 0.85em; color: var(--accent); margin-top: 0;"></p>
         
         <button class="tab-btn active" onclick="showTab('crmTab', this)" id="m_crm">👥 Clients Registry</button>
-        <button class="tab-btn" onclick="showTab('tasksTab', this)" id="m_tasks">📅 Tasks & AI Info</button>
+        <button class="tab-btn" onclick="showTab('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button>
         <button class="tab-btn" onclick="showTab('dashboardTab', this)" id="m_dash">📊 AI Analytics</button>
-        <button class="tab-btn admin-only" onclick="showTab('usersTab', this)" id="m_users">🔐 Users Management</button>
-        <button class="tab-btn" onclick="showTab('recycleTab', this)" style="color:#ff9999" id="m_recycle">♻️ Recycle Bin</button>
+        <button class="tab-btn" onclick="showTab('profileTab', this)" id="m_profile">👤 My Account</button>
+        <button class="tab-btn" onclick="showTab('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ Recycle Bin</button>
+        
+        <button class="tab-btn admin-only" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:none; background: #4a4a6a; border: 1px solid var(--accent);">👑 Admin Control</button>
         
         <button onclick="logout()" style="margin-top:auto; background:var(--danger)" id="m_logout">Logout</button>
     </div>
@@ -106,25 +111,23 @@
     <div class="main">
         <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
-            
-            <div class="search-container">
-                <input id="search" placeholder="🔍 Search Name or Phone..." oninput="renderCRM()">
-                <select id="filterStatus" onchange="renderCRM()">
-                    <option value="All">All Statuses (الكل)</option>
-                    <option value="Interested">Interested (مهتم)</option>
-                    <option value="In Progress">In Progress (متابعة)</option>
-                    <option value="Hold">Hold (هولد)</option>
-                    <option value="Completed">Completed (انتهى)</option>
-                    <option value="VIP">VIP (عميل مميز)</option>
+            <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                <input id="search" placeholder="🔍 Search Name or Phone..." oninput="renderCRM()" style="flex:2">
+                <select id="filterStatus" onchange="renderCRM()" style="flex:1">
+                    <option value="All">All Statuses</option>
+                    <option value="Interested">Interested</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Hold">Hold</option>
+                    <option value="Completed">Completed</option>
+                    <option value="VIP">VIP</option>
                 </select>
-                <select id="filterGov" onchange="renderCRM()"><option value="All">All Governorates</option></select>
-                <button onclick="exportToCSV()" class="btn-export">📥 Export Excel</button>
+                <button onclick="exportToCSV()" style="background:#2c3e50; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">📥 Export Excel</button>
             </div>
             
             <div class="form-group">
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
                     <input id="name" placeholder="Client Name">
-                    <input id="phone" placeholder="Phone Number (e.g. 010...)">
+                    <input id="phone" placeholder="Phone Number">
                     <select id="gov"></select>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
@@ -138,74 +141,91 @@
                     <input id="agent" placeholder="Assigned Agent">
                     <input type="date" id="date">
                 </div>
-                <textarea id="notes" placeholder="Client Notes & AI Feedback..."></textarea>
-                <button class="btn-save" onclick="addOrUpdate()" id="btnSave">💾 Save & Sync</button>
+                <textarea id="notes" placeholder="Detailed Notes & AI Feedback..."></textarea>
+                <button class="btn-save" onclick="addOrUpdate()" id="btnSave">💾 Save & Sync Data</button>
             </div>
 
             <table>
-                <thead>
-                    <tr id="th_row">
-                        <th>Name</th><th>Phone</th><th>Gov</th><th>AI Score</th><th>Status</th><th>Actions</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>AI Lead</th><th>Status</th><th>Actions</th></tr></thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
+        <div id="adminControlTab" class="tab-content">
+            <h2 style="color:var(--vip)">👑 Admin Master Control</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <h3>👥 Manage System Users</h3>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <input id="newU" placeholder="Username">
+                        <input id="newP" placeholder="Password">
+                    </div>
+                    <input id="newD" placeholder="Display Name">
+                    <select id="newR">
+                        <option value="user">User (Full Access + Supervised)</option>
+                        <option value="admin">Admin (Master Access)</option>
+                    </select>
+                    <button onclick="addUser()" class="btn-save" style="background:var(--primary)">Add New User</button>
+                    <hr>
+                    <table style="font-size: 0.85em;">
+                        <thead><tr><th>User</th><th>Pass</th><th>Name</th><th>Role</th><th>Action</th></tr></thead>
+                        <tbody id="usersBody"></tbody>
+                    </table>
+                </div>
+                <div class="form-group" style="max-height: 500px; overflow-y: auto;">
+                    <h3>📜 Activity Logs (Who did what?)</h3>
+                    <div id="logsContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="profileTab" class="tab-content">
+            <h2>👤 My Account Settings</h2>
+            <div class="form-group">
+                <p>Hello, <b id="profName"></b>. You can update your password below:</p>
+                <input type="password" id="changePassInput" placeholder="Enter New Password">
+                <button onclick="updateMyPassword()" class="btn-save" style="background:var(--info)">Update My Password</button>
+            </div>
+        </div>
+
         <div id="tasksTab" class="tab-content">
-            <h2 id="h_tasks">Operations & Extra Info</h2>
+            <h2 id="h_tasks">Operations & Tasks</h2>
             <div class="form-group">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <select id="taskClientSelect" onchange="autoFillTask()"><option value="">Select Client</option></select>
                     <input id="taskDate" type="date">
                 </div>
-                <input id="taskText" placeholder="Main Task Details...">
-                <textarea id="extraInfo" placeholder="Extra Information (Editable Notes)"></textarea>
-                <button onclick="addTask()" class="btn-save" style="background:var(--info)" id="btnAddTask">➕ Add Task</button>
+                <input id="taskText" placeholder="What needs to be done?">
+                <textarea id="extraInfo" placeholder="Auto-filled client info (Editable)"></textarea>
+                <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
             </div>
             <table>
-                <thead><tr><th>Client</th><th>Task</th><th>Extra Info</th><th>Deadline</th><th>Action</th></tr></thead>
+                <thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Deadline</th><th>Action</th></tr></thead>
                 <tbody id="taskBody"></tbody>
             </table>
         </div>
 
         <div id="dashboardTab" class="tab-content">
-            <h2 id="h_dash">📊 AI Performance & Geo-Tracking</h2>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
-                <div style="background:#fff; padding:20px; border-radius:15px; text-align:center; border-bottom:5px solid var(--vip);">
-                    <h3 id="lbl_vip">VIP Clients</h3><p id="countVip" style="font-size:2em; font-weight:bold; color:var(--vip);">0</p>
-                </div>
-                <div style="background:#fff; padding:20px; border-radius:15px; text-align:center; border-bottom:5px solid var(--success);">
-                    <h3 id="lbl_comp">Completed</h3><p id="countComp" style="font-size:2em; font-weight:bold; color:var(--success);">0</p>
-                </div>
+            <h2 id="h_dash">📊 AI Performance</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--vip); text-align:center;"><h3>VIP Clients</h3><p id="countVip" style="font-size:2em; color:var(--vip)">0</p></div>
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--success); text-align:center;"><h3>Completed</h3><p id="countComp" style="font-size:2em; color:var(--success)">0</p></div>
             </div>
-            <div style="margin-top:20px; background:#fff; padding:20px; border-radius:15px;">
-                <h4 id="mapTitle">📍 Clients Distribution (Geo-Tracking)</h4>
-                <div id="geoStats" style="display:flex; flex-wrap:wrap; gap:10px; font-size:12px;"></div>
+            <div style="margin-top:20px; background:#fff; padding:15px; border-radius:15px;">
+                <h4>📍 Clients Geo-Distribution</h4>
+                <div id="geoStats" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
             </div>
-            <div style="max-width:400px; margin:30px auto;"><canvas id="statusChart"></canvas></div>
-        </div>
-
-        <div id="usersTab" class="tab-content admin-only">
-            <h2>🔐 System Access</h2>
-            <div class="form-group">
-                <input id="newU" placeholder="Username">
-                <input id="newP" placeholder="Password">
-                <input id="newD" placeholder="Display Name">
-                <select id="newR"><option value="user">User</option><option value="admin">Admin</option></select>
-                <button onclick="addUser()" class="btn-save">Add System User</button>
-            </div>
-            <table><thead><tr><th>User</th><th>Name</th><th>Role</th><th>Action</th></tr></thead><tbody id="usersBody"></tbody></table>
+            <div style="max-width:350px; margin:30px auto;"><canvas id="statusChart"></canvas></div>
         </div>
 
         <div id="recycleTab" class="tab-content">
-            <h2 style="color:var(--danger)" id="h_recycle">♻️ Recycle Bin</h2>
+            <h2 style="color:var(--danger)">♻️ Recycle Bin (Deleted Clients)</h2>
             <table><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody id="recycleBody"></tbody></table>
         </div>
     </div>
 </div>
 
 <script>
-// 1. الإعدادات الأساسية
+// 1. الإعدادات والربط
 const firebaseConfig = { 
     apiKey: "AIzaSyCh3wFPo7mVeB_ccqufW5LyKgPFoeSO0J0", 
     authDomain: "crm-and-tasks-9f7c3.firebaseapp.com", 
@@ -218,94 +238,70 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, editIdx = -1, statusChart = null, currentLang = 'en';
-
+let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null, currentLang = 'en';
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
-const i18n = {
-    en: { side_title: "Utopia AI CRM", m_crm: "👥 Clients Registry", m_tasks: "📅 Tasks & AI Info", m_dash: "📊 AI Analytics", m_users: "🔐 Users Management", m_recycle: "♻️ Recycle Bin", m_logout: "Logout", h_crm: "Clients Management", btnSave: "💾 Save & Sync Data", lbl_vip: "VIP Clients", lbl_comp: "Completed", h_tasks: "Operations & Extra Info", h_recycle: "♻️ Deleted Items", mapTitle: "📍 Clients Geo-Distribution" },
-    ar: { side_title: "يوتوبيا للذكاء الاصطناعي", m_crm: "👥 سجل العملاء", m_tasks: "📅 المهام والمعلومات", m_dash: "📊 التحليلات الذكية", m_users: "🔐 إدارة المستخدمين", m_recycle: "♻️ سلة المحذوفات", m_logout: "خروج", h_crm: "إدارة العملاء", btnSave: "💾 حفظ ومزامنة البيانات", lbl_vip: "العملاء المميزين", lbl_comp: "العمليات الناجحة", h_tasks: "العمليات والمعلومات الإضافية", h_recycle: "♻️ العناصر المحذوفة", mapTitle: "📍 التوزيع الجغرافي للعملاء" }
-};
-
-// 2. تتبع الخريطة (Geo-Tracking Logic)
-function updateGeoTracking() {
-    const geoDiv = document.getElementById('geoStats');
-    geoDiv.innerHTML = '';
-    const counts = {};
-    clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
-    
-    Object.entries(counts).sort((a,b) => b[1] - a[1]).forEach(([gov, count]) => {
-        geoDiv.innerHTML += `<span style="background:#e1e1f0; padding:5px 10px; border-radius:20px; border-left:3px solid var(--info)"><b>${gov}:</b> ${count}</span>`;
-    });
-}
-
-// 3. تصدير البيانات Excel/CSV (يدعم العربي)
-function exportToCSV() {
-    let csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date\n";
-    clients.forEach(c => {
-        csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}","${c.date}"\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Utopia_Data_${new Date().toLocaleDateString()}.csv`;
-    link.click();
-    notify("Exported Successfully", "success");
-}
-
-// 4. الربط والتحكم (Logic)
+// 2. نظام الدخول والرقابة
 function checkLogin() {
     const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
-    if (u === "admin" && p === "@Mody6699") { loginSuccess("admin", "Master Admin"); return; }
-    const user = authSystem.users.find(acc => acc.u === u && acc.p === p);
-    if(user) loginSuccess(user.role, user.displayName);
-    else { document.getElementById('loginError').style.display = 'block'; playSound('soundAlert'); }
+    if (u === "admin" && p === "@Mody6699") { loginSuccess("admin", "Master Admin", -1); return; }
+    
+    const userIdx = authSystem.users.findIndex(acc => acc.u === u && acc.p === p);
+    if(userIdx !== -1) {
+        loginSuccess(authSystem.users[userIdx].role, authSystem.users[userIdx].displayName, userIdx);
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        playSound('soundAlert');
+    }
 }
 
-function loginSuccess(role, name) {
-    sessionStorage.setItem('isLoggedIn', 'true'); sessionStorage.setItem('userRole', role); sessionStorage.setItem('userDisplayName', name);
-    playSound('soundLogin'); setTimeout(() => location.reload(), 500);
+function loginSuccess(role, name, idx) {
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('userRole', role);
+    sessionStorage.setItem('userDisplayName', name);
+    sessionStorage.setItem('userIdx', idx);
+    addLog(`Logged into the system`);
+    playSound('soundSuccess');
+    setTimeout(() => location.reload(), 500);
 }
 
-function logout() { sessionStorage.clear(); location.reload(); }
+function logout() { addLog("Logged out"); sessionStorage.clear(); location.reload(); }
 
+// 3. إدارة البيانات (Clients)
 function init() {
     if(!sessionStorage.getItem('isLoggedIn')) return;
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
-    document.getElementById('welcomeUser').innerText = (currentLang === 'en' ? "Welcome, " : "مرحباً، ") + sessionStorage.getItem('userDisplayName');
+    document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
     
-    if(sessionStorage.getItem('userRole') === 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+    if(sessionStorage.getItem('userRole') === 'admin') {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+    }
 
-    const gSelect = document.getElementById('gov'), fGov = document.getElementById('filterGov');
-    govs.forEach(g => { const opt = `<option value="${g}">${g}</option>`; gSelect.innerHTML += opt; fGov.innerHTML += opt; });
+    const gSelect = document.getElementById('gov');
+    govs.forEach(g => gSelect.innerHTML += `<option value="${g}">${g}</option>`);
 
-    db.ref('clients').on('value', s => { 
-        clients = s.val() ? Object.values(s.val()) : []; 
-        renderCRM(); updateDash(); fillTaskClients(); updateGeoTracking();
-    });
+    db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDash(); fillTaskClients(); updateGeo(); });
     db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
     db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
     db.ref('authSystem/users').on('value', s => { authSystem.users = s.val() ? Object.values(s.val()) : []; renderUsers(); });
+    db.ref('logs').limitToLast(50).on('value', s => { logs = s.val() ? Object.values(s.val()) : []; renderLogs(); });
 }
 
 function renderCRM() {
     const b = document.getElementById('tableBody'); b.innerHTML = '';
-    const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value, fGov = document.getElementById('filterGov').value;
+    const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value;
 
     clients.forEach((c, i) => {
-        if((q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) || (fStatus !== 'All' && c.status !== fStatus) || (fGov !== 'All' && c.gov !== fGov)) return;
-
+        if((q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) || (fStatus !== 'All' && c.status !== fStatus)) return;
         let rowClass = c.status === 'VIP' ? 'vip-row' : (c.status === 'Hold' ? 'hold-row' : '');
         b.innerHTML += `<tr class="${rowClass}">
-            <td>${c.name} ${c.status === 'VIP' ? '⭐' : ''}</td>
-            <td>${c.phone}</td><td>${c.gov}</td>
-            <td><span style="background:#eee;padding:2px 6px;border-radius:5px">${calculateAIScore(c)}%</span></td>
-            <td><b style="color:${getStatusColor(c.status)}">${c.status}</b></td>
+            <td>${c.name}</td><td>${c.phone}</td><td>${c.gov}</td>
+            <td>${calculateAIScore(c)}%</td><td><b style="color:${getStatusColor(c.status)}">${c.status}</b></td>
             <td>
                 <button class="action-btn btn-call" onclick="window.open('tel:${c.phone}')">📞</button>
                 <button class="action-btn btn-wa" onclick="window.open('https://wa.me/2${c.phone}')">💬</button>
-                <button class="action-btn btn-edit" onclick="editClient(${i})">✏️</button>
+                <button class="action-btn btn-call" style="background:var(--accent);color:black" onclick="editClient(${i})">✏️</button>
                 <button class="action-btn btn-del" onclick="deleteClient(${i})">✕</button>
             </td></tr>`;
     });
@@ -313,52 +309,110 @@ function renderCRM() {
 
 function addOrUpdate() {
     const n = document.getElementById('name').value;
-    if(!n) { playSound('soundAlert'); return alert('Name required'); }
+    if(!n) return notify("Name is required", "error");
     const c = { name: n, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value, status: document.getElementById('status').value, notes: document.getElementById('notes').value, agent: document.getElementById('agent').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0] };
-    if(editIdx > -1) clients[editIdx] = c; else clients.push(c);
+    
+    if(editIdx > -1) {
+        addLog(`Updated client: ${c.name}`);
+        clients[editIdx] = c; 
+    } else {
+        addLog(`Added new client: ${c.name}`);
+        clients.push(c);
+    }
     db.ref('clients').set(clients);
-    playSound(c.status === 'Hold' ? 'soundAlert' : 'soundSuccess');
     editIdx = -1;
     ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
     notify("Database Synced", "success");
 }
 
-function editClient(i) {
-    const c = clients[i];
-    document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone;
-    document.getElementById('gov').value = c.gov; document.getElementById('status').value = c.status;
-    document.getElementById('notes').value = c.notes; document.getElementById('agent').value = c.agent;
-    editIdx = i; showTab('crmTab', document.getElementById('m_crm'));
+function deleteClient(i) {
+    if(!confirm('Delete this client?')) return;
+    addLog(`Deleted client: ${clients[i].name}`);
+    deletedClients.push(clients[i]);
+    clients.splice(i, 1);
+    db.ref('clients').set(clients);
+    db.ref('deletedClients').set(deletedClients);
 }
 
-function calculateAIScore(c) {
-    let s = 50; if (c.status === 'VIP') s += 40; if (c.status === 'Interested') s += 20; if (c.status === 'Hold') s -= 20;
-    return Math.min(100, Math.max(0, s));
+// 4. نظام سجل العمليات (Logs)
+function addLog(action) {
+    const log = {
+        user: sessionStorage.getItem('userDisplayName') || "Unknown",
+        action: action,
+        time: new Date().toLocaleString()
+    };
+    db.ref('logs').push(log);
 }
 
-function getStatusColor(s) {
-    const colors = { VIP: '#9b59b6', Completed: '#28a745', Hold: '#dc3545' };
-    return colors[s] || '#1e1e2f';
+function renderLogs() {
+    const container = document.getElementById('logsContainer');
+    container.innerHTML = logs.reverse().map(l => `
+        <div class="log-entry">
+            <span class="log-user">[${l.user}]</span> <span class="log-action">${l.action}</span> <br>
+            <small style="color:#999">${l.time}</small>
+        </div>
+    `).join('');
 }
 
+// 5. إدارة المستخدمين (لأدمن السوبر)
+function addUser() {
+    const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
+    if(!u || !p) return alert("Fill all fields");
+    authSystem.users.push({ u, p, displayName: d, role: r });
+    db.ref('authSystem/users').set(authSystem.users);
+    addLog(`Created new user: ${d}`);
+}
+
+function renderUsers() {
+    const b = document.getElementById('usersBody'); if(!b) return;
+    b.innerHTML = authSystem.users.map((u, i) => `
+        <tr><td>${u.u}</td><td><b>${u.p}</b></td><td>${u.displayName}</td><td>${u.role}</td>
+        <td><button class="action-btn btn-del" onclick="delU(${i})">✕</button></td></tr>
+    `).join('');
+}
+
+function updateMyPassword() {
+    const newP = document.getElementById('changePassInput').value;
+    const idx = sessionStorage.getItem('userIdx');
+    if(!newP) return alert("Enter new password");
+    if(idx == -1) return alert("Master Admin password is fixed");
+    
+    authSystem.users[idx].p = newP;
+    db.ref('authSystem/users').set(authSystem.users);
+    addLog(`Changed their own password`);
+    notify("Password Updated", "success");
+}
+
+// 6. وظائف مساعدة
 function autoFillTask() {
-    const c = clients.find(cl => cl.name === document.getElementById('taskClientSelect').value);
-    if(c) document.getElementById('extraInfo').value = `Note: ${c.notes}`;
+    const client = clients.find(c => c.name === document.getElementById('taskClientSelect').value);
+    if(client) document.getElementById('extraInfo').value = `Agent: ${client.agent} | Gov: ${client.gov}\nNotes: ${client.notes}`;
 }
 
 function addTask() {
-    tasks.push({ client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value });
-    db.ref('tasks').set(tasks); playSound('soundSuccess');
+    const t = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value };
+    if(!t.client) return alert("Select client");
+    tasks.push(t);
+    db.ref('tasks').set(tasks);
+    addLog(`Added task for: ${t.client}`);
 }
 
 function renderTasks() {
-    const b = document.getElementById('taskBody'); b.innerHTML = '';
-    tasks.forEach((t, i) => {
-        b.innerHTML += `<tr><td><b>${t.client}</b></td><td>${t.text}</td><td><textarea onchange="updateTaskNote(${i}, this.value)" style="width:100%;height:40px">${t.extra}</textarea></td><td>${t.date}</td><td><button class="action-btn btn-del" onclick="delT(${i})">✕</button></td></tr>`;
-    });
+    const b = document.getElementById('taskBody'); b.innerHTML = tasks.map((t, i) => `
+        <tr><td><b>${t.client}</b></td><td>${t.text}</td>
+        <td><textarea onchange="updateTaskExtra(${i}, this.value)" style="width:100%;height:40px">${t.extra}</textarea></td>
+        <td>${t.date}</td><td><button class="action-btn btn-del" onclick="delT(${i})">✕</button></td></tr>
+    `).join('');
 }
-function updateTaskNote(i, val) { tasks[i].extra = val; db.ref('tasks').set(tasks); }
+function updateTaskExtra(i, v) { tasks[i].extra = v; db.ref('tasks').set(tasks); }
 function delT(i) { tasks.splice(i,1); db.ref('tasks').set(tasks); }
+
+function updateGeo() {
+    const counts = {}; clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
+    document.getElementById('geoStats').innerHTML = Object.entries(counts).map(([g, c]) => 
+        `<span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:12px;">${g}: ${c}</span>`
+    ).join('');
+}
 
 function updateDash() {
     document.getElementById('countVip').innerText = clients.filter(c => c.status === 'VIP').length;
@@ -367,30 +421,29 @@ function updateDash() {
     const counts = { Interested:0, "In Progress":0, Hold:0, Completed:0, VIP:0 };
     clients.forEach(c => counts[c.status]++);
     if(statusChart) statusChart.destroy();
-    statusChart = new Chart(ctx, { type:'doughnut', data:{ labels:Object.keys(counts), datasets:[{data:Object.values(counts), backgroundColor:['#17a2b8','#ffcc00','#dc3545','#28a745','#9b59b6']}] }, options: { plugins: { legend: { position: 'bottom' } } } });
+    statusChart = new Chart(ctx, { type:'doughnut', data:{ labels:Object.keys(counts), datasets:[{data:Object.values(counts), backgroundColor:['#17a2b8','#ffcc00','#dc3545','#28a745','#9b59b6']}] } });
 }
 
-function fillTaskClients() {
-    const s = document.getElementById('taskClientSelect'); s.innerHTML = '<option value="">Select Client</option>';
-    clients.forEach(c => s.innerHTML += `<option value="${c.name}">${c.name}</option>`);
+function exportToCSV() {
+    let csv = "\uFEFFName,Phone,Gov,Status,Agent,Notes\n";
+    clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}"\n`);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    link.download = `Utopia_Data.csv`; link.click();
 }
 
-function toggleLang() {
-    currentLang = currentLang === 'en' ? 'ar' : 'en';
-    document.getElementById('htmlTag').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-    document.getElementById('langBtn').innerText = currentLang === 'en' ? 'AR' : 'EN';
-    for (let id in i18n[currentLang]) { const el = document.getElementById(id); if (el) el.innerText = i18n[currentLang][id]; }
-    renderCRM();
+function calculateAIScore(c) {
+    let s = 50; if (c.status === 'VIP') s += 40; if (c.status === 'Interested') s += 20; if (c.status === 'Hold') s -= 20;
+    return Math.min(100, Math.max(0, s));
 }
 
+function getStatusColor(s) { return { VIP:'#9b59b6', Completed:'#28a745', Hold:'#dc3545' }[s] || '#1e1e2f'; }
 function playSound(id) { document.getElementById(id).play(); }
 function notify(m, t) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); }
 function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
-function deleteClient(i) { if(!confirm('Move to recycle?')) return; deletedClients.push(clients[i]); clients.splice(i, 1); db.ref('clients').set(clients); db.ref('deletedClients').set(deletedClients); }
-function renderRecycle() { const b = document.getElementById('recycleBody'); b.innerHTML = ''; deletedClients.forEach((c, i) => b.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄</button></td></tr>`); }
+function renderRecycle() { const b = document.getElementById('recycleBody'); b.innerHTML = deletedClients.map((c, i) => `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button></td></tr>`).join(''); }
 function restore(i) { clients.push(deletedClients[i]); deletedClients.splice(i,1); db.ref('clients').set(clients); db.ref('deletedClients').set(deletedClients); }
-function addUser() { const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value; if(!u || !p) return; authSystem.users.push({ u, p, displayName: d, role: r }); db.ref('authSystem/users').set(authSystem.users); }
-function renderUsers() { const b = document.getElementById('usersBody'); if(!b) return; b.innerHTML = ''; authSystem.users.forEach((u, i) => b.innerHTML += `<tr><td>${u.u}</td><td>${u.displayName}</td><td>${u.role}</td><td><button class="action-btn btn-del" onclick="delU(${i})">✕</button></td></tr>`); }
+function fillTaskClients() { const s = document.getElementById('taskClientSelect'); s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); }
 function delU(i) { if(confirm('Delete user?')) { authSystem.users.splice(i, 1); db.ref('authSystem/users').set(authSystem.users); } }
 
 window.onload = init;
