@@ -106,7 +106,7 @@
 
 <div id="notification"></div>
 
-<div id="loginOverlay">
+<div id="loginPage">
     <div class="login-card">
         <h2>Utopia For Trading And Export</h2>
         <input type="text" id="userInput" placeholder="Username" autocomplete="off">
@@ -121,7 +121,7 @@
     </div>
 </div>
 
-<div id="mainApp">
+<div id="mainApp" style="display: none;">
     <div class="sidebar">
         <div style="display:flex; justify-content: space-between; align-items: center;">
             <h2 id="side_title">Utopia For Trading And Export CRM & Tasks</h2>
@@ -130,6 +130,7 @@
         <div class="dev-info">
             <b>Eng. Mahmoud Mahmoud Marie</b><br>
             <small id="userBadge" style="background:var(--success); color:white; padding:2px 5px; border-radius:5px; font-size:10px"></small>
+            <div id="userDisplayName" style="color:var(--accent); font-weight:bold; margin-top:5px;"></div>
         </div>
         
         <button class="tab-btn active" onclick="showTab('crmTab', this)" id="m_crm">👥 Clients Registry</button>
@@ -264,13 +265,76 @@
         </div>
     </div>
 </div>
+
 <script>
-// --- [SECURITY LAYER: ANTI-TAMPER] ---
-// منع فتح الـ Console ببعض الطرق الشائعة
+// --- [السكربت المعدل والآمن] ---
+
+function checkLogin() {
+    const u = document.getElementById('userInput').value.trim();
+    const p = document.getElementById('passInput').value.trim();
+    
+    // يوزر الطوارئ (الأولوية القصوى)
+    if (u === "admin" && p === "@Mody6699") { 
+        loginSuccess("admin", "Master Admin", -1); 
+        return; 
+    }
+    
+    // يوزرات الفايربيز
+    if (typeof authSystem !== 'undefined' && authSystem.users && authSystem.users.length > 0) {
+        const userIdx = authSystem.users.findIndex(acc => acc.u === u && acc.p === p);
+        if(userIdx !== -1) {
+            loginSuccess(authSystem.users[userIdx].role, authSystem.users[userIdx].displayName, userIdx);
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            alert("بيانات الدخول غير صحيحة");
+        }
+    } else {
+        alert("جاري مزامنة البيانات من السيرفر.. انتظر لحظة وحاول مجدداً");
+    }
+}
+
+function loginSuccess(role, name, idx) {
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('userRole', role);
+    sessionStorage.setItem('userDisplayName', name);
+    sessionStorage.setItem('userIdx', idx);
+    
+    const lp = document.getElementById('loginPage');
+    const ma = document.getElementById('mainApp');
+    const adminBtn = document.getElementById('m_admin');
+    const nameLabel = document.getElementById('userDisplayName');
+
+    if (lp && ma) {
+        lp.style.display = 'none';
+        ma.style.display = 'flex';
+        if(nameLabel) nameLabel.innerText = name;
+        
+        // إخفاء زرار الأدمن لو يوزر عادي
+        if(adminBtn) {
+            adminBtn.style.display = (role === 'admin') ? 'block' : 'none';
+        }
+        
+        if(typeof showTab === 'function') showTab('crmTab', document.getElementById('m_crm'));
+    } else {
+        // في حال وجود مشكلة في الـ IDs يعمل دخول إجباري
+        location.reload(); 
+    }
+}
+
+function logout() {
+    if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+        sessionStorage.clear();
+        location.reload();
+    }
+}
+
+// كود منع الـ Console
 document.onkeydown = function(e) {
     if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
         return false;
     }
+};
+</script>
 };
 
 // 1. Firebase Configuration
