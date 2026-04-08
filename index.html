@@ -572,8 +572,41 @@ function playSound(id) { const s = document.getElementById(id); if(s) s.play(); 
 function notify(m, t) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); }
 function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
 function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; showTab('crmTab', document.getElementById('m_crm')); }
-function renderRecycle() { const b = document.getElementById('recycleBody'); if(!b) return; b.innerHTML = deletedClients.map((c, i) => `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button></td></tr>`).join(''); }
-function restore(i) { addLog(`Restored client: ${deletedClients[i].name}`); clients.push(deletedClients[i]); deletedClients.splice(i,1); db.ref('clients').set(clients); db.ref('deletedClients').set(deletedClients); }
+
+// --- التعديل المطلوب فى سلة المهملات ---
+function renderRecycle() { 
+    const b = document.getElementById('recycleBody'); 
+    if(!b) return; 
+    b.innerHTML = deletedClients.map((c, i) => `
+        <tr>
+            <td>${c.name}</td>
+            <td>${c.phone}</td>
+            <td>${c.status}</td>
+            <td>
+                <button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button>
+                <button class="action-btn btn-del" onclick="hardDelete(${i})">🗑️ Delete Forever</button>
+            </td>
+        </tr>`).join(''); 
+}
+
+function restore(i) { 
+    addLog(`Restored client: ${deletedClients[i].name}`); 
+    clients.push(deletedClients[i]); 
+    deletedClients.splice(i,1); 
+    db.ref('clients').set(clients); 
+    db.ref('deletedClients').set(deletedClients); 
+}
+
+function hardDelete(i) {
+    if(confirm('Security Warning: This will PERMANENTLY delete the client from the database. Proceed?')) {
+        addLog(`PERMANENTLY DELETED: ${deletedClients[i].name}`);
+        deletedClients.splice(i, 1);
+        db.ref('deletedClients').set(deletedClients);
+        notify("Client Deleted Permanently", "success");
+    }
+}
+// ------------------------------------
+
 function fillTaskClients() { const s = document.getElementById('taskClientSelect'); if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); }
 function delU(i) { if(confirm('Permanently delete this user?')) { addLog(`Deleted user account: ${authSystem.users[i].displayName}`); authSystem.users.splice(i, 1); db.ref('authSystem/users').set(authSystem.users); } }
 
