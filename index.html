@@ -505,91 +505,147 @@ id="recycleBody"></tbody></table>
 
 <script>
 
+<script>
+
 // --- [SECURITY LAYER: ANTI-TAMPER] ---
-
-// منع فتح الـ Console ببعض الطرق الشائعة
-
 document.onkeydown = function(e) {
-
-
     if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey &&
-
-(e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) ||
-
-e.keyCode == 'C'.charCodeAt(0))) || (e.ctrlKey && e.keyCode ==
-
-'U'.charCodeAt(0))) {
-
+    (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) ||
+     e.keyCode == 'C'.charCodeAt(0))) ||
+     (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
         return false;
+    }
+};
 
-    } 
- // --- [المنطق البرمجي المعدل] ---
+// --- [LOGIN SYSTEM - FIXED & MERGED] ---
+function checkLogin() {
+    const u = document.getElementById('userInput').value.trim();
+    const p = document.getElementById('passInput').value.trim();
 
- function checkLogin() {
-     const u = document.getElementById('userInput').value.trim();
-     const p = document.getElementById('passInput').value.trim();
-     
-     // 1. دخول الـ Admin (أولوية قصوى)
-     if (u === "admin" && p === "@Mody6699") { 
-         loginSuccess("admin", "Master Admin", -1); 
-         return; 
-     }
-     
-     // 2. دخول المستخدمين من Firebase (مثل utopia)
-     if (typeof authSystem !== 'undefined' && authSystem.users && authSystem.users.length > 0) {
-         const userIdx = authSystem.users.findIndex(acc => acc.u === u && acc.p === p);
-         if(userIdx !== -1) {
-             loginSuccess(authSystem.users[userIdx].role, authSystem.users[userIdx].displayName, userIdx);
-         } else {
-             alert("بيانات الدخول غير صحيحة");
-         }
-     } else {
-         alert("جاري تحميل بيانات السيرفر.. انتظر ثانية وحاول مجدداً");
-     }
- }
+    // Admin
+    if (u === "admin" && p === "@Mody6699") { 
+        loginSuccess("admin", "Master Admin", -1); 
+        return; 
+    }
 
- function loginSuccess(role, name, idx) {
-     sessionStorage.setItem('isLoggedIn', 'true');
-     sessionStorage.setItem('userRole', role);
-     sessionStorage.setItem('userDisplayName', name);
-     sessionStorage.setItem('userIdx', idx);
-     
-     const lp = document.getElementById('loginPage');
-     const ma = document.getElementById('mainApp');
-     const adminBtn = document.getElementById('m_admin');
-     const nameLabel = document.getElementById('userDisplayNameLabel');
+    // Firebase users
+    if (typeof authSystem !== 'undefined' && authSystem.users && authSystem.users.length > 0) {
+        const userIdx = authSystem.users.findIndex(acc => acc.u === u && acc.p === p);
 
-     if (lp && ma) {
-         lp.style.display = 'none';
-         ma.style.display = 'flex';
-         if(nameLabel) nameLabel.innerText = "Active: " + name;
-         
-         // التحكم في ظهور زرار الأدمن
-         if(adminBtn) {
-             adminBtn.style.display = (role === 'admin') ? 'block' : 'none';
-         }
-         
-         if(typeof showTab === 'function') showTab('crmTab', document.getElementById('m_crm'));
-     } else {
-         location.reload(); 
-     }
- }
+        if(userIdx !== -1) {
+            loginSuccess(authSystem.users[userIdx].role, authSystem.users[userIdx].displayName, userIdx);
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            alert("بيانات الدخول غير صحيحة");
+        }
+    } else {
+        alert("جاري تحميل البيانات... حاول مرة تانية");
+    }
+}
 
- function logout() {
-     if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-         sessionStorage.clear();
-         location.reload();
-     }
- }
+function loginSuccess(role, name, idx) {
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('userRole', role);
+    sessionStorage.setItem('userDisplayName', name);
+    sessionStorage.setItem('userIdx', idx);
 
- // منع فتح الـ Console 
- document.onkeydown = function(e) { 
-     if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) { 
-         return false; 
-     }  
- };
- </script>
+    // ✅ FIX هنا (كان loginPage غلط)
+    const lp = document.getElementById('loginOverlay');
+    const ma = document.getElementById('mainApp');
+    const adminBtn = document.getElementById('m_admin');
 
+    if (lp && ma) {
+        lp.style.display = 'none';
+        ma.style.display = 'flex';
+
+        if(adminBtn) {
+            adminBtn.style.display = (role === 'admin') ? 'block' : 'none';
+        }
+
+        showTab('crmTab', document.getElementById('m_crm'));
+    } else {
+        location.reload(); 
+    }
+}
+
+function logout() {
+    if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+        sessionStorage.clear();
+        location.reload();
+    }
+}
+
+<script>
+
+// 1. Firebase Configuration
+const firebaseConfig = { 
+    apiKey: "AIzaSyCh3wFPo7mVeB_ccqufW5LyKgPFoeSO0J0", 
+    authDomain: "crm-and-tasks-9f7c3.firebaseapp.com", 
+    databaseURL: "https://crm-and-tasks-9f7c3-default-rtdb.firebaseio.com", 
+    projectId: "crm-and-tasks-9f7c3", 
+    storageBucket: "crm-and-tasks-9f7c3.firebasestorage.app", 
+    messagingSenderId: "762341152156",
+    appId: "1:762341152156:web:91d417128226fc8708a459" 
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null;
+
+const govs = ["Cairo","Giza","Alexandria","Dakahlia","Sharkia","Monufia","Gharbia","Kafr El Sheikh","Beheira","Damietta","Port Said","Ismailia","Suez","Beni Suef","Fayoum","Minya","Assiut","Sohag","Qena","Luxor","Aswan","Red Sea","New Valley","Matrouh","North Sinai","South Sinai","Qalyubia"];
+
+// Loading
+function showLoading(show) {
+    const overlay = document.getElementById('loadingOverlay');
+    if(overlay) overlay.style.display = show ? 'flex' : 'none';
+}
+
+// INIT
+function init() {
+
+    document.getElementById('loginOverlay').style.display = 'flex';
+
+    if(sessionStorage.getItem('isLoggedIn')) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+    }
+
+    const gSelect = document.getElementById('gov');
+    if(gSelect) govs.forEach(g => gSelect.innerHTML += `<option value="${g}">${g}</option>`);
+
+    db.ref('clients').on('value', snap => {
+        clients = snap.val() ? Object.values(snap.val()) : [];
+        renderCRM();
+        updateDash();
+        fillTaskClients();
+        updateGeo();
+    });
+
+    db.ref('tasks').on('value', snap => {
+        tasks = snap.val() ? Object.values(snap.val()) : [];
+        renderTasks();
+    });
+
+    db.ref('deletedClients').on('value', snap => {
+        deletedClients = snap.val() ? Object.values(snap.val()) : [];
+        renderRecycle();
+    });
+
+    db.ref('authSystem/users').on('value', snap => {
+        authSystem.users = snap.val() ? Object.values(snap.val()) : [];
+        renderUsers();
+    });
+
+    db.ref('logs').limitToLast(50).on('value', snap => {
+        logs = snap.val() ? Object.values(snap.val()) : [];
+        renderLogs();
+    });
+}
+
+window.onload = init;
+
+</script>
 function checkLogin() {
     const u = document.getElementById('userInput').value.trim();
     const p = document.getElementById('passInput').value.trim();
