@@ -299,33 +299,34 @@ function showLoading(show) {
 
 // 2. Authentication System (Enhanced)
 function checkLogin() {
-    // إضافة .trim() لمنع أخطاء المسافات الزائدة
+    // 1. جلب البيانات من الخانات
     const u = document.getElementById('userInput').value.trim();
     const p = document.getElementById('passInput').value.trim();
     
-    // يوزر الطوارئ الماستر (Hardcoded)
+    // 2. يوزر الطوارئ (الـ admin) - لازم يكون أول شرط عشان يفتح حتى لو السيرفر واقف
     if (u === "admin" && p === "@Mody6699") { 
+        console.log("Master Admin Access Granted");
         loginSuccess("admin", "Master Admin", -1); 
         return; 
     }
     
-    // التأكد أن مصفوفة المستخدمين ليست فارغة
-    if (!authSystem.users || authSystem.users.length === 0) {
-        alert("جاري تحميل بيانات المستخدمين من السيرفر... حاول مرة أخرى خلال ثوانٍ");
-        return;
-    }
-
-    const userIdx = authSystem.users.findIndex(acc => acc.u === u && acc.p === p);
-    
-    if(userIdx !== -1) {
-        loginSuccess(authSystem.users[userIdx].role, authSystem.users[userIdx].displayName, userIdx);
+    // 3. التحقق من وجود بيانات من الفايربيز ليوزر utopia وغيره
+    if (typeof authSystem !== 'undefined' && authSystem.users && authSystem.users.length > 0) {
+        const userIdx = authSystem.users.findIndex(acc => acc.u === u && acc.p === p);
+        
+        if(userIdx !== -1) {
+            loginSuccess(authSystem.users[userIdx].role, authSystem.users[userIdx].displayName, userIdx);
+        } else {
+            if(document.getElementById('loginError')) document.getElementById('loginError').style.display = 'block';
+            if(typeof playSound === 'function') playSound('soundAlert');
+            alert("اسم المستخدم أو كلمة المرور غير صحيحة");
+        }
     } else {
-        document.getElementById('loginError').style.display = 'block';
-        if(typeof playSound === 'function') playSound('soundAlert');
-        alert("اسم المستخدم أو كلمة المرور غير صحيحة");
+        // لو اليوزر مش admin والفايربيز لسه محملش
+        console.warn("Firebase users not loaded yet...");
+        alert("جاري مزامنة البيانات مع السيرفر.. انتظر لحظة وحاول مجدداً");
     }
 }
-
 function loginSuccess(role, name, idx) {
     // 1. تخزين البيانات في الجلسة
     sessionStorage.setItem('isLoggedIn', 'true');
