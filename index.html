@@ -309,7 +309,16 @@ function init() {
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
-    document.getElementById('userBadge').innerText = sessionStorage.getItem('userRole').toUpperCase();
+    
+    // --- التعديل هنا: إخفاء الرتبة عن المستخدمين وإظهارها للماستر فقط ---
+    const roleBadge = document.getElementById('userBadge');
+    if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
+        roleBadge.innerText = "MASTER";
+        roleBadge.style.display = 'inline-block';
+    } else {
+        roleBadge.style.display = 'none'; // إخفاء تماماً لأي مستخدم آخر
+    }
+    // --- نهاية التعديل ---
     
     if(sessionStorage.getItem('userRole') === 'admin') {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
