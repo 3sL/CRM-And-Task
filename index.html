@@ -253,14 +253,29 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null;
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
-// 2. Authentication System
+// تحميل المستخدمين فوراً عند فتح الصفحة ليكونوا جاهزين لتسجيل الدخول
+db.ref('authSystem/users').on('value', s => { 
+    authSystem.users = s.val() ? Object.values(s.val()) : []; 
+    renderUsers(); 
+});
+
+// 2. Authentication System (FIXED)
 function checkLogin() {
     const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
-    if (u === "admin" && p === "@Mody6699") { loginSuccess("admin", "Master Admin", -1); return; }
     
-    const userIdx = authSystem.users.findIndex(acc => acc.u === u && acc.p === p);
-    if(userIdx !== -1) {
-        loginSuccess(authSystem.users[userIdx].role, authSystem.users[userIdx].displayName, userIdx);
+    // Admin Hardcoded
+    if (u === "admin" && p === "@Mody6699") { 
+        loginSuccess("admin", "Master Admin", -1); 
+        return; 
+    }
+    
+    // البحث الدقيق في Firebase Users
+    const foundUser = authSystem.users.find(acc => acc.u === u && acc.p === p);
+    
+    if(foundUser) {
+        // نمرر الفهرس الصحيح للمستخدم داخل المصفوفة
+        const actualIdx = authSystem.users.indexOf(foundUser);
+        loginSuccess(foundUser.role, foundUser.displayName, actualIdx);
     } else {
         document.getElementById('loginError').style.display = 'block';
         playSound('soundAlert');
@@ -318,10 +333,6 @@ function init() {
     db.ref('deletedClients').on('value', s => { 
         deletedClients = s.val() ? Object.values(s.val()) : []; 
         renderRecycle(); 
-    });
-    db.ref('authSystem/users').on('value', s => { 
-        authSystem.users = s.val() ? Object.values(s.val()) : []; 
-        renderUsers(); 
     });
     db.ref('logs').limitToLast(50).on('value', s => { 
         logs = s.val() ? Object.values(s.val()) : []; 
@@ -407,8 +418,13 @@ function addUser() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
     if(!u || !p) return alert("Fill all security fields");
     authSystem.users.push({ u, p, displayName: d, role: r });
-    db.ref('authSystem/users').set(authSystem.users);
-    addLog(`Admin created user: ${d}`);
+    db.ref('authSystem/users').set(authSystem.users).then(() => {
+        alert("User Created Successfully");
+        addLog(`Admin created user: ${d}`);
+        document.getElementById('newU').value = '';
+        document.getElementById('newP').value = '';
+        document.getElementById('newD').value = '';
+    });
 }
 
 function renderUsers() {
