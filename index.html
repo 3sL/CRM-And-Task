@@ -310,15 +310,14 @@ function init() {
     document.getElementById('mainApp').style.display = 'flex';
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
     
-    // --- التعديل هنا: إخفاء الرتبة عن المستخدمين وإظهارها للماستر فقط ---
+    // التعديل: إخفاء الرتبة عن المستخدمين وإظهارها للماستر فقط
     const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
         roleBadge.innerText = "MASTER";
         roleBadge.style.display = 'inline-block';
     } else {
-        roleBadge.style.display = 'none'; // إخفاء تماماً لأي مستخدم آخر
+        roleBadge.style.display = 'none'; 
     }
-    // --- نهاية التعديل ---
     
     if(sessionStorage.getItem('userRole') === 'admin') {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
@@ -439,17 +438,11 @@ function addUser() {
 function renderUsers() {
     const b = document.getElementById('usersBody'); 
     if(!b) return;
-
-    // جلب اسم الشخص اللي مسجل دخول حالياً
     const currentUser = sessionStorage.getItem('userDisplayName');
-
-    // لو اللي داخل مش هو الـ Master Admin، اظهر رسالة حماية واخفي البيانات
     if (currentUser !== "Master Admin") {
         b.innerHTML = `<tr><td colspan="5" style="color:var(--danger); font-weight:bold; padding:20px;">🛡️ Access Restricted: Only Master Admin can manage users.</td></tr>`;
         return;
     }
-
-    // لو هو الـ Master Admin، اعرض الجدول عادي جداً
     b.innerHTML = authSystem.users.map((u, i) => `
         <tr>
             <td>${u.u}</td>
