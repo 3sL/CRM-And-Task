@@ -517,6 +517,7 @@ document.onkeydown = function(e) {
     }
 };
 
+<script>
 // --- [LOGIN SYSTEM - FIXED & MERGED] ---
 function checkLogin() {
     const u = document.getElementById('userInput').value.trim();
@@ -549,7 +550,6 @@ function loginSuccess(role, name, idx) {
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
 
-    // ✅ FIX هنا (كان loginPage غلط)
     const lp = document.getElementById('loginOverlay');
     const ma = document.getElementById('mainApp');
     const adminBtn = document.getElementById('m_admin');
@@ -562,7 +562,7 @@ function loginSuccess(role, name, idx) {
             adminBtn.style.display = (role === 'admin') ? 'block' : 'none';
         }
 
-        showTab('crmTab', document.getElementById('m_crm'));
+        if(typeof showTab === 'function') showTab('crmTab', document.getElementById('m_crm'));
     } else {
         location.reload(); 
     }
@@ -574,9 +574,7 @@ function logout() {
         location.reload();
     }
 }
-
 </script>
-
 // 1. Firebase Configuration
 const firebaseConfig = { 
     apiKey: "AIzaSyCh3wFPo7mVeB_ccqufW5LyKgPFoeSO0J0", 
