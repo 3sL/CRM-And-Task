@@ -384,12 +384,7 @@ function init() {
         const data = snapshot.val();
         if(data && typeof data === 'object') {
             authSystem.users = Object.values(data);
-        } else {
-            authSystem.users = [
-                { u: "utopia", p: "utopia2026", displayName: "Utopia Trading", role: "admin" }
-            ];
-            db.ref('authSystem/users').set(authSystem.users);
-        }
+        } 
         renderUsers(); 
     });
     
