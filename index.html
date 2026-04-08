@@ -99,161 +99,430 @@
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
 
- <div class="loading-overlay" id="loadingOverlay"> 
-     <div class="loading-spinner"> 
-         ⏳ جاري التحميل... 
-     </div> 
- </div> 
+<div class="loading-overlay" id="loadingOverlay">
 
- <div id="notification"></div> 
+    <div class="loading-spinner">
 
- <div id="loginPage"> 
-     <div class="login-card"> 
-         <h2>Utopia For Trading And Export</h2> 
-         <input type="text" id="userInput" placeholder="Username" autocomplete="off"> 
-         <input type="password" id="passInput" placeholder="Password" autocomplete="off"> 
-         <button onclick="checkLogin()">Secure Login</button> 
+        ⏳ جاري التحميل...
 
-         <p id="loginError" style="color:var(--danger); display:none; margin-top:10px; font-weight:bold;">⚠️ Access Denied!</p> 
-         <div style="margin-top:20px; font-size:0.75em; color:#bbb;"> 
-             System Security Enabled<br> 
-             Developed By: Eng. Mahmoud Mahmoud Marie<br> 
-             <a href="tel:+201222153415" class="dev-link">📞 Call Support</a> 
-         </div> 
-     </div> 
- </div> 
+    </div>
 
- <div id="mainApp" style="display:none;"> 
-     <div class="sidebar"> 
-         <div style="display:flex; justify-content: space-between; align-items: center;"> 
-             <h2 id="side_title">Utopia For Trading And Export CRM & Tasks</h2> 
-             <button onclick="toggleLang()" style="padding:4px 8px; font-size:10px; background:var(--accent); color:var(--primary);" id="langBtn">AR</button> 
-         </div>
-         <div class="dev-info"> 
-             <b>Eng. Mahmoud Mahmoud Marie</b><br> 
-             <small id="userBadge" style="background:var(--success); color:white; padding:2px 5px; border-radius:5px; font-size:10px"></small>
-             <div id="userDisplayNameLabel" style="color:var(--accent); font-size:12px; margin-top:5px;"></div>
-         </div> 
-         
-         <button class="tab-btn active" onclick="showTab('crmTab', this)" id="m_crm">👥 Clients Registry</button> 
-         <button class="tab-btn" onclick="showTab('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button> 
-         <button class="tab-btn" onclick="showTab('dashboardTab', this)" id="m_dash">📊 AI Analytics</button> 
-         <button class="tab-btn" onclick="showTab('profileTab', this)" id="m_profile">👤 My Profile</button> 
-         <button class="tab-btn" onclick="showTab('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ Recycle Bin</button> 
+</div>
 
-         <button class="tab-btn admin-only" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent);">👑 Admin Master</button> 
-         
-         <button onclick="logout()" style="margin-top:auto; background:var(--danger); color:white;" id="m_logout">🚪 Logout Securely</button> 
-     </div> 
 
-     <div class="main"> 
-         <div id="crmTab" class="tab-content active"> 
-             <h2 id="h_crm">Clients Management</h2> 
-             <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;"> 
-                 <input id="search" placeholder="🔍 Search Name or Phone..." oninput="renderCRM()" style="flex:2"> 
-                 <select id="filterStatus" onchange="renderCRM()" style="flex:1"> 
-                     <option value="All">All Statuses</option> 
-                     <option value="Interested">Interested</option> 
-                     <option value="In Progress">In Progress</option> 
-                     <option value="Hold">Hold</option> 
-                     <option value="Completed">Completed</option> 
-                     <option value="VIP">VIP</option> 
-                 </select> 
-                 <button onclick="exportToCSV()" style="background:#2c3e50; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">📥 Export Data</button> 
-             </div> 
-             
-             <div class="form-group"> 
-                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;"> 
-                     <input id="name" placeholder="Client Name"> 
-                     <input id="phone" placeholder="Phone Number"> 
-                     <select id="gov"></select> 
-                 </div> 
-                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;"> 
-                     <select id="status"> 
-                         <option value="Interested">Interested</option> 
-                         <option value="In Progress">In Progress</option> 
-                         <option value="Hold">Hold ⚠️</option> 
-                         <option value="Completed">Completed ✅</option> 
-                         <option value="VIP">VIP 🌟</option> 
-                     </select> 
-                     <input id="agent" placeholder="Assigned Agent"> 
-                     <input type="date" id="date"> 
-                 </div> 
-                 <textarea id="notes" placeholder="Notes & AI Insights..."></textarea> 
-                 <button class="btn-save" onclick="addOrUpdate()" id="btnSave">💾 Save Client</button> 
-             </div> 
-             <table> 
-                <thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>AI Score</th><th>Status</th><th>Actions</th></tr></thead> 
-                <tbody id="tableBody"></tbody> 
-             </table> 
-         </div> 
+<div id="notification"></div>
 
-         <div id="adminControlTab" class="tab-content"> 
-             <h2 style="color:var(--vip)">👑 Admin Master Control</h2> 
-             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;"> 
-                 <div class="form-group"> 
-                     <h3>👥 User Management</h3> 
-                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"> 
-                         <input id="newU" placeholder="Username"> 
-                         <input id="newP" placeholder="Password"> 
-                     </div> 
-                     <input id="newD" placeholder="Display Name"> 
-                     <select id="newR"> 
-                         <option value="user">Standard User</option> 
-                         <option value="admin">System Admin</option> 
-                     </select> 
-                     <button onclick="addUser()" class="btn-save" style="background:var(--primary)">Add User</button> 
-                     <hr> 
-                     <table style="width:100%;"> 
-                        <thead><tr><th>User</th><th>Pass</th><th>Role</th><th>Action</th></tr></thead> 
-                        <tbody id="usersBody"></tbody> 
-                     </table> 
-                 </div> 
-                 <div class="form-group" style="max-height: 500px; overflow-y: auto;"> 
-                     <h3>📜 Activity Logs</h3> 
-                     <div id="logsContainer"></div> 
-                 </div> 
-             </div> 
-         </div> 
 
-         <div id="profileTab" class="tab-content"> 
-             <h2>👤 My Account</h2> 
-             <div class="form-group"> 
-                 <p>Welcome, <b id="profName"></b></p> 
-                 <input type="password" id="changePassInput" placeholder="New Password"> 
-                 <button onclick="updateMyPassword()" class="btn-save" style="background:var(--info)">Update</button> 
-             </div> 
-         </div> 
+<div id="loginOverlay">
 
-         <div id="tasksTab" class="tab-content"> 
-             <h2>📅 Operations Tasks</h2> 
-             <div class="form-group"> 
-                 <select id="taskClientSelect" onchange="autoFillTask()"><option value="">Select Client</option></select> 
-                 <input id="taskDate" type="date"> 
-                 <input id="taskText" placeholder="Task description..."> 
-                 <button onclick="addTask()" class="btn-save">➕ Add Task</button> 
-             </div> 
-             <table style="width:100%;"> 
-                <thead><tr><th>Client</th><th>Task</th><th>Deadline</th><th>Action</th></tr></thead> 
-                <tbody id="taskBody"></tbody> 
-             </table> 
-         </div> 
-         
-         <div id="dashboardTab" class="tab-content"> 
-            <h2>📊 Performance</h2>
-            <p id="countVip">0 VIP Clients</p>
-            <p id="countComp">0 Completed Tasks</p>
-         </div>
+    <div class="login-card">
 
-         <div id="recycleTab" class="tab-content"> 
+        <h2>Utopia For Trading And Export</h2>
+
+        <input type="text" id="userInput" placeholder="Username" autocomplete="off">
+
+        <input type="password" id="passInput" placeholder="Password" autocomplete="off">
+
+        <button onclick="checkLogin()">Secure Login</button>
+
+
+        <p id="loginError" style="color:var(--danger); display:none;
+
+margin-top:10px; font-weight:bold;">⚠️ Access Denied!</p>
+
+        <div style="margin-top:20px; font-size:0.75em; color:#bbb;">
+
+            System Security Enabled<br>
+
+            Developed By: Eng. Mahmoud Mahmoud Marie<br>
+
+            <a href="tel:+201222153415" class="dev-link">📞 Call Support</a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="mainApp">
+
+    <div class="sidebar">
+
+        <div style="display:flex; justify-content: space-between; align-items: center;">
+
+            <h2 id="side_title">Utopia For Trading And Export CRM & Tasks</h2>
+
+
+            <button onclick="toggleLang()" style="padding:4px 8px;
+
+font-size:10px; background:var(--accent); color:var(--primary);"
+
+id="langBtn">AR</button>
+
+        </div>
+
+        <div class="dev-info">
+
+            <b>Eng. Mahmoud Mahmoud Marie</b><br>
+
+
+            <small id="userBadge" style="background:var(--success);
+
+color:white; padding:2px 5px; border-radius:5px;
+
+font-size:10px"></small>
+
+        </div>
+
+        
+
+        <button class="tab-btn active" onclick="showTab('crmTab', this)" id="m_crm">👥 Clients Registry</button>
+
+
+        <button class="tab-btn" onclick="showTab('tasksTab', this)"
+
+id="m_tasks">📅 Tasks & Operations</button>
+
+        <button class="tab-btn" onclick="showTab('dashboardTab', this)" id="m_dash">📊 AI Analytics</button>
+
+        <button class="tab-btn" onclick="showTab('profileTab', this)" id="m_profile">👤 My Profile</button>
+
+
+        <button class="tab-btn" onclick="showTab('recycleTab',
+
+this)" id="m_recycle" style="color:#ff9999">♻️ Recycle
+
+Bin</button>
+
+        
+
+
+        <button class="tab-btn admin-only"
+
+onclick="showTab('adminControlTab', this)" id="m_admin"
+
+style="display:none; background: #3a3a5a; border: 1px solid
+
+var(--accent);">👑 Admin Master</button>
+
+        
+
+
+        <button onclick="logout()" style="margin-top:auto;
+
+background:var(--danger); color:white;" id="m_logout">🚪 Logout
+
+Securely</button>
+
+    </div>
+
+
+    <div class="main">
+
+        <div id="crmTab" class="tab-content active">
+
+            <h2 id="h_crm">Clients Management</h2>
+
+            <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+
+                <input id="search" placeholder="🔍 Search Name or Phone..." oninput="renderCRM()" style="flex:2">
+
+                <select id="filterStatus" onchange="renderCRM()" style="flex:1">
+
+                    <option value="All">All Statuses</option>
+
+                    <option value="Interested">Interested</option>
+
+                    <option value="In Progress">In Progress</option>
+
+                    <option value="Hold">Hold</option>
+
+                    <option value="Completed">Completed</option>
+
+                    <option value="VIP">VIP</option>
+
+                </select>
+
+
+                <button onclick="exportToCSV()"
+
+style="background:#2c3e50; color:white; border:none; padding:10px;
+
+border-radius:10px; cursor:pointer;">📥 Export Data</button>
+
+            </div>
+
+            
+
+            <div class="form-group">
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+
+                    <input id="name" placeholder="Client Name">
+
+                    <input id="phone" placeholder="Phone Number">
+
+                    <select id="gov"></select>
+
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+
+                    <select id="status">
+
+                        <option value="Interested">Interested</option>
+
+                        <option value="In Progress">In Progress</option>
+
+                        <option value="Hold">Hold ⚠️</option>
+
+                        <option value="Completed">Completed ✅</option>
+
+                        <option value="VIP">VIP 🌟</option>
+
+                    </select>
+
+                    <input id="agent" placeholder="Assigned Agent">
+
+                    <input type="date" id="date">
+
+                </div>
+
+                <textarea id="notes" placeholder="Notes & AI Insights..."></textarea>
+
+                <button class="btn-save" onclick="addOrUpdate()" id="btnSave">💾 Save Client</button>
+
+            </div>
+
+            <table>
+
+
+               
+
+<thead><tr><th>Name</th><th>Phone</th><th>Gov</th><th>AI
+
+Score</th><th>Status</th><th>Actions</th></tr></thead>
+
+                <tbody id="tableBody"></tbody>
+
+            </table>
+
+        </div>
+
+
+        <div id="adminControlTab" class="tab-content">
+
+            <h2 style="color:var(--vip)">👑 Admin Master Control & Supervision</h2>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+
+                <div class="form-group">
+
+                    <h3>👥 User Management</h3>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+
+                        <input id="newU" placeholder="Username">
+
+                        <input id="newP" placeholder="Password">
+
+                    </div>
+
+                    <input id="newD" placeholder="Display Name">
+
+                    <select id="newR">
+
+                        <option value="user">Standard User (Full Operation)</option>
+
+                        <option value="admin">System Admin (Full Control)</option>
+
+                    </select>
+
+
+                    <button onclick="addUser()" class="btn-save"
+
+style="background:var(--primary)">Add User</button>
+
+                    <hr>
+
+                    <div style="overflow-x: auto;">
+
+                        <table style="min-width: 500px;">
+
+
+                           
+
+<thead><tr><th>User</th><th>Pass</th><th>Name</th><th>Role</th><th>Action</th></tr></thead>
+
+                            <tbody id="usersBody"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+                <div class="form-group" style="max-height: 500px; overflow-y: auto;">
+
+                    <h3>📜 Secure Activity Logs</h3>
+
+                    <div id="logsContainer"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div id="profileTab" class="tab-content">
+
+            <h2>👤 My Account Settings</h2>
+
+            <div class="form-group">
+
+                <p>Welcome, <b id="profName"></b>. Update your access password:</p>
+
+                <input type="password" id="changePassInput" placeholder="New Password">
+
+
+                <button onclick="updateMyPassword()"
+
+class="btn-save" style="background:var(--info)">Update
+
+Password</button>
+
+            </div>
+
+        </div>
+
+
+        <div id="tasksTab" class="tab-content">
+
+            <h2 id="h_tasks">Operations Tasks</h2>
+
+            <div class="form-group">
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+
+
+                    <select id="taskClientSelect"
+
+onchange="autoFillTask()"><option value="">Select
+
+Client</option></select>
+
+                    <input id="taskDate" type="date">
+
+                </div>
+
+                <input id="taskText" placeholder="Task description...">
+
+                <textarea id="extraInfo" placeholder="Client info..."></textarea>
+
+                <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
+
+            </div>
+
+            <div style="overflow-x: auto;">
+
+                <table style="min-width: 600px;">
+
+
+                   
+
+<thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Deadline</th><th>Action</th></tr></thead>
+
+                    <tbody id="taskBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <div id="dashboardTab" class="tab-content">
+
+            <h2 id="h_dash">📊 AI Performance</h2>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+
+
+                <div style="background:#fff; padding:20px;
+
+border-radius:15px; border-bottom:5px solid var(--vip);
+
+text-align:center;"><h3>VIP</h3><p id="countVip"
+
+style="font-size:2em">0</p></div>
+
+
+                <div style="background:#fff; padding:20px;
+
+border-radius:15px; border-bottom:5px solid var(--success);
+
+text-align:center;"><h3>Done</h3><p id="countComp"
+
+style="font-size:2em">0</p></div>
+
+            </div>
+
+            <div style="margin-top:20px; background:#fff; padding:15px; border-radius:15px;">
+
+                <h4>📍 Geo-Distribution</h4>
+
+                <div id="geoStats" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+
+            </div>
+
+            <div style="max-width:350px; margin:30px auto;"><canvas id="statusChart"></canvas></div>
+
+        </div>
+
+
+        <div id="recycleTab" class="tab-content">
+
             <h2 style="color:var(--danger)">♻️ Recycle Bin</h2>
-            <tbody id="recycleBody"></tbody>
-         </div>
 
-     </div> 
- </div> 
+            <div style="overflow-x: auto;">
 
- <script> 
+
+                <table style="min-width:
+
+400px;"><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody
+
+id="recycleBody"></tbody></table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+// --- [SECURITY LAYER: ANTI-TAMPER] ---
+
+// منع فتح الـ Console ببعض الطرق الشائعة
+
+document.onkeydown = function(e) {
+
+
+    if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey &&
+
+(e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) ||
+
+e.keyCode == 'C'.charCodeAt(0))) || (e.ctrlKey && e.keyCode ==
+
+'U'.charCodeAt(0))) {
+
+        return false;
+
+    } 
  // --- [المنطق البرمجي المعدل] ---
 
  function checkLogin() {
