@@ -299,15 +299,30 @@ function showLoading(show) {
 
 // 2. Authentication System (Enhanced)
 function checkLogin() {
-    const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
-    if (u === "admin" && p === "@Mody6699") { loginSuccess("admin", "Master Admin", -1); return; }
+    // إضافة .trim() لمنع أخطاء المسافات الزائدة
+    const u = document.getElementById('userInput').value.trim();
+    const p = document.getElementById('passInput').value.trim();
     
+    // يوزر الطوارئ الماستر (Hardcoded)
+    if (u === "admin" && p === "@Mody6699") { 
+        loginSuccess("admin", "Master Admin", -1); 
+        return; 
+    }
+    
+    // التأكد أن مصفوفة المستخدمين ليست فارغة
+    if (!authSystem.users || authSystem.users.length === 0) {
+        alert("جاري تحميل بيانات المستخدمين من السيرفر... حاول مرة أخرى خلال ثوانٍ");
+        return;
+    }
+
     const userIdx = authSystem.users.findIndex(acc => acc.u === u && acc.p === p);
+    
     if(userIdx !== -1) {
         loginSuccess(authSystem.users[userIdx].role, authSystem.users[userIdx].displayName, userIdx);
     } else {
         document.getElementById('loginError').style.display = 'block';
-        playSound('soundAlert');
+        if(typeof playSound === 'function') playSound('soundAlert');
+        alert("اسم المستخدم أو كلمة المرور غير صحيحة");
     }
 }
 
