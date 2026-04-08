@@ -327,21 +327,41 @@ function checkLogin() {
 }
 
 function loginSuccess(role, name, idx) {
-    const sessionToken = btoa(name + Date.now());
-    sessionStorage.setItem('u_token', sessionToken);
+    // 1. تخزين بيانات الجلسة
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
-    addLog(`Logged in successfully`);
-    playSound('soundSuccess');
-    setTimeout(() => location.reload(), 500);
+    
+    // 2. إظهار واجهة البرنامج وإخفاء صفحة الدخول فوراً (بدون ريفريش)
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    document.getElementById('userDisplayName').innerText = name;
+
+    // 3. تطبيق نظام الصلاحيات (إخفاء زرار الأدمن لليوزر العادي)
+    const adminBtn = document.getElementById('m_admin'); // تأكد إن الـ ID ده صح في الـ HTML بتاعك
+    if(adminBtn) {
+        if(role === 'admin') {
+            adminBtn.style.display = 'block';
+        } else {
+            adminBtn.style.display = 'none';
+        }
+    }
+    
+    // 4. فتح صفحة العملاء تلقائياً
+    showTab('crmTab', document.getElementById('m_crm'));
+    
+    // 5. مؤثرات إضافية
+    if(typeof addLog === 'function') addLog(`Logged in as ${name}`);
+    if(typeof playSound === 'function') playSound('soundSuccess');
+    
+    notify("Welcome back, " + name, "success");
 }
 
 function logout() {
-    if(confirm("Are you sure you want to logout?")) {
-        addLog("Logged out");
+    if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
         sessionStorage.clear();
+        // هنا بنعمل ريفريش عشان نرجع لشاشة الدخول وننظف الذاكرة
         location.reload();
     }
 }
