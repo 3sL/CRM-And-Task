@@ -204,7 +204,7 @@
                 </div>
                 <input id="taskText" placeholder="Task description...">
                 <textarea id="extraInfo" placeholder="Client info..."></textarea>
-                <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
+                <button onclick="addOrUpdateTask()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ Save Task</button>
             </div>
             <table>
                 <thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Deadline</th><th>Action</th></tr></thead>
@@ -253,7 +253,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null;
+let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, editTaskIdx = -1, statusChart = null;
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
 // تحميل المستخدمين فوراً عند فتح الصفحة ليكونوا جاهزين لتسجيل الدخول
@@ -483,12 +483,38 @@ function autoFillTask() {
     if(client) document.getElementById('extraInfo').value = `Phone: ${client.phone}\nAgent: ${client.agent}\nGov: ${client.gov}`;
 }
 
-function addTask() {
-    const t = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value };
+function addOrUpdateTask() {
+    const t = { 
+        client: document.getElementById('taskClientSelect').value, 
+        text: document.getElementById('taskText').value, 
+        extra: document.getElementById('extraInfo').value, 
+        date: document.getElementById('taskDate').value 
+    };
     if(!t.client || !t.text) return alert("Missing data");
-    tasks.push(t);
+
+    if(editTaskIdx > -1) {
+        tasks[editTaskIdx] = t;
+        addLog(`Updated task for: ${t.client}`);
+        editTaskIdx = -1;
+    } else {
+        tasks.push(t);
+        addLog(`Task created for: ${t.client}`);
+    }
+    
     db.ref('tasks').set(tasks);
-    addLog(`Task created for: ${t.client}`);
+    document.getElementById('taskText').value = '';
+    document.getElementById('extraInfo').value = '';
+    notify("Task Saved", "success");
+}
+
+function editTask(i) {
+    editTaskIdx = i;
+    const t = tasks[i];
+    document.getElementById('taskClientSelect').value = t.client;
+    document.getElementById('taskDate').value = t.date;
+    document.getElementById('taskText').value = t.text;
+    document.getElementById('extraInfo').value = t.extra;
+    window.scrollTo(0,0);
 }
 
 function renderTasks() {
@@ -496,11 +522,15 @@ function renderTasks() {
     b.innerHTML = tasks.map((t, i) => `
         <tr><td><b>${t.client}</b></td><td>${t.text}</td>
         <td><textarea onchange="updateTaskExtra(${i}, this.value)" style="height:40px">${t.extra}</textarea></td>
-        <td>${t.date}</td><td><button class="action-btn btn-del" onclick="delT(${i})">✕</button></td></tr>
+        <td>${t.date}</td>
+        <td>
+            <button class="action-btn" style="background:var(--accent);color:black" onclick="editTask(${i})">✏️</button>
+            <button class="action-btn btn-del" onclick="delT(${i})">✕</button>
+        </td></tr>
     `).join('');
 }
 function updateTaskExtra(i, v) { tasks[i].extra = v; db.ref('tasks').set(tasks); }
-function delT(i) { tasks.splice(i,1); db.ref('tasks').set(tasks); }
+function delT(i) { if(confirm('Delete task?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); } }
 
 function updateDash() {
     const cv = document.getElementById('countVip');
