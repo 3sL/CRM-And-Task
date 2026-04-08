@@ -66,12 +66,12 @@
         .log-user { color: var(--info); font-weight: bold; }
         .log-action { color: var(--danger); }
         
-        /* لإخفاء كلمات المرور تلقائياً في الجدول */
         .mask-pass { filter: blur(4px); transition: 0.3s; cursor: pointer; }
         .mask-pass:hover { filter: blur(0); }
     </style>
 </head>
-<body oncontextmenu="return false;"> <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<body oncontextmenu="return false;"> 
+<audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
 <div id="notification"></div>
@@ -94,7 +94,7 @@
 <div id="mainApp">
     <div class="sidebar">
         <div style="display:flex; justify-content: space-between; align-items: center;">
-            <h2 id="side_title">Utopia For Trading And Export CRM & Tasks</h2>
+            <h2 id="side_title" style="font-size: 0.9em;">Utopia CRM & Tasks</h2>
             <button onclick="toggleLang()" style="padding:4px 8px; font-size:10px; background:var(--accent); color:var(--primary);" id="langBtn">AR</button>
         </div>
         <div class="dev-info">
@@ -114,7 +114,7 @@
     </div>
 
     <div class="main">
-<div id="crmTab" class="tab-content active">
+        <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
             <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
                 <input id="search" placeholder="🔍 Search Name or Phone..." oninput="renderCRM()" style="flex:2">
@@ -156,7 +156,7 @@
         </div>
 
         <div id="adminControlTab" class="tab-content">
-            <h2 style="color:var(--vip)">👑 Admin Master Control & Supervision</h2>
+            <h2 style="color:var(--vip)">👑 Admin Master Control</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                 <div class="form-group">
                     <h3>👥 User Management</h3>
@@ -166,8 +166,8 @@
                     </div>
                     <input id="newD" placeholder="Display Name">
                     <select id="newR">
-                        <option value="user">Standard User (Full Operation)</option>
-                        <option value="admin">System Admin (Full Control)</option>
+                        <option value="user">Standard User</option>
+                        <option value="admin">System Admin</option>
                     </select>
                     <button onclick="addUser()" class="btn-save" style="background:var(--primary)">Add User</button>
                     <hr>
@@ -230,8 +230,7 @@
 </div>
 
 <script>
-// --- [SECURITY LAYER: ANTI-TAMPER] ---
-// منع فتح الـ Console ببعض الطرق الشائعة
+// SECURITY: ANTI-TAMPER
 document.onkeydown = function(e) {
     if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
         return false;
@@ -254,7 +253,7 @@ const db = firebase.database();
 let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null;
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
-// 2. Authentication System (Enhanced)
+// 2. Authentication System
 function checkLogin() {
     const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
     if (u === "admin" && p === "@Mody6699") { loginSuccess("admin", "Master Admin", -1); return; }
@@ -269,13 +268,13 @@ function checkLogin() {
 }
 
 function loginSuccess(role, name, idx) {
-    const sessionToken = btoa(name + Date.now()); // تشفير بسيط للتوكن
+    const sessionToken = btoa(name + Date.now());
     sessionStorage.setItem('u_token', sessionToken);
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
-    addLog(Logged in successfully);
+    addLog("Logged in successfully");
     playSound('soundSuccess');
     setTimeout(() => location.reload(), 500);
 }
@@ -302,19 +301,38 @@ function init() {
     }
 
     const gSelect = document.getElementById('gov');
-    if(gSelect) govs.forEach(g => gSelect.innerHTML += <option value="${g}">${g}</option>);
+    if(gSelect) {
+        gSelect.innerHTML = '';
+        govs.forEach(g => gSelect.innerHTML += `<option value="${g}">${g}</option>`);
+    }
 
     // Real-time Database Listeners
-    db.ref('clients').on('value', s => { clients = s.val() ? Object.values(s.val()) : []; renderCRM(); updateDash(); fillTaskClients(); updateGeo(); });
-    db.ref('tasks').on('value', s => { tasks = s.val() ? Object.values(s.val()) : []; renderTasks(); });
-    db.ref('deletedClients').on('value', s => { deletedClients = s.val() ? Object.values(s.val()) : []; renderRecycle(); });
-    db.ref('authSystem/users').on('value', s => { authSystem.users = s.val() ? Object.values(s.val()) : []; renderUsers(); });
-    db.ref('logs').limitToLast(50).on('value', s => { logs = s.val() ? Object.values(s.val()) : []; renderLogs(); });
+    db.ref('clients').on('value', s => { 
+        clients = s.val() ? Object.values(s.val()) : []; 
+        renderCRM(); updateDash(); fillTaskClients(); updateGeo(); 
+    });
+    db.ref('tasks').on('value', s => { 
+        tasks = s.val() ? Object.values(s.val()) : []; 
+        renderTasks(); 
+    });
+    db.ref('deletedClients').on('value', s => { 
+        deletedClients = s.val() ? Object.values(s.val()) : []; 
+        renderRecycle(); 
+    });
+    db.ref('authSystem/users').on('value', s => { 
+        authSystem.users = s.val() ? Object.values(s.val()) : []; 
+        renderUsers(); 
+    });
+    db.ref('logs').limitToLast(50).on('value', s => { 
+        logs = s.val() ? Object.values(s.val()) : []; 
+        renderLogs(); 
+    });
 }
 
 // 4. Data Management Functions
 function renderCRM() {
-    const b = document.getElementById('tableBody'); b.innerHTML = '';
+    const b = document.getElementById('tableBody'); if(!b) return;
+    b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value;
 
     clients.forEach((c, i) => {
@@ -347,10 +365,10 @@ function addOrUpdate() {
     };
     
     if(editIdx > -1) { 
-        addLog(Updated client: ${c.name}); 
+        addLog(`Updated client: ${c.name}`); 
         clients[editIdx] = c; 
     } else { 
-        addLog(Added new client: ${c.name}); 
+        addLog(`Added new client: ${c.name}`); 
         clients.push(c); 
     }
     db.ref('clients').set(clients);
@@ -361,7 +379,7 @@ function addOrUpdate() {
 
 function deleteClient(i) {
     if(!confirm('Security Check: Move to recycle bin?')) return;
-    addLog(Deleted client: ${clients[i].name});
+    addLog(`Deleted client: ${clients[i].name}`);
     deletedClients.push(clients[i]);
     clients.splice(i, 1);
     db.ref('clients').set(clients);
@@ -390,7 +408,7 @@ function addUser() {
     if(!u || !p) return alert("Fill all security fields");
     authSystem.users.push({ u, p, displayName: d, role: r });
     db.ref('authSystem/users').set(authSystem.users);
-    addLog(Admin created user: ${d});
+    addLog(`Admin created user: ${d}`);
 }
 
 function renderUsers() {
@@ -408,14 +426,14 @@ function updateMyPassword() {
     if(idx == -1) return alert("Master Admin password is hardcoded.");
     authSystem.users[idx].p = newP;
     db.ref('authSystem/users').set(authSystem.users);
-    addLog(Updated own password);
+    addLog("Updated own password");
     notify("Password Updated Securely", "success");
 }
 
 // 6. Tasks & Analytics
 function autoFillTask() {
     const client = clients.find(c => c.name === document.getElementById('taskClientSelect').value);
-    if(client) document.getElementById('extraInfo').value = Phone: ${client.phone}\nAgent: ${client.agent}\nGov: ${client.gov};
+    if(client) document.getElementById('extraInfo').value = `Phone: ${client.phone}\nAgent: ${client.agent}\nGov: ${client.gov}`;
 }
 
 function addTask() {
@@ -423,11 +441,12 @@ function addTask() {
     if(!t.client || !t.text) return alert("Missing data");
     tasks.push(t);
     db.ref('tasks').set(tasks);
-    addLog(Task created for: ${t.client});
+    addLog(`Task created for: ${t.client}`);
 }
 
 function renderTasks() {
-    const b = document.getElementById('taskBody'); b.innerHTML = tasks.map((t, i) => `
+    const b = document.getElementById('taskBody'); if(!b) return;
+    b.innerHTML = tasks.map((t, i) => `
         <tr><td><b>${t.client}</b></td><td>${t.text}</td>
         <td><textarea onchange="updateTaskExtra(${i}, this.value)" style="height:40px">${t.extra}</textarea></td>
         <td>${t.date}</td><td><button class="action-btn btn-del" onclick="delT(${i})">✕</button></td></tr>
@@ -437,9 +456,14 @@ function updateTaskExtra(i, v) { tasks[i].extra = v; db.ref('tasks').set(tasks);
 function delT(i) { tasks.splice(i,1); db.ref('tasks').set(tasks); }
 
 function updateDash() {
-    document.getElementById('countVip').innerText = clients.filter(c => c.status === 'VIP').length;
-    document.getElementById('countComp').innerText = clients.filter(c => c.status === 'Completed').length;
-    const ctx = document.getElementById('statusChart').getContext('2d');
+    const cv = document.getElementById('countVip');
+    const cc = document.getElementById('countComp');
+    if(cv) cv.innerText = clients.filter(c => c.status === 'VIP').length;
+    if(cc) cc.innerText = clients.filter(c => c.status === 'Completed').length;
+    
+    const chartEl = document.getElementById('statusChart');
+    if(!chartEl) return;
+    const ctx = chartEl.getContext('2d');
     const counts = { Interested:0, "In Progress":0, Hold:0, Completed:0, VIP:0 };
     clients.forEach(c => counts[c.status]++);
     if(statusChart) statusChart.destroy();
@@ -449,16 +473,16 @@ function updateDash() {
 function updateGeo() {
     const counts = {}; clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
     const gs = document.getElementById('geoStats');
-    if(gs) gs.innerHTML = Object.entries(counts).map(([g, c]) => <span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:11px;">${g}: ${c}</span>).join('');
+    if(gs) gs.innerHTML = Object.entries(counts).map(([g, c]) => `<span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:11px;">${g}: ${c}</span>`).join('');
 }
 
 function exportToCSV() {
     let csv = "\uFEFFName,Phone,Gov,Status,Agent,Notes\n";
-    clients.forEach(c => csv += "${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}"\n);
+    clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}"\n`);
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-    link.download = Secure_Utopia_Export.csv; link.click();
-    addLog(Exported database to CSV);
+    link.download = "Secure_Utopia_Export.csv"; link.click();
+    addLog("Exported database to CSV");
 }
 
 // 7. Helper Utilities
@@ -471,12 +495,11 @@ function playSound(id) { const s = document.getElementById(id); if(s) s.play(); 
 function notify(m, t) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); }
 function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
 function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; showTab('crmTab', document.getElementById('m_crm')); }
-function renderRecycle() { const b = document.getElementById('recycleBody'); b.innerHTML = deletedClients.map((c, i) => <tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button></td></tr>).join(''); }
-function restore(i) { addLog(Restored client: ${deletedClients[i].name}); clients.push(deletedClients[i]); deletedClients.splice(i,1); db.ref('clients').set(clients); db.ref('deletedClients').set(deletedClients); }
-function fillTaskClients() { const s = document.getElementById('taskClientSelect'); if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => <option value="${c.name}">${c.name}</option>).join(''); }
-function delU(i) { if(confirm('Permanently delete this user?')) { addLog(Deleted user account: ${authSystem.users[i].displayName}); authSystem.users.splice(i, 1); db.ref('authSystem/users').set(authSystem.users); } }
+function renderRecycle() { const b = document.getElementById('recycleBody'); if(!b) return; b.innerHTML = deletedClients.map((c, i) => `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button></td></tr>`).join(''); }
+function restore(i) { addLog(`Restored client: ${deletedClients[i].name}`); clients.push(deletedClients[i]); deletedClients.splice(i,1); db.ref('clients').set(clients); db.ref('deletedClients').set(deletedClients); }
+function fillTaskClients() { const s = document.getElementById('taskClientSelect'); if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); }
+function delU(i) { if(confirm('Permanently delete this user?')) { addLog(`Deleted user account: ${authSystem.users[i].displayName}`); authSystem.users.splice(i, 1); db.ref('authSystem/users').set(authSystem.users); } }
 
-// Language Toggle (Simple)
 function toggleLang() {
     const html = document.getElementById('htmlTag');
     const isLtr = html.getAttribute('dir') === 'ltr';
