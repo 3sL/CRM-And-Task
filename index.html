@@ -327,45 +327,53 @@ function checkLogin() {
 }
 
 function loginSuccess(role, name, idx) {
-    // 1. تخزين بيانات الجلسة
+    // 1. تخزين البيانات في الجلسة
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
     
-    // 2. إظهار واجهة البرنامج وإخفاء صفحة الدخول فوراً (بدون ريفريش)
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-    document.getElementById('userDisplayName').innerText = name;
+    // 2. محاولة إيجاد العناصر من الـ HTML
+    const lp = document.getElementById('loginPage');
+    const ma = document.getElementById('mainApp');
+    const adminBtn = document.getElementById('m_admin');
+    const nameLabel = document.getElementById('userDisplayName');
 
-    // 3. تطبيق نظام الصلاحيات (إخفاء زرار الأدمن لليوزر العادي)
-    const adminBtn = document.getElementById('m_admin'); // تأكد إن الـ ID ده صح في الـ HTML بتاعك
-    if(adminBtn) {
-        if(role === 'admin') {
-            adminBtn.style.display = 'block';
-        } else {
-            adminBtn.style.display = 'none';
+    // 3. التبديل بين الشاشات بأمان
+    if (lp && ma) {
+        lp.style.display = 'none';
+        ma.style.display = 'flex';
+        
+        if (nameLabel) nameLabel.innerText = name;
+
+        // 4. تطبيق نظام الصلاحيات (إخفاء زرار الأدمن لليوزر utopia)
+        if (adminBtn) {
+            adminBtn.style.display = (role === 'admin') ? 'block' : 'none';
         }
+        
+        // فتح أول صفحة تلقائياً
+        if (typeof showTab === 'function') {
+            showTab('crmTab', document.getElementById('m_crm'));
+        }
+        
+        // مؤثرات إضافية
+        if (typeof addLog === 'function') addLog(`Logged in as ${name}`);
+        if (typeof playSound === 'function') playSound('soundSuccess');
+        if (typeof notify === 'function') notify("Welcome back, " + name, "success");
+
+    } else {
+        // لو الكود مش لاقي الـ IDs، هيدخلك "إجباري" عن طريق الريفريش
+        console.error("Critical Error: HTML IDs (loginPage or mainApp) not found!");
+        location.reload(); 
     }
-    
-    // 4. فتح صفحة العملاء تلقائياً
-    showTab('crmTab', document.getElementById('m_crm'));
-    
-    // 5. مؤثرات إضافية
-    if(typeof addLog === 'function') addLog(`Logged in as ${name}`);
-    if(typeof playSound === 'function') playSound('soundSuccess');
-    
-    notify("Welcome back, " + name, "success");
 }
 
 function logout() {
     if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
         sessionStorage.clear();
-        // هنا بنعمل ريفريش عشان نرجع لشاشة الدخول وننظف الذاكرة
         location.reload();
     }
 }
-
 // 3. Core Initialization
 function init() {
     if(!sessionStorage.getItem('isLoggedIn') || !sessionStorage.getItem('u_token')) {
