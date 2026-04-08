@@ -428,13 +428,29 @@ function addUser() {
 }
 
 function renderUsers() {
-    const b = document.getElementById('usersBody'); if(!b) return;
+    const b = document.getElementById('usersBody'); 
+    if(!b) return;
+
+    // جلب اسم الشخص اللي مسجل دخول حالياً
+    const currentUser = sessionStorage.getItem('userDisplayName');
+
+    // لو اللي داخل مش هو الـ Master Admin، اظهر رسالة حماية واخفي البيانات
+    if (currentUser !== "Master Admin") {
+        b.innerHTML = `<tr><td colspan="5" style="color:var(--danger); font-weight:bold; padding:20px;">🛡️ Access Restricted: Only Master Admin can manage users.</td></tr>`;
+        return;
+    }
+
+    // لو هو الـ Master Admin، اعرض الجدول عادي جداً
     b.innerHTML = authSystem.users.map((u, i) => `
-        <tr><td>${u.u}</td><td class="mask-pass">**</td><td>${u.displayName}</td><td>${u.role}</td>
-        <td><button class="action-btn btn-del" onclick="delU(${i})">✕</button></td></tr>
+        <tr>
+            <td>${u.u}</td>
+            <td class="mask-pass">**</td>
+            <td>${u.displayName}</td>
+            <td>${u.role}</td>
+            <td><button class="action-btn btn-del" onclick="delU(${i})">✕</button></td>
+        </tr>
     `).join('');
 }
-
 function updateMyPassword() {
     const newP = document.getElementById('changePassInput').value;
     const idx = sessionStorage.getItem('userIdx');
