@@ -264,7 +264,6 @@
         </div>
     </div>
 </div>
-
 <script>
 // --- [SECURITY LAYER: ANTI-TAMPER] ---
 // منع فتح الـ Console ببعض الطرق الشائعة
@@ -401,8 +400,9 @@ function init() {
         if(data && typeof data === 'object') {
             authSystem.users = Object.values(data);
         } else {
+            // إضافة يوزر افتراضي في حالة كانت قاعدة البيانات فارغة تماماً
             authSystem.users = [
-                { u: "user1", p: "123456", displayName: "Standard User", role: "user" }
+                { u: "utopia", p: "utopia2026", displayName: "Utopia Trading", role: "admin" }
             ];
             db.ref('authSystem/users').set(authSystem.users);
         }
@@ -548,8 +548,8 @@ function addUser() {
     })
     .catch((error) => {
         showLoading(false);
-        console.error("Full Firebase Error:", error); // ده هيقولك المشكلة فين بالظبط
-        notify("Permission Denied: Check Console (F12)", "error");
+        console.error("Full Firebase Error:", error); 
+        notify("Permission Denied: Check Rules in Firebase", "error");
     });
 }
 
