@@ -120,7 +120,7 @@
         <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
             <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-                <input id="search" placeholder="🔍 Search Name or Phone..." oninput="renderCRM()" style="flex:2">
+                <input id="search" placeholder="🔍 Search Name, Phone or Status..." oninput="renderCRM()" style="flex:2">
                 <select id="filterStatus" onchange="renderCRM()" style="flex:1">
                     <option value="All">All Statuses</option>
                     <option value="Interested">Interested</option>
@@ -351,14 +351,24 @@ function init() {
     });
 }
 
-// 4. Data Management Functions
+// 4. Data Management Functions (UPDATED FOR MULTI-FILTER SEARCH)
 function renderCRM() {
     const b = document.getElementById('tableBody'); if(!b) return;
     b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value;
 
     clients.forEach((c, i) => {
-        if((q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) || (fStatus !== 'All' && c.status !== fStatus)) return;
+        // التحقق من البحث في (الاسم، التليفون، الحالة)
+        const matchesSearch = !q || 
+            c.name.toLowerCase().includes(q) || 
+            c.phone.includes(q) || 
+            c.status.toLowerCase().includes(q);
+
+        // التحقق من فلتر الحالة المنفصل
+        const matchesStatusFilter = (fStatus === 'All' || c.status === fStatus);
+
+        if(!matchesSearch || !matchesStatusFilter) return;
+
         let rowClass = c.status === 'VIP' ? 'vip-row' : (c.status === 'Hold' ? 'hold-row' : '');
         b.innerHTML += `<tr class="${rowClass}">
             <td>${c.name}</td><td>${c.phone}</td><td>${c.gov}</td>
