@@ -521,24 +521,35 @@ function renderLogs() {
 
 
 function addUser() {
-    const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
-    if(!u || !p) return notify("Fill all security fields", "error");
-    if(!d) return notify("Please enter display name", "error");
-    
+    const u = document.getElementById('newU').value, 
+          p = document.getElementById('newP').value, 
+          d = document.getElementById('newD').value, 
+          r = document.getElementById('newR').value;
+
+    if(!u || !p || !d) return notify("Fill all security fields", "error");
+
     const newUser = { u, p, displayName: d, role: r };
+    
+    // سطر للتأكد إن الأري مش فاضية قبل الرفع
+    if(!Array.isArray(authSystem.users)) authSystem.users = [];
     authSystem.users.push(newUser);
+
     showLoading(true);
-    db.ref('authSystem/users').set(authSystem.users, (error) => {
+    
+    // محاولة الحفظ مع طباعة الخطأ التفصيلي
+    db.ref('authSystem/users').set(authSystem.users)
+    .then(() => {
         showLoading(false);
-        if(error) {
-            notify("Error adding user: " + error.message, "error");
-        } else {
-            addLog(`Admin created user: ${d}`);
-            document.getElementById('newU').value = '';
-            document.getElementById('newP').value = '';
-            document.getElementById('newD').value = '';
-            notify("User added successfully!", "success");
-        }
+        addLog(`Admin created user: ${d}`);
+        document.getElementById('newU').value = '';
+        document.getElementById('newP').value = '';
+        document.getElementById('newD').value = '';
+        notify("User added successfully!", "success");
+    })
+    .catch((error) => {
+        showLoading(false);
+        console.error("Full Firebase Error:", error); // ده هيقولك المشكلة فين بالظبط
+        notify("Permission Denied: Check Console (F12)", "error");
     });
 }
 
