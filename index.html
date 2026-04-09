@@ -9,11 +9,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --vip: #9b59b6; --bg-main: #f5f6fa; --card-bg: #ffffff; --text-main: #333; }
-        /* [New Addition] Dark Mode Variables */
-        .dark-mode { --bg-main: #121212; --card-bg: #1e1e2f; --text-main: #f0f0f0; }
-        
-        body { font-family:'Segoe UI', Tahoma, sans-serif; background: var(--bg-main); color: var(--text-main); margin:0; display:flex; height:100vh; overflow:hidden; transition: 0.3s; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --vip: #9b59b6; }
+        body { font-family:'Segoe UI', Tahoma, sans-serif; background:#f5f6fa; margin:0; display:flex; height:100vh; overflow:hidden; transition: 0.3s; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
         
         [dir="rtl"] body { flex-direction: row-reverse; }
         [dir="rtl"] .sidebar { border-left: 1px solid #333; border-right: none; }
@@ -38,29 +35,25 @@
         .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .sidebar button.active { background:var(--accent); color:var(--primary); }
         
-        .main { flex:1; padding:25px; overflow-y:auto; background: var(--bg-main); }
+        .main { flex:1; padding:25px; overflow-y:auto; background: #f0f2f5; }
         .tab-content { display:none; animation: fadeIn 0.4s; }
         .tab-content.active { display:block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .form-group { background: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select, textarea { padding:12px; margin:5px 0; width:100%; border-radius:10px; border:1px solid #ddd; box-sizing: border-box; font-size: 14px; outline: none; transition: 0.3s; background: var(--card-bg); color: var(--text-main); }
+        .form-group { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select, textarea { padding:12px; margin:5px 0; width:100%; border-radius:10px; border:1px solid #ddd; box-sizing: border-box; font-size: 14px; outline: none; transition: 0.3s; }
         input:focus { border-color: var(--info); }
         
         .btn-save { background: var(--success); color: white; font-weight: bold; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; font-size: 16px; transition: 0.3s; }
         .btn-save:hover { opacity: 0.9; }
         
-        table { width:100%; border-collapse:collapse; background: var(--card-bg); margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        table { width:100%; border-collapse:collapse; background:#fff; margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         th, td { padding:12px; text-align:center; border-bottom:1px solid #eee; }
-        th { background:var(--primary); color:var(--accent); font-size: 12px; cursor: pointer; }
+        th { background:var(--primary); color:var(--accent); font-size: 12px; cursor: pointer; } /* Added cursor pointer */
         
         .vip-row { background: #fffcf0 !important; border-left: 5px solid var(--vip); }
         .hold-row { background: #fff5f5 !important; border-left: 5px solid var(--danger); }
         
-        /* Dark Mode Row Overrides */
-        .dark-mode .vip-row { background: #2c2401 !important; }
-        .dark-mode .hold-row { background: #2c0101 !important; }
-
         .action-btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; color: white; margin: 2px; transition: 0.2s; }
         .action-btn:hover { transform: scale(1.1); }
         .btn-call { background: var(--info); }
@@ -69,15 +62,15 @@
         
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:20001; color:#fff; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        .log-entry { font-size: 0.8em; padding: 8px; border-bottom: 1px solid #eee; text-align: left; background: var(--card-bg); margin-bottom: 5px; border-radius: 5px; }
+        .log-entry { font-size: 0.8em; padding: 8px; border-bottom: 1px solid #eee; text-align: left; background: #fff; margin-bottom: 5px; border-radius: 5px; }
         .log-user { color: var(--info); font-weight: bold; }
         .log-action { color: var(--danger); }
         
         .mask-pass { filter: blur(4px); transition: 0.3s; cursor: pointer; }
         .mask-pass:hover { filter: blur(0); }
-
-        /* [New Addition] Utility for Sidebar Icons */
-        .side-icons { margin-right: 8px; }
+        
+        /* New Table Hover Effect */
+        tbody tr:hover { background-color: #f9f9f9; transition: 0.2s; }
     </style>
 </head>
 <body oncontextmenu="return false;"> 
@@ -103,12 +96,9 @@
 
 <div id="mainApp">
     <div class="sidebar">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div style="display:flex; justify-content: space-between; align-items: center;">
             <h2 id="side_title" style="font-size: 0.9em;">Utopia CRM & Tasks</h2>
-            <div style="display: flex; gap: 5px;">
-                <button onclick="toggleDarkMode()" style="padding:4px 8px; font-size:10px; background:#444; color:white;" title="Dark Mode">🌙</button>
-                <button onclick="toggleLang()" style="padding:4px 8px; font-size:10px; background:var(--accent); color:var(--primary);" id="langBtn">AR</button>
-            </div>
+            <button onclick="toggleLang()" style="padding:4px 8px; font-size:10px; background:var(--accent); color:var(--primary);" id="langBtn">AR</button>
         </div>
        <div class="dev-info">
     <b>Eng. Mahmoud Mahmoud Marie</b><br>
@@ -168,11 +158,11 @@
             <table>
                 <thead>
                     <tr>
-                        <th onclick="sortClients('name')">Name ↕️</th>
-                        <th>Phone</th>
-                        <th onclick="sortClients('gov')">Gov ↕️</th>
-                        <th>AI Score</th>
-                        <th onclick="sortClients('status')">Status ↕️</th>
+                        <th onclick="sortTable(0)">Name ↕️</th>
+                        <th onclick="sortTable(1)">Phone</th>
+                        <th onclick="sortTable(2)">Gov ↕️</th>
+                        <th onclick="sortTable(3)">AI Score</th>
+                        <th onclick="sortTable(4)">Status ↕️</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -228,8 +218,7 @@
                 <textarea id="extraInfo" placeholder="Client info..."></textarea>
                 <button onclick="addOrUpdateTask()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ Save Task</button>
             </div>
-            <!-- [New Addition] Search in Tasks -->
-            <input id="taskSearch" placeholder="🔍 Search tasks..." oninput="renderTasks()" style="margin-bottom:10px;">
+            <input id="taskSearch" placeholder="🔍 Search in tasks..." oninput="renderTasks()" style="margin-bottom: 10px;">
             <table>
                 <thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Deadline</th><th>Action</th></tr></thead>
                 <tbody id="taskBody"></tbody>
@@ -239,11 +228,11 @@
         <div id="dashboardTab" class="tab-content">
             <h2 id="h_dash">📊 AI Performance</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px;">
-                <div style="background:var(--card-bg); padding:20px; border-radius:15px; border-bottom:5px solid var(--info); text-align:center;"><h3>Total</h3><p id="countTotal" style="font-size:2em">0</p></div>
-                <div style="background:var(--card-bg); padding:20px; border-radius:15px; border-bottom:5px solid var(--vip); text-align:center;"><h3>VIP</h3><p id="countVip" style="font-size:2em">0</p></div>
-                <div style="background:var(--card-bg); padding:20px; border-radius:15px; border-bottom:5px solid var(--success); text-align:center;"><h3>Done</h3><p id="countComp" style="font-size:2em">0</p></div>
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--info); text-align:center;"><h3>Total Clients</h3><p id="countTotal" style="font-size:2em">0</p></div>
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--vip); text-align:center;"><h3>VIP</h3><p id="countVip" style="font-size:2em">0</p></div>
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--success); text-align:center;"><h3>Done</h3><p id="countComp" style="font-size:2em">0</p></div>
             </div>
-            <div style="margin-top:20px; background:var(--card-bg); padding:15px; border-radius:15px;">
+            <div style="margin-top:20px; background:#fff; padding:15px; border-radius:15px;">
                 <h4>📍 Geo-Distribution</h4>
                 <div id="geoStats" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
             </div>
@@ -374,9 +363,6 @@ function init() {
         logs = s.val() ? Object.values(s.val()) : []; 
         renderLogs(); 
     });
-    
-    // [New Addition] Load Dark Mode Preference
-    if(localStorage.getItem('dark-mode') === 'true') document.body.classList.add('dark-mode');
 }
 
 // 4. Data Management Functions (UPDATED FOR MULTI-FILTER SEARCH)
@@ -547,11 +533,11 @@ function editTask(i) {
 
 function renderTasks() {
     const b = document.getElementById('taskBody'); if(!b) return;
-    const q = document.getElementById('taskSearch').value.toLowerCase();
+    const q = document.getElementById('taskSearch').value.toLowerCase(); // Added Search Filter
     
     b.innerHTML = tasks
-    .filter(t => !q || t.client.toLowerCase().includes(q) || t.text.toLowerCase().includes(q))
-    .map((t, i) => `
+        .filter(t => !q || t.client.toLowerCase().includes(q) || t.text.toLowerCase().includes(q)) // Filter Logic
+        .map((t, i) => `
         <tr><td><b>${t.client}</b></td><td>${t.text}</td>
         <td><textarea onchange="updateTaskExtra(${i}, this.value)" style="height:40px">${t.extra}</textarea></td>
         <td>${t.date}</td>
@@ -565,7 +551,7 @@ function updateTaskExtra(i, v) { tasks[i].extra = v; db.ref('tasks').set(tasks);
 function delT(i) { if(confirm('Delete task?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); } }
 
 function updateDash() {
-    const ct = document.getElementById('countTotal');
+    const ct = document.getElementById('countTotal'); // Added Total Count
     const cv = document.getElementById('countVip');
     const cc = document.getElementById('countComp');
     if(ct) ct.innerText = clients.length;
@@ -607,7 +593,7 @@ function notify(m, t) { const n = document.getElementById('notification'); n.inn
 function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
 function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; showTab('crmTab', document.getElementById('m_crm')); }
 
-// --- سلة المهملات ---
+// --- التعديل المطلوب فى سلة المهملات ---
 function renderRecycle() { 
     const b = document.getElementById('recycleBody'); 
     if(!b) return; 
@@ -640,17 +626,42 @@ function hardDelete(i) {
     }
 }
 
-// [New Addition] Utility: Sort Clients
-function sortClients(prop) {
-    clients.sort((a, b) => a[prop].localeCompare(b[prop]));
-    renderCRM();
-    notify("Sorted by " + prop, "success");
-}
-
-// [New Addition] Utility: Dark Mode
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('dark-mode', document.body.classList.contains('dark-mode'));
+// [New Addition] Table Sort Logic
+function sortTable(n) {
+  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+  table = document.querySelector("table");
+  switching = true;
+  dir = "asc";
+  while (switching) {
+    switching = false;
+    rows = table.rows;
+    for (i = 1; i < (rows.length - 1); i++) {
+      shouldSwitch = false;
+      x = rows[i].getElementsByTagName("TD")[n];
+      y = rows[i + 1].getElementsByTagName("TD")[n];
+      if (dir == "asc") {
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      } else if (dir == "desc") {
+        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      switchcount ++;
+    } else {
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+    }
+  }
 }
 
 function fillTaskClients() { const s = document.getElementById('taskClientSelect'); if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); }
