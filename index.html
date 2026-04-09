@@ -676,10 +676,51 @@ function init() {
         renderLogs();
     });
 
+   // 1. استلام وتجهيز بيانات المستخدمين فوراً
     db.ref('authSystem/users').on('value', snapshot => {
-        authSystem.users = snapshot.val() ? Object.values(snapshot.val()) : [];
-        renderUsers();
+        const data = snapshot.val();
+        if (data) {
+            // تحويل الكائن لمصفوفة والتأكد من نظافة البيانات
+            authSystem.users = Object.values(data).filter(u => u !== null);
+            console.log("✅ Users synced:", authSystem.users);
+        } else {
+            authSystem.users = [];
+            console.warn("⚠️ No users found in database");
+        }
+        if (typeof renderUsers === "function") renderUsers();
     });
+
+// 2. دالة الدخول الذكية والمؤمنة ضد المسافات
+function checkLogin() {
+    const userInput = document.getElementById('userInput').value.trim();
+    const passInput = document.getElementById('passInput').value.trim();
+    
+    document.getElementById('loginError').style.display = 'none';
+
+    // دخول الطوارئ (الأدمن الرئيسي)
+    if (userInput === "admin" && passInput === "@Mody6699") {
+        loginSuccess("admin", "Master Admin", -1);
+        return;
+    }
+
+    // فحص الموظفين
+    if (authSystem && authSystem.users && authSystem.users.length > 0) {
+        const foundUser = authSystem.users.find(acc => 
+            acc && acc.u && acc.p && 
+            acc.u.toString().trim() === userInput && 
+            acc.p.toString().trim() === passInput
+        );
+
+        if (foundUser) {
+            const userIndex = authSystem.users.indexOf(foundUser);
+            loginSuccess(foundUser.role, foundUser.displayName, userIndex);
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            if (typeof playSound === "function") playSound('soundAlert');
+        }
+    } else {
+        alert("تنبيه: السيستم لسه بيسحب بيانات الموظفين من السيرفر، انتظر ثواني وجرب تاني.");
+    }
 }
 
 // ============================================================
