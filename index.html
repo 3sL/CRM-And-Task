@@ -5,40 +5,12 @@
     <title>Utopia Trading Pro CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie - Secure Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
     <style>
-        :root { 
-            --primary: #1e1e2f; 
-            --accent: #ffcc00; 
-            --success: #28a745; 
-            --danger: #dc3545; 
-            --info: #17a2b8; 
-            --vip: #9b59b6; 
-            --bg-main: #f5f6fa;
-            --card-bg: #ffffff;
-            --text-main: #333;
-        }
-
-        /* Dark Mode variables */
-        .dark-mode {
-            --bg-main: #121212;
-            --card-bg: #1e1e2e;
-            --text-main: #e0e0e0;
-        }
-
-        body { 
-            font-family:'Segoe UI', Tahoma, sans-serif; 
-            background: var(--bg-main); 
-            color: var(--text-main);
-            margin:0; display:flex; height:100vh; overflow:hidden; transition: 0.3s; 
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; 
-        }
+        :root { --primary: #1e1e2f; --accent: #ffcc00; --success: #28a745; --danger: #dc3545; --info: #17a2b8; --vip: #9b59b6; }
+        body { font-family:'Segoe UI', Tahoma, sans-serif; background:#f5f6fa; margin:0; display:flex; height:100vh; overflow:hidden; transition: 0.3s; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
         
         [dir="rtl"] body { flex-direction: row-reverse; }
         [dir="rtl"] .sidebar { border-left: 1px solid #333; border-right: none; }
@@ -63,24 +35,24 @@
         .sidebar button { background:#2e2e4d; color:#fff; border:none; padding:12px; margin:5px 0; border-radius:12px; cursor:pointer; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .sidebar button.active { background:var(--accent); color:var(--primary); }
         
-        .main { flex:1; padding:25px; overflow-y:auto; background: var(--bg-main); }
+        .main { flex:1; padding:25px; overflow-y:auto; background: #f0f2f5; }
         .tab-content { display:none; animation: fadeIn 0.4s; }
         .tab-content.active { display:block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .form-group { background: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select, textarea { background: var(--card-bg); color: var(--text-main); padding:12px; margin:5px 0; width:100%; border-radius:10px; border:1px solid #ddd; box-sizing: border-box; font-size: 14px; outline: none; transition: 0.3s; }
+        .form-group { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select, textarea { padding:12px; margin:5px 0; width:100%; border-radius:10px; border:1px solid #ddd; box-sizing: border-box; font-size: 14px; outline: none; transition: 0.3s; }
         input:focus { border-color: var(--info); }
         
         .btn-save { background: var(--success); color: white; font-weight: bold; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; font-size: 16px; transition: 0.3s; }
         .btn-save:hover { opacity: 0.9; }
         
-        table { width:100%; border-collapse:collapse; background: var(--card-bg); margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        th, td { padding:12px; text-align:center; border-bottom:1px solid #eee; color: var(--text-main); }
+        table { width:100%; border-collapse:collapse; background:#fff; margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        th, td { padding:12px; text-align:center; border-bottom:1px solid #eee; }
         th { background:var(--primary); color:var(--accent); font-size: 12px; }
         
-        .vip-row { background: rgba(155, 89, 182, 0.1) !important; border-left: 5px solid var(--vip); }
-        .hold-row { background: rgba(220, 53, 69, 0.1) !important; border-left: 5px solid var(--danger); }
+        .vip-row { background: #fffcf0 !important; border-left: 5px solid var(--vip); }
+        .hold-row { background: #fff5f5 !important; border-left: 5px solid var(--danger); }
         
         .action-btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; color: white; margin: 2px; transition: 0.2s; }
         .action-btn:hover { transform: scale(1.1); }
@@ -90,15 +62,12 @@
         
         #notification { position: fixed; top:20px; right:20px; padding:15px 30px; border-radius:12px; display:none; z-index:20001; color:#fff; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        .log-entry { font-size: 0.8em; padding: 8px; border-bottom: 1px solid #eee; text-align: left; background: var(--card-bg); margin-bottom: 5px; border-radius: 5px; }
+        .log-entry { font-size: 0.8em; padding: 8px; border-bottom: 1px solid #eee; text-align: left; background: #fff; margin-bottom: 5px; border-radius: 5px; }
         .log-user { color: var(--info); font-weight: bold; }
         .log-action { color: var(--danger); }
         
         .mask-pass { filter: blur(4px); transition: 0.3s; cursor: pointer; }
         .mask-pass:hover { filter: blur(0); }
-
-        /* Dark Mode Toggle Button Style */
-        .toggle-theme { position: absolute; bottom: 80px; left: 20px; background: #3a3a5a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--accent); }
     </style>
 </head>
 <body oncontextmenu="return false;"> 
@@ -144,8 +113,6 @@
         
         <button class="tab-btn admin-only" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent);">👑 Admin Master</button>
         
-        <div class="toggle-theme" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">🌓</div>
-
         <button onclick="logout()" style="margin-top:auto; background:var(--danger); color:white;" id="m_logout">🚪 Logout Securely</button>
     </div>
 
@@ -162,8 +129,7 @@
                     <option value="Completed">Completed</option>
                     <option value="VIP">VIP</option>
                 </select>
-                <button onclick="exportToExcel()" style="background:#2c3e50; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">📊 Export Excel</button>
-                <button onclick="exportToCSV()" style="background:#17a2b8; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">📥 Export CSV</button>
+                <button onclick="exportToCSV()" style="background:#2c3e50; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">📥 Export Data</button>
             </div>
             
             <div class="form-group">
@@ -249,10 +215,10 @@
         <div id="dashboardTab" class="tab-content">
             <h2 id="h_dash">📊 AI Performance</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                <div style="background:var(--card-bg); padding:20px; border-radius:15px; border-bottom:5px solid var(--vip); text-align:center;"><h3>VIP</h3><p id="countVip" style="font-size:2em">0</p></div>
-                <div style="background:var(--card-bg); padding:20px; border-radius:15px; border-bottom:5px solid var(--success); text-align:center;"><h3>Done</h3><p id="countComp" style="font-size:2em">0</p></div>
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--vip); text-align:center;"><h3>VIP</h3><p id="countVip" style="font-size:2em">0</p></div>
+                <div style="background:#fff; padding:20px; border-radius:15px; border-bottom:5px solid var(--success); text-align:center;"><h3>Done</h3><p id="countComp" style="font-size:2em">0</p></div>
             </div>
-            <div style="margin-top:20px; background:var(--card-bg); padding:15px; border-radius:15px;">
+            <div style="margin-top:20px; background:#fff; padding:15px; border-radius:15px;">
                 <h4>📍 Geo-Distribution</h4>
                 <div id="geoStats" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
             </div>
@@ -298,8 +264,7 @@ db.ref('authSystem/users').on('value', s => {
 
 // 2. Authentication System (FIXED)
 function checkLogin() {
-    const u = document.getElementById('userInput').value, 
-          p = document.getElementById('passInput').value;
+    const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
     
     // Admin Hardcoded
     if (u === "admin" && p === "@Mody6699") { 
@@ -311,6 +276,7 @@ function checkLogin() {
     const foundUser = authSystem.users.find(acc => acc.u === u && acc.p === p);
     
     if(foundUser) {
+        // نمرر الفهرس الصحيح للمستخدم داخل المصفوفة
         const actualIdx = authSystem.users.indexOf(foundUser);
         loginSuccess(foundUser.role, foundUser.displayName, actualIdx);
     } else {
@@ -326,40 +292,28 @@ function loginSuccess(role, name, idx) {
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
-    addLog(`Logged in successfully: ${name}`); // تم الإصلاح هنا
+    addLog("Logged in successfully");
     playSound('soundSuccess');
     setTimeout(() => location.reload(), 500);
 }
 
 function logout() {
-    Swal.fire({
-        title: 'Logout?',
-        text: "Are you sure you want to exit the system?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        confirmButtonText: 'Yes, Exit'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            addLog("Logged out");
-            sessionStorage.clear();
-            location.reload();
-        }
-    });
+    if(confirm("Are you sure you want to logout?")) {
+        addLog("Logged out");
+        sessionStorage.clear();
+        location.reload();
+    }
 }
 
 // 3. Core Initialization
 function init() {
-    if(localStorage.getItem('theme') === 'dark') {
-        document.documentElement.classList.add('dark-mode');
-    }
-
     if(!sessionStorage.getItem('isLoggedIn') || !sessionStorage.getItem('u_token')) return;
     
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
     
+    // التعديل: إخفاء الرتبة عن المستخدمين وإظهارها للماستر فقط
     const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
         roleBadge.innerText = "MASTER";
@@ -374,12 +328,11 @@ function init() {
 
     const gSelect = document.getElementById('gov');
     if(gSelect) {
-        gSelect.innerHTML = ''; 
-        govs.forEach(g => {
-            gSelect.innerHTML += `<option value="${g}">${g}</option>`;
-        });
+        gSelect.innerHTML = '';
+        govs.forEach(g => gSelect.innerHTML += <option value="${g}">${g}</option>);
     }
 
+    // Real-time Database Listeners
     db.ref('clients').on('value', s => { 
         clients = s.val() ? Object.values(s.val()) : []; 
         renderCRM(); updateDash(); fillTaskClients(); updateGeo(); 
@@ -398,19 +351,20 @@ function init() {
     });
 }
 
-// 4. Data Management Functions
+// 4. Data Management Functions (UPDATED FOR MULTI-FILTER SEARCH)
 function renderCRM() {
     const b = document.getElementById('tableBody'); if(!b) return;
     b.innerHTML = '';
-    const q = document.getElementById('search').value.toLowerCase(), 
-          fStatus = document.getElementById('filterStatus').value;
+    const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value;
 
     clients.forEach((c, i) => {
+        // التحقق من البحث في (الاسم، التليفون، الحالة)
         const matchesSearch = !q || 
             c.name.toLowerCase().includes(q) || 
             c.phone.includes(q) || 
             c.status.toLowerCase().includes(q);
 
+        // التحقق من فلتر الحالة المنفصل
         const matchesStatusFilter = (fStatus === 'All' || c.status === fStatus);
 
         if(!matchesSearch || !matchesStatusFilter) return;
@@ -431,7 +385,6 @@ function renderCRM() {
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify("Name required", "error");
-    
     const c = { 
         name: n, 
         phone: document.getElementById('phone').value, 
@@ -444,55 +397,30 @@ function addOrUpdate() {
     };
     
     if(editIdx > -1) { 
-        addLog(`Updated client: ${c.name}`); 
+        addLog(Updated client: ${c.name}); 
         clients[editIdx] = c; 
     } else { 
-        addLog(`Added new client: ${c.name}`); 
+        addLog(Added new client: ${c.name}); 
         clients.push(c); 
     }
-    
     db.ref('clients').set(clients);
     editIdx = -1;
-    
-    // تنظيف الحقول بطريقة آمنة
-    ['name','phone','notes','agent'].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.value = '';
-    });
-    
-    Swal.fire({ 
-        icon: 'success', 
-        title: 'Secured!', 
-        text: 'Client data saved to Cloud.', 
-        timer: 2000, 
-        showConfirmButton: false 
-    });
-}
-function deleteClient(i) {
-    Swal.fire({
-        title: 'Move to Recycle Bin?',
-        text: "You can restore this client later.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, Delete'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            addLog(`Deleted client: ${clients[i].name}`); // تم الإصلاح هنا
-            deletedClients.push(clients[i]);
-            clients.splice(i, 1);
-            db.ref('clients').set(clients);
-            db.ref('deletedClients').set(deletedClients);
-            notify("Moved to Recycle Bin", "success");
-        }
-    });
+    ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
+    notify("Database Secured & Saved", "success");
 }
 
+function deleteClient(i) {
+    if(!confirm('Security Check: Move to recycle bin?')) return;
+    addLog(Deleted client: ${clients[i].name});
+    deletedClients.push(clients[i]);
+    clients.splice(i, 1);
+    db.ref('clients').set(clients);
+    db.ref('deletedClients').set(deletedClients);
+}
+
+// 5. Admin & Logs Logic
 function addLog(action) {
-    const log = { 
-        user: sessionStorage.getItem('userDisplayName') || "Unknown", 
-        action: action, 
-        time: new Date().toLocaleString() 
-    };
+    const log = { user: sessionStorage.getItem('userDisplayName') || "Unknown", action: action, time: new Date().toLocaleString() };
     db.ref('logs').push(log);
 }
 
@@ -509,10 +437,10 @@ function renderLogs() {
 
 function addUser() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
-    if(!u || !p) return Swal.fire('Error', 'Fill all security fields', 'error');
+    if(!u || !p) return alert("Fill all security fields");
     authSystem.users.push({ u, p, displayName: d, role: r });
     db.ref('authSystem/users').set(authSystem.users).then(() => {
-        Swal.fire('Success', 'User Created Successfully', 'success');
+        alert("User Created Successfully");
         addLog(Admin created user: ${d});
         document.getElementById('newU').value = '';
         document.getElementById('newP').value = '';
@@ -602,11 +530,7 @@ function renderTasks() {
     `).join('');
 }
 function updateTaskExtra(i, v) { tasks[i].extra = v; db.ref('tasks').set(tasks); }
-function delT(i) { 
-    Swal.fire({ title: 'Delete Task?', icon: 'question', showCancelButton: true }).then(r => {
-        if(r.isConfirmed){ tasks.splice(i,1); db.ref('tasks').set(tasks); }
-    });
-}
+function delT(i) { if(confirm('Delete task?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); } }
 
 function updateDash() {
     const cv = document.getElementById('countVip');
@@ -623,75 +547,33 @@ function updateDash() {
     statusChart = new Chart(ctx, { type:'doughnut', data:{ labels:Object.keys(counts), datasets:[{data:Object.values(counts), backgroundColor:['#17a2b8','#ffcc00','#dc3545','#28a745','#9b59b6']}] } });
 }
 
-function fillTaskClients() { 
-    const s = document.getElementById('taskClientSelect'); 
-    if(s) {
-        s.innerHTML = '<option value="">Select Client</option>' + 
-        clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); 
-    }
-}
-// تحسين تصدير البيانات باستخدام مكتبة XLSX الحقيقية
-function exportToExcel() {
-    const worksheet = XLSX.utils.json_to_sheet(clients);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Clients");
-    XLSX.writeFile(workbook, "Utopia_CRM_Full_Report.xlsx");
-    addLog("Exported full Excel report");
+function updateGeo() {
+    const counts = {}; clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
+    const gs = document.getElementById('geoStats');
+    if(gs) gs.innerHTML = Object.entries(counts).map(([g, c]) => <span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:11px;">${g}: ${c}</span>).join('');
 }
 
 function exportToCSV() {
     let csv = "\uFEFFName,Phone,Gov,Status,Agent,Notes\n";
-    clients.forEach(c => csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}"\n`);
+    clients.forEach(c => csv += "${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}"\n);
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-    link.download = "Secure_Utopia_Export.csv"; 
-    link.click();
+    link.download = "Secure_Utopia_Export.csv"; link.click();
     addLog("Exported database to CSV");
 }
 
 // 7. Helper Utilities
 function calculateAIScore(c) {
-    let s = 50; 
-    if (c.status === 'VIP') s += 40; 
-    if (c.status === 'Interested') s += 20; 
-    if (c.status === 'Hold') s -= 20;
+    let s = 50; if (c.status === 'VIP') s += 40; if (c.status === 'Interested') s += 20; if (c.status === 'Hold') s -= 20;
     return Math.min(100, Math.max(0, s));
 }
+function getStatusColor(s) { return { VIP:'#9b59b6', Completed:'#28a745', Hold:'#dc3545' }[s] || '#1e1e2f'; }
+function playSound(id) { const s = document.getElementById(id); if(s) s.play(); }
+function notify(m, t) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); }
+function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
+function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; showTab('crmTab', document.getElementById('m_crm')); }
 
-function getStatusColor(s) { 
-    return { 'VIP':'#9b59b6', 'Completed':'#28a745', 'Hold':'#dc3545' }[s] || '#1e1e2f'; 
-}
-
-function playSound(id) { 
-    const s = document.getElementById(id); 
-    if(s) s.play(); 
-}
-
-function notify(m, t) { 
-    const n = document.getElementById('notification'); 
-    n.innerText = m; 
-    n.style.display = 'block'; 
-    n.style.background = t==='success'?'#28a745':'#dc3545'; 
-    setTimeout(() => n.style.display = 'none', 3000); 
-}
-
-function showTab(id, btn) { 
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-    document.getElementById(id).classList.add('active'); 
-    if(btn) btn.classList.add('active'); 
-}
-
-function editClient(i) { 
-    editIdx = i; 
-    const c = clients[i]; 
-    document.getElementById('name').value = c.name; 
-    document.getElementById('phone').value = c.phone; 
-    document.getElementById('status').value = c.status; 
-    document.getElementById('notes').value = c.notes; 
-    showTab('crmTab', document.getElementById('m_crm')); 
-}
-
+// --- التعديل المطلوب فى سلة المهملات ---
 function renderRecycle() { 
     const b = document.getElementById('recycleBody'); 
     if(!b) return; 
@@ -708,7 +590,7 @@ function renderRecycle() {
 }
 
 function restore(i) { 
-    addLog(`Restored client: ${deletedClients[i].name}`); // تم إصلاح علامة الـ ` هنا
+    addLog(Restored client: ${deletedClients[i].name}); 
     clients.push(deletedClients[i]); 
     deletedClients.splice(i,1); 
     db.ref('clients').set(clients); 
@@ -716,80 +598,23 @@ function restore(i) {
 }
 
 function hardDelete(i) {
-    Swal.fire({
-        title: 'PERMANENT DELETE?',
-        text: "This action cannot be undone!",
-        icon: 'error',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Yes, Delete Forever'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            addLog(`PERMANENTLY DELETED: ${deletedClients[i].name}`); // تم إصلاح علامة الـ ` هنا
-            deletedClients.splice(i, 1);
-            db.ref('deletedClients').set(deletedClients);
-            notify("Client Deleted Permanently", "success");
-        }
-    });
+    if(confirm('Security Warning: This will PERMANENTLY delete the client from the database. Proceed?')) {
+        addLog(PERMANENTLY DELETED: ${deletedClients[i].name});
+        deletedClients.splice(i, 1);
+        db.ref('deletedClients').set(deletedClients);
+        notify("Client Deleted Permanently", "success");
+    }
 }
+// ------------------------------------
 
-function delU(i) { 
-    if(confirm('Permanently delete this user?')) { 
-        addLog(`Deleted user account: ${authSystem.users[i].displayName}`); // تم إصلاح علامة الـ ` هنا
-        authSystem.users.splice(i, 1); 
-        db.ref('authSystem/users').set(authSystem.users); 
-    } 
-}
-
-function restore(i) { 
-    addLog(`Restored client: ${deletedClients[i].name}`); 
-    clients.push(deletedClients[i]); 
-    deletedClients.splice(i,1); 
-    db.ref('clients').set(clients); 
-    db.ref('deletedClients').set(deletedClients); 
-}
-
-function hardDelete(i) {
-    Swal.fire({
-        title: 'PERMANENT DELETE?',
-        text: "This action cannot be undone!",
-        icon: 'error',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Yes, Delete Forever'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            addLog(`PERMANENTLY DELETED: ${deletedClients[i].name}`);
-            deletedClients.splice(i, 1);
-            db.ref('deletedClients').set(deletedClients);
-            notify("Client Deleted Permanently", "success");
-        }
-    });
-}
-
-function fillTaskClients() { 
-    const s = document.getElementById('taskClientSelect'); 
-    if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); 
-}
-
-function delU(i) { 
-    if(confirm('Permanently delete this user?')) { 
-        addLog(`Deleted user account: ${authSystem.users[i].displayName}`); 
-        authSystem.users.splice(i, 1); 
-        db.ref('authSystem/users').set(authSystem.users); 
-    } 
-}
+function fillTaskClients() { const s = document.getElementById('taskClientSelect'); if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => <option value="${c.name}">${c.name}</option>).join(''); }
+function delU(i) { if(confirm('Permanently delete this user?')) { addLog(Deleted user account: ${authSystem.users[i].displayName}); authSystem.users.splice(i, 1); db.ref('authSystem/users').set(authSystem.users); } }
 
 function toggleLang() {
     const html = document.getElementById('htmlTag');
     const isLtr = html.getAttribute('dir') === 'ltr';
     html.setAttribute('dir', isLtr ? 'rtl' : 'ltr');
     document.getElementById('langBtn').innerText = isLtr ? 'EN' : 'AR';
-}
-
-function toggleDarkMode() {
-    const isDark = document.documentElement.classList.toggle('dark-mode');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
 window.onload = init;
