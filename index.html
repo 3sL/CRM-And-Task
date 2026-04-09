@@ -572,38 +572,36 @@ const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "
 // AUTHENTICATION LOGIC
 // ============================================================
 function checkLogin() {
-    // جلب القيم مع حذف أي مسافات زائدة في البداية أو النهاية
-    const u = document.getElementById('userInput').value.trim();
-    const p = document.getElementById('passInput').value.trim();
+    const userInput = document.getElementById('userInput').value.trim();
+    const passInput = document.getElementById('passInput').value.trim();
     
-    // إخفاء رسالة الخطأ عند كل محاولة جديدة
     document.getElementById('loginError').style.display = 'none';
-    
-    // 1. نظام الدخول الطوارئ (Master Admin)
-    if (u === "admin" && p === "@Mody6699") {
-        console.log("Master Admin Access Granted");
+
+    // 1. دخول الأدمن الرئيسي (Master Admin)
+    if (userInput === "admin" && passInput === "@Mody6699") {
         loginSuccess("admin", "Master Admin", -1);
         return;
     }
-    
-    // 2. التحقق من وجود مستخدمين في النظام قبل البحث
-    if (authSystem && authSystem.users && Array.isArray(authSystem.users)) {
+
+    // 2. فحص يوزرات الموظفين من قاعدة البيانات
+    if (authSystem && authSystem.users) {
+        // تحويل البيانات لمصفوفة لضمان البحث الصحيح بنسبة 100%
+        const usersList = Object.values(authSystem.users);
         
-        // البحث عن المستخدم (مع التأكد من مطابقة الحالة وبدون مسافات)
-        const foundUser = authSystem.users.find(acc => acc.u.trim() === u && acc.p.trim() === p);
-        
+        const foundUser = usersList.find(acc => 
+            acc && acc.u && acc.p && 
+            acc.u.toString().trim() === userInput && 
+            acc.p.toString().trim() === passInput
+        );
+
         if (foundUser) {
-            console.log("User Access Granted: " + foundUser.displayName);
-            loginSuccess(foundUser.role, foundUser.displayName, authSystem.users.indexOf(foundUser));
+            loginSuccess(foundUser.role, foundUser.displayName, usersList.indexOf(foundUser));
         } else {
-            // بيانات خاطئة
             document.getElementById('loginError').style.display = 'block';
             playSound('soundAlert');
         }
     } else {
-        // في حال لم يتم تحميل البيانات من Firebase بعد
-        alert("System is still loading data, please wait a second...");
-        console.error("AuthSystem or Users array is not defined yet.");
+        alert("تنبيه: جاري مزامنة بيانات المستخدمين.. انتظر ثانية واحدة وحاول مجدداً");
     }
 }
 
