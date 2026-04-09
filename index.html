@@ -645,23 +645,28 @@ function init() {
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
    // تحديد العنصر والتأكد إنه موجود
-   // الخطة البديلة: إجبار العنصر على الظهور وتغيير مكانه لو لزم الأمر
-const target = document.getElementById('profName');
-if (target) {
-    // 1. إجبار العنصر على الظهور
-    target.setAttribute('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; align-items: center; gap: 10px;');
-    
-    // 2. وضع المحتوى الجديد
-    target.innerHTML = `
-        <span style="color: #ffffff !important; font-weight: bold;">${sessionStorage.getItem('userDisplayName')}</span>
-        <a href="tel:01222153415" style="background: #00ff88 !important; color: #000 !important; padding: 5px 12px; border-radius: 50px; font-size: 12px !important; text-decoration: none !important; font-weight: bold !important; box-shadow: 0 0 15px rgba(0,255,136,0.6); display: inline-block !important;">
-            📞 01222153415
-        </a>
-    `;
-} else {
-    // 3. لو مش لاقي الـ ID أصلاً، هيطلع لك تنبيه في الكونسول عشان نعرف المشكلة فين
-    console.error("يا هندسة الـ ID اللي اسمه profName مش موجود في صفحة الـ HTML عندك!");
-}
+  // الحل الشامل: البحث عن الاسم في كل الصفحة وإضافة الرقم جنبه
+setTimeout(() => {
+    const userName = sessionStorage.getItem('userDisplayName');
+    if (userName) {
+        // بنلف على كل العناصر اللي ممكن يكون فيها نص
+        const elements = document.querySelectorAll('span, div, b, p, h3');
+        elements.forEach(el => {
+            // لو العنصر جواه اسم المستخدم بالظبط ومفيش جواه عناصر تانية
+            if (el.innerText && el.innerText.trim() === userName.trim() && el.children.length === 0) {
+                el.style.display = 'inline-flex';
+                el.style.alignItems = 'center';
+                el.style.gap = '10px';
+                el.innerHTML = `
+                    ${userName} 
+                    <a href="tel:01222153415" style="background:#00ff88 !important; color:#000 !important; padding:2px 10px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:bold; box-shadow:0 0 10px rgba(0,255,136,0.5); margin-left:5px;">
+                        📞 01222153415
+                    </a>
+                `;
+            }
+        });
+    }
+}, 1500); // بينتظر ثانية ونص عشان نضمن إن الصفحة حملت بالكامل
     
    const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
