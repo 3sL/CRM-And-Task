@@ -346,14 +346,20 @@
             pointer-events: none;
             z-index: 99999;
         }
+        
+        /* حماية إضافية - منع تحديد النص */
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
     </style>
 </head>
-<body oncontextmenu="return false;"> 
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;"> 
 <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
 <div id="notification"></div>
-<div class="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415</div>
+<div class="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415 | محمي قانونياً</div>
 
 <div id="loginOverlay">
     <div class="login-card">
@@ -502,7 +508,7 @@
         <div id="recycleTab" class="tab-content">
             <h2 style="color:var(--danger)">♻️ Recycle Bin (Archived)</h2>
             <div class="table-container">
-                <table>
+                <tr>
                     <thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Restore</th><th>Delete</th></tr></thead>
                     <tbody id="recycleBody"></tbody>
                 </table>
@@ -585,8 +591,8 @@
     
     var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
     
-    // Anti-DevTools
-    var devtools = /Chrome|Firefox|Safari|Edge/.test(navigator.userAgent);
+    // ========== الحماية المتقدمة ==========
+    // كشف أدوات المطور ومنعها
     setInterval(function(){
         var before = new Date();
         debugger;
@@ -596,6 +602,61 @@
             setTimeout(function(){ window.location.href = "about:blank"; }, 100);
         }
     }, 1000);
+    
+    // منع حفظ الصفحة (Ctrl+S) بشكل قاطع
+    document.addEventListener('keydown', function(e){
+        // منع Ctrl+S (حفظ الصفحة)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
+            e.preventDefault();
+            e.stopPropagation();
+            _0x3d2a['notify']("❌ حفظ الصفحة غير مسموح به - هذه النسخة محمية بحقوق الملكية", "error");
+            return false;
+        }
+        // منع Ctrl+P (طباعة)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
+            e.preventDefault();
+            _0x3d2a['notify']("❌ الطباعة غير مسموحة", "error");
+            return false;
+        }
+        // منع Ctrl+U (عرض المصدر)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
+            e.preventDefault();
+            return false;
+        }
+        // منع F12
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        // منع Ctrl+Shift+I (Console)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
+            e.preventDefault();
+            return false;
+        }
+        // منع Ctrl+Shift+J (Console)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
+            e.preventDefault();
+            return false;
+        }
+        // منع Ctrl+Shift+C (Element inspector)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
+    // منع السحب والإفلات لحماية الملفات
+    document.addEventListener('dragenter', function(e) { e.preventDefault(); return false; });
+    document.addEventListener('dragover', function(e) { e.preventDefault(); return false; });
+    document.addEventListener('drop', function(e) { e.preventDefault(); return false; });
+    
+    // منع view-source
+    if(window.location.protocol === 'view-source:'){
+        window.location.href = 'about:blank';
+    }
+    
+    // منع تحديد النص بالماوس
+    document.onselectstart = function() { return false; };
     
     // Check Login
     _0x3d2a['check'] = function(){
@@ -739,7 +800,7 @@
                 var rowClass = "";
                 if(c.status === 'VIP') rowClass = "vip-row";
                 if(c.status === 'Hold') rowClass = "hold-row";
-                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.gov || '') + '</td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></td></tr>';
+                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.gov || '') + '</td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></td></table>';
             }
         });
     };
@@ -1076,28 +1137,9 @@
         }
     };
     
-    // Anti-theft: prevent view-source and save
-    if(window.location.protocol === 'view-source:'){
-        window.location.href = 'about:blank';
-    }
-    document.addEventListener('keydown', function(e){
-        if((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')){
-            e.preventDefault();
-            _0x3d2a['notify']("Saving is disabled", "error");
-            return false;
-        }
-    });
-    
     // Start
     _0x3d2a['init']();
 })();
-
-// Security
-document.onkeydown = function(e){
-    if(e.keyCode == 123) return false;
-    if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) return false;
-    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
-}
 </script>
 </body>
 </html>
