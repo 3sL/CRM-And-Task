@@ -646,14 +646,15 @@ function init() {
     document.getElementById('mainApp').style.display = 'flex';
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
     
-    const roleBadge = document.getElementById('userBadge');
+   const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
         roleBadge.innerText = "👑 MASTER ACCESS";
         roleBadge.style.background = "var(--vip)";
+        roleBadge.style.display = "inline-block"; // تظهر للأدمن فقط
     } else {
-        roleBadge.innerText = "AGENT: " + sessionStorage.getItem('userRole').toUpperCase();
+        // إخفاء الكلمة تماماً لليوزر العادي
+        roleBadge.style.display = "none"; 
     }
-    
     if(sessionStorage.getItem('userRole') === 'admin') {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
