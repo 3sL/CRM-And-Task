@@ -371,7 +371,7 @@
         </div>
         
         <div class="dev-info">
-            <b>Eng. Mahmoud Mahmoud Marie</b><br>
+            <b>Eng. Mahmoud Marie</b><br>
             <span id="userBadge" style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:10px; margin-top:5px; display:inline-block;"></span>
         </div>
         
@@ -572,36 +572,21 @@ const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "
 // AUTHENTICATION LOGIC
 // ============================================================
 function checkLogin() {
-    const userInput = document.getElementById('userInput').value.trim();
-    const passInput = document.getElementById('passInput').value.trim();
+    const u = document.getElementById('userInput').value;
+    const p = document.getElementById('passInput').value;
     
-    document.getElementById('loginError').style.display = 'none';
-
-    // 1. دخول الأدمن الرئيسي (Master Admin)
-    if (userInput === "admin" && passInput === "@Mody6699") {
+    // Master Admin Override
+    if (u === "admin" && p === "@Mody6699") {
         loginSuccess("admin", "Master Admin", -1);
         return;
     }
-
-    // 2. فحص يوزرات الموظفين من قاعدة البيانات
-    if (authSystem && authSystem.users) {
-        // تحويل البيانات لمصفوفة لضمان البحث الصحيح بنسبة 100%
-        const usersList = Object.values(authSystem.users);
-        
-        const foundUser = usersList.find(acc => 
-            acc && acc.u && acc.p && 
-            acc.u.toString().trim() === userInput && 
-            acc.p.toString().trim() === passInput
-        );
-
-        if (foundUser) {
-            loginSuccess(foundUser.role, foundUser.displayName, usersList.indexOf(foundUser));
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-            playSound('soundAlert');
-        }
+    
+    const foundUser = authSystem.users.find(acc => acc.u === u && acc.p === p);
+    if(foundUser) {
+        loginSuccess(foundUser.role, foundUser.displayName, authSystem.users.indexOf(foundUser));
     } else {
-        alert("تنبيه: جاري مزامنة بيانات المستخدمين.. انتظر ثانية واحدة وحاول مجدداً");
+        document.getElementById('loginError').style.display = 'block';
+        playSound('soundAlert');
     }
 }
 
@@ -676,51 +661,10 @@ function init() {
         renderLogs();
     });
 
-   // 1. استلام وتجهيز بيانات المستخدمين فوراً
     db.ref('authSystem/users').on('value', snapshot => {
-        const data = snapshot.val();
-        if (data) {
-            // تحويل الكائن لمصفوفة والتأكد من نظافة البيانات
-            authSystem.users = Object.values(data).filter(u => u !== null);
-            console.log("✅ Users synced:", authSystem.users);
-        } else {
-            authSystem.users = [];
-            console.warn("⚠️ No users found in database");
-        }
-        if (typeof renderUsers === "function") renderUsers();
+        authSystem.users = snapshot.val() ? Object.values(snapshot.val()) : [];
+        renderUsers();
     });
-
-// 2. دالة الدخول الذكية والمؤمنة ضد المسافات
-function checkLogin() {
-    const userInput = document.getElementById('userInput').value.trim();
-    const passInput = document.getElementById('passInput').value.trim();
-    
-    document.getElementById('loginError').style.display = 'none';
-
-    // دخول الطوارئ (الأدمن الرئيسي)
-    if (userInput === "admin" && passInput === "@Mody6699") {
-        loginSuccess("admin", "Master Admin", -1);
-        return;
-    }
-
-    // فحص الموظفين
-    if (authSystem && authSystem.users && authSystem.users.length > 0) {
-        const foundUser = authSystem.users.find(acc => 
-            acc && acc.u && acc.p && 
-            acc.u.toString().trim() === userInput && 
-            acc.p.toString().trim() === passInput
-        );
-
-        if (foundUser) {
-            const userIndex = authSystem.users.indexOf(foundUser);
-            loginSuccess(foundUser.role, foundUser.displayName, userIndex);
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-            if (typeof playSound === "function") playSound('soundAlert');
-        }
-    } else {
-        alert("تنبيه: السيستم لسه بيسحب بيانات الموظفين من السيرفر، انتظر ثواني وجرب تاني.");
-    }
 }
 
 // ============================================================
