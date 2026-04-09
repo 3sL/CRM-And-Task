@@ -298,7 +298,8 @@ db.ref('authSystem/users').on('value', s => {
 
 // 2. Authentication System (FIXED)
 function checkLogin() {
-    const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
+    const u = document.getElementById('userInput').value, 
+          p = document.getElementById('passInput').value;
     
     // Admin Hardcoded
     if (u === "admin" && p === "@Mody6699") { 
@@ -310,7 +311,6 @@ function checkLogin() {
     const foundUser = authSystem.users.find(acc => acc.u === u && acc.p === p);
     
     if(foundUser) {
-        // نمرر الفهرس الصحيح للمستخدم داخل المصفوفة
         const actualIdx = authSystem.users.indexOf(foundUser);
         loginSuccess(foundUser.role, foundUser.displayName, actualIdx);
     } else {
@@ -326,13 +326,12 @@ function loginSuccess(role, name, idx) {
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
-    addLog("Logged in successfully");
+    addLog(`Logged in successfully: ${name}`); // تم الإصلاح هنا
     playSound('soundSuccess');
     setTimeout(() => location.reload(), 500);
 }
 
 function logout() {
-    // استخدام SweetAlert2 للتأكيد الاحترافي
     Swal.fire({
         title: 'Logout?',
         text: "Are you sure you want to exit the system?",
@@ -351,7 +350,6 @@ function logout() {
 
 // 3. Core Initialization
 function init() {
-    // استرجاع وضع الـ Dark Mode المفضل
     if(localStorage.getItem('theme') === 'dark') {
         document.documentElement.classList.add('dark-mode');
     }
@@ -362,7 +360,6 @@ function init() {
     document.getElementById('mainApp').style.display = 'flex';
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
     
-    // التعديل: إخفاء الرتبة عن المستخدمين وإظهارها للماستر فقط
     const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
         roleBadge.innerText = "MASTER";
@@ -375,15 +372,14 @@ function init() {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
 
-const gSelect = document.getElementById('gov');
+    const gSelect = document.getElementById('gov');
     if(gSelect) {
-        gSelect.innerHTML = ''; // مهم جداً عشان ميكررش المحافظات كل ما الصفحة تفتح
+        gSelect.innerHTML = ''; 
         govs.forEach(g => {
             gSelect.innerHTML += `<option value="${g}">${g}</option>`;
         });
     }
 
-    // Real-time Database Listeners
     db.ref('clients').on('value', s => { 
         clients = s.val() ? Object.values(s.val()) : []; 
         renderCRM(); updateDash(); fillTaskClients(); updateGeo(); 
@@ -402,20 +398,19 @@ const gSelect = document.getElementById('gov');
     });
 }
 
-// 4. Data Management Functions (UPDATED FOR MULTI-FILTER SEARCH)
+// 4. Data Management Functions
 function renderCRM() {
     const b = document.getElementById('tableBody'); if(!b) return;
     b.innerHTML = '';
-    const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value;
+    const q = document.getElementById('search').value.toLowerCase(), 
+          fStatus = document.getElementById('filterStatus').value;
 
     clients.forEach((c, i) => {
-        // التحقق من البحث في (الاسم، التليفون، الحالة)
         const matchesSearch = !q || 
             c.name.toLowerCase().includes(q) || 
             c.phone.includes(q) || 
             c.status.toLowerCase().includes(q);
 
-        // التحقق من فلتر الحالة المنفصل
         const matchesStatusFilter = (fStatus === 'All' || c.status === fStatus);
 
         if(!matchesSearch || !matchesStatusFilter) return;
@@ -448,17 +443,16 @@ function addOrUpdate() {
     };
     
     if(editIdx > -1) { 
-        addLog(Updated client: ${c.name}); 
+        addLog(`Updated client: ${c.name}`); // تم الإصلاح هنا
         clients[editIdx] = c; 
     } else { 
-        addLog(Added new client: ${c.name}); 
+        addLog(`Added new client: ${c.name}`); // تم الإصلاح هنا
         clients.push(c); 
     }
     db.ref('clients').set(clients);
     editIdx = -1;
     ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
     
-    // إشعار احترافي باستخدام SweetAlert2
     Swal.fire({ icon: 'success', title: 'Secured!', text: 'Client data saved to Cloud.', timer: 2000, showConfirmButton: false });
 }
 
@@ -471,7 +465,7 @@ function deleteClient(i) {
         confirmButtonText: 'Yes, Delete'
     }).then((result) => {
         if (result.isConfirmed) {
-            addLog(Deleted client: ${clients[i].name});
+            addLog(`Deleted client: ${clients[i].name}`); // تم الإصلاح هنا
             deletedClients.push(clients[i]);
             clients.splice(i, 1);
             db.ref('clients').set(clients);
@@ -481,9 +475,12 @@ function deleteClient(i) {
     });
 }
 
-// 5. Admin & Logs Logic
 function addLog(action) {
-    const log = { user: sessionStorage.getItem('userDisplayName') || "Unknown", action: action, time: new Date().toLocaleString() };
+    const log = { 
+        user: sessionStorage.getItem('userDisplayName') || "Unknown", 
+        action: action, 
+        time: new Date().toLocaleString() 
+    };
     db.ref('logs').push(log);
 }
 
