@@ -375,10 +375,12 @@ function init() {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
 
-    const gSelect = document.getElementById('gov');
+const gSelect = document.getElementById('gov');
     if(gSelect) {
-        gSelect.innerHTML = '';
-        govs.forEach(g => gSelect.innerHTML += <option value="${g}">${g}</option>);
+        gSelect.innerHTML = ''; // مهم جداً عشان ميكررش المحافظات كل ما الصفحة تفتح
+        govs.forEach(g => {
+            gSelect.innerHTML += `<option value="${g}">${g}</option>`;
+        });
     }
 
     // Real-time Database Listeners
