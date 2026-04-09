@@ -611,13 +611,13 @@ function updateDash() {
     statusChart = new Chart(ctx, { type:'doughnut', data:{ labels:Object.keys(counts), datasets:[{data:Object.values(counts), backgroundColor:['#17a2b8','#ffcc00','#dc3545','#28a745','#9b59b6']}] } });
 }
 
-function updateGeo() {
-    const counts = {}; 
-    clients.forEach(c => counts[c.gov] = (counts[c.gov] || 0) + 1);
-    const gs = document.getElementById('geoStats');
-    if(gs) gs.innerHTML = Object.entries(counts).map(([g, c]) => `<span style="background:rgba(0,0,0,0.05); padding:5px 10px; border-radius:15px; font-size:11px;">${g}: ${c}</span>`).join('');
+function fillTaskClients() { 
+    const s = document.getElementById('taskClientSelect'); 
+    if(s) {
+        s.innerHTML = '<option value="">Select Client</option>' + 
+        clients.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); 
+    }
 }
-
 // تحسين تصدير البيانات باستخدام مكتبة XLSX الحقيقية
 function exportToExcel() {
     const worksheet = XLSX.utils.json_to_sheet(clients);
