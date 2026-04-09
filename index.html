@@ -47,7 +47,6 @@
             flex-direction: row-reverse;
         }
 
-        /* Security Overlay Styling */
         #loginOverlay {
             position: fixed;
             top: 0;
@@ -117,7 +116,6 @@
             box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
         }
 
-        /* Main Application Structure */
         #mainApp {
             display: none;
             width: 100%;
@@ -205,7 +203,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Form Controls */
         .form-group {
             background: white;
             padding: 25px;
@@ -252,7 +249,6 @@
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
         }
 
-        /* Table Design */
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -277,6 +273,7 @@
             text-align: center;
             position: sticky;
             top: 0;
+            cursor: pointer;
         }
 
         td {
@@ -313,7 +310,6 @@
         .btn-del { background: var(--danger); }
         .btn-edit { background: var(--accent); color: var(--primary); }
 
-        /* Notifications & Badges */
         #notification {
             position: fixed;
             top: 25px;
@@ -371,12 +367,12 @@
         </div>
         
         <div class="dev-info">
-    <b>Eng. Mahmoud Mahmoud Marie</b><br>
-    <a href="tel:+201222153415" style="color: #00ff88; text-decoration: none; font-size: 13px; font-weight: bold; display: block; margin-top: 5px;">
-        📞 +201222153415
-    </a>
-    <span id="userBadge" style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:10px; margin-top:5px; display:inline-block;"></span>
-</div>
+            <b>Eng. Mahmoud Mahmoud Marie</b><br>
+            <a href="tel:+201222153415" style="color: #00ff88; text-decoration: none; font-size: 13px; font-weight: bold; display: block; margin-top: 5px;">
+                📞 +201222153415
+            </a>
+            <span id="userBadge" style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:10px; margin-top:5px; display:inline-block;"></span>
+        </div>
         
         <button class="tab-btn active" onclick="showTab('crmTab', this)" id="m_crm">👥 Clients Registry</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button>
@@ -568,11 +564,12 @@ const db = firebase.database();
 // ============================================================
 let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [];
 let editIdx = -1, editTaskIdx = -1, statusChart = null;
+let sortColumn = 0, sortDirection = 'asc';
 
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
 // ============================================================
-// AUTHENTICATION LOGIC (تعديل لضمان الدخول الصحيح)
+// AUTHENTICATION LOGIC
 // ============================================================
 function checkLogin() {
     const uInput = document.getElementById('userInput').value.trim();
@@ -580,19 +577,15 @@ function checkLogin() {
     
     document.getElementById('loginError').style.display = 'none';
 
-    // 1. دخول الأدمن الرئيسي (Master Override)
     if (uInput === "admin" && pInput === "@Mody6699") {
         loginSuccess("admin", "Master Admin", -1);
         return;
     }
 
-    // 2. سحب البيانات فوراً عند الضغط (Direct Fetch)
     db.ref('authSystem/users').once('value').then(snapshot => {
         const data = snapshot.val();
         if (data) {
-            // تحويل البيانات لمصفوفة لضمان البحث الصحيح
             const usersList = Object.values(data);
-            
             const foundUser = usersList.find(acc => 
                 acc && acc.u && acc.p && 
                 acc.u.toString().trim() === uInput && 
@@ -600,10 +593,8 @@ function checkLogin() {
             );
 
             if (foundUser) {
-                // نجاح الدخول
                 loginSuccess(foundUser.role, foundUser.displayName, usersList.indexOf(foundUser));
             } else {
-                // بيانات خاطئة
                 document.getElementById('loginError').style.display = 'block';
                 if(typeof playSound === 'function') playSound('soundAlert');
             }
@@ -615,13 +606,13 @@ function checkLogin() {
         alert("فشل الاتصال بقاعدة البيانات. تأكد من الإنترنت.");
     });
 }
+
 function loginSuccess(role, name, idx) {
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
     
-    // تسجيل لوج الدخول
     db.ref('logs').push({
         user: name,
         action: "User logged into the system",
@@ -647,37 +638,28 @@ function init() {
     
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
-   // تحديد العنصر والتأكد إنه موجود
-  // الحل الشامل: البحث عن الاسم في كل الصفحة وإضافة الرقم جنبه
-setTimeout(() => {
-    const userName = sessionStorage.getItem('userDisplayName');
-    if (userName) {
-        // بنلف على كل العناصر اللي ممكن يكون فيها نص
-        const elements = document.querySelectorAll('span, div, b, p, h3');
-        elements.forEach(el => {
-            // لو العنصر جواه اسم المستخدم بالظبط ومفيش جواه عناصر تانية
-            if (el.innerText && el.innerText.trim() === userName.trim() && el.children.length === 0) {
-                el.style.display = 'inline-flex';
-                el.style.alignItems = 'center';
-                el.style.gap = '10px';
-                el.innerHTML = `
-                    ${userName} 
-                    <a href="tel:01222153415" style="background:#00ff88 !important; color:#000 !important; padding:2px 10px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:bold; box-shadow:0 0 10px rgba(0,255,136,0.5); margin-left:5px;">
-                        📞 01222153415
-                    </a>
-                `;
-            }
-        });
-    }
-}, 1500); // بينتظر ثانية ونص عشان نضمن إن الصفحة حملت بالكامل
     
-   const roleBadge = document.getElementById('userBadge');
+    setTimeout(() => {
+        const userName = sessionStorage.getItem('userDisplayName');
+        if (userName) {
+            const elements = document.querySelectorAll('span, div, b, p, h3');
+            elements.forEach(el => {
+                if (el.innerText && el.innerText.trim() === userName.trim() && el.children.length === 0) {
+                    el.style.display = 'inline-flex';
+                    el.style.alignItems = 'center';
+                    el.style.gap = '10px';
+                    el.innerHTML = `${userName} <a href="tel:01222153415" style="background:#00ff88 !important; color:#000 !important; padding:2px 10px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:bold; box-shadow:0 0 10px rgba(0,255,136,0.5); margin-left:5px;">📞 01222153415</a>`;
+                }
+            });
+        }
+    }, 1500);
+    
+    const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
         roleBadge.innerText = "👑 MASTER ACCESS";
         roleBadge.style.background = "var(--vip)";
-        roleBadge.style.display = "inline-block"; // تظهر للأدمن فقط
+        roleBadge.style.display = "inline-block";
     } else {
-        // إخفاء الكلمة تماماً لليوزر العادي
         roleBadge.style.display = "none"; 
     }
     if(sessionStorage.getItem('userRole') === 'admin') {
@@ -693,11 +675,9 @@ setTimeout(() => {
         });
     }
 
-    // --- مزامنة اليوزرات (تعديل جوهري لتحويل البيانات لمصفوفة) ---
     db.ref('authSystem/users').on('value', snapshot => {
         const data = snapshot.val();
         if (data) {
-            // تحويل Object الـ Firebase لمصفوفة لضمان عمل دالة .find()
             authSystem.users = Object.values(data).filter(item => item !== null);
         } else {
             authSystem.users = [];
@@ -705,7 +685,6 @@ setTimeout(() => {
         if(typeof renderUsers === 'function') renderUsers();
     });
 
-    // مزامنة العملاء
     db.ref('clients').on('value', snapshot => {
         clients = snapshot.val() ? Object.values(snapshot.val()) : [];
         if(typeof renderCRM === 'function') renderCRM();
@@ -714,35 +693,73 @@ setTimeout(() => {
         if(typeof updateGeo === 'function') updateGeo();
     });
 
-    // مزامنة المهام
     db.ref('tasks').on('value', snapshot => {
         tasks = snapshot.val() ? Object.values(snapshot.val()) : [];
         if(typeof renderTasks === 'function') renderTasks();
     });
 
-    // مزامنة سلة المهملات
     db.ref('deletedClients').on('value', snapshot => {
         deletedClients = snapshot.val() ? Object.values(snapshot.val()) : [];
         if(typeof renderRecycle === 'function') renderRecycle();
     });
 
-    // مزامنة السجلات
     db.ref('logs').limitToLast(100).on('value', snapshot => {
         logs = snapshot.val() ? Object.values(snapshot.val()) : [];
         if(typeof renderLogs === 'function') renderLogs();
     });
+    
+    document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName') || "User";
 }
+
+// ============================================================
+// SORT FUNCTION (تمت إضافتها لأنها كانت مفقودة)
+// ============================================================
+function sortTable(column) {
+    if (sortColumn === column) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortColumn = column;
+        sortDirection = 'asc';
+    }
+    
+    clients.sort((a, b) => {
+        let valA, valB;
+        switch(column) {
+            case 0: valA = a.name || ''; valB = b.name || ''; break;
+            case 1: valA = a.phone || ''; valB = b.phone || ''; break;
+            case 2: valA = a.gov || ''; valB = b.gov || ''; break;
+            case 3: valA = calculateAIScore(a); valB = calculateAIScore(b); break;
+            case 4: valA = a.status || ''; valB = b.status || ''; break;
+            default: valA = a.name || ''; valB = b.name || '';
+        }
+        
+        if (typeof valA === 'number') {
+            return sortDirection === 'asc' ? valA - valB : valB - valA;
+        }
+        
+        valA = valA.toString().toLowerCase();
+        valB = valB.toString().toLowerCase();
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    renderCRM();
+}
+
 // ============================================================
 // CRM CORE FUNCTIONS
 // ============================================================
 function renderCRM() {
     const body = document.getElementById('tableBody');
+    if (!body) return;
     body.innerHTML = '';
     const searchTerm = document.getElementById('search').value.toLowerCase();
     const statusFilter = document.getElementById('filterStatus').value;
 
     clients.forEach((client, index) => {
-        const matchesSearch = client.name.toLowerCase().includes(searchTerm) || client.phone.includes(searchTerm);
+        const matchesSearch = (client.name && client.name.toLowerCase().includes(searchTerm)) || 
+                              (client.phone && client.phone.includes(searchTerm));
         const matchesStatus = (statusFilter === 'All' || client.status === statusFilter);
 
         if(matchesSearch && matchesStatus) {
@@ -752,16 +769,16 @@ function renderCRM() {
 
             body.innerHTML += `
                 <tr class="${rowClass}">
-                    <td style="font-weight:bold">${client.name}</td>
-                    <td>${client.phone}</td>
-                    <td>${client.gov}</td>
+                    <td style="font-weight:bold">${client.name || ''}</td>
+                    <td>${client.phone || ''}</td>
+                    <td>${client.gov || ''}</td>
                     <td>
                         <div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto">
                             <div style="background:var(--success); height:100%; width:${calculateAIScore(client)}%; border-radius:4px;"></div>
                         </div>
                         <small>${calculateAIScore(client)}%</small>
                     </td>
-                    <td><span class="status-badge" style="background:${getStatusColor(client.status)}; color:white">${client.status}</span></td>
+                    <td><span class="status-badge" style="background:${getStatusColor(client.status)}; color:white">${client.status || 'Interested'}</span></td>
                     <td>
                         <button class="action-btn btn-call" onclick="window.open('tel:${client.phone}')">📞</button>
                         <button class="action-btn btn-wa" onclick="window.open('https://wa.me/2${client.phone}')">💬</button>
@@ -822,17 +839,17 @@ function deleteClient(index) {
 function editClient(index) {
     const c = clients[index];
     editIdx = index;
-    document.getElementById('name').value = c.name;
-    document.getElementById('phone').value = c.phone;
-    document.getElementById('gov').value = c.gov;
-    document.getElementById('status').value = c.status;
-    document.getElementById('notes').value = c.notes;
-    document.getElementById('agent').value = c.agent;
-    document.getElementById('date').value = c.date;
+    document.getElementById('name').value = c.name || '';
+    document.getElementById('phone').value = c.phone || '';
+    document.getElementById('gov').value = c.gov || '';
+    document.getElementById('status').value = c.status || 'Interested';
+    document.getElementById('notes').value = c.notes || '';
+    document.getElementById('agent').value = c.agent || '';
+    document.getElementById('date').value = c.date || '';
     
     document.getElementById('btnSave').innerHTML = "🔄 Update Client Record";
     document.getElementById('btnSave').style.background = "var(--info)";
-    showTab('crmTab');
+    showTab('crmTab', null);
     window.scrollTo(0,0);
 }
 
@@ -846,7 +863,7 @@ function updateDash() {
 
     const ctx = document.getElementById('statusChart').getContext('2d');
     const counts = { Interested:0, "In Progress":0, Hold:0, Completed:0, VIP:0 };
-    clients.forEach(c => counts[c.status]++);
+    clients.forEach(c => { if(c.status) counts[c.status]++; });
 
     if(statusChart) statusChart.destroy();
     statusChart = new Chart(ctx, {
@@ -865,6 +882,7 @@ function updateDash() {
 
 function updateGeo() {
     const geoDiv = document.getElementById('geoStats');
+    if (!geoDiv) return;
     geoDiv.innerHTML = '';
     const counts = {};
     clients.forEach(c => { if(c.gov) counts[c.gov] = (counts[c.gov] || 0) + 1; });
@@ -884,12 +902,13 @@ function updateGeo() {
 // ============================================================
 function renderTasks() {
     const body = document.getElementById('taskBody');
+    if (!body) return;
     body.innerHTML = tasks.map((t, i) => `
         <tr>
-            <td><b>${t.client}</b></td>
-            <td>${t.text}</td>
+            <td><b>${t.client || ''}</b></td>
+            <td>${t.text || ''}</td>
             <td><textarea style="margin:0; font-size:12px" onchange="updateTaskExtra(${i}, this.value)">${t.extra || ''}</textarea></td>
-            <td><span style="color:var(--danger)">${t.date}</span></td>
+            <td><span style="color:var(--danger)">${t.date || ''}</span></td>
             <td>
                 <button class="action-btn btn-edit" onclick="editTask(${i})">✏️</button>
                 <button class="action-btn btn-del" onclick="delT(${i})">✕</button>
@@ -916,6 +935,7 @@ function addOrUpdateTask() {
     db.ref('tasks').set(tasks);
     document.getElementById('taskText').value = '';
     document.getElementById('extraInfo').value = '';
+    document.getElementById('taskDate').value = '';
     notify("Task List Updated", "success");
 }
 
@@ -934,10 +954,10 @@ function delT(i) {
 function editTask(i) {
     const t = tasks[i];
     editTaskIdx = i;
-    document.getElementById('taskClientSelect').value = t.client;
-    document.getElementById('taskText').value = t.text;
-    document.getElementById('extraInfo').value = t.extra;
-    document.getElementById('taskDate').value = t.date;
+    document.getElementById('taskClientSelect').value = t.client || '';
+    document.getElementById('taskText').value = t.text || '';
+    document.getElementById('extraInfo').value = t.extra || '';
+    document.getElementById('taskDate').value = t.date || '';
     window.scrollTo(0,0);
 }
 
@@ -969,10 +989,10 @@ function renderUsers() {
     }
     body.innerHTML = authSystem.users.map((u, i) => `
         <tr>
-            <td>${u.u}</td>
+            <td>${u.u || ''}</td>
             <td class="mask-pass">**</td>
-            <td>${u.displayName}</td>
-            <td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">${u.role}</span></td>
+            <td>${u.displayName || ''}</td>
+            <td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">${u.role || 'user'}</span></td>
             <td><button class="action-btn btn-del" onclick="delU(${i})">✕</button></td>
         </tr>
     `).join('');
@@ -1011,11 +1031,12 @@ function renderLogs() {
 // ============================================================
 function renderRecycle() {
     const body = document.getElementById('recycleBody');
+    if (!body) return;
     body.innerHTML = deletedClients.map((c, i) => `
         <tr>
-            <td>${c.name}</td>
-            <td>${c.phone}</td>
-            <td>${c.status}</td>
+            <td>${c.name || ''}</td>
+            <td>${c.phone || ''}</td>
+            <td>${c.status || ''}</td>
             <td><button class="action-btn btn-call" onclick="restore(${i})">🔄</button></td>
             <td><button class="action-btn btn-del" onclick="hardDelete(${i})">🗑️</button></td>
         </tr>
@@ -1057,6 +1078,7 @@ function getStatusColor(s) {
 
 function notify(msg, type) {
     const n = document.getElementById('notification');
+    if (!n) return;
     n.innerText = msg;
     n.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
     n.style.display = 'block';
@@ -1066,38 +1088,58 @@ function notify(msg, type) {
 function showTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    const tab = document.getElementById(id);
+    if (tab) tab.classList.add('active');
     if(btn) btn.classList.add('active');
 }
 
 function clearForm() {
-    ['name', 'phone', 'notes', 'agent', 'date'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('status').value = 'Interested';
-    document.getElementById('gov').value = '';
+    const fields = ['name', 'phone', 'notes', 'agent', 'date'];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    const statusEl = document.getElementById('status');
+    if (statusEl) statusEl.value = 'Interested';
+    const govEl = document.getElementById('gov');
+    if (govEl) govEl.value = '';
 }
-
-// ============================================================
-// التعديلات المطلوبة: الدوال الثلاث التالية تم إصلاحها
-// ============================================================
 
 function fillTaskClients() {
     const sel = document.getElementById('taskClientSelect');
+    if (!sel) return;
     sel.innerHTML = '<option value="">Link to Client</option>' + 
-                    clients.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                    clients.map(c => `<option value="${c.name || ''}">${c.name || ''}</option>`).join('');
 }
 
 function autoFillTask() {
     const name = document.getElementById('taskClientSelect').value;
     const client = clients.find(c => c.name === name);
     if(client) {
-        document.getElementById('extraInfo').value = `Phone: ${client.phone} | Gov: ${client.gov} | Agent: ${client.agent}`;
+        document.getElementById('extraInfo').value = `Phone: ${client.phone || ''} | Gov: ${client.gov || ''} | Agent: ${client.agent || ''}`;
     }
+}
+
+function toggleLang() {
+    const html = document.getElementById('htmlTag');
+    const current = html.getAttribute('dir');
+    const newDir = current === 'ltr' ? 'rtl' : 'ltr';
+    html.setAttribute('dir', newDir);
+    const langBtn = document.getElementById('langBtn');
+    if (langBtn) langBtn.innerText = newDir === 'ltr' ? 'AR' : 'EN';
+}
+
+function playSound(id) {
+    try { 
+        const sound = document.getElementById(id);
+        if (sound) sound.play(); 
+    } catch(e) {}
 }
 
 function exportToCSV() {
     let csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date\n";
     clients.forEach(c => {
-        csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}","${c.date}"\n`;
+        csv += `"${c.name || ''}","${c.phone || ''}","${c.gov || ''}","${c.status || ''}","${c.agent || ''}","${c.notes || ''}","${c.date || ''}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
@@ -1106,28 +1148,20 @@ function exportToCSV() {
     link.click();
 }
 
-function toggleLang() {
-    const html = document.getElementById('htmlTag');
-    const current = html.getAttribute('dir');
-    const newDir = current === 'ltr' ? 'rtl' : 'ltr';
-    html.setAttribute('dir', newDir);
-    document.getElementById('langBtn').innerText = newDir === 'ltr' ? 'AR' : 'EN';
-}
-
-function playSound(id) {
-    try { document.getElementById(id).play(); } catch(e) {}
-}
-
 function updateMyPassword() {
     const newP = document.getElementById('changePassInput').value;
     const idx = sessionStorage.getItem('userIdx');
     if(!newP) return alert("Enter password");
     if(idx == -1) return alert("Master Admin password cannot be changed here.");
     
-    authSystem.users[idx].p = newP;
-    db.ref('authSystem/users').set(authSystem.users);
-    notify("Password Updated Successfully", "success");
-    document.getElementById('changePassInput').value = '';
+    if (authSystem.users[idx]) {
+        authSystem.users[idx].p = newP;
+        db.ref('authSystem/users').set(authSystem.users);
+        notify("Password Updated Successfully", "success");
+        document.getElementById('changePassInput').value = '';
+    } else {
+        alert("User not found!");
+    }
 }
 
 // Security: Prevent F12 and Context Menu
