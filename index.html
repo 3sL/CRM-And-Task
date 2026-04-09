@@ -1076,18 +1076,34 @@ function clearForm() {
     document.getElementById('gov').value = '';
 }
 
+// ============================================================
+// التعديلات المطلوبة: الدوال الثلاث التالية تم إصلاحها
+// ============================================================
+
 function fillTaskClients() {
     const sel = document.getElementById('taskClientSelect');
     sel.innerHTML = '<option value="">Link to Client</option>' + 
-                    clients.map(c => <option value="${c.name}">${c.name}</option>).join('');
+                    clients.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
 }
 
 function autoFillTask() {
     const name = document.getElementById('taskClientSelect').value;
     const client = clients.find(c => c.name === name);
     if(client) {
-        document.getElementById('extraInfo').value = Phone: ${client.phone} | Gov: ${client.gov} | Agent: ${client.agent};
+        document.getElementById('extraInfo').value = `Phone: ${client.phone} | Gov: ${client.gov} | Agent: ${client.agent}`;
     }
+}
+
+function exportToCSV() {
+    let csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date\n";
+    clients.forEach(c => {
+        csv += `"${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}","${c.date}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Utopia_Data_${new Date().toLocaleDateString()}.csv`;
+    link.click();
 }
 
 function toggleLang() {
@@ -1100,18 +1116,6 @@ function toggleLang() {
 
 function playSound(id) {
     try { document.getElementById(id).play(); } catch(e) {}
-}
-
-function exportToCSV() {
-    let csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date\n";
-    clients.forEach(c => {
-        csv += "${c.name}","${c.phone}","${c.gov}","${c.status}","${c.agent}","${c.notes}","${c.date}"\n;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = Utopia_Data_${new Date().toLocaleDateString()}.csv;
-    link.click();
 }
 
 function updateMyPassword() {
