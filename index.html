@@ -572,21 +572,38 @@ const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "
 // AUTHENTICATION LOGIC
 // ============================================================
 function checkLogin() {
-    const u = document.getElementById('userInput').value;
-    const p = document.getElementById('passInput').value;
+    // جلب القيم مع حذف أي مسافات زائدة في البداية أو النهاية
+    const u = document.getElementById('userInput').value.trim();
+    const p = document.getElementById('passInput').value.trim();
     
-    // Master Admin Override
+    // إخفاء رسالة الخطأ عند كل محاولة جديدة
+    document.getElementById('loginError').style.display = 'none';
+    
+    // 1. نظام الدخول الطوارئ (Master Admin)
     if (u === "admin" && p === "@Mody6699") {
+        console.log("Master Admin Access Granted");
         loginSuccess("admin", "Master Admin", -1);
         return;
     }
     
-    const foundUser = authSystem.users.find(acc => acc.u === u && acc.p === p);
-    if(foundUser) {
-        loginSuccess(foundUser.role, foundUser.displayName, authSystem.users.indexOf(foundUser));
+    // 2. التحقق من وجود مستخدمين في النظام قبل البحث
+    if (authSystem && authSystem.users && Array.isArray(authSystem.users)) {
+        
+        // البحث عن المستخدم (مع التأكد من مطابقة الحالة وبدون مسافات)
+        const foundUser = authSystem.users.find(acc => acc.u.trim() === u && acc.p.trim() === p);
+        
+        if (foundUser) {
+            console.log("User Access Granted: " + foundUser.displayName);
+            loginSuccess(foundUser.role, foundUser.displayName, authSystem.users.indexOf(foundUser));
+        } else {
+            // بيانات خاطئة
+            document.getElementById('loginError').style.display = 'block';
+            playSound('soundAlert');
+        }
     } else {
-        document.getElementById('loginError').style.display = 'block';
-        playSound('soundAlert');
+        // في حال لم يتم تحميل البيانات من Firebase بعد
+        alert("System is still loading data, please wait a second...");
+        console.error("AuthSystem or Users array is not defined yet.");
     }
 }
 
