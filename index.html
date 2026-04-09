@@ -644,14 +644,19 @@ function init() {
     
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
-    document.getElementById('profName').innerHTML = `
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="color: #ffffff !important;">${sessionStorage.getItem('userDisplayName')}</span>
-        <a href="tel:01222153415" style="background: #00ff88 !important; color: #000 !important; padding: 2px 10px; border-radius: 50px; font-size: 13px !important; text-decoration: none !important; font-weight: bold !important; display: inline-flex; align-items: center; box-shadow: 0 0 10px rgba(0,255,136,0.5);">
-            📞 01222153415
-        </a>
-    </div>
-`;
+   // تحديد العنصر والتأكد إنه موجود
+    const profNameElement = document.getElementById('profName');
+    
+    if (profNameElement) {
+        profNameElement.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-end;">
+                <span style="color: #ffffff !important; font-weight: 500;">${sessionStorage.getItem('userDisplayName')}</span>
+                <a href="tel:01222153415" style="background: #00ff88 !important; color: #000 !important; padding: 4px 12px; border-radius: 50px; font-size: 12px !important; text-decoration: none !important; font-weight: bold !important; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 10px rgba(0,255,136,0.4);">
+                    <span style="font-size: 14px;">📞</span> 01222153415
+                </a>
+            </div>
+        `;
+    }
     
    const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
