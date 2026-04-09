@@ -696,6 +696,40 @@ function renderRecycle() {
 }
 
 function restore(i) { 
+    addLog(`Restored client: ${deletedClients[i].name}`); // تم إصلاح علامة الـ ` هنا
+    clients.push(deletedClients[i]); 
+    deletedClients.splice(i,1); 
+    db.ref('clients').set(clients); 
+    db.ref('deletedClients').set(deletedClients); 
+}
+
+function hardDelete(i) {
+    Swal.fire({
+        title: 'PERMANENT DELETE?',
+        text: "This action cannot be undone!",
+        icon: 'error',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, Delete Forever'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            addLog(`PERMANENTLY DELETED: ${deletedClients[i].name}`); // تم إصلاح علامة الـ ` هنا
+            deletedClients.splice(i, 1);
+            db.ref('deletedClients').set(deletedClients);
+            notify("Client Deleted Permanently", "success");
+        }
+    });
+}
+
+function delU(i) { 
+    if(confirm('Permanently delete this user?')) { 
+        addLog(`Deleted user account: ${authSystem.users[i].displayName}`); // تم إصلاح علامة الـ ` هنا
+        authSystem.users.splice(i, 1); 
+        db.ref('authSystem/users').set(authSystem.users); 
+    } 
+}
+
+function restore(i) { 
     addLog(`Restored client: ${deletedClients[i].name}`); 
     clients.push(deletedClients[i]); 
     deletedClients.splice(i,1); 
