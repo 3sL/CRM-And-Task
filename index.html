@@ -97,13 +97,10 @@
             <h2 id="side_title" style="font-size: 0.9em;">Utopia CRM & Tasks</h2>
             <button onclick="toggleLang()" style="padding:4px 8px; font-size:10px; background:var(--accent); color:var(--primary);" id="langBtn">AR</button>
         </div>
-       <div class="dev-info">
-    <b>Eng. Mahmoud Mahmoud Marie</b><br>
-    <a href="tel:+201222153415" style="color: var(--accent); text-decoration: none; font-size: 0.85em; font-weight: bold; display: block; margin-top: 3px;">
-        📞 +201222153415
-    </a>
-    <small id="userBadge" style="background:var(--success); color:white; padding:2px 5px; border-radius:5px; font-size:10px; display: inline-block; margin-top: 5px;"></small>
-</div>
+        <div class="dev-info">
+            <b>Eng. Mahmoud Mahmoud Marie</b><br>
+            <small id="userBadge" style="background:var(--success); color:white; padding:2px 5px; border-radius:5px; font-size:10px"></small>
+        </div>
         
         <button class="tab-btn active" onclick="showTab('crmTab', this)" id="m_crm">👥 Clients Registry</button>
         <button class="tab-btn" onclick="showTab('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button>
@@ -120,7 +117,7 @@
         <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
             <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-                <input id="search" placeholder="🔍 Search Name, Phone or Status..." oninput="renderCRM()" style="flex:2">
+                <input id="search" placeholder="🔍 Search Name or Phone..." oninput="renderCRM()" style="flex:2">
                 <select id="filterStatus" onchange="renderCRM()" style="flex:1">
                     <option value="All">All Statuses</option>
                     <option value="Interested">Interested</option>
@@ -204,7 +201,7 @@
                 </div>
                 <input id="taskText" placeholder="Task description...">
                 <textarea id="extraInfo" placeholder="Client info..."></textarea>
-                <button onclick="addOrUpdateTask()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ Save Task</button>
+                <button onclick="addTask()" class="btn-save" style="background:var(--info)">➕ Add Task</button>
             </div>
             <table>
                 <thead><tr><th>Client</th><th>Task</th><th>Notes</th><th>Deadline</th><th>Action</th></tr></thead>
@@ -253,7 +250,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, editTaskIdx = -1, statusChart = null;
+let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [], editIdx = -1, statusChart = null;
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
 // تحميل المستخدمين فوراً عند فتح الصفحة ليكونوا جاهزين لتسجيل الدخول
@@ -313,14 +310,15 @@ function init() {
     document.getElementById('mainApp').style.display = 'flex';
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
     
-    // التعديل: إخفاء الرتبة عن المستخدمين وإظهارها للماستر فقط
+    // --- التعديل هنا: إخفاء الرتبة عن المستخدمين وإظهارها للماستر فقط ---
     const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
         roleBadge.innerText = "MASTER";
         roleBadge.style.display = 'inline-block';
     } else {
-        roleBadge.style.display = 'none'; 
+        roleBadge.style.display = 'none'; // إخفاء تماماً لأي مستخدم آخر
     }
+    // --- نهاية التعديل ---
     
     if(sessionStorage.getItem('userRole') === 'admin') {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
@@ -351,24 +349,14 @@ function init() {
     });
 }
 
-// 4. Data Management Functions (UPDATED FOR MULTI-FILTER SEARCH)
+// 4. Data Management Functions
 function renderCRM() {
     const b = document.getElementById('tableBody'); if(!b) return;
     b.innerHTML = '';
     const q = document.getElementById('search').value.toLowerCase(), fStatus = document.getElementById('filterStatus').value;
 
     clients.forEach((c, i) => {
-        // التحقق من البحث في (الاسم، التليفون، الحالة)
-        const matchesSearch = !q || 
-            c.name.toLowerCase().includes(q) || 
-            c.phone.includes(q) || 
-            c.status.toLowerCase().includes(q);
-
-        // التحقق من فلتر الحالة المنفصل
-        const matchesStatusFilter = (fStatus === 'All' || c.status === fStatus);
-
-        if(!matchesSearch || !matchesStatusFilter) return;
-
+        if((q && !c.name.toLowerCase().includes(q) && !c.phone.includes(q)) || (fStatus !== 'All' && c.status !== fStatus)) return;
         let rowClass = c.status === 'VIP' ? 'vip-row' : (c.status === 'Hold' ? 'hold-row' : '');
         b.innerHTML += `<tr class="${rowClass}">
             <td>${c.name}</td><td>${c.phone}</td><td>${c.gov}</td>
@@ -451,11 +439,17 @@ function addUser() {
 function renderUsers() {
     const b = document.getElementById('usersBody'); 
     if(!b) return;
+
+    // جلب اسم الشخص اللي مسجل دخول حالياً
     const currentUser = sessionStorage.getItem('userDisplayName');
+
+    // لو اللي داخل مش هو الـ Master Admin، اظهر رسالة حماية واخفي البيانات
     if (currentUser !== "Master Admin") {
         b.innerHTML = <tr><td colspan="5" style="color:var(--danger); font-weight:bold; padding:20px;">🛡️ Access Restricted: Only Master Admin can manage users.</td></tr>;
         return;
     }
+
+    // لو هو الـ Master Admin، اعرض الجدول عادي جداً
     b.innerHTML = authSystem.users.map((u, i) => `
         <tr>
             <td>${u.u}</td>
@@ -483,38 +477,12 @@ function autoFillTask() {
     if(client) document.getElementById('extraInfo').value = Phone: ${client.phone}\nAgent: ${client.agent}\nGov: ${client.gov};
 }
 
-function addOrUpdateTask() {
-    const t = { 
-        client: document.getElementById('taskClientSelect').value, 
-        text: document.getElementById('taskText').value, 
-        extra: document.getElementById('extraInfo').value, 
-        date: document.getElementById('taskDate').value 
-    };
+function addTask() {
+    const t = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value };
     if(!t.client || !t.text) return alert("Missing data");
-
-    if(editTaskIdx > -1) {
-        tasks[editTaskIdx] = t;
-        addLog(Updated task for: ${t.client});
-        editTaskIdx = -1;
-    } else {
-        tasks.push(t);
-        addLog(Task created for: ${t.client});
-    }
-    
+    tasks.push(t);
     db.ref('tasks').set(tasks);
-    document.getElementById('taskText').value = '';
-    document.getElementById('extraInfo').value = '';
-    notify("Task Saved", "success");
-}
-
-function editTask(i) {
-    editTaskIdx = i;
-    const t = tasks[i];
-    document.getElementById('taskClientSelect').value = t.client;
-    document.getElementById('taskDate').value = t.date;
-    document.getElementById('taskText').value = t.text;
-    document.getElementById('extraInfo').value = t.extra;
-    window.scrollTo(0,0);
+    addLog(Task created for: ${t.client});
 }
 
 function renderTasks() {
@@ -522,15 +490,11 @@ function renderTasks() {
     b.innerHTML = tasks.map((t, i) => `
         <tr><td><b>${t.client}</b></td><td>${t.text}</td>
         <td><textarea onchange="updateTaskExtra(${i}, this.value)" style="height:40px">${t.extra}</textarea></td>
-        <td>${t.date}</td>
-        <td>
-            <button class="action-btn" style="background:var(--accent);color:black" onclick="editTask(${i})">✏️</button>
-            <button class="action-btn btn-del" onclick="delT(${i})">✕</button>
-        </td></tr>
+        <td>${t.date}</td><td><button class="action-btn btn-del" onclick="delT(${i})">✕</button></td></tr>
     `).join('');
 }
 function updateTaskExtra(i, v) { tasks[i].extra = v; db.ref('tasks').set(tasks); }
-function delT(i) { if(confirm('Delete task?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); } }
+function delT(i) { tasks.splice(i,1); db.ref('tasks').set(tasks); }
 
 function updateDash() {
     const cv = document.getElementById('countVip');
@@ -572,41 +536,8 @@ function playSound(id) { const s = document.getElementById(id); if(s) s.play(); 
 function notify(m, t) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; n.style.background = t==='success'?'#28a745':'#dc3545'; setTimeout(() => n.style.display = 'none', 3000); }
 function showTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); if(btn) btn.classList.add('active'); }
 function editClient(i) { editIdx = i; const c = clients[i]; document.getElementById('name').value = c.name; document.getElementById('phone').value = c.phone; document.getElementById('status').value = c.status; document.getElementById('notes').value = c.notes; showTab('crmTab', document.getElementById('m_crm')); }
-
-// --- التعديل المطلوب فى سلة المهملات ---
-function renderRecycle() { 
-    const b = document.getElementById('recycleBody'); 
-    if(!b) return; 
-    b.innerHTML = deletedClients.map((c, i) => `
-        <tr>
-            <td>${c.name}</td>
-            <td>${c.phone}</td>
-            <td>${c.status}</td>
-            <td>
-                <button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button>
-                <button class="action-btn btn-del" onclick="hardDelete(${i})">🗑️ Delete Forever</button>
-            </td>
-        </tr>`).join(''); 
-}
-
-function restore(i) { 
-    addLog(Restored client: ${deletedClients[i].name}); 
-    clients.push(deletedClients[i]); 
-    deletedClients.splice(i,1); 
-    db.ref('clients').set(clients); 
-    db.ref('deletedClients').set(deletedClients); 
-}
-
-function hardDelete(i) {
-    if(confirm('Security Warning: This will PERMANENTLY delete the client from the database. Proceed?')) {
-        addLog(PERMANENTLY DELETED: ${deletedClients[i].name});
-        deletedClients.splice(i, 1);
-        db.ref('deletedClients').set(deletedClients);
-        notify("Client Deleted Permanently", "success");
-    }
-}
-// ------------------------------------
-
+function renderRecycle() { const b = document.getElementById('recycleBody'); if(!b) return; b.innerHTML = deletedClients.map((c, i) => <tr><td>${c.name}</td><td>${c.phone}</td><td>${c.status}</td><td><button class="action-btn btn-wa" onclick="restore(${i})">🔄 Restore</button></td></tr>).join(''); }
+function restore(i) { addLog(Restored client: ${deletedClients[i].name}); clients.push(deletedClients[i]); deletedClients.splice(i,1); db.ref('clients').set(clients); db.ref('deletedClients').set(deletedClients); }
 function fillTaskClients() { const s = document.getElementById('taskClientSelect'); if(s) s.innerHTML = '<option value="">Select Client</option>' + clients.map(c => <option value="${c.name}">${c.name}</option>).join(''); }
 function delU(i) { if(confirm('Permanently delete this user?')) { addLog(Deleted user account: ${authSystem.users[i].displayName}); authSystem.users.splice(i, 1); db.ref('authSystem/users').set(authSystem.users); } }
 
