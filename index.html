@@ -2,7 +2,7 @@
 <html lang="en" id="htmlTag" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading Pro CRM & Tasks DEV By Eng.Mahmoud Mohamed Marie</title>
+    <title>Utopia Trading Pro CRM & Tasks | Secured System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     
@@ -335,6 +335,17 @@
             font-size: 12px;
             font-weight: bold;
         }
+        
+        /* Anti-theft watermark */
+        .watermark {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+            font-size: 9px;
+            color: rgba(0,0,0,0.2);
+            pointer-events: none;
+            z-index: 99999;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;"> 
@@ -342,6 +353,7 @@
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
 <div id="notification"></div>
+<div class="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415</div>
 
 <div id="loginOverlay">
     <div class="login-card">
@@ -349,7 +361,7 @@
         <p style="color: #aaa; font-size: 0.9em; margin-top: -15px;">Secure Management System</p>
         <input type="text" id="userInput" placeholder="Username" autocomplete="off">
         <input type="password" id="passInput" placeholder="Password" autocomplete="off">
-        <button onclick="checkLogin()">Access System</button>
+        <button onclick="_0x3d2a['check']()">Access System</button>
         <p id="loginError" style="color:var(--danger); display:none; margin-top:15px; font-weight:bold;">⚠️ Access Denied! Check Credentials</p>
         <div style="margin-top:25px; font-size:0.75em; color:#888; border-top: 1px solid #444; padding-top: 15px;">
             Developed & Secured By:<br>
@@ -363,7 +375,7 @@
     <div class="sidebar">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h2 id="side_title" style="margin:0; font-size: 1.1em;">Utopia For Trading And Export</h2>
-            <button onclick="toggleLang()" style="padding:5px 10px; font-size:11px; background:var(--accent); color:var(--primary); width: auto;" id="langBtn">AR</button>
+            <button onclick="_0x3d2a['toggle']()" style="padding:5px 10px; font-size:11px; background:var(--accent); color:var(--primary); width: auto;" id="langBtn">AR</button>
         </div>
         
         <div class="dev-info">
@@ -374,23 +386,23 @@
             <span id="userBadge" style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:10px; margin-top:5px; display:inline-block;"></span>
         </div>
         
-        <button class="tab-btn active" onclick="showTab('crmTab', this)" id="m_crm">👥 Clients Registry</button>
-        <button class="tab-btn" onclick="showTab('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button>
-        <button class="tab-btn" onclick="showTab('dashboardTab', this)" id="m_dash">📊 AI Analytics</button>
-        <button class="tab-btn" onclick="showTab('profileTab', this)" id="m_profile">👤 My Profile</button>
-        <button class="tab-btn" onclick="showTab('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ Recycle Bin</button>
+        <button class="tab-btn active" onclick="_0x3d2a['show']('crmTab', this)" id="m_crm">👥 Clients Registry</button>
+        <button class="tab-btn" onclick="_0x3d2a['show']('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button>
+        <button class="tab-btn" onclick="_0x3d2a['show']('dashboardTab', this)" id="m_dash">📊 AI Analytics</button>
+        <button class="tab-btn" onclick="_0x3d2a['show']('profileTab', this)" id="m_profile">👤 My Profile</button>
+        <button class="tab-btn" onclick="_0x3d2a['show']('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ Recycle Bin</button>
         
-        <button class="tab-btn admin-only" onclick="showTab('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent); margin-top: 15px;">👑 Admin Master</button>
+        <button class="tab-btn admin-only" onclick="_0x3d2a['show']('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent); margin-top: 15px;">👑 Admin Master</button>
         
-        <button onclick="logout()" style="margin-top:auto; background:var(--danger); color:white; justify-content: center;" id="m_logout">🚪 Secure Logout</button>
+        <button onclick="_0x3d2a['out']()" style="margin-top:auto; background:var(--danger); color:white; justify-content: center;" id="m_logout">🚪 Secure Logout</button>
     </div>
 
     <div class="main">
         <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
             <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
-                <input id="search" placeholder="🔍 Search Name, Phone or Status..." oninput="renderCRM()" style="flex:3; margin:0;">
-                <select id="filterStatus" onchange="renderCRM()" style="flex:1; margin:0;">
+                <input id="search" placeholder="🔍 Search Name, Phone or Status..." oninput="_0x3d2a['renderCRM']()" style="flex:3; margin:0;">
+                <select id="filterStatus" onchange="_0x3d2a['renderCRM']()" style="flex:1; margin:0;">
                     <option value="All">All Statuses</option>
                     <option value="Interested">Interested</option>
                     <option value="In Progress">In Progress</option>
@@ -398,7 +410,7 @@
                     <option value="Completed">Completed</option>
                     <option value="VIP">VIP</option>
                 </select>
-                <button onclick="exportToCSV()" style="background:#2c3e50; color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; flex:0.5;">📥 Export</button>
+                <button onclick="_0x3d2a['exportCSV']()" style="background:#2c3e50; color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; flex:0.5;">📥 Export</button>
             </div>
             
             <div class="form-group">
@@ -419,18 +431,18 @@
                     <input type="date" id="date">
                 </div>
                 <textarea id="notes" rows="3" placeholder="Additional Notes & Client History..."></textarea>
-                <button class="btn-save" onclick="addOrUpdate()" id="btnSave">💾 Save Client Data</button>
+                <button class="btn-save" onclick="_0x3d2a['save']()" id="btnSave">💾 Save Client Data</button>
             </div>
 
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th onclick="sortTable(0)">Name ↕️</th>
-                            <th onclick="sortTable(1)">Phone</th>
-                            <th onclick="sortTable(2)">Governorate ↕️</th>
-                            <th onclick="sortTable(3)">AI Priority</th>
-                            <th onclick="sortTable(4)">Status ↕️</th>
+                            <th onclick="_0x3d2a['sort'](0)">Name ↕️</th>
+                            <th onclick="_0x3d2a['sort'](1)">Phone</th>
+                            <th onclick="_0x3d2a['sort'](2)">Governorate ↕️</th>
+                            <th onclick="_0x3d2a['sort'](3)">AI Priority</th>
+                            <th onclick="_0x3d2a['sort'](4)">Status ↕️</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -472,12 +484,12 @@
             <h2 id="h_tasks">Operations & Follow-ups</h2>
             <div class="form-group">
                 <div class="grid-3">
-                    <select id="taskClientSelect" onchange="autoFillTask()"><option value="">Link to Client</option></select>
+                    <select id="taskClientSelect" onchange="_0x3d2a['autoFill']()"><option value="">Link to Client</option></select>
                     <input id="taskDate" type="date">
                     <input id="taskText" placeholder="What needs to be done?">
                 </div>
                 <textarea id="extraInfo" placeholder="Details or requirements..."></textarea>
-                <button onclick="addOrUpdateTask()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ Add Operation</button>
+                <button onclick="_0x3d2a['saveTask']()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ Add Operation</button>
             </div>
             <div class="table-container">
                 <table>
@@ -511,7 +523,7 @@
                         <option value="user">Standard Agent</option>
                         <option value="admin">System Administrator</option>
                     </select>
-                    <button onclick="addUser()" class="btn-save" style="background:var(--primary)">Register New User</button>
+                    <button onclick="_0x3d2a['addUser']()" class="btn-save" style="background:var(--primary)">Register New User</button>
                     <div class="table-container" style="margin-top:20px;">
                         <table>
                             <thead><tr><th>User</th><th>Pass</th><th>Name</th><th>Role</th><th>Action</th></tr></thead>
@@ -533,7 +545,7 @@
                 <hr>
                 <label>Change Access Password:</label>
                 <input type="password" id="changePassInput" placeholder="Enter new password">
-                <button onclick="updateMyPassword()" class="btn-save" style="background:var(--info)">Update My Password</button>
+                <button onclick="_0x3d2a['updatePass']()" class="btn-save" style="background:var(--info)">Update My Password</button>
             </div>
         </div>
     </div>
@@ -541,637 +553,551 @@
 
 <script>
 // ============================================================
-// SECURITY CONFIGURATION & FIREBASE INITIALIZATION
+// PROTECTED & OBFUSCATED CODE
+// System secured by Eng. Mahmoud Mohamed Marie
+// Unauthorized copying or distribution is prohibited
 // ============================================================
-const _0x_key = atob("QUl6YVN5Q2gzd0ZQbzdtVmVCX2NjdWZXNUx5S2dQRm9lU08wSjAw");
-const _0x_db = atob("aHR0cHM6Ly9jcm0tYW5kLXRhc2tzLTlmN2MzLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbQ==");
 
-const firebaseConfig = {
-    apiKey: _0x_key,
-    authDomain: "crm-and-tasks-9f7c3.firebaseapp.com",
-    databaseURL: _0x_db,
-    projectId: "crm-and-tasks-9f7c3",
-    storageBucket: "crm-and-tasks-9f7c3.firebasestorage.app",
-    messagingSenderId: "762341152156",
-    appId: "1:762341152156:web:91d417128226fc8708a459"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// ============================================================
-// GLOBAL VARIABLES
-// ============================================================
-let clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [];
-let editIdx = -1, editTaskIdx = -1, statusChart = null;
-let sortColumn = 0, sortDirection = 'asc';
-
-const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
-
-// ============================================================
-// AUTHENTICATION LOGIC
-// ============================================================
-function checkLogin() {
-    const uInput = document.getElementById('userInput').value.trim();
-    const pInput = document.getElementById('passInput').value.trim();
+(function(){
+    var _0x3d2a = window._0x3d2a = {};
     
-    document.getElementById('loginError').style.display = 'none';
-
-    if (uInput === "admin" && pInput === "@Mody6699") {
-        loginSuccess("admin", "Master Admin", -1);
-        return;
-    }
-
-    db.ref('authSystem/users').once('value').then(snapshot => {
-        const data = snapshot.val();
-        if (data) {
-            const usersList = Object.values(data);
-            const foundUser = usersList.find(acc => 
-                acc && acc.u && acc.p && 
-                acc.u.toString().trim() === uInput && 
-                acc.p.toString().trim() === pInput
-            );
-
-            if (foundUser) {
-                loginSuccess(foundUser.role, foundUser.displayName, usersList.indexOf(foundUser));
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-                if(typeof playSound === 'function') playSound('soundAlert');
-            }
-        } else {
-            alert("لا توجد بيانات موظفين مسجلة في النظام.");
+    // Firebase Configuration (Encoded)
+    var _0xkey = atob("QUl6YVN5Q2gzd0ZQbzdtVmVCX2NjdWZXNUx5S2dQRm9lU08wSjAw");
+    var _0xdb = atob("aHR0cHM6Ly9jcm0tYW5kLXRhc2tzLTlmN2MzLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbQ==");
+    
+    var firebaseConfig = {
+        apiKey: _0xkey,
+        authDomain: "crm-and-tasks-9f7c3.firebaseapp.com",
+        databaseURL: _0xdb,
+        projectId: "crm-and-tasks-9f7c3",
+        storageBucket: "crm-and-tasks-9f7c3.firebasestorage.app",
+        messagingSenderId: "762341152156",
+        appId: "1:762341152156:web:91d417128226fc8708a459"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+    
+    // Variables
+    var clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [];
+    var editIdx = -1, editTaskIdx = -1, statusChart = null;
+    var sortColumn = 0, sortDirection = 'asc';
+    
+    var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
+    
+    // Anti-DevTools
+    var devtools = /Chrome|Firefox|Safari|Edge/.test(navigator.userAgent);
+    setInterval(function(){
+        var before = new Date();
+        debugger;
+        var after = new Date();
+        if(after - before > 100){
+            document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:50px'>🔒 Access Denied<br><small>Developer tools are not allowed</small></h1>";
+            setTimeout(function(){ window.location.href = "about:blank"; }, 100);
         }
-    }).catch(error => {
-        console.error("Auth Error:", error);
-        alert("فشل الاتصال بقاعدة البيانات. تأكد من الإنترنت.");
-    });
-}
-
-function loginSuccess(role, name, idx) {
-    sessionStorage.setItem('isLoggedIn', 'true');
-    sessionStorage.setItem('userRole', role);
-    sessionStorage.setItem('userDisplayName', name);
-    sessionStorage.setItem('userIdx', idx);
+    }, 1000);
     
-    db.ref('logs').push({
-        user: name,
-        action: "User logged into the system",
-        time: new Date().toLocaleString()
-    });
-
-    if(typeof playSound === 'function') playSound('soundSuccess');
-    setTimeout(() => location.reload(), 300);
-}
-
-function logout() {
-    if(confirm("Confirm security logout?")) {
-        sessionStorage.clear();
-        location.reload();
-    }
-}
-
-// ============================================================
-// INITIALIZATION & REAL-TIME LISTENERS
-// ============================================================
-function init() {
-    if(!sessionStorage.getItem('isLoggedIn')) return;
-    
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-    
-    setTimeout(() => {
-        const userName = sessionStorage.getItem('userDisplayName');
-        if (userName) {
-            const elements = document.querySelectorAll('span, div, b, p, h3');
-            elements.forEach(el => {
-                if (el.innerText && el.innerText.trim() === userName.trim() && el.children.length === 0) {
-                    el.style.display = 'inline-flex';
-                    el.style.alignItems = 'center';
-                    el.style.gap = '10px';
-                    el.innerHTML = `${userName} <a href="tel:01222153415" style="background:#00ff88 !important; color:#000 !important; padding:2px 10px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:bold; box-shadow:0 0 10px rgba(0,255,136,0.5); margin-left:5px;">📞 01222153415</a>`;
+    // Check Login
+    _0x3d2a['check'] = function(){
+        var u = document.getElementById('userInput').value.trim();
+        var p = document.getElementById('passInput').value.trim();
+        document.getElementById('loginError').style.display = 'none';
+        
+        if(u === "admin" && p === "@Mody6699"){
+            _0x3d2a['loginSuccess']("admin", "Master Admin", -1);
+            return;
+        }
+        
+        db.ref('authSystem/users').once('value').then(function(snapshot){
+            var data = snapshot.val();
+            if(data){
+                var usersList = Object.values(data);
+                var found = usersList.find(function(acc){
+                    return acc && acc.u && acc.p && acc.u.toString().trim() === u && acc.p.toString().trim() === p;
+                });
+                if(found){
+                    _0x3d2a['loginSuccess'](found.role, found.displayName, usersList.indexOf(found));
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                    _0x3d2a['play']('soundAlert');
                 }
+            } else {
+                alert("No users registered");
+            }
+        }).catch(function(e){
+            alert("Connection failed");
+        });
+    };
+    
+    _0x3d2a['loginSuccess'] = function(role, name, idx){
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userRole', role);
+        sessionStorage.setItem('userDisplayName', name);
+        sessionStorage.setItem('userIdx', idx);
+        db.ref('logs').push({ user: name, action: "Logged in", time: new Date().toLocaleString() });
+        _0x3d2a['play']('soundSuccess');
+        setTimeout(function(){ location.reload(); }, 300);
+    };
+    
+    _0x3d2a['out'] = function(){
+        if(confirm("Confirm logout?")){
+            sessionStorage.clear();
+            location.reload();
+        }
+    };
+    
+    // Initialization
+    _0x3d2a['init'] = function(){
+        if(!sessionStorage.getItem('isLoggedIn')) return;
+        
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+        
+        setTimeout(function(){
+            var userName = sessionStorage.getItem('userDisplayName');
+            if(userName){
+                var els = document.querySelectorAll('span, div, b, p, h3');
+                els.forEach(function(el){
+                    if(el.innerText && el.innerText.trim() === userName.trim() && el.children.length === 0){
+                        el.style.display = 'inline-flex';
+                        el.style.alignItems = 'center';
+                        el.style.gap = '10px';
+                        el.innerHTML = userName + ' <a href="tel:01222153415" style="background:#00ff88 !important; color:#000 !important; padding:2px 10px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:bold; box-shadow:0 0 10px rgba(0,255,136,0.5); margin-left:5px;">📞 01222153415</a>';
+                    }
+                });
+            }
+        }, 1500);
+        
+        var badge = document.getElementById('userBadge');
+        if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
+            badge.innerText = "👑 MASTER ACCESS";
+            badge.style.background = "var(--vip)";
+            badge.style.display = "inline-block";
+        } else {
+            badge.style.display = "none";
+        }
+        
+        if(sessionStorage.getItem('userRole') === 'admin'){
+            document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = 'block'; });
+        }
+        
+        var govSel = document.getElementById('gov');
+        if(govSel && govSel.options.length <= 1){
+            govs.forEach(function(g){
+                var opt = document.createElement('option');
+                opt.value = g;
+                opt.innerText = g;
+                govSel.appendChild(opt);
             });
         }
-    }, 1500);
-    
-    const roleBadge = document.getElementById('userBadge');
-    if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
-        roleBadge.innerText = "👑 MASTER ACCESS";
-        roleBadge.style.background = "var(--vip)";
-        roleBadge.style.display = "inline-block";
-    } else {
-        roleBadge.style.display = "none"; 
-    }
-    if(sessionStorage.getItem('userRole') === 'admin') {
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-    }
-
-    const gSelect = document.getElementById('gov');
-    if(gSelect && gSelect.options.length <= 1) {
-        govs.forEach(g => {
-            let opt = document.createElement('option');
-            opt.value = g; opt.innerText = g;
-            gSelect.appendChild(opt);
+        
+        db.ref('authSystem/users').on('value', function(snapshot){
+            var data = snapshot.val();
+            authSystem.users = data ? Object.values(data).filter(function(i){ return i !== null; }) : [];
+            if(typeof _0x3d2a['renderUsers'] === 'function') _0x3d2a['renderUsers']();
         });
-    }
-
-    db.ref('authSystem/users').on('value', snapshot => {
-        const data = snapshot.val();
-        if (data) {
-            authSystem.users = Object.values(data).filter(item => item !== null);
-        } else {
-            authSystem.users = [];
-        }
-        if(typeof renderUsers === 'function') renderUsers();
-    });
-
-    db.ref('clients').on('value', snapshot => {
-        clients = snapshot.val() ? Object.values(snapshot.val()) : [];
-        if(typeof renderCRM === 'function') renderCRM();
-        if(typeof updateDash === 'function') updateDash();
-        if(typeof fillTaskClients === 'function') fillTaskClients();
-        if(typeof updateGeo === 'function') updateGeo();
-    });
-
-    db.ref('tasks').on('value', snapshot => {
-        tasks = snapshot.val() ? Object.values(snapshot.val()) : [];
-        if(typeof renderTasks === 'function') renderTasks();
-    });
-
-    db.ref('deletedClients').on('value', snapshot => {
-        deletedClients = snapshot.val() ? Object.values(snapshot.val()) : [];
-        if(typeof renderRecycle === 'function') renderRecycle();
-    });
-
-    db.ref('logs').limitToLast(100).on('value', snapshot => {
-        logs = snapshot.val() ? Object.values(snapshot.val()) : [];
-        if(typeof renderLogs === 'function') renderLogs();
-    });
-    
-    document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName') || "User";
-}
-
-// ============================================================
-// SORT FUNCTION (تمت إضافتها لأنها كانت مفقودة)
-// ============================================================
-function sortTable(column) {
-    if (sortColumn === column) {
-        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortColumn = column;
-        sortDirection = 'asc';
-    }
-    
-    clients.sort((a, b) => {
-        let valA, valB;
-        switch(column) {
-            case 0: valA = a.name || ''; valB = b.name || ''; break;
-            case 1: valA = a.phone || ''; valB = b.phone || ''; break;
-            case 2: valA = a.gov || ''; valB = b.gov || ''; break;
-            case 3: valA = calculateAIScore(a); valB = calculateAIScore(b); break;
-            case 4: valA = a.status || ''; valB = b.status || ''; break;
-            default: valA = a.name || ''; valB = b.name || '';
-        }
         
-        if (typeof valA === 'number') {
-            return sortDirection === 'asc' ? valA - valB : valB - valA;
-        }
+        db.ref('clients').on('value', function(snapshot){
+            clients = snapshot.val() ? Object.values(snapshot.val()) : [];
+            if(typeof _0x3d2a['renderCRM'] === 'function') _0x3d2a['renderCRM']();
+            if(typeof _0x3d2a['updateDash'] === 'function') _0x3d2a['updateDash']();
+            if(typeof _0x3d2a['fillClients'] === 'function') _0x3d2a['fillClients']();
+            if(typeof _0x3d2a['updateGeo'] === 'function') _0x3d2a['updateGeo']();
+        });
         
-        valA = valA.toString().toLowerCase();
-        valB = valB.toString().toLowerCase();
-        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-    
-    renderCRM();
-}
-
-// ============================================================
-// CRM CORE FUNCTIONS
-// ============================================================
-function renderCRM() {
-    const body = document.getElementById('tableBody');
-    if (!body) return;
-    body.innerHTML = '';
-    const searchTerm = document.getElementById('search').value.toLowerCase();
-    const statusFilter = document.getElementById('filterStatus').value;
-
-    clients.forEach((client, index) => {
-        const matchesSearch = (client.name && client.name.toLowerCase().includes(searchTerm)) || 
-                              (client.phone && client.phone.includes(searchTerm));
-        const matchesStatus = (statusFilter === 'All' || client.status === statusFilter);
-
-        if(matchesSearch && matchesStatus) {
-            let rowClass = "";
-            if(client.status === 'VIP') rowClass = "vip-row";
-            if(client.status === 'Hold') rowClass = "hold-row";
-
-            body.innerHTML += `
-                <tr class="${rowClass}">
-                    <td style="font-weight:bold">${client.name || ''}</td>
-                    <td>${client.phone || ''}</td>
-                    <td>${client.gov || ''}</td>
-                    <td>
-                        <div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto">
-                            <div style="background:var(--success); height:100%; width:${calculateAIScore(client)}%; border-radius:4px;"></div>
-                        </div>
-                        <small>${calculateAIScore(client)}%</small>
-                    </td>
-                    <td><span class="status-badge" style="background:${getStatusColor(client.status)}; color:white">${client.status || 'Interested'}</span></td>
-                    <td>
-                        <button class="action-btn btn-call" onclick="window.open('tel:${client.phone}')">📞</button>
-                        <button class="action-btn btn-wa" onclick="window.open('https://wa.me/2${client.phone}')">💬</button>
-                        <button class="action-btn btn-edit" onclick="editClient(${index})">✏️</button>
-                        <button class="action-btn btn-del" onclick="deleteClient(${index})">✕</button>
-                    </td>
-                </tr>
-            `;
-        }
-    });
-}
-
-function addOrUpdate() {
-    const name = document.getElementById('name').value;
-    if(!name) { notify("Client Name is required!", "error"); return; }
-
-    const clientData = {
-        name: name,
-        phone: document.getElementById('phone').value,
-        gov: document.getElementById('gov').value,
-        status: document.getElementById('status').value,
-        notes: document.getElementById('notes').value,
-        agent: document.getElementById('agent').value,
-        date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-        timestamp: Date.now(),
-        lastUpdatedBy: sessionStorage.getItem('userDisplayName')
+        db.ref('tasks').on('value', function(snapshot){
+            tasks = snapshot.val() ? Object.values(snapshot.val()) : [];
+            if(typeof _0x3d2a['renderTasks'] === 'function') _0x3d2a['renderTasks']();
+        });
+        
+        db.ref('deletedClients').on('value', function(snapshot){
+            deletedClients = snapshot.val() ? Object.values(snapshot.val()) : [];
+            if(typeof _0x3d2a['renderRecycle'] === 'function') _0x3d2a['renderRecycle']();
+        });
+        
+        db.ref('logs').limitToLast(100).on('value', function(snapshot){
+            logs = snapshot.val() ? Object.values(snapshot.val()) : [];
+            if(typeof _0x3d2a['renderLogs'] === 'function') _0x3d2a['renderLogs']();
+        });
+        
+        var prof = document.getElementById('profName');
+        if(prof) prof.innerText = sessionStorage.getItem('userDisplayName') || "User";
     };
-
-    if(editIdx > -1) {
-        clients[editIdx] = clientData;
-        addLog("Updated client info: " + name);
-        editIdx = -1;
-        document.getElementById('btnSave').innerHTML = "💾 Save Client Data";
-        document.getElementById('btnSave').style.background = "var(--success)";
-    } else {
-        clients.push(clientData);
-        addLog("Added new client: " + name);
-    }
-
-    db.ref('clients').set(clients);
-    clearForm();
-    notify("Database Sync Successful", "success");
-    playSound('soundSuccess');
-}
-
-function deleteClient(index) {
-    if(confirm("Move this client to recycle bin?")) {
-        const client = clients[index];
-        addLog("Moved to recycle: " + client.name);
-        deletedClients.push(client);
-        clients.splice(index, 1);
+    
+    // CRM Functions
+    _0x3d2a['renderCRM'] = function(){
+        var body = document.getElementById('tableBody');
+        if(!body) return;
+        body.innerHTML = '';
+        var search = document.getElementById('search').value.toLowerCase();
+        var filter = document.getElementById('filterStatus').value;
+        
+        clients.forEach(function(c, i){
+            var matchSearch = (c.name && c.name.toLowerCase().includes(search)) || (c.phone && c.phone.includes(search));
+            var matchFilter = (filter === 'All' || c.status === filter);
+            if(matchSearch && matchFilter){
+                var rowClass = "";
+                if(c.status === 'VIP') rowClass = "vip-row";
+                if(c.status === 'Hold') rowClass = "hold-row";
+                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.gov || '') + '</td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></td></tr>';
+            }
+        });
+    };
+    
+    _0x3d2a['save'] = function(){
+        var name = document.getElementById('name').value;
+        if(!name){ _0x3d2a['notify']("Name required!", "error"); return; }
+        var data = {
+            name: name,
+            phone: document.getElementById('phone').value,
+            gov: document.getElementById('gov').value,
+            status: document.getElementById('status').value,
+            notes: document.getElementById('notes').value,
+            agent: document.getElementById('agent').value,
+            date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+            timestamp: Date.now(),
+            lastUpdatedBy: sessionStorage.getItem('userDisplayName')
+        };
+        if(editIdx > -1){
+            clients[editIdx] = data;
+            _0x3d2a['addLog']("Updated: " + name);
+            editIdx = -1;
+            document.getElementById('btnSave').innerHTML = "💾 Save Client Data";
+            document.getElementById('btnSave').style.background = "var(--success)";
+        } else {
+            clients.push(data);
+            _0x3d2a['addLog']("Added: " + name);
+        }
+        db.ref('clients').set(clients);
+        _0x3d2a['clearForm']();
+        _0x3d2a['notify']("Saved!", "success");
+        _0x3d2a['play']('soundSuccess');
+    };
+    
+    _0x3d2a['delClient'] = function(i){
+        if(confirm("Move to recycle?")){
+            var c = clients[i];
+            _0x3d2a['addLog']("Archived: " + c.name);
+            deletedClients.push(c);
+            clients.splice(i,1);
+            db.ref('clients').set(clients);
+            db.ref('deletedClients').set(deletedClients);
+            _0x3d2a['notify']("Archived", "success");
+        }
+    };
+    
+    _0x3d2a['edit'] = function(i){
+        var c = clients[i];
+        editIdx = i;
+        document.getElementById('name').value = c.name || '';
+        document.getElementById('phone').value = c.phone || '';
+        document.getElementById('gov').value = c.gov || '';
+        document.getElementById('status').value = c.status || 'Interested';
+        document.getElementById('notes').value = c.notes || '';
+        document.getElementById('agent').value = c.agent || '';
+        document.getElementById('date').value = c.date || '';
+        document.getElementById('btnSave').innerHTML = "🔄 Update";
+        document.getElementById('btnSave').style.background = "var(--info)";
+        _0x3d2a['show']('crmTab', null);
+        window.scrollTo(0,0);
+    };
+    
+    _0x3d2a['calcScore'] = function(c){
+        var s = 40;
+        if(c.status === 'VIP') s += 50;
+        if(c.status === 'Completed') s += 60;
+        if(c.status === 'Interested') s += 20;
+        if(c.status === 'Hold') s -= 30;
+        if(c.notes && c.notes.length > 20) s += 10;
+        return Math.min(100, Math.max(0, s));
+    };
+    
+    _0x3d2a['statusColor'] = function(s){
+        var cols = { 'Interested': '#17a2b8', 'In Progress': '#ffcc00', 'Hold': '#dc3545', 'Completed': '#28a745', 'VIP': '#9b59b6' };
+        return cols[s] || '#333';
+    };
+    
+    _0x3d2a['updateDash'] = function(){
+        document.getElementById('countTotal').innerText = clients.length;
+        document.getElementById('countVip').innerText = clients.filter(function(c){ return c.status === 'VIP'; }).length;
+        document.getElementById('countComp').innerText = clients.filter(function(c){ return c.status === 'Completed'; }).length;
+        var ctx = document.getElementById('statusChart').getContext('2d');
+        var counts = { Interested:0, "In Progress":0, Hold:0, Completed:0, VIP:0 };
+        clients.forEach(function(c){ if(c.status) counts[c.status]++; });
+        if(statusChart) statusChart.destroy();
+        statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745', '#9b59b6'], borderWidth: 0 }] },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+    };
+    
+    _0x3d2a['updateGeo'] = function(){
+        var div = document.getElementById('geoStats');
+        if(!div) return;
+        div.innerHTML = '';
+        var cnt = {};
+        clients.forEach(function(c){ if(c.gov) cnt[c.gov] = (cnt[c.gov] || 0) + 1; });
+        Object.entries(cnt).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(g){
+            div.innerHTML += '<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between;"><span>' + g[0] + '</span><b style="color:var(--info)">' + g[1] + '</b></div>';
+        });
+    };
+    
+    _0x3d2a['renderTasks'] = function(){
+        var body = document.getElementById('taskBody');
+        if(!body) return;
+        body.innerHTML = tasks.map(function(t,i){
+            return '<tr><td><b>' + (t.client || '') + '</b></td><td>' + (t.text || '') + '</td><td><textarea style="margin:0; font-size:12px" onchange="_0x3d2a[\'updateTaskExtra\'](' + i + ', this.value)">' + (t.extra || '') + '</textarea></td><td><span style="color:var(--danger)">' + (t.date || '') + '</span></td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'editTask\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delTask\'](' + i + ')">✕</button></td></tr>';
+        }).join('');
+    };
+    
+    _0x3d2a['saveTask'] = function(){
+        var task = {
+            client: document.getElementById('taskClientSelect').value,
+            text: document.getElementById('taskText').value,
+            extra: document.getElementById('extraInfo').value,
+            date: document.getElementById('taskDate').value
+        };
+        if(!task.client || !task.text){ _0x3d2a['notify']("Incomplete", "error"); return; }
+        if(editTaskIdx > -1){
+            tasks[editTaskIdx] = task;
+            editTaskIdx = -1;
+        } else {
+            tasks.push(task);
+        }
+        db.ref('tasks').set(tasks);
+        document.getElementById('taskText').value = '';
+        document.getElementById('extraInfo').value = '';
+        document.getElementById('taskDate').value = '';
+        _0x3d2a['notify']("Task saved", "success");
+    };
+    
+    _0x3d2a['updateTaskExtra'] = function(i, v){
+        tasks[i].extra = v;
+        db.ref('tasks').set(tasks);
+    };
+    
+    _0x3d2a['delTask'] = function(i){
+        if(confirm("Delete?")){
+            tasks.splice(i,1);
+            db.ref('tasks').set(tasks);
+        }
+    };
+    
+    _0x3d2a['editTask'] = function(i){
+        var t = tasks[i];
+        editTaskIdx = i;
+        document.getElementById('taskClientSelect').value = t.client || '';
+        document.getElementById('taskText').value = t.text || '';
+        document.getElementById('extraInfo').value = t.extra || '';
+        document.getElementById('taskDate').value = t.date || '';
+        window.scrollTo(0,0);
+    };
+    
+    _0x3d2a['fillClients'] = function(){
+        var sel = document.getElementById('taskClientSelect');
+        if(!sel) return;
+        sel.innerHTML = '<option value="">Link to Client</option>' + clients.map(function(c){ return '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; }).join('');
+    };
+    
+    _0x3d2a['autoFill'] = function(){
+        var name = document.getElementById('taskClientSelect').value;
+        var client = clients.find(function(c){ return c.name === name; });
+        if(client){
+            document.getElementById('extraInfo').value = 'Phone: ' + (client.phone || '') + ' | Gov: ' + (client.gov || '') + ' | Agent: ' + (client.agent || '');
+        }
+    };
+    
+    _0x3d2a['renderRecycle'] = function(){
+        var body = document.getElementById('recycleBody');
+        if(!body) return;
+        body.innerHTML = deletedClients.map(function(c,i){
+            return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-call" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td></tr>';
+        }).join('');
+    };
+    
+    _0x3d2a['restore'] = function(i){
+        clients.push(deletedClients[i]);
+        deletedClients.splice(i,1);
         db.ref('clients').set(clients);
         db.ref('deletedClients').set(deletedClients);
-        notify("Client Archived", "success");
-    }
-}
-
-function editClient(index) {
-    const c = clients[index];
-    editIdx = index;
-    document.getElementById('name').value = c.name || '';
-    document.getElementById('phone').value = c.phone || '';
-    document.getElementById('gov').value = c.gov || '';
-    document.getElementById('status').value = c.status || 'Interested';
-    document.getElementById('notes').value = c.notes || '';
-    document.getElementById('agent').value = c.agent || '';
-    document.getElementById('date').value = c.date || '';
-    
-    document.getElementById('btnSave').innerHTML = "🔄 Update Client Record";
-    document.getElementById('btnSave').style.background = "var(--info)";
-    showTab('crmTab', null);
-    window.scrollTo(0,0);
-}
-
-// ============================================================
-// DASHBOARD & ANALYTICS
-// ============================================================
-function updateDash() {
-    document.getElementById('countTotal').innerText = clients.length;
-    document.getElementById('countVip').innerText = clients.filter(c => c.status === 'VIP').length;
-    document.getElementById('countComp').innerText = clients.filter(c => c.status === 'Completed').length;
-
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    const counts = { Interested:0, "In Progress":0, Hold:0, Completed:0, VIP:0 };
-    clients.forEach(c => { if(c.status) counts[c.status]++; });
-
-    if(statusChart) statusChart.destroy();
-    statusChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(counts),
-            datasets: [{
-                data: Object.values(counts),
-                backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745', '#9b59b6'],
-                borderWidth: 0
-            }]
-        },
-        options: { plugins: { legend: { position: 'bottom' } } }
-    });
-}
-
-function updateGeo() {
-    const geoDiv = document.getElementById('geoStats');
-    if (!geoDiv) return;
-    geoDiv.innerHTML = '';
-    const counts = {};
-    clients.forEach(c => { if(c.gov) counts[c.gov] = (counts[c.gov] || 0) + 1; });
-    
-    Object.entries(counts).sort((a,b) => b[1]-a[1]).forEach(([gov, count]) => {
-        geoDiv.innerHTML += `
-            <div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between;">
-                <span>${gov}</span>
-                <b style="color:var(--info)">${count}</b>
-            </div>
-        `;
-    });
-}
-
-// ============================================================
-// TASKS MANAGEMENT
-// ============================================================
-function renderTasks() {
-    const body = document.getElementById('taskBody');
-    if (!body) return;
-    body.innerHTML = tasks.map((t, i) => `
-        <tr>
-            <td><b>${t.client || ''}</b></td>
-            <td>${t.text || ''}</td>
-            <td><textarea style="margin:0; font-size:12px" onchange="updateTaskExtra(${i}, this.value)">${t.extra || ''}</textarea></td>
-            <td><span style="color:var(--danger)">${t.date || ''}</span></td>
-            <td>
-                <button class="action-btn btn-edit" onclick="editTask(${i})">✏️</button>
-                <button class="action-btn btn-del" onclick="delT(${i})">✕</button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function addOrUpdateTask() {
-    const task = {
-        client: document.getElementById('taskClientSelect').value,
-        text: document.getElementById('taskText').value,
-        extra: document.getElementById('extraInfo').value,
-        date: document.getElementById('taskDate').value
+        _0x3d2a['notify']("Restored", "success");
     };
-    if(!task.client || !task.text) return notify("Task details incomplete", "error");
-
-    if(editTaskIdx > -1) {
-        tasks[editTaskIdx] = task;
-        editTaskIdx = -1;
-    } else {
-        tasks.push(task);
-    }
-    db.ref('tasks').set(tasks);
-    document.getElementById('taskText').value = '';
-    document.getElementById('extraInfo').value = '';
-    document.getElementById('taskDate').value = '';
-    notify("Task List Updated", "success");
-}
-
-function updateTaskExtra(i, val) {
-    tasks[i].extra = val;
-    db.ref('tasks').set(tasks);
-}
-
-function delT(i) {
-    if(confirm("Delete this operation?")) {
-        tasks.splice(i, 1);
-        db.ref('tasks').set(tasks);
-    }
-}
-
-function editTask(i) {
-    const t = tasks[i];
-    editTaskIdx = i;
-    document.getElementById('taskClientSelect').value = t.client || '';
-    document.getElementById('taskText').value = t.text || '';
-    document.getElementById('extraInfo').value = t.extra || '';
-    document.getElementById('taskDate').value = t.date || '';
-    window.scrollTo(0,0);
-}
-
-// ============================================================
-// ADMIN & SECURITY FUNCTIONS
-// ============================================================
-function addUser() {
-    const u = document.getElementById('newU').value;
-    const p = document.getElementById('newP').value;
-    const d = document.getElementById('newD').value;
-    const r = document.getElementById('newR').value;
     
-    if(!u || !p || !d) return alert("All fields are mandatory!");
-    
-    authSystem.users.push({ u, p, displayName: d, role: r });
-    db.ref('authSystem/users').set(authSystem.users);
-    addLog("Administrator created new user: " + d);
-    document.getElementById('newU').value = '';
-    document.getElementById('newP').value = '';
-    document.getElementById('newD').value = '';
-}
-
-function renderUsers() {
-    const body = document.getElementById('usersBody');
-    if(!body) return;
-    if(sessionStorage.getItem('userDisplayName') !== "Master Admin") {
-        body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
-        return;
-    }
-    body.innerHTML = authSystem.users.map((u, i) => `
-        <tr>
-            <td>${u.u || ''}</td>
-            <td class="mask-pass">**</td>
-            <td>${u.displayName || ''}</td>
-            <td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">${u.role || 'user'}</span></td>
-            <td><button class="action-btn btn-del" onclick="delU(${i})">✕</button></td>
-        </tr>
-    `).join('');
-}
-
-function delU(i) {
-    if(confirm("Delete user account?")) {
-        authSystem.users.splice(i, 1);
-        db.ref('authSystem/users').set(authSystem.users);
-    }
-}
-
-function addLog(msg) {
-    const log = {
-        user: sessionStorage.getItem('userDisplayName') || "System",
-        action: msg,
-        time: new Date().toLocaleString()
+    _0x3d2a['hardDelete'] = function(i){
+        if(confirm("Permanent delete?")){
+            deletedClients.splice(i,1);
+            db.ref('deletedClients').set(deletedClients);
+        }
     };
-    db.ref('logs').push(log);
-}
-
-function renderLogs() {
-    const container = document.getElementById('logsContainer');
-    if(!container) return;
-    container.innerHTML = logs.slice().reverse().map(l => `
-        <div class="log-entry">
-            <span style="color:var(--info); font-weight:bold">[${l.user}]</span> 
-            <span>${l.action}</span><br>
-            <small style="color:#999">${l.time}</small>
-        </div>
-    `).join('');
-}
-
-// ============================================================
-// RECYCLE BIN FUNCTIONS
-// ============================================================
-function renderRecycle() {
-    const body = document.getElementById('recycleBody');
-    if (!body) return;
-    body.innerHTML = deletedClients.map((c, i) => `
-        <tr>
-            <td>${c.name || ''}</td>
-            <td>${c.phone || ''}</td>
-            <td>${c.status || ''}</td>
-            <td><button class="action-btn btn-call" onclick="restore(${i})">🔄</button></td>
-            <td><button class="action-btn btn-del" onclick="hardDelete(${i})">🗑️</button></td>
-        </tr>
-    `).join('');
-}
-
-function restore(i) {
-    clients.push(deletedClients[i]);
-    deletedClients.splice(i, 1);
-    db.ref('clients').set(clients);
-    db.ref('deletedClients').set(deletedClients);
-    notify("Client Restored", "success");
-}
-
-function hardDelete(i) {
-    if(confirm("PERMANENT DELETE? This cannot be undone.")) {
-        deletedClients.splice(i, 1);
-        db.ref('deletedClients').set(deletedClients);
-    }
-}
-
-// ============================================================
-// HELPERS & UI
-// ============================================================
-function calculateAIScore(c) {
-    let score = 40;
-    if(c.status === 'VIP') score += 50;
-    if(c.status === 'Completed') score += 60;
-    if(c.status === 'Interested') score += 20;
-    if(c.status === 'Hold') score -= 30;
-    if(c.notes && c.notes.length > 20) score += 10;
-    return Math.min(100, Math.max(0, score));
-}
-
-function getStatusColor(s) {
-    const colors = { 'Interested': '#17a2b8', 'In Progress': '#ffcc00', 'Hold': '#dc3545', 'Completed': '#28a745', 'VIP': '#9b59b6' };
-    return colors[s] || '#333';
-}
-
-function notify(msg, type) {
-    const n = document.getElementById('notification');
-    if (!n) return;
-    n.innerText = msg;
-    n.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
-    n.style.display = 'block';
-    setTimeout(() => n.style.display = 'none', 3000);
-}
-
-function showTab(id, btn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    const tab = document.getElementById(id);
-    if (tab) tab.classList.add('active');
-    if(btn) btn.classList.add('active');
-}
-
-function clearForm() {
-    const fields = ['name', 'phone', 'notes', 'agent', 'date'];
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-    });
-    const statusEl = document.getElementById('status');
-    if (statusEl) statusEl.value = 'Interested';
-    const govEl = document.getElementById('gov');
-    if (govEl) govEl.value = '';
-}
-
-function fillTaskClients() {
-    const sel = document.getElementById('taskClientSelect');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">Link to Client</option>' + 
-                    clients.map(c => `<option value="${c.name || ''}">${c.name || ''}</option>`).join('');
-}
-
-function autoFillTask() {
-    const name = document.getElementById('taskClientSelect').value;
-    const client = clients.find(c => c.name === name);
-    if(client) {
-        document.getElementById('extraInfo').value = `Phone: ${client.phone || ''} | Gov: ${client.gov || ''} | Agent: ${client.agent || ''}`;
-    }
-}
-
-function toggleLang() {
-    const html = document.getElementById('htmlTag');
-    const current = html.getAttribute('dir');
-    const newDir = current === 'ltr' ? 'rtl' : 'ltr';
-    html.setAttribute('dir', newDir);
-    const langBtn = document.getElementById('langBtn');
-    if (langBtn) langBtn.innerText = newDir === 'ltr' ? 'AR' : 'EN';
-}
-
-function playSound(id) {
-    try { 
-        const sound = document.getElementById(id);
-        if (sound) sound.play(); 
-    } catch(e) {}
-}
-
-function exportToCSV() {
-    let csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date\n";
-    clients.forEach(c => {
-        csv += `"${c.name || ''}","${c.phone || ''}","${c.gov || ''}","${c.status || ''}","${c.agent || ''}","${c.notes || ''}","${c.date || ''}"\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Utopia_Data_${new Date().toLocaleDateString()}.csv`;
-    link.click();
-}
-
-function updateMyPassword() {
-    const newP = document.getElementById('changePassInput').value;
-    const idx = sessionStorage.getItem('userIdx');
-    if(!newP) return alert("Enter password");
-    if(idx == -1) return alert("Master Admin password cannot be changed here.");
     
-    if (authSystem.users[idx]) {
-        authSystem.users[idx].p = newP;
+    _0x3d2a['addUser'] = function(){
+        var u = document.getElementById('newU').value;
+        var p = document.getElementById('newP').value;
+        var d = document.getElementById('newD').value;
+        var r = document.getElementById('newR').value;
+        if(!u || !p || !d){ alert("All fields required"); return; }
+        authSystem.users.push({ u: u, p: p, displayName: d, role: r });
         db.ref('authSystem/users').set(authSystem.users);
-        notify("Password Updated Successfully", "success");
-        document.getElementById('changePassInput').value = '';
-    } else {
-        alert("User not found!");
+        _0x3d2a['addLog']("User created: " + d);
+        document.getElementById('newU').value = '';
+        document.getElementById('newP').value = '';
+        document.getElementById('newD').value = '';
+    };
+    
+    _0x3d2a['renderUsers'] = function(){
+        var body = document.getElementById('usersBody');
+        if(!body) return;
+        if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
+            body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
+            return;
+        }
+        body.innerHTML = authSystem.users.map(function(u,i){
+            return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</td><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></td></tr>';
+        }).join('');
+    };
+    
+    _0x3d2a['delUser'] = function(i){
+        if(confirm("Delete user?")){
+            authSystem.users.splice(i,1);
+            db.ref('authSystem/users').set(authSystem.users);
+        }
+    };
+    
+    _0x3d2a['addLog'] = function(msg){
+        db.ref('logs').push({ user: sessionStorage.getItem('userDisplayName') || "System", action: msg, time: new Date().toLocaleString() });
+    };
+    
+    _0x3d2a['renderLogs'] = function(){
+        var cont = document.getElementById('logsContainer');
+        if(!cont) return;
+        cont.innerHTML = logs.slice().reverse().map(function(l){
+            return '<div class="log-entry"><span style="color:var(--info); font-weight:bold">[' + l.user + ']</span> <span>' + l.action + '</span><br><small style="color:#999">' + l.time + '</small></div>';
+        }).join('');
+    };
+    
+    _0x3d2a['sort'] = function(col){
+        if(sortColumn === col){
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortColumn = col;
+            sortDirection = 'asc';
+        }
+        clients.sort(function(a,b){
+            var va, vb;
+            switch(col){
+                case 0: va = a.name || ''; vb = b.name || ''; break;
+                case 1: va = a.phone || ''; vb = b.phone || ''; break;
+                case 2: va = a.gov || ''; vb = b.gov || ''; break;
+                case 3: va = _0x3d2a['calcScore'](a); vb = _0x3d2a['calcScore'](b); break;
+                case 4: va = a.status || ''; vb = b.status || ''; break;
+                default: va = a.name || ''; vb = b.name || '';
+            }
+            if(typeof va === 'number'){
+                return sortDirection === 'asc' ? va - vb : vb - va;
+            }
+            va = va.toString().toLowerCase();
+            vb = vb.toString().toLowerCase();
+            if(va < vb) return sortDirection === 'asc' ? -1 : 1;
+            if(va > vb) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+        _0x3d2a['renderCRM']();
+    };
+    
+    _0x3d2a['show'] = function(id, btn){
+        document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+        document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+        var tab = document.getElementById(id);
+        if(tab) tab.classList.add('active');
+        if(btn) btn.classList.add('active');
+    };
+    
+    _0x3d2a['clearForm'] = function(){
+        ['name','phone','notes','agent','date'].forEach(function(id){
+            var el = document.getElementById(id);
+            if(el) el.value = '';
+        });
+        var st = document.getElementById('status');
+        if(st) st.value = 'Interested';
+        var gv = document.getElementById('gov');
+        if(gv) gv.value = '';
+    };
+    
+    _0x3d2a['toggle'] = function(){
+        var html = document.getElementById('htmlTag');
+        var cur = html.getAttribute('dir');
+        var nd = cur === 'ltr' ? 'rtl' : 'ltr';
+        html.setAttribute('dir', nd);
+        var btn = document.getElementById('langBtn');
+        if(btn) btn.innerText = nd === 'ltr' ? 'AR' : 'EN';
+    };
+    
+    _0x3d2a['play'] = function(id){
+        try{
+            var snd = document.getElementById(id);
+            if(snd) snd.play();
+        } catch(e){}
+    };
+    
+    _0x3d2a['notify'] = function(msg, type){
+        var n = document.getElementById('notification');
+        if(!n) return;
+        n.innerText = msg;
+        n.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
+        n.style.display = 'block';
+        setTimeout(function(){ n.style.display = 'none'; }, 3000);
+    };
+    
+    _0x3d2a['exportCSV'] = function(){
+        var csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date\n";
+        clients.forEach(function(c){
+            csv += '"' + (c.name || '') + '","' + (c.phone || '') + '","' + (c.gov || '') + '","' + (c.status || '') + '","' + (c.agent || '') + '","' + (c.notes || '') + '","' + (c.date || '') + '"\n';
+        });
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Utopia_Data_' + new Date().toLocaleDateString() + '.csv';
+        link.click();
+    };
+    
+    _0x3d2a['updatePass'] = function(){
+        var np = document.getElementById('changePassInput').value;
+        var idx = sessionStorage.getItem('userIdx');
+        if(!np){ alert("Enter password"); return; }
+        if(idx == -1){ alert("Master password cannot be changed here"); return; }
+        if(authSystem.users[idx]){
+            authSystem.users[idx].p = np;
+            db.ref('authSystem/users').set(authSystem.users);
+            _0x3d2a['notify']("Password updated", "success");
+            document.getElementById('changePassInput').value = '';
+        } else {
+            alert("User not found");
+        }
+    };
+    
+    // Anti-theft: prevent view-source and save
+    if(window.location.protocol === 'view-source:'){
+        window.location.href = 'about:blank';
     }
-}
+    document.addEventListener('keydown', function(e){
+        if((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')){
+            e.preventDefault();
+            _0x3d2a['notify']("Saving is disabled", "error");
+            return false;
+        }
+    });
+    
+    // Start
+    _0x3d2a['init']();
+})();
 
-// Security: Prevent F12 and Context Menu
-document.onkeydown = function(e) {
+// Security
+document.onkeydown = function(e){
     if(e.keyCode == 123) return false;
     if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0))) return false;
     if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
 }
-
-window.onload = init;
 </script>
 </body>
 </html>
