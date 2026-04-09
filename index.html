@@ -431,6 +431,7 @@ function renderCRM() {
 function addOrUpdate() {
     const n = document.getElementById('name').value;
     if(!n) return notify("Name required", "error");
+    
     const c = { 
         name: n, 
         phone: document.getElementById('phone').value, 
@@ -443,19 +444,30 @@ function addOrUpdate() {
     };
     
     if(editIdx > -1) { 
-        addLog(`Updated client: ${c.name}`); // تم الإصلاح هنا
+        addLog(`Updated client: ${c.name}`); 
         clients[editIdx] = c; 
     } else { 
-        addLog(`Added new client: ${c.name}`); // تم الإصلاح هنا
+        addLog(`Added new client: ${c.name}`); 
         clients.push(c); 
     }
+    
     db.ref('clients').set(clients);
     editIdx = -1;
-    ['name','phone','notes','agent'].forEach(id => document.getElementById(id).value = '');
     
-    Swal.fire({ icon: 'success', title: 'Secured!', text: 'Client data saved to Cloud.', timer: 2000, showConfirmButton: false });
+    // تنظيف الحقول بطريقة آمنة
+    ['name','phone','notes','agent'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = '';
+    });
+    
+    Swal.fire({ 
+        icon: 'success', 
+        title: 'Secured!', 
+        text: 'Client data saved to Cloud.', 
+        timer: 2000, 
+        showConfirmButton: false 
+    });
 }
-
 function deleteClient(i) {
     Swal.fire({
         title: 'Move to Recycle Bin?',
