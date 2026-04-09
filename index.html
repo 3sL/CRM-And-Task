@@ -572,37 +572,46 @@ const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "
 // AUTHENTICATION LOGIC (تعديل لضمان الدخول الصحيح)
 // ============================================================
 function checkLogin() {
-    const u = document.getElementById('userInput').value.trim();
-    const p = document.getElementById('passInput').value.trim();
+    const uInput = document.getElementById('userInput').value.trim();
+    const pInput = document.getElementById('passInput').value.trim();
     
-    // إخفاء رسالة الخطأ عند كل محاولة
     document.getElementById('loginError').style.display = 'none';
-    
-    // 1. دخول الأدمن الرئيسي (Master Admin)
-    if (u === "admin" && p === "@Mody6699") {
+
+    // 1. دخول الأدمن الرئيسي (Master Override)
+    if (uInput === "admin" && pInput === "@Mody6699") {
         loginSuccess("admin", "Master Admin", -1);
         return;
     }
-    
-    // 2. فحص الموظفين في المصفوفة المحملة
-    if (authSystem.users && authSystem.users.length > 0) {
-        const foundUser = authSystem.users.find(acc => 
-            acc && acc.u && acc.p && 
-            acc.u.toString().trim() === u && 
-            acc.p.toString().trim() === p
-        );
 
-        if(foundUser) {
-            loginSuccess(foundUser.role, foundUser.displayName, authSystem.users.indexOf(foundUser));
+    // 2. سحب البيانات فوراً عند الضغط (Direct Fetch)
+    db.ref('authSystem/users').once('value').then(snapshot => {
+        const data = snapshot.val();
+        if (data) {
+            // تحويل البيانات لمصفوفة لضمان البحث الصحيح
+            const usersList = Object.values(data);
+            
+            const foundUser = usersList.find(acc => 
+                acc && acc.u && acc.p && 
+                acc.u.toString().trim() === uInput && 
+                acc.p.toString().trim() === pInput
+            );
+
+            if (foundUser) {
+                // نجاح الدخول
+                loginSuccess(foundUser.role, foundUser.displayName, usersList.indexOf(foundUser));
+            } else {
+                // بيانات خاطئة
+                document.getElementById('loginError').style.display = 'block';
+                if(typeof playSound === 'function') playSound('soundAlert');
+            }
         } else {
-            document.getElementById('loginError').style.display = 'block';
-            if(typeof playSound === 'function') playSound('soundAlert');
+            alert("لا توجد بيانات موظفين مسجلة في النظام.");
         }
-    } else {
-        alert("جاري تحميل بيانات المستخدمين من السيرفر، انتظر ثواني وحاول مجدداً.");
-    }
+    }).catch(error => {
+        console.error("Auth Error:", error);
+        alert("فشل الاتصال بقاعدة البيانات. تأكد من الإنترنت.");
+    });
 }
-
 function loginSuccess(role, name, idx) {
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('userRole', role);
