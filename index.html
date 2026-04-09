@@ -569,24 +569,37 @@ let editIdx = -1, editTaskIdx = -1, statusChart = null;
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
 // ============================================================
-// AUTHENTICATION LOGIC
+// AUTHENTICATION LOGIC (تعديل لضمان الدخول الصحيح)
 // ============================================================
 function checkLogin() {
-    const u = document.getElementById('userInput').value;
-    const p = document.getElementById('passInput').value;
+    const u = document.getElementById('userInput').value.trim();
+    const p = document.getElementById('passInput').value.trim();
     
-    // Master Admin Override
+    // إخفاء رسالة الخطأ عند كل محاولة
+    document.getElementById('loginError').style.display = 'none';
+    
+    // 1. دخول الأدمن الرئيسي (Master Admin)
     if (u === "admin" && p === "@Mody6699") {
         loginSuccess("admin", "Master Admin", -1);
         return;
     }
     
-    const foundUser = authSystem.users.find(acc => acc.u === u && acc.p === p);
-    if(foundUser) {
-        loginSuccess(foundUser.role, foundUser.displayName, authSystem.users.indexOf(foundUser));
+    // 2. فحص الموظفين في المصفوفة المحملة
+    if (authSystem.users && authSystem.users.length > 0) {
+        const foundUser = authSystem.users.find(acc => 
+            acc && acc.u && acc.p && 
+            acc.u.toString().trim() === u && 
+            acc.p.toString().trim() === p
+        );
+
+        if(foundUser) {
+            loginSuccess(foundUser.role, foundUser.displayName, authSystem.users.indexOf(foundUser));
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            if(typeof playSound === 'function') playSound('soundAlert');
+        }
     } else {
-        document.getElementById('loginError').style.display = 'block';
-        playSound('soundAlert');
+        alert("جاري تحميل بيانات المستخدمين من السيرفر، انتظر ثواني وحاول مجدداً.");
     }
 }
 
@@ -595,14 +608,20 @@ function loginSuccess(role, name, idx) {
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
-    addLog("User logged into the system");
-    playSound('soundSuccess');
+    
+    // تسجيل لوج الدخول
+    db.ref('logs').push({
+        user: name,
+        action: "User logged into the system",
+        time: new Date().toLocaleString()
+    });
+
+    if(typeof playSound === 'function') playSound('soundSuccess');
     setTimeout(() => location.reload(), 300);
 }
 
 function logout() {
     if(confirm("Confirm security logout?")) {
-        addLog("User logged out");
         sessionStorage.clear();
         location.reload();
     }
@@ -631,42 +650,53 @@ function init() {
     }
 
     const gSelect = document.getElementById('gov');
-    govs.forEach(g => {
-        let opt = document.createElement('option');
-        opt.value = g; opt.innerText = g;
-        gSelect.appendChild(opt);
+    if(gSelect && gSelect.options.length <= 1) {
+        govs.forEach(g => {
+            let opt = document.createElement('option');
+            opt.value = g; opt.innerText = g;
+            gSelect.appendChild(opt);
+        });
+    }
+
+    // --- مزامنة اليوزرات (تعديل جوهري لتحويل البيانات لمصفوفة) ---
+    db.ref('authSystem/users').on('value', snapshot => {
+        const data = snapshot.val();
+        if (data) {
+            // تحويل Object الـ Firebase لمصفوفة لضمان عمل دالة .find()
+            authSystem.users = Object.values(data).filter(item => item !== null);
+        } else {
+            authSystem.users = [];
+        }
+        if(typeof renderUsers === 'function') renderUsers();
     });
 
-    // Firebase Data Syncing
+    // مزامنة العملاء
     db.ref('clients').on('value', snapshot => {
         clients = snapshot.val() ? Object.values(snapshot.val()) : [];
-        renderCRM();
-        updateDash();
-        fillTaskClients();
-        updateGeo();
+        if(typeof renderCRM === 'function') renderCRM();
+        if(typeof updateDash === 'function') updateDash();
+        if(typeof fillTaskClients === 'function') fillTaskClients();
+        if(typeof updateGeo === 'function') updateGeo();
     });
 
+    // مزامنة المهام
     db.ref('tasks').on('value', snapshot => {
         tasks = snapshot.val() ? Object.values(snapshot.val()) : [];
-        renderTasks();
+        if(typeof renderTasks === 'function') renderTasks();
     });
 
+    // مزامنة سلة المهملات
     db.ref('deletedClients').on('value', snapshot => {
         deletedClients = snapshot.val() ? Object.values(snapshot.val()) : [];
-        renderRecycle();
+        if(typeof renderRecycle === 'function') renderRecycle();
     });
 
+    // مزامنة السجلات
     db.ref('logs').limitToLast(100).on('value', snapshot => {
         logs = snapshot.val() ? Object.values(snapshot.val()) : [];
-        renderLogs();
-    });
-
-    db.ref('authSystem/users').on('value', snapshot => {
-        authSystem.users = snapshot.val() ? Object.values(snapshot.val()) : [];
-        renderUsers();
+        if(typeof renderLogs === 'function') renderLogs();
     });
 }
-
 // ============================================================
 // CRM CORE FUNCTIONS
 // ============================================================
