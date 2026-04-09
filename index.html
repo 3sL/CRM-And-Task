@@ -644,7 +644,12 @@ function init() {
     
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
-    document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName');
+    document.getElementById('profName').innerHTML = `
+    <span style="color: #fff;">${sessionStorage.getItem('userDisplayName')}</span>
+    <span style="background: rgba(0, 255, 136, 0.1); color: #00ff88; padding: 4px 12px; border-radius: 20px; margin-left: 15px; font-size: 0.9em; border: 1px solid rgba(0, 255, 136, 0.3); letter-spacing: 1px;">
+        📞 01222153415
+    </span>
+`;
     
    const roleBadge = document.getElementById('userBadge');
     if (sessionStorage.getItem('userDisplayName') === "Master Admin") {
