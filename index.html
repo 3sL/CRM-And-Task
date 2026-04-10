@@ -26,6 +26,11 @@
             --card-bg: #ffffff;
             --text-main: #333;
             --sidebar-width: 260px;
+            --quotation: #3498db;
+            --followup: #e67e22;
+            --supply: #2ecc71;
+            --bank: #f39c12;
+            --cash: #1abc9c;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
@@ -141,6 +146,7 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .form-group { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); margin-bottom: 25px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         input, select, textarea {
             padding: 14px;
             margin: 8px 0;
@@ -171,7 +177,7 @@
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
         }
         .table-container { width: 100%; overflow-x: auto; background: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th {
             background: var(--primary);
             color: var(--accent);
@@ -318,6 +324,25 @@
         .task-status-pending { background: #ffc107; color: #333; }
         .task-status-completed { background: #28a745; color: white; }
         .task-status-overdue { background: #dc3545; color: white; }
+        
+        /* أنماط أنواع العمليات */
+        .operation-type-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .op-quotation { background: #3498db; color: white; }
+        .op-followup { background: #e67e22; color: white; }
+        .op-supply { background: #2ecc71; color: white; }
+        .op-bank { background: #f39c12; color: white; }
+        .op-cash { background: #1abc9c; color: white; }
+        
+        .amount-field {
+            font-weight: bold;
+            color: var(--success);
+        }
     </style>
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;"> 
@@ -490,6 +515,14 @@
                     <option value="completed">مكتملة</option>
                     <option value="overdue">متأخرة</option>
                 </select>
+                <select id="taskFilterOperationType" onchange="_0x3d2a['renderTasks']()">
+                    <option value="">كل أنواع العمليات</option>
+                    <option value="quotation">📄 طلب عرض سعر</option>
+                    <option value="followup">👀 متابعة عرض سعر</option>
+                    <option value="supply">🚚 توريد</option>
+                    <option value="bank">🏦 بنك</option>
+                    <option value="cash">💵 كاش</option>
+                </select>
                 <input type="date" id="taskFilterDate" onchange="_0x3d2a['renderTasks']()" placeholder="تاريخ محدد">
                 <button onclick="_0x3d2a['clearTaskFilters']()" class="btn-ai" style="background: #6c5ce7;">🗑️ مسح الفلاتر</button>
             </div>
@@ -497,22 +530,35 @@
             <div class="form-group">
                 <div class="grid-3">
                     <select id="taskClientSelect" onchange="_0x3d2a['autoFill']()"><option value="">Link to Client</option></select>
-                    <input id="taskDate" type="date">
-                    <input id="taskText" placeholder="What needs to be done?">
+                    <select id="taskOperationType">
+                        <option value="quotation">📄 طلب عرض سعر</option>
+                        <option value="followup">👀 متابعة عرض سعر</option>
+                        <option value="supply">🚚 توريد</option>
+                        <option value="bank">🏦 بنك</option>
+                        <option value="cash">💵 كاش</option>
+                    </select>
+                    <input id="taskAmount" type="number" step="0.01" placeholder="المبلغ (إن وجد)">
                 </div>
-                <textarea id="extraInfo" placeholder="Details or requirements..."></textarea>
-                <button onclick="_0x3d2a['saveTask']()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ Add Operation</button>
+                <div class="grid-3">
+                    <input id="taskDate" type="date">
+                    <input id="taskText" placeholder="وصف العملية / المهمة">
+                </div>
+                <textarea id="taskNotes" rows="2" placeholder="ملاحظات إضافية عن العملية..."></textarea>
+                <textarea id="extraInfo" rows="2" placeholder="تفاصيل إضافية أو متطلبات..."></textarea>
+                <button onclick="_0x3d2a['saveTask']()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ إضافة عملية</button>
             </div>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th id="taskClientHeader">Client</th>
-                            <th id="taskTextHeader">Task</th>
-                            <th id="taskNotesHeader">Progress/Notes</th>
-                            <th id="taskDateHeader">Deadline</th>
-                            <th id="taskStatusHeader">Status</th>
-                            <th id="taskActionHeader">Action</th>
+                            <th id="taskClientHeader">العميل</th>
+                            <th id="taskTypeHeader">نوع العملية</th>
+                            <th id="taskAmountHeader">المبلغ</th>
+                            <th id="taskTextHeader">الوصف</th>
+                            <th id="taskNotesHeader">ملاحظات إضافية</th>
+                            <th id="taskDateHeader">تاريخ التسليم</th>
+                            <th id="taskStatusHeader">الحالة</th>
+                            <th id="taskActionHeader">إجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="taskBody"></tbody>
@@ -521,16 +567,16 @@
         </div>
 
         <div id="recycleTab" class="tab-content">
-            <h2 id="recycleTitle" style="color:var(--danger)">♻️ Recycle Bin (Archived)</h2>
+            <h2 id="recycleTitle" style="color:var(--danger)">♻️ سلة المحذوفات (المؤرشفة)</h2>
             <div class="table-container">
-                <tr>
+                <table>
                     <thead>
                         <tr>
-                            <th id="recycleNameHeader">Name</th>
-                            <th id="recyclePhoneHeader">Phone</th>
-                            <th id="recycleStatusHeader">Status</th>
-                            <th id="recycleRestoreHeader">Restore</th>
-                            <th id="recycleDeleteHeader">Delete</th>
+                            <th id="recycleNameHeader">الاسم</th>
+                            <th id="recyclePhoneHeader">الهاتف</th>
+                            <th id="recycleStatusHeader">الحالة السابقة</th>
+                            <th id="recycleRestoreHeader">استعادة</th>
+                            <th id="recycleDeleteHeader">حذف نهائي</th>
                         </tr>
                     </thead>
                     <tbody id="recycleBody"></tbody>
@@ -539,29 +585,29 @@
         </div>
 
         <div id="adminControlTab" class="tab-content">
-            <h2 id="adminTitle" style="color:var(--vip)">👑 Admin Master Control Panel</h2>
+            <h2 id="adminTitle" style="color:var(--vip)">👑 لوحة تحكم الأدمن الرئيسي</h2>
             <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:20px;">
                 <div class="form-group">
-                    <h3 id="usersTitle">👥 User Accounts Management</h3>
+                    <h3 id="usersTitle">👥 إدارة حسابات المستخدمين</h3>
                     <div class="grid-3">
-                        <input id="newU" placeholder="Username">
-                        <input id="newP" placeholder="Password">
-                        <input id="newD" placeholder="Full Name">
+                        <input id="newU" placeholder="اسم المستخدم">
+                        <input id="newP" placeholder="كلمة المرور">
+                        <input id="newD" placeholder="الاسم الكامل">
                     </div>
                     <select id="newR" style="margin-top:10px;">
-                        <option value="user">Standard Agent</option>
-                        <option value="admin">System Administrator</option>
+                        <option value="user">مندوب عادي</option>
+                        <option value="admin">مسؤول النظام</option>
                     </select>
-                    <button onclick="_0x3d2a['addUser']()" class="btn-save" style="background:var(--primary)" id="registerBtn">Register New User</button>
+                    <button onclick="_0x3d2a['addUser']()" class="btn-save" style="background:var(--primary)" id="registerBtn">تسجيل مستخدم جديد</button>
                     <div class="table-container" style="margin-top:20px;">
-                        <table>
+                        </table>
                             <thead>
                                 <tr>
-                                    <th id="usersTableUser">User</th>
-                                    <th id="usersTablePass">Pass</th>
-                                    <th id="usersTableName">Name</th>
-                                    <th id="usersTableRole">Role</th>
-                                    <th id="usersTableAction">Action</th>
+                                    <th id="usersTableUser">المستخدم</th>
+                                    <th id="usersTablePass">كلمة المرور</th>
+                                    <th id="usersTableName">الاسم</th>
+                                    <th id="usersTableRole">الصلاحية</th>
+                                    <th id="usersTableAction">إجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="usersBody"></tbody>
@@ -569,20 +615,20 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <h3 id="logsTitle">📜 Security Activity Logs</h3>
+                    <h3 id="logsTitle">📜 سجلات النشاطات الأمنية</h3>
                     <div id="logsContainer" style="max-height: 500px; overflow-y: auto; background: #fafafa; border-radius: 10px; padding: 10px;"></div>
                 </div>
             </div>
         </div>
 
         <div id="profileTab" class="tab-content">
-            <h2 id="profileTitle">👤 User Settings</h2>
+            <h2 id="profileTitle">👤 إعدادات المستخدم</h2>
             <div class="form-group" style="max-width: 500px;">
-                <p id="loggedInAs">Logged in as: <b id="profName" style="color: var(--info);"></b></p>
+                <p id="loggedInAs">مسجل الدخول باسم: <b id="profName" style="color: var(--info);"></b></p>
                 <hr>
-                <label id="changePassLabel">Change Access Password:</label>
-                <input type="password" id="changePassInput" placeholder="Enter new password">
-                <button onclick="_0x3d2a['updatePass']()" class="btn-save" style="background:var(--info)" id="updatePassBtn">Update My Password</button>
+                <label id="changePassLabel">تغيير كلمة المرور:</label>
+                <input type="password" id="changePassInput" placeholder="أدخل كلمة المرور الجديدة">
+                <button onclick="_0x3d2a['updatePass']()" class="btn-save" style="background:var(--info)" id="updatePassBtn">تحديث كلمة المرور</button>
                 <hr>
                 <button onclick="_0x3d2a['enableDesktopNotifications']()" class="btn-save" style="background:var(--info); margin-top:10px;" id="enableNotifBtn">🔔 تفعيل الإشعارات</button>
                 <button onclick="_0x3d2a['manualSync']()" class="btn-save" style="background:var(--primary); margin-top:10px;" id="manualSyncBtn">🔄 مزامنة يدوية</button>
@@ -769,7 +815,11 @@
             'th_status': 'Status ↕️', 'th_actions': 'Actions', 'task_status_header': 'Status',
             'task_status_pending': 'Pending', 'task_status_completed': 'Completed', 'task_status_overdue': 'Overdue',
             'clear_filters': '🗑️ Clear Filters', 'search_tasks': '🔍 Search Tasks...', 'all_clients': 'All Clients',
-            'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date'
+            'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date',
+            'task_type_header': 'Operation Type', 'task_amount_header': 'Amount',
+            'op_quotation': 'Quotation Request', 'op_followup': 'Quotation Follow-up',
+            'op_supply': 'Supply', 'op_bank': 'Bank', 'op_cash': 'Cash',
+            'task_notes_placeholder': 'Additional notes about the operation...'
         },
         ar: {
             'm_crm': '👥 إدارة العملاء', 'm_tasks': '📅 المهام والعمليات', 'm_dash': '📊 التحليلات الذكية',
@@ -807,7 +857,11 @@
             'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات', 'task_status_header': 'الحالة',
             'task_status_pending': 'قيد التنفيذ', 'task_status_completed': 'مكتملة', 'task_status_overdue': 'متأخرة',
             'clear_filters': '🗑️ مسح الفلاتر', 'search_tasks': '🔍 بحث في المهام...', 'all_clients': 'كل العملاء',
-            'all_task_statuses': 'كل الحالات', 'specific_date': 'تاريخ محدد'
+            'all_task_statuses': 'كل الحالات', 'specific_date': 'تاريخ محدد',
+            'task_type_header': 'نوع العملية', 'task_amount_header': 'المبلغ',
+            'op_quotation': '📄 طلب عرض سعر', 'op_followup': '👀 متابعة عرض سعر',
+            'op_supply': '🚚 توريد', 'op_bank': '🏦 بنك', 'op_cash': '💵 كاش',
+            'task_notes_placeholder': 'ملاحظات إضافية عن العملية...'
         }
     };
     
@@ -830,6 +884,30 @@
         { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" },
         { u: "test", p: "test123", displayName: "مستخدم تجريبي", role: "user" }
     ];
+    
+    // دوال مساعدة لأنواع العمليات
+    function getOperationTypeText(type) {
+        var t = translations[currentLang];
+        var types = {
+            'quotation': t['op_quotation'] || '📄 طلب عرض سعر',
+            'followup': t['op_followup'] || '👀 متابعة عرض سعر',
+            'supply': t['op_supply'] || '🚚 توريد',
+            'bank': t['op_bank'] || '🏦 بنك',
+            'cash': t['op_cash'] || '💵 كاش'
+        };
+        return types[type] || type;
+    }
+    
+    function getOperationTypeClass(type) {
+        var classes = {
+            'quotation': 'op-quotation',
+            'followup': 'op-followup',
+            'supply': 'op-supply',
+            'bank': 'op-bank',
+            'cash': 'op-cash'
+        };
+        return classes[type] || 'op-quotation';
+    }
     
     function updateSyncStatusUI() {
         var indicator = document.getElementById('syncStatusIndicator');
@@ -867,7 +945,8 @@
             'aiInsightLabel': 'aiInsightLabel', 'enableNotifBtn': 'enableNotifBtn', 'manualSyncBtn': 'manualSyncBtn',
             'usersTableUser': 'usersTableUser', 'usersTablePass': 'usersTablePass', 'usersTableName': 'usersTableName',
             'usersTableRole': 'usersTableRole', 'usersTableAction': 'usersTableAction', 'thName': 'thName',
-            'thPhone': 'thPhone', 'thGov': 'thGov', 'thPriority': 'thPriority', 'thStatus': 'thStatus', 'thActions': 'thActions'
+            'thPhone': 'thPhone', 'thGov': 'thGov', 'thPriority': 'thPriority', 'thStatus': 'thStatus', 'thActions': 'thActions',
+            'taskTypeHeader': 'taskTypeHeader', 'taskAmountHeader': 'taskAmountHeader'
         };
         for (var id in elements) { 
             var el = document.getElementById(id); 
@@ -882,6 +961,7 @@
         var agentInput = document.getElementById('agent'); if (agentInput) agentInput.placeholder = t['agent_placeholder'];
         var notesArea = document.getElementById('notes'); if (notesArea) notesArea.placeholder = t['notes_placeholder'];
         var taskTextInput = document.getElementById('taskText'); if (taskTextInput) taskTextInput.placeholder = t['task_text_placeholder'];
+        var taskNotesArea = document.getElementById('taskNotes'); if (taskNotesArea) taskNotesArea.placeholder = t['task_notes_placeholder'];
         var extraInfoArea = document.getElementById('extraInfo'); if (extraInfoArea) extraInfoArea.placeholder = t['task_extra_placeholder'];
         var newUInput = document.getElementById('newU'); if (newUInput) newUInput.placeholder = t['username_placeholder'];
         var newPInput = document.getElementById('newP'); if (newPInput) newPInput.placeholder = t['password_placeholder'];
@@ -936,6 +1016,27 @@
             newRole.options[1].text = t['role_admin']; 
         }
         
+        // تحديث خيارات أنواع العمليات في الفلتر
+        var taskFilterOperationType = document.getElementById('taskFilterOperationType');
+        if (taskFilterOperationType) {
+            taskFilterOperationType.options[0].text = t['all_task_statuses'] || 'كل الحالات';
+            taskFilterOperationType.options[1].text = t['op_quotation'] || '📄 طلب عرض سعر';
+            taskFilterOperationType.options[2].text = t['op_followup'] || '👀 متابعة عرض سعر';
+            taskFilterOperationType.options[3].text = t['op_supply'] || '🚚 توريد';
+            taskFilterOperationType.options[4].text = t['op_bank'] || '🏦 بنك';
+            taskFilterOperationType.options[5].text = t['op_cash'] || '💵 كاش';
+        }
+        
+        // تحديث خيارات أنواع العمليات في نموذج الإضافة
+        var taskOperationType = document.getElementById('taskOperationType');
+        if (taskOperationType) {
+            taskOperationType.options[0].text = t['op_quotation'] || '📄 طلب عرض سعر';
+            taskOperationType.options[1].text = t['op_followup'] || '👀 متابعة عرض سعر';
+            taskOperationType.options[2].text = t['op_supply'] || '🚚 توريد';
+            taskOperationType.options[3].text = t['op_bank'] || '🏦 بنك';
+            taskOperationType.options[4].text = t['op_cash'] || '💵 كاش';
+        }
+        
         var btnSave = document.getElementById('btnSave');
         if (btnSave && editIdx === -1) {
             btnSave.innerHTML = t['save_btn'];
@@ -982,13 +1083,20 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.database();
     
-    // IndexedDB
+    // IndexedDB - تحديث هيكل التخزين ليشمل الحقول الجديدة
     var localDB = new Dexie("UtopiaCRMOffline");
-    localDB.version(1).stores({
+    localDB.version(2).stores({
         clients: "++id, name, phone, status, timestamp",
-        tasks: "++id, client, text, date, completed, completedAt",
+        tasks: "++id, client, text, operationType, amount, taskNotes, date, completed, completedAt",
         deletedClients: "++id, name, phone",
         users: "++id, u"
+    }).upgrade(function(trans) {
+        // تحديث المهام القديمة لإضافة الحقول الجديدة
+        return trans.tasks.toCollection().modify(function(task) {
+            if (!task.operationType) task.operationType = 'quotation';
+            if (task.amount === undefined) task.amount = null;
+            if (!task.taskNotes) task.taskNotes = '';
+        });
     });
     
     async function syncFromFirebase() {
@@ -1007,7 +1115,7 @@
             var firebaseTasks = tasksSnapshot.val() ? Object.values(tasksSnapshot.val()) : [];
             await localDB.tasks.clear();
             if (firebaseTasks.length > 0) {
-                await localDB.tasks.bulkAdd(firebaseTasks.map(t => ({ ...t, id: t.timestamp || Date.now(), completed: t.completed || false })));
+                await localDB.tasks.bulkAdd(firebaseTasks.map(t => ({ ...t, id: t.timestamp || Date.now(), completed: t.completed || false, operationType: t.operationType || 'quotation', amount: t.amount || null, taskNotes: t.taskNotes || '' })));
             }
             
             var deletedSnapshot = await db.ref('deletedClients').once('value');
@@ -1180,7 +1288,6 @@
             return;
         }
         
-        // التأكد من تحميل المستخدمين قبل التحقق
         if (authSystem.users.length === 0) {
             await loadDataFromLocalDB();
         }
@@ -1553,6 +1660,7 @@
         document.getElementById('taskSearch').value = '';
         document.getElementById('taskFilterClient').value = '';
         document.getElementById('taskFilterStatus').value = 'all';
+        document.getElementById('taskFilterOperationType').value = '';
         document.getElementById('taskFilterDate').value = '';
         _0x3d2a['renderTasks']();
         _0x3d2a['showToast']('✅ تم مسح جميع فلاتر المهام', 'success');
@@ -1566,12 +1674,14 @@
         var searchTerm = document.getElementById('taskSearch').value.toLowerCase().trim();
         var filterClient = document.getElementById('taskFilterClient').value;
         var filterStatus = document.getElementById('taskFilterStatus').value;
+        var filterOperationType = document.getElementById('taskFilterOperationType').value;
         var filterDate = document.getElementById('taskFilterDate').value;
         var t = translations[currentLang];
         
         var filteredTasks = tasks.filter(function(task, idx){
             var matchesSearch = !searchTerm || (task.client && task.client.toLowerCase().includes(searchTerm)) || (task.text && task.text.toLowerCase().includes(searchTerm));
             var matchesClient = !filterClient || task.client === filterClient;
+            var matchesOperationType = !filterOperationType || task.operationType === filterOperationType;
             var matchesDate = !filterDate || task.date === filterDate;
             var taskCompleted = task.completed || false;
             var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
@@ -1581,11 +1691,11 @@
             else if (filterStatus === 'completed') matchesStatus = taskCompleted === true;
             else if (filterStatus === 'overdue') matchesStatus = isOverdue;
             
-            return matchesSearch && matchesClient && matchesDate && matchesStatus;
+            return matchesSearch && matchesClient && matchesOperationType && matchesDate && matchesStatus;
         });
         
         if (filteredTasks.length === 0 && tasks.length > 0) {
-            body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">⚠️ لا توجد مهام تطابق معايير البحث</b></tr>';
+            body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">⚠️ لا توجد مهام تطابق معايير البحث</td></tr>';
         }
         
         filteredTasks.forEach(function(task, idx){
@@ -1594,11 +1704,16 @@
             var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
             var statusText = taskCompleted ? (t['task_status_completed'] || 'مكتملة') : (isOverdue ? (t['task_status_overdue'] || 'متأخرة') : (t['task_status_pending'] || 'قيد التنفيذ'));
             var statusClass = taskCompleted ? 'task-status-completed' : (isOverdue ? 'task-status-overdue' : 'task-status-pending');
+            var operationTypeText = getOperationTypeText(task.operationType || 'quotation');
+            var operationTypeClass = getOperationTypeClass(task.operationType || 'quotation');
+            var amountDisplay = task.amount ? (currentLang === 'ar' ? task.amount + ' ج.م' : task.amount + ' EGP') : '—';
             
             body.innerHTML += '<tr>' +
                 '<td><b>' + (task.client || '') + '</b></td>' +
+                '<td><span class="operation-type-badge ' + operationTypeClass + '">' + operationTypeText + '</span></td>' +
+                '<td class="amount-field">' + amountDisplay + '</td>' +
                 '<td>' + (task.text || '') + '</td>' +
-                '<td><textarea style="margin:0; font-size:12px; width:100%;" onchange="_0x3d2a[\'updateTaskExtra\'](' + originalIdx + ', this.value)">' + (task.extra || '') + '</textarea></td>' +
+                '<td><textarea style="margin:0; font-size:12px; width:100%;" onchange="_0x3d2a[\'updateTaskNotes\'](' + originalIdx + ', this.value)">' + (task.taskNotes || '') + '</textarea></td>' +
                 '<td><span style="color:var(--danger)">' + (task.date || '') + '</span></td>' +
                 '<td><span class="task-status-badge ' + statusClass + '">' + statusText + '</span><br>' +
                 (!taskCompleted ? '<button class="btn-ai" style="margin-top:5px; font-size:10px;" onclick="_0x3d2a[\'completeTask\'](' + originalIdx + ')">✓ إكمال</button>' : '') +
@@ -1611,7 +1726,14 @@
         });
         
         if (tasks.length === 0) {
-            body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
+            body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</td></tr>';
+        }
+    };
+    
+    _0x3d2a['updateTaskNotes'] = function(i, v){ 
+        if(tasks[i]) {
+            tasks[i].taskNotes = v; 
+            saveToLocalDB('tasks', tasks);
         }
     };
     
@@ -1626,32 +1748,40 @@
     };
     
     _0x3d2a['saveTask'] = function(){
-        // الحصول على القيم مع التحقق
         var clientSelect = document.getElementById('taskClientSelect');
+        var operationTypeSelect = document.getElementById('taskOperationType');
+        var amountInput = document.getElementById('taskAmount');
         var taskTextInput = document.getElementById('taskText');
-        var extraInfoText = document.getElementById('extraInfo');
+        var taskNotesArea = document.getElementById('taskNotes');
+        var extraInfoArea = document.getElementById('extraInfo');
         var taskDateInput = document.getElementById('taskDate');
         
         var clientValue = clientSelect ? clientSelect.value : '';
+        var operationTypeValue = operationTypeSelect ? operationTypeSelect.value : 'quotation';
+        var amountValue = amountInput && amountInput.value ? parseFloat(amountInput.value) : null;
         var taskTextValue = taskTextInput ? taskTextInput.value : '';
-        var extraInfoValue = extraInfoText ? extraInfoText.value : '';
+        var taskNotesValue = taskNotesArea ? taskNotesArea.value : '';
+        var extraInfoValue = extraInfoArea ? extraInfoArea.value : '';
         var taskDateValue = taskDateInput ? taskDateInput.value : '';
         
-        console.log("Saving task - Client:", clientValue, "Text:", taskTextValue);
+        console.log("Saving task - Client:", clientValue, "Type:", operationTypeValue, "Text:", taskTextValue);
         
         if(!clientValue || clientValue === ''){
             _0x3d2a['showToast']('⚠️ الرجاء اختيار عميل من القائمة', 'warning');
             return;
         }
         if(!taskTextValue || taskTextValue.trim() === ''){
-            _0x3d2a['showToast']('⚠️ الرجاء إدخال نص المهمة', 'warning');
+            _0x3d2a['showToast']('⚠️ الرجاء إدخال وصف العملية', 'warning');
             return;
         }
         
         var task = { 
             client: clientValue, 
-            text: taskTextValue, 
-            extra: extraInfoValue, 
+            operationType: operationTypeValue,
+            amount: amountValue,
+            text: taskTextValue,
+            taskNotes: taskNotesValue,
+            extra: extraInfoValue,
             date: taskDateValue,
             timestamp: Date.now(),
             completed: false,
@@ -1663,19 +1793,21 @@
             task.completedAt = tasks[editTaskIdx].completedAt || null;
             tasks[editTaskIdx] = task; 
             editTaskIdx = -1; 
-            _0x3d2a['showToast']('✅ تم تحديث المهمة بنجاح', 'success');
+            _0x3d2a['showToast']('✅ تم تحديث العملية بنجاح', 'success');
         } else { 
             tasks.push(task); 
-            _0x3d2a['showToast']('✅ تم إضافة المهمة بنجاح', 'success');
+            _0x3d2a['showToast']('✅ تم إضافة العملية بنجاح', 'success');
         }
         
         saveToLocalDB('tasks', tasks);
         
-        // مسح الحقول
         if(taskTextInput) taskTextInput.value = '';
-        if(extraInfoText) extraInfoText.value = '';
+        if(taskNotesArea) taskNotesArea.value = '';
+        if(extraInfoArea) extraInfoArea.value = '';
         if(taskDateInput) taskDateInput.value = '';
+        if(amountInput) amountInput.value = '';
         if(clientSelect) clientSelect.value = '';
+        if(operationTypeSelect) operationTypeSelect.value = 'quotation';
         
         _0x3d2a['renderTasks']();
         _0x3d2a['updateTaskClientFilter']();
@@ -1694,17 +1826,20 @@
             saveToLocalDB('tasks', tasks); 
             _0x3d2a['renderTasks']();
             _0x3d2a['updateTaskClientFilter']();
-            _0x3d2a['showToast']('✅ تم حذف المهمة بنجاح', 'success');
+            _0x3d2a['showToast']('✅ تم حذف العملية بنجاح', 'success');
         } 
     };
     _0x3d2a['editTask'] = function(i){ 
         var task = tasks[i]; 
         editTaskIdx = i; 
         document.getElementById('taskClientSelect').value = task.client || ''; 
+        document.getElementById('taskOperationType').value = task.operationType || 'quotation';
+        if(task.amount) document.getElementById('taskAmount').value = task.amount;
         document.getElementById('taskText').value = task.text || ''; 
+        document.getElementById('taskNotes').value = task.taskNotes || ''; 
         document.getElementById('extraInfo').value = task.extra || ''; 
         document.getElementById('taskDate').value = task.date || ''; 
-        _0x3d2a['showToast']('✏️ جاري تعديل المهمة، اضغط حفظ للتحديث', 'info');
+        _0x3d2a['showToast']('✏️ جاري تعديل العملية، اضغط حفظ للتحديث', 'info');
         window.scrollTo(0,0); 
     };
     _0x3d2a['fillClients'] = function(){ 
@@ -1742,15 +1877,15 @@
         var body = document.getElementById('usersBody');
         if(!body) return;
         if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
-            body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></tr>";
+            body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
             return;
         }
         if (authSystem.users && authSystem.users.length > 0) {
             body.innerHTML = authSystem.users.map(function(u,i){
-                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</b><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></b><tr><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></b></tr>';
+                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</td><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></td></tr>';
             }).join('');
         } else {
-            body.innerHTML = "<tr><td colspan='5'>No users found</b></tr>";
+            body.innerHTML = "<tr><td colspan='5'>No users found</td></tr>";
         }
     };
     
