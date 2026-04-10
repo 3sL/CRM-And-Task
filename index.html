@@ -263,7 +263,6 @@
         .sync-status.offline { background: #dc3545; }
         .sync-status.syncing { background: #ffc107; color: #333; animation: pulse 1s infinite; }
         
-        /* طبقة حماية إضافية */
         .anti-debug-overlay {
             position: fixed;
             top: 0;
@@ -280,7 +279,6 @@
             text-align: center;
         }
         
-        /* تحسينات RTL */
         [dir="rtl"] .advanced-filter-bar button,
         [dir="rtl"] .action-btn,
         [dir="rtl"] .btn-ai {
@@ -296,7 +294,6 @@
             left: 30px;
         }
         
-        /* تحسينات فلاتر المهام */
         .task-filter-bar {
             background: white;
             padding: 15px;
@@ -482,7 +479,6 @@
         <div id="tasksTab" class="tab-content">
             <h2 id="h_tasks">Operations & Follow-ups</h2>
             
-            <!-- إضافة فلاتر شاملة للمهام -->
             <div class="task-filter-bar">
                 <input type="text" id="taskSearch" placeholder="🔍 بحث في المهام..." oninput="_0x3d2a['renderTasks']()" style="flex:2;">
                 <select id="taskFilterClient" onchange="_0x3d2a['renderTasks']()">
@@ -602,14 +598,12 @@
 // All rights reserved - Unauthorized access prohibited
 // ============================================================
 
-// ========== طبقة حماية إضافية متقدمة (قبل أي شيء) ==========
+// ========== طبقة حماية إضافية متقدمة ==========
 (function() {
-    // منع view-source
     if (window.location.protocol === 'view-source:') {
         window.location.href = 'about:blank';
     }
     
-    // منع فتح أدوات المطور بشكل كامل
     var devToolsDetection = function() {
         var threshold = 160;
         var check = function() {
@@ -625,7 +619,6 @@
         setInterval(check, 500);
     };
     
-    // حماية الـ Console من التنفيذ
     var protectConsole = function() {
         var methods = ['log', 'info', 'warn', 'error', 'debug', 'trace'];
         for (var i = 0; i < methods.length; i++) {
@@ -637,7 +630,6 @@
         console.clear = function() {};
     };
     
-    // كشف محاولات فتح F12 والمفاتيح المختصرة
     var blockShortcuts = function(e) {
         if (e.key === 'F12' || e.keyCode === 123) {
             e.preventDefault();
@@ -701,7 +693,6 @@
                 return originalSetItem.call(this, key, value);
             }
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
-                console.warn('Storage modification blocked');
                 return;
             }
             return originalSetItem.call(this, key, value);
@@ -820,6 +811,35 @@
         }
     };
     
+    // تعريف المتغيرات العامة
+    var clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [];
+    var editIdx = -1, editTaskIdx = -1, statusChart = null;
+    var sortColumn = 0, sortDirection = 'asc';
+    var savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '[]');
+    var notifications = [];
+    var speechRecognition = null;
+    var isListening = false;
+    var isOnline = navigator.onLine;
+    var isSyncing = false;
+    var syncInterval = null;
+    var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
+    
+    function updateSyncStatusUI() {
+        var indicator = document.getElementById('syncStatusIndicator');
+        var textSpan = document.getElementById('syncStatusText');
+        if (!indicator) return;
+        if (isSyncing) {
+            indicator.className = 'sync-status syncing';
+            if(textSpan) textSpan.innerText = 'جاري المزامنة...';
+        } else if (isOnline) {
+            indicator.className = 'sync-status online';
+            if(textSpan) textSpan.innerText = 'متصل | متزامن';
+        } else {
+            indicator.className = 'sync-status offline';
+            if(textSpan) textSpan.innerText = 'غير متصل (أوفلاين)';
+        }
+    }
+    
     function updateUILanguage() {
         var t = translations[currentLang];
         var elements = {
@@ -931,12 +951,7 @@
         var clearFiltersBtn = document.querySelector('#tasksTab .task-filter-bar button');
         if (clearFiltersBtn && t['clear_filters']) clearFiltersBtn.innerHTML = t['clear_filters'];
         
-        var syncStatusText = document.getElementById('syncStatusText');
-        if (syncStatusText) {
-            if (isSyncing) syncStatusText.innerText = 'جاري المزامنة...';
-            else if (isOnline) syncStatusText.innerText = 'متصل | متزامن';
-            else syncStatusText.innerText = 'غير متصل (أوفلاين)';
-        }
+        updateSyncStatusUI();
     }
     
     _0x3d2a['toggle'] = function(){ 
@@ -949,6 +964,7 @@
         _0x3d2a['renderTasks']();
     };
     
+    // Firebase Configuration
     var _0xkey = atob("QUl6YVN5Q2gzd0ZQbzdtVmVCX2NjdWZXNUx5S2dQRm9lU08wSjAw");
     var _0xdb = atob("aHR0cHM6Ly9jcm0tYW5kLXRhc2tzLTlmN2MzLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbQ==");
     var firebaseConfig = {
@@ -959,6 +975,7 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.database();
     
+    // IndexedDB
     var localDB = new Dexie("UtopiaCRMOffline");
     localDB.version(1).stores({
         clients: "++id, name, phone, status, timestamp",
@@ -966,26 +983,6 @@
         deletedClients: "++id, name, phone",
         users: "++id, u"
     });
-    
-    var isOnline = navigator.onLine;
-    var isSyncing = false;
-    var syncInterval = null;
-    
-    function updateSyncStatusUI() {
-        var indicator = document.getElementById('syncStatusIndicator');
-        var textSpan = document.getElementById('syncStatusText');
-        if (!indicator) return;
-        if (isSyncing) {
-            indicator.className = 'sync-status syncing';
-            textSpan.innerText = 'جاري المزامنة...';
-        } else if (isOnline) {
-            indicator.className = 'sync-status online';
-            textSpan.innerText = 'متصل | متزامن';
-        } else {
-            indicator.className = 'sync-status offline';
-            textSpan.innerText = 'غير متصل (أوفلاين)';
-        }
-    }
     
     async function syncFromFirebase() {
         if (!isOnline || isSyncing) return;
@@ -1022,7 +1019,6 @@
             
             _0x3d2a['showToast']('✅ تمت المزامنة من السحابة بنجاح', 'success');
         } catch (err) {
-            console.error("Sync from Firebase error:", err);
             _0x3d2a['showToast']('⚠️ فشل المزامنة من السحابة', 'error');
         } finally {
             isSyncing = false;
@@ -1047,7 +1043,6 @@
             
             _0x3d2a['showToast']('✅ تم رفع البيانات إلى السحابة بنجاح', 'success');
         } catch (err) {
-            console.error("Sync to Firebase error:", err);
             _0x3d2a['showToast']('⚠️ فشل رفع البيانات إلى السحابة', 'error');
         } finally {
             isSyncing = false;
@@ -1085,7 +1080,6 @@
             deletedClients = await localDB.deletedClients.toArray();
             var usersArray = await localDB.users.toArray();
             authSystem.users = usersArray;
-            console.log("Data loaded from IndexedDB:", { clients: clients.length, tasks: tasks.length, users: usersArray.length });
         } catch (err) {
             console.error("Error loading from IndexedDB:", err);
         }
@@ -1135,14 +1129,17 @@
         }, 30000);
     }
     
-    var clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [];
-    var editIdx = -1, editTaskIdx = -1, statusChart = null;
-    var sortColumn = 0, sortDirection = 'asc';
-    var savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '[]');
-    var notifications = [];
-    var speechRecognition = null;
-    var isListening = false;
-    var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
+    // دالة الإشعار الأساسية
+    _0x3d2a['notify'] = function(msg, type) {
+        var notificationDiv = document.getElementById('notification');
+        if(notificationDiv){
+            notificationDiv.innerText = msg;
+            notificationDiv.style.backgroundColor = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--info)');
+            notificationDiv.style.display = 'block';
+            setTimeout(function(){ notificationDiv.style.display = 'none'; }, 3000);
+        }
+        _0x3d2a['showToast'](msg, type);
+    };
     
     _0x3d2a['check'] = function(){
         var u = document.getElementById('userInput').value.trim();
@@ -1363,9 +1360,6 @@
         setTimeout(() => { toast.remove(); }, 4000);
     };
     
-    var originalNotify = _0x3d2a['notify'];
-    _0x3d2a['notify'] = function(msg, type) { originalNotify(msg, type); _0x3d2a['showToast'](msg, type); };
-    
     _0x3d2a['renderCRM'] = function(){
         var body = document.getElementById('tableBody');
         if(!body) return;
@@ -1395,7 +1389,7 @@
                 if(c.status === 'Hold') rowClass = "hold-row";
                 var prediction = _0x3d2a['predictClientBehavior'](c);
                 rowClass += ' priority-' + prediction.priority;
-                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + ' <span class="ai-score">🤖 ' + aiProb + '%</span>' + '</td><td>' + (c.phone || '') + '</b></td><td>' + (c.gov || '') + '</b></td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></b></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></b></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></b></tr>';
+                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + ' <span class="ai-score">🤖 ' + aiProb + '%</span>' + '</td><td>' + (c.phone || '') + '</td><td>' + (c.gov || '') + '</td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></td></tr>';
             }
         });
         _0x3d2a['updateAIInsights']();
@@ -1653,90 +1647,19 @@
     _0x3d2a['restore'] = function(i){ clients.push(deletedClients[i]); deletedClients.splice(i,1); saveToLocalDB('clients', clients); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['notify']("Restored", "success"); _0x3d2a['renderCRM'](); _0x3d2a['renderRecycle'](); };
     _0x3d2a['hardDelete'] = function(i){ if(confirm("Permanent delete?")){ deletedClients.splice(i,1); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['renderRecycle'](); } };
     
-    _0x3d2a['init'] = async function(){
-        if(!sessionStorage.getItem('isLoggedIn')) return;
-        
-        await loadDataFromLocalDB();
-        
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        
-        updateUILanguage();
-        
-        setTimeout(function(){
-            var userName = sessionStorage.getItem('userDisplayName');
-            if(userName){
-                var els = document.querySelectorAll('span, div, b, p, h3');
-                els.forEach(function(el){
-                    if(el.innerText && el.innerText.trim() === userName.trim() && el.children.length === 0){
-                        el.style.display = 'inline-flex';
-                        el.style.alignItems = 'center';
-                        el.style.gap = '10px';
-                        el.innerHTML = userName + ' <a href="tel:01222153415" style="background:#00ff88 !important; color:#000 !important; padding:2px 10px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:bold; box-shadow:0 0 10px rgba(0,255,136,0.5); margin-left:5px;">📞 01222153415</a>';
-                    }
-                });
-            }
-        }, 1500);
-        
-        var badge = document.getElementById('userBadge');
-        if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
-            badge.innerText = "👑 MASTER ACCESS";
-            badge.style.background = "var(--vip)";
-            badge.style.display = "inline-block";
-        } else { badge.style.display = "none"; }
-        
-        if(sessionStorage.getItem('userRole') === 'admin'){
-            document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = 'block'; });
+    _0x3d2a['renderUsers'] = function(){
+        var body = document.getElementById('usersBody');
+        if(!body) return;
+        if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
+            body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
+            return;
         }
-        
-        var govSel = document.getElementById('gov');
-        if(govSel && govSel.options.length <= 1){
-            govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; govSel.appendChild(opt); });
-        }
-        
-        var filterGovSel = document.getElementById('filterGov');
-        if(filterGovSel && filterGovSel.options.length <= 1){
-            govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; filterGovSel.appendChild(opt); });
-        }
-        
-        _0x3d2a['renderUsers'] = function(){
-            var body = document.getElementById('usersBody');
-            if(!body) return;
-            if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
-                body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
-                return;
-            }
-            if (authSystem.users && authSystem.users.length > 0) {
-                body.innerHTML = authSystem.users.map(function(u,i){
-                    return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</td><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></td></tr>';
-                }).join('');
-            } else {
-                body.innerHTML = "<tr><td colspan='5'>No users found</td></tr>";
-            }
-        };
-        
-        _0x3d2a['renderUsers']();
-        _0x3d2a['renderCRM']();
-        _0x3d2a['renderTasks']();
-        _0x3d2a['renderRecycle']();
-        _0x3d2a['updateDash']();
-        _0x3d2a['updateGeo']();
-        _0x3d2a['fillClients']();
-        _0x3d2a['updateAgentList']();
-        _0x3d2a['updateTaskClientFilter']();
-        
-        var prof = document.getElementById('profName');
-        if(prof) prof.innerText = sessionStorage.getItem('userDisplayName') || "User";
-        
-        _0x3d2a['showToast']('🤖 AI Enhancement Active | نظام آمن بالكامل | Ultra Secure Mode', 'info');
-        
-        startPeriodicSync();
-        if (isOnline) { setTimeout(() => { fullSync(); }, 1000); }
-        
-        if (Notification.permission === 'default') {
-            setTimeout(() => {
-                if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { _0x3d2a['enableDesktopNotifications'](); }
-            }, 2000);
+        if (authSystem.users && authSystem.users.length > 0) {
+            body.innerHTML = authSystem.users.map(function(u,i){
+                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</td><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></td></tr>';
+            }).join('');
+        } else {
+            body.innerHTML = "<tr><td colspan='5'>No users found</td></tr>";
         }
     };
     
@@ -1811,6 +1734,77 @@
         Object.entries(cnt).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(g){
             div.innerHTML += '<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between;"><span>' + g[0] + '</span><b style="color:var(--info)">' + g[1] + '</b></div>';
         });
+    };
+    
+    _0x3d2a['init'] = async function(){
+        if(!sessionStorage.getItem('isLoggedIn')) return;
+        
+        await loadDataFromLocalDB();
+        
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+        
+        updateUILanguage();
+        
+        setTimeout(function(){
+            var userName = sessionStorage.getItem('userDisplayName');
+            if(userName){
+                var els = document.querySelectorAll('span, div, b, p, h3');
+                els.forEach(function(el){
+                    if(el.innerText && el.innerText.trim() === userName.trim() && el.children.length === 0){
+                        el.style.display = 'inline-flex';
+                        el.style.alignItems = 'center';
+                        el.style.gap = '10px';
+                        el.innerHTML = userName + ' <a href="tel:01222153415" style="background:#00ff88 !important; color:#000 !important; padding:2px 10px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:bold; box-shadow:0 0 10px rgba(0,255,136,0.5); margin-left:5px;">📞 01222153415</a>';
+                    }
+                });
+            }
+        }, 1500);
+        
+        var badge = document.getElementById('userBadge');
+        if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
+            badge.innerText = "👑 MASTER ACCESS";
+            badge.style.background = "var(--vip)";
+            badge.style.display = "inline-block";
+        } else { badge.style.display = "none"; }
+        
+        if(sessionStorage.getItem('userRole') === 'admin'){
+            document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = 'block'; });
+        }
+        
+        var govSel = document.getElementById('gov');
+        if(govSel && govSel.options.length <= 1){
+            govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; govSel.appendChild(opt); });
+        }
+        
+        var filterGovSel = document.getElementById('filterGov');
+        if(filterGovSel && filterGovSel.options.length <= 1){
+            govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; filterGovSel.appendChild(opt); });
+        }
+        
+        _0x3d2a['renderUsers']();
+        _0x3d2a['renderCRM']();
+        _0x3d2a['renderTasks']();
+        _0x3d2a['renderRecycle']();
+        _0x3d2a['updateDash']();
+        _0x3d2a['updateGeo']();
+        _0x3d2a['fillClients']();
+        _0x3d2a['updateAgentList']();
+        _0x3d2a['updateTaskClientFilter']();
+        
+        var prof = document.getElementById('profName');
+        if(prof) prof.innerText = sessionStorage.getItem('userDisplayName') || "User";
+        
+        _0x3d2a['showToast']('🤖 AI Enhancement Active | نظام آمن بالكامل | Ultra Secure Mode', 'info');
+        
+        startPeriodicSync();
+        if (isOnline) { setTimeout(() => { fullSync(); }, 1000); }
+        
+        if (Notification.permission === 'default') {
+            setTimeout(() => {
+                if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { _0x3d2a['enableDesktopNotifications'](); }
+            }, 2000);
+        }
     };
     
     _0x3d2a['init']();
