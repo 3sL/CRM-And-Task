@@ -504,7 +504,7 @@
                 <button onclick="_0x3d2a['saveTask']()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ Add Operation</button>
             </div>
             <div class="table-container">
-                <tr>
+                <table>
                     <thead>
                         <tr>
                             <th id="taskClientHeader">Client</th>
@@ -523,7 +523,7 @@
         <div id="recycleTab" class="tab-content">
             <h2 id="recycleTitle" style="color:var(--danger)">♻️ Recycle Bin (Archived)</h2>
             <div class="table-container">
-                <table>
+                <tr>
                     <thead>
                         <tr>
                             <th id="recycleNameHeader">Name</th>
@@ -827,7 +827,8 @@
     // مستخدمين تجريبيين افتراضيين للتأكد من وجود بيانات
     var defaultUsers = [
         { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
-        { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" }
+        { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" },
+        { u: "test", p: "test123", displayName: "مستخدم تجريبي", role: "user" }
     ];
     
     function updateSyncStatusUI() {
@@ -1100,7 +1101,7 @@
             }
             
             authSystem.users = usersArray;
-            console.log("Data loaded - Users:", authSystem.users.length);
+            console.log("Data loaded - Clients:", clients.length, "Tasks:", tasks.length, "Users:", authSystem.users.length);
         } catch (err) {
             console.error("Error loading from IndexedDB:", err);
             try {
@@ -1583,6 +1584,10 @@
             return matchesSearch && matchesClient && matchesDate && matchesStatus;
         });
         
+        if (filteredTasks.length === 0 && tasks.length > 0) {
+            body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">⚠️ لا توجد مهام تطابق معايير البحث</b></tr>';
+        }
+        
         filteredTasks.forEach(function(task, idx){
             var originalIdx = tasks.findIndex(function(t, i){ return t === task; });
             var taskCompleted = task.completed || false;
@@ -1604,6 +1609,10 @@
                 '</td>' +
                 '</tr>';
         });
+        
+        if (tasks.length === 0) {
+            body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
+        }
     };
     
     _0x3d2a['completeTask'] = function(i){
@@ -1617,31 +1626,60 @@
     };
     
     _0x3d2a['saveTask'] = function(){
+        // الحصول على القيم مع التحقق
+        var clientSelect = document.getElementById('taskClientSelect');
+        var taskTextInput = document.getElementById('taskText');
+        var extraInfoText = document.getElementById('extraInfo');
+        var taskDateInput = document.getElementById('taskDate');
+        
+        var clientValue = clientSelect ? clientSelect.value : '';
+        var taskTextValue = taskTextInput ? taskTextInput.value : '';
+        var extraInfoValue = extraInfoText ? extraInfoText.value : '';
+        var taskDateValue = taskDateInput ? taskDateInput.value : '';
+        
+        console.log("Saving task - Client:", clientValue, "Text:", taskTextValue);
+        
+        if(!clientValue || clientValue === ''){
+            _0x3d2a['showToast']('⚠️ الرجاء اختيار عميل من القائمة', 'warning');
+            return;
+        }
+        if(!taskTextValue || taskTextValue.trim() === ''){
+            _0x3d2a['showToast']('⚠️ الرجاء إدخال نص المهمة', 'warning');
+            return;
+        }
+        
         var task = { 
-            client: document.getElementById('taskClientSelect').value, 
-            text: document.getElementById('taskText').value, 
-            extra: document.getElementById('extraInfo').value, 
-            date: document.getElementById('taskDate').value,
+            client: clientValue, 
+            text: taskTextValue, 
+            extra: extraInfoValue, 
+            date: taskDateValue,
             timestamp: Date.now(),
             completed: false,
             completedAt: null
         };
-        if(!task.client || !task.text){ _0x3d2a['notify']("Incomplete", "error"); return; }
+        
         if(editTaskIdx > -1){ 
             task.completed = tasks[editTaskIdx].completed || false;
             task.completedAt = tasks[editTaskIdx].completedAt || null;
             tasks[editTaskIdx] = task; 
             editTaskIdx = -1; 
+            _0x3d2a['showToast']('✅ تم تحديث المهمة بنجاح', 'success');
         } else { 
             tasks.push(task); 
+            _0x3d2a['showToast']('✅ تم إضافة المهمة بنجاح', 'success');
         }
+        
         saveToLocalDB('tasks', tasks);
-        document.getElementById('taskText').value = '';
-        document.getElementById('extraInfo').value = '';
-        document.getElementById('taskDate').value = '';
-        _0x3d2a['notify']("Task saved", "success");
+        
+        // مسح الحقول
+        if(taskTextInput) taskTextInput.value = '';
+        if(extraInfoText) extraInfoText.value = '';
+        if(taskDateInput) taskDateInput.value = '';
+        if(clientSelect) clientSelect.value = '';
+        
         _0x3d2a['renderTasks']();
         _0x3d2a['updateTaskClientFilter']();
+        _0x3d2a['play']('soundSuccess');
     };
     
     _0x3d2a['updateTaskExtra'] = function(i, v){ 
@@ -1656,6 +1694,7 @@
             saveToLocalDB('tasks', tasks); 
             _0x3d2a['renderTasks']();
             _0x3d2a['updateTaskClientFilter']();
+            _0x3d2a['showToast']('✅ تم حذف المهمة بنجاح', 'success');
         } 
     };
     _0x3d2a['editTask'] = function(i){ 
@@ -1665,38 +1704,53 @@
         document.getElementById('taskText').value = task.text || ''; 
         document.getElementById('extraInfo').value = task.extra || ''; 
         document.getElementById('taskDate').value = task.date || ''; 
+        _0x3d2a['showToast']('✏️ جاري تعديل المهمة، اضغط حفظ للتحديث', 'info');
         window.scrollTo(0,0); 
     };
     _0x3d2a['fillClients'] = function(){ 
         var sel = document.getElementById('taskClientSelect'); 
         if(!sel) return; 
         var t = translations[currentLang];
-        sel.innerHTML = '<option value="">' + (t['task_client_placeholder'] || 'ربط بعميل') + '</option>' + clients.map(function(c){ return '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; }).join(''); 
+        var options = '<option value="">' + (t['task_client_placeholder'] || 'ربط بعميل') + '</option>';
+        
+        if(clients.length === 0){
+            options += '<option value="" disabled>⚠️ لا يوجد عملاء - أضف عميل أولاً</option>';
+        } else {
+            clients.forEach(function(c){ 
+                if(c && c.name){
+                    options += '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; 
+                }
+            });
+        }
+        sel.innerHTML = options;
+        console.log("Fill clients - Total clients:", clients.length);
     };
     _0x3d2a['autoFill'] = function(){ 
         var name = document.getElementById('taskClientSelect').value; 
+        if(!name) return;
         var client = clients.find(function(c){ return c.name === name; }); 
         if(client){ 
             document.getElementById('extraInfo').value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || ''); 
+            _0x3d2a['showToast']('✅ تم تعبئة بيانات العميل تلقائياً', 'success');
         } 
     };
-    _0x3d2a['renderRecycle'] = function(){ var body = document.getElementById('recycleBody'); if(!body) return; body.innerHTML = deletedClients.map(function(c,i){ return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td><tr>'; }).join(''); };
-    _0x3d2a['restore'] = function(i){ clients.push(deletedClients[i]); deletedClients.splice(i,1); saveToLocalDB('clients', clients); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['notify']("Restored", "success"); _0x3d2a['renderCRM'](); _0x3d2a['renderRecycle'](); };
+    _0x3d2a['renderRecycle'] = function(){ var body = document.getElementById('recycleBody'); if(!body) return; body.innerHTML = deletedClients.map(function(c,i){ return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td></tr>'; }).join(''); };
+    _0x3d2a['restore'] = function(i){ clients.push(deletedClients[i]); deletedClients.splice(i,1); saveToLocalDB('clients', clients); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['notify']("Restored", "success"); _0x3d2a['renderCRM'](); _0x3d2a['renderRecycle'](); _0x3d2a['fillClients'](); };
     _0x3d2a['hardDelete'] = function(i){ if(confirm("Permanent delete?")){ deletedClients.splice(i,1); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['renderRecycle'](); } };
     
     _0x3d2a['renderUsers'] = function(){
         var body = document.getElementById('usersBody');
         if(!body) return;
         if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
-            body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
+            body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></tr>";
             return;
         }
         if (authSystem.users && authSystem.users.length > 0) {
             body.innerHTML = authSystem.users.map(function(u,i){
-                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</td><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></td></tr>';
+                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</b><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></b><tr><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></b></tr>';
             }).join('');
         } else {
-            body.innerHTML = "<tr><td colspan='5'>No users found</td></tr>";
+            body.innerHTML = "<tr><td colspan='5'>No users found</b></tr>";
         }
     };
     
