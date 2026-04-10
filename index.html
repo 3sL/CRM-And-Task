@@ -41,10 +41,6 @@
             height: 100vh;
             overflow: hidden;
             transition: all 0.3s ease;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
         }
         [dir="rtl"] body { flex-direction: row-reverse; }
         [dir="rtl"] .sidebar button { text-align: right; flex-direction: row-reverse; }
@@ -325,7 +321,6 @@
         .task-status-completed { background: #28a745; color: white; }
         .task-status-overdue { background: #dc3545; color: white; }
         
-        /* أنماط أنواع العمليات */
         .operation-type-badge {
             padding: 4px 10px;
             border-radius: 20px;
@@ -344,7 +339,6 @@
             color: var(--success);
         }
         
-        /* زر تحديث سلة المحذوفات */
         .recycle-header {
             display: flex;
             justify-content: space-between;
@@ -352,6 +346,17 @@
             margin-bottom: 15px;
             flex-wrap: wrap;
             gap: 10px;
+        }
+        
+        .demo-data-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -368,7 +373,7 @@
         <p id="loginSubtitle" style="color: #aaa; font-size: 0.9em; margin-top: -15px;">Secure Management System</p>
         <input type="text" id="userInput" placeholder="Username" autocomplete="off">
         <input type="password" id="passInput" placeholder="Password" autocomplete="off">
-        <button onclick="_0x3d2a['check']()" id="loginBtn">Access System</button>
+        <button onclick="window._0x3d2a.check()" id="loginBtn">Access System</button>
         <p id="loginError" style="color:var(--danger); display:none; margin-top:15px; font-weight:bold;">⚠️ Access Denied! Check Credentials</p>
         <div style="margin-top:25px; font-size:0.75em; color:#888; border-top: 1px solid #444; padding-top: 15px;">
             Developed & Secured By:<br>
@@ -383,8 +388,8 @@
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h2 id="side_title" style="margin:0; font-size: 1.1em;">Utopia For Trading And Export</h2>
             <div style="display: flex; align-items: center;">
-                <button onclick="_0x3d2a['toggle']()" style="padding:5px 10px; font-size:11px; background:var(--accent); color:var(--primary); width: auto;" id="langBtn">🇸🇦 عربي</button>
-                <div class="notification-bell" onclick="_0x3d2a['showNotificationsPanel']()">
+                <button onclick="window._0x3d2a.toggle()" style="padding:5px 10px; font-size:11px; background:var(--accent); color:var(--primary); width: auto;" id="langBtn">🇸🇦 عربي</button>
+                <div class="notification-bell" onclick="window._0x3d2a.showNotificationsPanel()">
                     <i class="fas fa-bell" style="color: white; font-size: 18px;"></i>
                     <span id="notificationBadge" class="badge" style="display: none;">0</span>
                 </div>
@@ -402,38 +407,41 @@
             <span id="userBadge" style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:10px; margin-top:5px; display:inline-block;"></span>
         </div>
         
-        <button class="tab-btn active" onclick="_0x3d2a['show']('crmTab', this)" id="m_crm">👥 Clients Registry</button>
-        <button class="tab-btn" onclick="_0x3d2a['show']('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button>
-        <button class="tab-btn" onclick="_0x3d2a['show']('dashboardTab', this)" id="m_dash">📊 AI Analytics</button>
-        <button class="tab-btn" onclick="_0x3d2a['show']('profileTab', this)" id="m_profile">👤 My Profile</button>
-        <button class="tab-btn" onclick="_0x3d2a['show']('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ Recycle Bin</button>
+        <button class="tab-btn active" onclick="window._0x3d2a.show('crmTab', this)" id="m_crm">👥 Clients Registry</button>
+        <button class="tab-btn" onclick="window._0x3d2a.show('tasksTab', this)" id="m_tasks">📅 Tasks & Operations</button>
+        <button class="tab-btn" onclick="window._0x3d2a.show('dashboardTab', this)" id="m_dash">📊 AI Analytics</button>
+        <button class="tab-btn" onclick="window._0x3d2a.show('profileTab', this)" id="m_profile">👤 My Profile</button>
+        <button class="tab-btn" onclick="window._0x3d2a.show('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ Recycle Bin</button>
         
-        <button class="tab-btn admin-only" onclick="_0x3d2a['show']('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent); margin-top: 15px;">👑 Admin Master</button>
+        <button class="tab-btn admin-only" onclick="window._0x3d2a.show('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent); margin-top: 15px;">👑 Admin Master</button>
         
-        <button onclick="_0x3d2a['out']()" style="margin-top:auto; background:var(--danger); color:white; justify-content: center;" id="m_logout">🚪 Secure Logout</button>
+        <button onclick="window._0x3d2a.out()" style="margin-top:auto; background:var(--danger); color:white; justify-content: center;" id="m_logout">🚪 Secure Logout</button>
     </div>
 
     <div class="main">
         <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
             
+            <!-- زر إضافة بيانات تجريبية -->
+            <button class="demo-data-btn" onclick="window._0x3d2a.addDemoData()">📊 إضافة بيانات تجريبية (Demo)</button>
+            
             <div class="advanced-filter-bar">
-                <input type="text" id="advancedSearch" placeholder="🔍 بحث متقدم..." oninput="_0x3d2a['renderCRM']()">
-                <select id="filterGov" onchange="_0x3d2a['renderCRM']()"><option value="">كل المحافظات</option></select>
-                <select id="filterAgent" onchange="_0x3d2a['renderCRM']()"><option value="">كل المندوبين</option></select>
-                <select id="filterPriority" onchange="_0x3d2a['renderCRM']()">
+                <input type="text" id="advancedSearch" placeholder="🔍 بحث متقدم..." oninput="window._0x3d2a.renderCRM()">
+                <select id="filterGov" onchange="window._0x3d2a.renderCRM()"><option value="">كل المحافظات</option></select>
+                <select id="filterAgent" onchange="window._0x3d2a.renderCRM()"><option value="">كل المندوبين</option></select>
+                <select id="filterPriority" onchange="window._0x3d2a.renderCRM()">
                     <option value="">كل الأولويات</option>
                     <option value="high">عالية (70%+)</option>
                     <option value="medium">متوسطة (40-69%)</option>
                     <option value="low">منخفضة (-40%)</option>
                 </select>
-                <button onclick="_0x3d2a['saveCurrentFilter']()" class="btn-ai" style="white-space: nowrap;">💾 حفظ الفلتر</button>
-                <button onclick="_0x3d2a['loadSavedFilters']()" class="btn-ai" style="white-space: nowrap; background: #6c5ce7;">📂 الفلاتر المحفوظة</button>
+                <button onclick="window._0x3d2a.saveCurrentFilter()" class="btn-ai" style="white-space: nowrap;">💾 حفظ الفلتر</button>
+                <button onclick="window._0x3d2a.loadSavedFilters()" class="btn-ai" style="white-space: nowrap; background: #6c5ce7;">📂 الفلاتر المحفوظة</button>
             </div>
             
             <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
-                <input id="search" placeholder="🔍 Search by Name, Phone or Status..." oninput="_0x3d2a['renderCRM']()" style="flex:3; margin:0;">
-                <select id="filterStatus" onchange="_0x3d2a['renderCRM']()" style="flex:1; margin:0;">
+                <input id="search" placeholder="🔍 Search by Name, Phone or Status..." oninput="window._0x3d2a.renderCRM()" style="flex:3; margin:0;">
+                <select id="filterStatus" onchange="window._0x3d2a.renderCRM()" style="flex:1; margin:0;">
                     <option value="All">All Statuses</option>
                     <option value="Interested">Interested</option>
                     <option value="In Progress">In Progress</option>
@@ -441,8 +449,8 @@
                     <option value="Completed">Completed</option>
                     <option value="VIP">VIP</option>
                 </select>
-                <button onclick="_0x3d2a['exportCSV']()" style="background:#2c3e50; color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; flex:0.5;">📥 Export</button>
-                <button onclick="_0x3d2a['startVoiceInput']()" class="voice-btn" id="voiceBtn"><i class="fas fa-microphone"></i> بحث صوتي</button>
+                <button onclick="window._0x3d2a.exportCSV()" style="background:#2c3e50; color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; flex:0.5;">📥 Export</button>
+                <button onclick="window._0x3d2a.startVoiceInput()" class="voice-btn" id="voiceBtn"><i class="fas fa-microphone"></i> بحث صوتي</button>
             </div>
             
             <div class="form-group">
@@ -460,31 +468,37 @@
                             <option value="Completed">Completed ✅</option>
                             <option value="VIP">VIP 🌟</option>
                         </select>
-                        <button type="button" class="btn-ai" onclick="_0x3d2a['aiSuggestStatus']()" style="white-space: nowrap;">🤖 AI Suggest</button>
+                        <button type="button" class="btn-ai" onclick="window._0x3d2a.aiSuggestStatus()" style="white-space: nowrap;">🤖 AI Suggest</button>
                     </div>
                     <input id="agent" placeholder="Assigned Agent">
                     <input type="date" id="date">
                 </div>
-                <textarea id="notes" rows="3" placeholder="Additional Notes & Client History..." oninput="_0x3d2a['analyzeSentiment'](this.value)"></textarea>
+                <textarea id="notes" rows="3" placeholder="Additional Notes & Client History..." oninput="window._0x3d2a.analyzeSentiment(this.value)"></textarea>
                 <div id="sentimentResult" class="suggestion-badge" style="display: none;"></div>
-                <button class="btn-save" onclick="_0x3d2a['save']()" id="btnSave">💾 Save Client Data</button>
+                <button class="btn-save" onclick="window._0x3d2a.save()" id="btnSave">💾 Save Client Data</button>
             </div>
             
             <div id="aiRecommendations" class="ai-recommendation" style="display: none;"></div>
 
             <div class="table-container">
-                </table>
+                <table id="clientsTable">
                     <thead>
                         <tr>
-                            <th onclick="_0x3d2a['sort'](0)" id="thName">Name ↕️</th>
-                            <th onclick="_0x3d2a['sort'](1)" id="thPhone">Phone</th>
-                            <th onclick="_0x3d2a['sort'](2)" id="thGov">Governorate ↕️</th>
-                            <th onclick="_0x3d2a['sort'](3)" id="thPriority">AI Priority</th>
-                            <th onclick="_0x3d2a['sort'](4)" id="thStatus">Status ↕️</th>
+                            <th onclick="window._0x3d2a.sort(0)" id="thName">Name ↕️</th>
+                            <th onclick="window._0x3d2a.sort(1)" id="thPhone">Phone</th>
+                            <th onclick="window._0x3d2a.sort(2)" id="thGov">Governorate ↕️</th>
+                            <th onclick="window._0x3d2a.sort(3)" id="thPriority">AI Priority</th>
+                            <th onclick="window._0x3d2a.sort(4)" id="thStatus">Status ↕️</th>
                             <th id="thActions">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody"></tbody>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:40px;">
+                                ⏳ جاري تحميل البيانات... يرجى الانتظار
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -515,17 +529,17 @@
             <h2 id="h_tasks">Operations & Follow-ups</h2>
             
             <div class="task-filter-bar">
-                <input type="text" id="taskSearch" placeholder="🔍 بحث في المهام..." oninput="_0x3d2a['renderTasks']()" style="flex:2;">
-                <select id="taskFilterClient" onchange="_0x3d2a['renderTasks']()">
+                <input type="text" id="taskSearch" placeholder="🔍 بحث في المهام..." oninput="window._0x3d2a.renderTasks()" style="flex:2;">
+                <select id="taskFilterClient" onchange="window._0x3d2a.renderTasks()">
                     <option value="">كل العملاء</option>
                 </select>
-                <select id="taskFilterStatus" onchange="_0x3d2a['renderTasks']()">
+                <select id="taskFilterStatus" onchange="window._0x3d2a.renderTasks()">
                     <option value="all">كل الحالات</option>
                     <option value="pending">قيد التنفيذ</option>
                     <option value="completed">مكتملة</option>
                     <option value="overdue">متأخرة</option>
                 </select>
-                <select id="taskFilterOperationType" onchange="_0x3d2a['renderTasks']()">
+                <select id="taskFilterOperationType" onchange="window._0x3d2a.renderTasks()">
                     <option value="">كل أنواع العمليات</option>
                     <option value="quotation">📄 طلب عرض سعر</option>
                     <option value="followup">👀 متابعة عرض سعر</option>
@@ -533,13 +547,13 @@
                     <option value="bank">🏦 بنك</option>
                     <option value="cash">💵 كاش</option>
                 </select>
-                <input type="date" id="taskFilterDate" onchange="_0x3d2a['renderTasks']()" placeholder="تاريخ محدد">
-                <button onclick="_0x3d2a['clearTaskFilters']()" class="btn-ai" style="background: #6c5ce7;">🗑️ مسح الفلاتر</button>
+                <input type="date" id="taskFilterDate" onchange="window._0x3d2a.renderTasks()" placeholder="تاريخ محدد">
+                <button onclick="window._0x3d2a.clearTaskFilters()" class="btn-ai" style="background: #6c5ce7;">🗑️ مسح الفلاتر</button>
             </div>
             
             <div class="form-group">
                 <div class="grid-3">
-                    <select id="taskClientSelect" onchange="_0x3d2a['autoFill']()"><option value="">Link to Client</option></select>
+                    <select id="taskClientSelect" onchange="window._0x3d2a.autoFill()"><option value="">Link to Client</option></select>
                     <select id="taskOperationType">
                         <option value="quotation">📄 طلب عرض سعر</option>
                         <option value="followup">👀 متابعة عرض سعر</option>
@@ -555,10 +569,10 @@
                 </div>
                 <textarea id="taskNotes" rows="2" placeholder="ملاحظات إضافية عن العملية..."></textarea>
                 <textarea id="extraInfo" rows="2" placeholder="تفاصيل إضافية أو متطلبات..."></textarea>
-                <button onclick="_0x3d2a['saveTask']()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ إضافة عملية</button>
+                <button onclick="window._0x3d2a.saveTask()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ إضافة عملية</button>
             </div>
             <div class="table-container">
-                <table>
+                <table id="tasksTable">
                     <thead>
                         <tr>
                             <th id="taskClientHeader">العميل</th>
@@ -571,7 +585,13 @@
                             <th id="taskActionHeader">إجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="taskBody"></tbody>
+                    <tbody id="taskBody">
+                        <tr>
+                            <td colspan="8" style="text-align:center; padding:40px;">
+                                ⏳ جاري تحميل المهام...
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -579,11 +599,11 @@
         <div id="recycleTab" class="tab-content">
             <h2 id="recycleTitle" style="color:var(--danger)">♻️ سلة المحذوفات (المؤرشفة)</h2>
             <div class="recycle-header">
-                <button onclick="_0x3d2a['refreshRecycle']()" class="btn-ai" style="background: #17a2b8;">🔄 تحديث سلة المحذوفات</button>
-                <button onclick="_0x3d2a['clearAllRecycle']()" class="btn-ai" style="background: #dc3545;" id="clearAllRecycleBtn">🗑️ إفراغ السلة بالكامل</button>
+                <button onclick="window._0x3d2a.refreshRecycle()" class="btn-ai" style="background: #17a2b8;">🔄 تحديث سلة المحذوفات</button>
+                <button onclick="window._0x3d2a.clearAllRecycle()" class="btn-ai" style="background: #dc3545;" id="clearAllRecycleBtn">🗑️ إفراغ السلة بالكامل</button>
             </div>
             <div class="table-container">
-                <table>
+                <table id="recycleTable">
                     <thead>
                         <tr>
                             <th id="recycleNameHeader">الاسم</th>
@@ -612,9 +632,9 @@
                         <option value="user">مندوب عادي</option>
                         <option value="admin">مسؤول النظام</option>
                     </select>
-                    <button onclick="_0x3d2a['addUser']()" class="btn-save" style="background:var(--primary)" id="registerBtn">تسجيل مستخدم جديد</button>
+                    <button onclick="window._0x3d2a.addUser()" class="btn-save" style="background:var(--primary)" id="registerBtn">تسجيل مستخدم جديد</button>
                     <div class="table-container" style="margin-top:20px;">
-                        <table>
+                        <table id="usersTable">
                             <thead>
                                 <tr>
                                     <th id="usersTableUser">المستخدم</th>
@@ -642,10 +662,10 @@
                 <hr>
                 <label id="changePassLabel">تغيير كلمة المرور:</label>
                 <input type="password" id="changePassInput" placeholder="أدخل كلمة المرور الجديدة">
-                <button onclick="_0x3d2a['updatePass']()" class="btn-save" style="background:var(--info)" id="updatePassBtn">تحديث كلمة المرور</button>
+                <button onclick="window._0x3d2a.updatePass()" class="btn-save" style="background:var(--info)" id="updatePassBtn">تحديث كلمة المرور</button>
                 <hr>
-                <button onclick="_0x3d2a['enableDesktopNotifications']()" class="btn-save" style="background:var(--info); margin-top:10px;" id="enableNotifBtn">🔔 تفعيل الإشعارات</button>
-                <button onclick="_0x3d2a['manualSync']()" class="btn-save" style="background:var(--primary); margin-top:10px;" id="manualSyncBtn">🔄 مزامنة يدوية</button>
+                <button onclick="window._0x3d2a.enableDesktopNotifications()" class="btn-save" style="background:var(--info); margin-top:10px;" id="enableNotifBtn">🔔 تفعيل الإشعارات</button>
+                <button onclick="window._0x3d2a.manualSync()" class="btn-save" style="background:var(--primary); margin-top:10px;" id="manualSyncBtn">🔄 مزامنة يدوية</button>
             </div>
         </div>
     </div>
@@ -658,1504 +678,1475 @@
 // All rights reserved - Unauthorized access prohibited
 // ============================================================
 
-// ========== طبقة حماية إضافية متقدمة ==========
-(function() {
-    if (window.location.protocol === 'view-source:') {
-        window.location.href = 'about:blank';
-    }
-    
-    var devToolsDetection = function() {
-        var threshold = 160;
-        var check = function() {
-            var widthDiff = window.outerWidth - window.innerWidth;
-            var heightDiff = window.outerHeight - window.innerHeight;
-            if (widthDiff > threshold || heightDiff > threshold || 
-                (window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized)) {
-                document.body.innerHTML = '<div class="anti-debug-overlay"><h1>🔒 ACCESS DENIED</h1><p>Developer tools are not allowed on this system.</p><button onclick="location.reload()">إعادة تحميل</button></div>';
-                document.body.style.overflow = 'hidden';
-                throw new Error("Developer Tools Detected");
-            }
-        };
-        setInterval(check, 500);
-    };
-    
-    var protectConsole = function() {
-        var methods = ['log', 'info', 'warn', 'error', 'debug', 'trace'];
-        for (var i = 0; i < methods.length; i++) {
-            var method = methods[i];
-            if (console[method]) {
-                console[method] = function() {};
-            }
-        }
-        console.clear = function() {};
-    };
-    
-    var blockShortcuts = function(e) {
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
-            e.preventDefault();
-            e.stopPropagation();
-            alert('❌ Saving this page is disabled for security reasons.');
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
-            e.preventDefault();
-            e.stopPropagation();
-            alert('❌ Printing is disabled for security reasons.');
-            return false;
-        }
-    };
-    
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        return false;
-    });
-    
-    document.addEventListener('dragstart', function(e) {
-        e.preventDefault();
-        return false;
-    });
-    
-    var protectWatermark = function() {
-        var watermark = document.getElementById('watermark');
-        if (!watermark) return;
-        var observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'attributes' || mutation.type === 'childList') {
-                    var wm = document.getElementById('watermark');
-                    if (!wm || wm.style.display === 'none') {
-                        location.reload();
-                    }
-                }
-            });
-        });
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
-    };
-    
-    var protectStorage = function() {
-        var originalSetItem = Storage.prototype.setItem;
-        Storage.prototype.setItem = function(key, value) {
-            if (key === 'savedFilters' || key === 'appLang' || key === 'taskSavedFilters') {
-                return originalSetItem.call(this, key, value);
-            }
-            if (sessionStorage.getItem('isLoggedIn') === 'true') {
-                return;
-            }
-            return originalSetItem.call(this, key, value);
-        };
-    };
-    
-    var antiDebugger = function() {
-        var startTime = performance.now();
-        debugger;
-        var endTime = performance.now();
-        if (endTime - startTime > 100) {
-            document.body.innerHTML = '<div class="anti-debug-overlay"><h1>🔒 SECURITY BREACH DETECTED</h1><p>Debugging tools are not allowed.</p><button onclick="location.reload()">Reload Page</button></div>';
-            throw new Error("Debugger detected");
-        }
-        setTimeout(antiDebugger, 100);
-    };
-    
-    var isLoggedIn = false;
-    var checkLoginInterval = setInterval(function() {
-        if (sessionStorage.getItem('isLoggedIn') === 'true' && !isLoggedIn) {
-            isLoggedIn = true;
-            clearInterval(checkLoginInterval);
-            devToolsDetection();
-            protectConsole();
-            protectWatermark();
-            protectStorage();
-            antiDebugger();
-            document.addEventListener('keydown', blockShortcuts);
-        }
-    }, 500);
-})();
+window._0x3d2a = {};
 
-(function(){
-    var _0x3d2a = window._0x3d2a = {};
-    
-    var currentLang = localStorage.getItem('appLang') || 'en';
-    var translations = {
-        en: {
-            'm_crm': '👥 Clients Registry', 'm_tasks': '📅 Tasks & Operations', 'm_dash': '📊 AI Analytics',
-            'm_profile': '👤 My Profile', 'm_recycle': '♻️ Recycle Bin', 'm_admin': '👑 Admin Master',
-            'm_logout': '🚪 Secure Logout', 'h_crm': 'Clients Management',
-            'search_placeholder': '🔍 Search by Name, Phone or Status...', 'filter_all': 'All Statuses',
-            'filter_interested': 'Interested', 'filter_progress': 'In Progress', 'filter_hold': 'Hold',
-            'filter_completed': 'Completed', 'filter_vip': 'VIP', 'export_btn': '📥 Export',
-            'name_placeholder': 'Full Client Name', 'phone_placeholder': 'Phone (e.g. 012...)',
-            'gov_placeholder': 'Select Governorate', 'status_placeholder': 'Status', 'agent_placeholder': 'Assigned Agent',
-            'notes_placeholder': 'Additional Notes & Client History...', 'save_btn': '💾 Save Client Data',
-            'update_btn': '🔄 Update Client Record', 'h_dash': '📊 Real-time Performance',
-            'stat_total': 'Total Clients', 'stat_vip': 'VIP Members', 'stat_completed': 'Closed Deals',
-            'status_chart': '📈 Status Distribution', 'geo_chart': '📍 Geographical Distribution',
-            'h_tasks': 'Operations & Follow-ups', 'task_client_placeholder': 'Link to Client',
-            'task_text_placeholder': 'What needs to be done?', 'task_extra_placeholder': 'Details or requirements...',
-            'add_task_btn': '➕ Add Operation', 'task_client_header': 'Client', 'task_text_header': 'Task',
-            'task_notes_header': 'Progress/Notes', 'task_date_header': 'Deadline', 'task_action_header': 'Action',
-            'recycle_title': '♻️ Recycle Bin (Archived)', 'recycle_name': 'Name', 'recycle_phone': 'Phone',
-            'recycle_status': 'Status', 'recycle_restore': 'Restore', 'recycle_delete': 'Delete',
-            'admin_title': '👑 Admin Master Control Panel', 'users_title': '👥 User Accounts Management',
-            'username_placeholder': 'Username', 'password_placeholder': 'Password', 'fullname_placeholder': 'Full Name',
-            'role_user': 'Standard Agent', 'role_admin': 'System Administrator', 'register_btn': 'Register New User',
-            'logs_title': '📜 Security Activity Logs', 'profile_title': '👤 User Settings', 'logged_in_as': 'Logged in as:',
-            'change_pass_label': 'Change Access Password:', 'update_pass_btn': 'Update My Password',
-            'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
-            'login_btn': 'Access System', 'save_disabled': '❌ Saving page is disabled - This version is protected by copyright',
-            'print_disabled': '❌ Printing is not allowed', 'voice_search': 'Voice Search', 'ai_suggest': '🤖 AI Suggest',
-            'save_filter': '💾 Save Filter', 'load_filters': '📂 Saved Filters', 'advanced_search': 'Advanced Search...',
-            'all_governorates': 'All Governorates', 'all_agents': 'All Agents', 'all_priorities': 'All Priorities',
-            'high_priority': 'High (70%+)', 'medium_priority': 'Medium (40-69%)', 'low_priority': 'Low (-40%)',
-            'kpi_conversion': 'Conversion Rate', 'kpi_followup': 'Avg Follow-up Time', 'kpi_forecast': 'Next Week Forecast',
-            'kpi_top_agent': 'Top Agent', 'forecast_deals': 'Expected Deals', 'ai_insight': 'AI Insight:',
-            'enable_notifications': '🔔 Enable Notifications', 'manual_sync': '🔄 Manual Sync',
-            'users_table_user': 'User', 'users_table_pass': 'Pass', 'users_table_name': 'Name', 
-            'users_table_role': 'Role', 'users_table_action': 'Action', 'th_name': 'Name ↕️',
-            'th_phone': 'Phone', 'th_gov': 'Governorate ↕️', 'th_priority': 'AI Priority',
-            'th_status': 'Status ↕️', 'th_actions': 'Actions', 'task_status_header': 'Status',
-            'task_status_pending': 'Pending', 'task_status_completed': 'Completed', 'task_status_overdue': 'Overdue',
-            'clear_filters': '🗑️ Clear Filters', 'search_tasks': '🔍 Search Tasks...', 'all_clients': 'All Clients',
-            'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date',
-            'task_type_header': 'Operation Type', 'task_amount_header': 'Amount',
-            'op_quotation': 'Quotation Request', 'op_followup': 'Quotation Follow-up',
-            'op_supply': 'Supply', 'op_bank': 'Bank', 'op_cash': 'Cash',
-            'task_notes_placeholder': 'Additional notes about the operation...',
-            'refresh_recycle': '🔄 Refresh Recycle Bin', 'clear_all_recycle': '🗑️ Clear All'
-        },
-        ar: {
-            'm_crm': '👥 إدارة العملاء', 'm_tasks': '📅 المهام والعمليات', 'm_dash': '📊 التحليلات الذكية',
-            'm_profile': '👤 ملفي الشخصي', 'm_recycle': '♻️ سلة المحذوفات', 'm_admin': '👑 لوحة تحكم الأدمن',
-            'm_logout': '🚪 تسجيل خروج', 'h_crm': 'إدارة العملاء', 'search_placeholder': '🔍 بحث بالاسم أو رقم الهاتف أو الحالة...',
-            'filter_all': 'جميع الحالات', 'filter_interested': 'مهتم', 'filter_progress': 'قيد التنفيذ', 'filter_hold': 'معلق',
-            'filter_completed': 'مكتمل', 'filter_vip': 'VIP', 'export_btn': '📥 تصدير', 'name_placeholder': 'اسم العميل كاملاً',
-            'phone_placeholder': 'رقم الهاتف (مثال 012...)', 'gov_placeholder': 'اختر المحافظة', 'status_placeholder': 'الحالة',
-            'agent_placeholder': 'المندوب المسؤول', 'notes_placeholder': 'ملاحظات إضافية وتاريخ العميل...',
-            'save_btn': '💾 حفظ بيانات العميل', 'update_btn': '🔄 تحديث بيانات العميل', 'h_dash': '📊 الأداء الفوري',
-            'stat_total': 'إجمالي العملاء', 'stat_vip': 'عملاء VIP', 'stat_completed': 'الصفقات المغلقة',
-            'status_chart': '📈 توزيع الحالات', 'geo_chart': '📍 التوزيع الجغرافي', 'h_tasks': 'العمليات والمتابعات',
-            'task_client_placeholder': 'ربط بعميل', 'task_text_placeholder': 'المطلوب إنجازه؟',
-            'task_extra_placeholder': 'تفاصيل أو متطلبات...', 'add_task_btn': '➕ إضافة عملية', 'task_client_header': 'العميل',
-            'task_text_header': 'المهمة', 'task_notes_header': 'ملاحظات التقدم', 'task_date_header': 'تاريخ التسليم',
-            'task_action_header': 'إجراءات', 'recycle_title': '♻️ سلة المحذوفات (المؤرشفة)', 'recycle_name': 'الاسم',
-            'recycle_phone': 'الهاتف', 'recycle_status': 'الحالة السابقة', 'recycle_restore': 'استعادة',
-            'recycle_delete': 'حذف نهائي', 'admin_title': '👑 لوحة تحكم الأدمن الرئيسي', 'users_title': '👥 إدارة حسابات المستخدمين',
-            'username_placeholder': 'اسم المستخدم', 'password_placeholder': 'كلمة المرور', 'fullname_placeholder': 'الاسم الكامل',
-            'role_user': 'مندوب عادي', 'role_admin': 'مسؤول النظام', 'register_btn': 'تسجيل مستخدم جديد',
-            'logs_title': '📜 سجلات النشاطات الأمنية', 'profile_title': '👤 إعدادات المستخدم', 'logged_in_as': 'مسجل الدخول باسم:',
-            'change_pass_label': 'تغيير كلمة المرور:', 'update_pass_btn': 'تحديث كلمة المرور',
-            'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن', 'login_btn': 'الدخول للنظام',
-            'save_disabled': '❌ حفظ الصفحة غير مسموح - هذه النسخة محمية بحقوق الملكية', 'print_disabled': '❌ الطباعة غير مسموحة',
-            'voice_search': 'بحث صوتي', 'ai_suggest': '🤖 اقتراح AI', 'save_filter': '💾 حفظ الفلتر',
-            'load_filters': '📂 الفلاتر المحفوظة', 'advanced_search': 'بحث متقدم...', 'all_governorates': 'كل المحافظات',
-            'all_agents': 'كل المندوبين', 'all_priorities': 'كل الأولويات', 'high_priority': 'عالية (70%+)',
-            'medium_priority': 'متوسطة (40-69%)', 'low_priority': 'منخفضة (-40%)', 'kpi_conversion': 'معدل التحويل',
-            'kpi_followup': 'متوسط زمن المتابعة', 'kpi_forecast': 'توقعات الأسبوع القادم', 'kpi_top_agent': 'أفضل مندوب',
-            'forecast_deals': 'صفقة متوقعة', 'ai_insight': 'رؤية الذكاء الاصطناعي:',
-            'enable_notifications': '🔔 تفعيل الإشعارات', 'manual_sync': '🔄 مزامنة يدوية',
-            'users_table_user': 'المستخدم', 'users_table_pass': 'كلمة المرور', 'users_table_name': 'الاسم',
-            'users_table_role': 'الصلاحية', 'users_table_action': 'إجراء', 'th_name': 'الاسم ↕️',
-            'th_phone': 'الهاتف', 'th_gov': 'المحافظة ↕️', 'th_priority': 'أولوية AI',
-            'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات', 'task_status_header': 'الحالة',
-            'task_status_pending': 'قيد التنفيذ', 'task_status_completed': 'مكتملة', 'task_status_overdue': 'متأخرة',
-            'clear_filters': '🗑️ مسح الفلاتر', 'search_tasks': '🔍 بحث في المهام...', 'all_clients': 'كل العملاء',
-            'all_task_statuses': 'كل الحالات', 'specific_date': 'تاريخ محدد',
-            'task_type_header': 'نوع العملية', 'task_amount_header': 'المبلغ',
-            'op_quotation': '📄 طلب عرض سعر', 'op_followup': '👀 متابعة عرض سعر',
-            'op_supply': '🚚 توريد', 'op_bank': '🏦 بنك', 'op_cash': '💵 كاش',
-            'task_notes_placeholder': 'ملاحظات إضافية عن العملية...',
-            'refresh_recycle': '🔄 تحديث سلة المحذوفات', 'clear_all_recycle': '🗑️ إفراغ السلة بالكامل'
-        }
+var currentLang = localStorage.getItem('appLang') || 'en';
+var translations = {
+    en: {
+        'm_crm': '👥 Clients Registry', 'm_tasks': '📅 Tasks & Operations', 'm_dash': '📊 AI Analytics',
+        'm_profile': '👤 My Profile', 'm_recycle': '♻️ Recycle Bin', 'm_admin': '👑 Admin Master',
+        'm_logout': '🚪 Secure Logout', 'h_crm': 'Clients Management',
+        'search_placeholder': '🔍 Search by Name, Phone or Status...', 'filter_all': 'All Statuses',
+        'export_btn': '📥 Export',
+        'name_placeholder': 'Full Client Name', 'phone_placeholder': 'Phone (e.g. 012...)',
+        'gov_placeholder': 'Select Governorate', 'status_placeholder': 'Status', 'agent_placeholder': 'Assigned Agent',
+        'notes_placeholder': 'Additional Notes & Client History...', 'save_btn': '💾 Save Client Data',
+        'update_btn': '🔄 Update Client Record', 'h_dash': '📊 Real-time Performance',
+        'stat_total': 'Total Clients', 'stat_vip': 'VIP Members', 'stat_completed': 'Closed Deals',
+        'status_chart': '📈 Status Distribution', 'geo_chart': '📍 Geographical Distribution',
+        'h_tasks': 'Operations & Follow-ups', 'task_client_placeholder': 'Link to Client',
+        'task_text_placeholder': 'What needs to be done?', 'task_extra_placeholder': 'Details or requirements...',
+        'add_task_btn': '➕ Add Operation', 'task_client_header': 'Client', 'task_text_header': 'Task',
+        'task_notes_header': 'Progress/Notes', 'task_date_header': 'Deadline', 'task_action_header': 'Action',
+        'recycle_title': '♻️ Recycle Bin (Archived)', 'recycle_name': 'Name', 'recycle_phone': 'Phone',
+        'recycle_status': 'Status', 'recycle_restore': 'Restore', 'recycle_delete': 'Delete',
+        'admin_title': '👑 Admin Master Control Panel', 'users_title': '👥 User Accounts Management',
+        'username_placeholder': 'Username', 'password_placeholder': 'Password', 'fullname_placeholder': 'Full Name',
+        'role_user': 'Standard Agent', 'role_admin': 'System Administrator', 'register_btn': 'Register New User',
+        'logs_title': '📜 Security Activity Logs', 'profile_title': '👤 User Settings', 'logged_in_as': 'Logged in as:',
+        'change_pass_label': 'Change Access Password:', 'update_pass_btn': 'Update My Password',
+        'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
+        'login_btn': 'Access System',
+        'voice_search': 'Voice Search', 'ai_suggest': '🤖 AI Suggest',
+        'save_filter': '💾 Save Filter', 'load_filters': '📂 Saved Filters', 'advanced_search': 'Advanced Search...',
+        'all_governorates': 'All Governorates', 'all_agents': 'All Agents', 'all_priorities': 'All Priorities',
+        'high_priority': 'High (70%+)', 'medium_priority': 'Medium (40-69%)', 'low_priority': 'Low (-40%)',
+        'kpi_conversion': 'Conversion Rate', 'kpi_followup': 'Avg Follow-up Time', 'kpi_forecast': 'Next Week Forecast',
+        'kpi_top_agent': 'Top Agent', 'forecast_deals': 'Expected Deals', 'ai_insight': 'AI Insight:',
+        'enable_notifications': '🔔 Enable Notifications', 'manual_sync': '🔄 Manual Sync',
+        'users_table_user': 'User', 'users_table_pass': 'Pass', 'users_table_name': 'Name', 
+        'users_table_role': 'Role', 'users_table_action': 'Action', 'th_name': 'Name ↕️',
+        'th_phone': 'Phone', 'th_gov': 'Governorate ↕️', 'th_priority': 'AI Priority',
+        'th_status': 'Status ↕️', 'th_actions': 'Actions', 'task_status_header': 'Status',
+        'task_status_pending': 'Pending', 'task_status_completed': 'Completed', 'task_status_overdue': 'Overdue',
+        'clear_filters': '🗑️ Clear Filters', 'search_tasks': '🔍 Search Tasks...', 'all_clients': 'All Clients',
+        'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date',
+        'task_type_header': 'Operation Type', 'task_amount_header': 'Amount',
+        'op_quotation': 'Quotation Request', 'op_followup': 'Quotation Follow-up',
+        'op_supply': 'Supply', 'op_bank': 'Bank', 'op_cash': 'Cash',
+        'task_notes_placeholder': 'Additional notes about the operation...',
+        'refresh_recycle': '🔄 Refresh Recycle Bin', 'clear_all_recycle': '🗑️ Clear All'
+    },
+    ar: {
+        'm_crm': '👥 إدارة العملاء', 'm_tasks': '📅 المهام والعمليات', 'm_dash': '📊 التحليلات الذكية',
+        'm_profile': '👤 ملفي الشخصي', 'm_recycle': '♻️ سلة المحذوفات', 'm_admin': '👑 لوحة تحكم الأدمن',
+        'm_logout': '🚪 تسجيل خروج', 'h_crm': 'إدارة العملاء', 'search_placeholder': '🔍 بحث بالاسم أو رقم الهاتف أو الحالة...',
+        'filter_all': 'جميع الحالات', 'export_btn': '📥 تصدير', 'name_placeholder': 'اسم العميل كاملاً',
+        'phone_placeholder': 'رقم الهاتف (مثال 012...)', 'gov_placeholder': 'اختر المحافظة', 'status_placeholder': 'الحالة',
+        'agent_placeholder': 'المندوب المسؤول', 'notes_placeholder': 'ملاحظات إضافية وتاريخ العميل...',
+        'save_btn': '💾 حفظ بيانات العميل', 'update_btn': '🔄 تحديث بيانات العميل', 'h_dash': '📊 الأداء الفوري',
+        'stat_total': 'إجمالي العملاء', 'stat_vip': 'عملاء VIP', 'stat_completed': 'الصفقات المغلقة',
+        'status_chart': '📈 توزيع الحالات', 'geo_chart': '📍 التوزيع الجغرافي', 'h_tasks': 'العمليات والمتابعات',
+        'task_client_placeholder': 'ربط بعميل', 'task_text_placeholder': 'المطلوب إنجازه؟',
+        'task_extra_placeholder': 'تفاصيل أو متطلبات...', 'add_task_btn': '➕ إضافة عملية', 'task_client_header': 'العميل',
+        'task_text_header': 'المهمة', 'task_notes_header': 'ملاحظات التقدم', 'task_date_header': 'تاريخ التسليم',
+        'task_action_header': 'إجراءات', 'recycle_title': '♻️ سلة المحذوفات (المؤرشفة)', 'recycle_name': 'الاسم',
+        'recycle_phone': 'الهاتف', 'recycle_status': 'الحالة السابقة', 'recycle_restore': 'استعادة',
+        'recycle_delete': 'حذف نهائي', 'admin_title': '👑 لوحة تحكم الأدمن الرئيسي', 'users_title': '👥 إدارة حسابات المستخدمين',
+        'username_placeholder': 'اسم المستخدم', 'password_placeholder': 'كلمة المرور', 'fullname_placeholder': 'الاسم الكامل',
+        'role_user': 'مندوب عادي', 'role_admin': 'مسؤول النظام', 'register_btn': 'تسجيل مستخدم جديد',
+        'logs_title': '📜 سجلات النشاطات الأمنية', 'profile_title': '👤 إعدادات المستخدم', 'logged_in_as': 'مسجل الدخول باسم:',
+        'change_pass_label': 'تغيير كلمة المرور:', 'update_pass_btn': 'تحديث كلمة المرور',
+        'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن', 'login_btn': 'الدخول للنظام',
+        'voice_search': 'بحث صوتي', 'ai_suggest': '🤖 اقتراح AI', 'save_filter': '💾 حفظ الفلتر',
+        'load_filters': '📂 الفلاتر المحفوظة', 'advanced_search': 'بحث متقدم...', 'all_governorates': 'كل المحافظات',
+        'all_agents': 'كل المندوبين', 'all_priorities': 'كل الأولويات', 'high_priority': 'عالية (70%+)',
+        'medium_priority': 'متوسطة (40-69%)', 'low_priority': 'منخفضة (-40%)', 'kpi_conversion': 'معدل التحويل',
+        'kpi_followup': 'متوسط زمن المتابعة', 'kpi_forecast': 'توقعات الأسبوع القادم', 'kpi_top_agent': 'أفضل مندوب',
+        'forecast_deals': 'صفقة متوقعة', 'ai_insight': 'رؤية الذكاء الاصطناعي:',
+        'enable_notifications': '🔔 تفعيل الإشعارات', 'manual_sync': '🔄 مزامنة يدوية',
+        'users_table_user': 'المستخدم', 'users_table_pass': 'كلمة المرور', 'users_table_name': 'الاسم',
+        'users_table_role': 'الصلاحية', 'users_table_action': 'إجراء', 'th_name': 'الاسم ↕️',
+        'th_phone': 'الهاتف', 'th_gov': 'المحافظة ↕️', 'th_priority': 'أولوية AI',
+        'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات', 'task_status_header': 'الحالة',
+        'task_status_pending': 'قيد التنفيذ', 'task_status_completed': 'مكتملة', 'task_status_overdue': 'متأخرة',
+        'clear_filters': '🗑️ مسح الفلاتر', 'search_tasks': '🔍 بحث في المهام...', 'all_clients': 'كل العملاء',
+        'all_task_statuses': 'كل الحالات', 'specific_date': 'تاريخ محدد',
+        'task_type_header': 'نوع العملية', 'task_amount_header': 'المبلغ',
+        'op_quotation': '📄 طلب عرض سعر', 'op_followup': '👀 متابعة عرض سعر',
+        'op_supply': '🚚 توريد', 'op_bank': '🏦 بنك', 'op_cash': '💵 كاش',
+        'task_notes_placeholder': 'ملاحظات إضافية عن العملية...',
+        'refresh_recycle': '🔄 تحديث سلة المحذوفات', 'clear_all_recycle': '🗑️ إفراغ السلة بالكامل'
+    }
+};
+
+// تعريف المتغيرات العامة
+var clients = [];
+var tasks = [];
+var deletedClients = [];
+var authSystem = { users: [] };
+var logs = [];
+var editIdx = -1;
+var editTaskIdx = -1;
+var statusChart = null;
+var sortColumn = 0;
+var sortDirection = 'asc';
+var savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '[]');
+var notifications = [];
+var speechRecognition = null;
+var isListening = false;
+var isOnline = navigator.onLine;
+var isSyncing = false;
+var syncInterval = null;
+var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
+
+// مستخدمين تجريبيين
+var defaultUsers = [
+    { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
+    { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" },
+    { u: "test", p: "test123", displayName: "مستخدم تجريبي", role: "user" }
+];
+
+// بيانات تجريبية للعملاء
+var demoClients = [
+    { name: "أحمد محمد", phone: "01234567890", gov: "Cairo", status: "VIP", notes: "عميل مهم جداً - مهتم بمنتجاتنا", agent: "محمد علي", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 85 },
+    { name: "سارة أحمد", phone: "01122334455", gov: "Alexandria", status: "In Progress", notes: "تتفاوض على السعر - متابعة مستمرة", agent: "أحمد حسن", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 65 },
+    { name: "محمد إبراهيم", phone: "01099887766", gov: "Giza", status: "Interested", notes: "طلب عرض سعر - سيتم الرد قريباً", agent: "محمد علي", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 45 },
+    { name: "فاطمة حسن", phone: "01233445566", gov: "Dakahlia", status: "Completed", notes: "تم إتمام الصفقة بنجاح", agent: "سامي ربيع", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 95 },
+    { name: "عمر خالد", phone: "01155667788", gov: "Sharqia", status: "Hold", notes: "يطلب مهلة للتفكير", agent: "أحمد حسن", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 25 }
+];
+
+// بيانات تجريبية للمهام
+var demoTasks = [
+    { client: "أحمد محمد", operationType: "quotation", amount: 15000, text: "تقديم عرض سعر للمنتجات", taskNotes: "تم إرسال العرض عبر الواتساب", extra: "", date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null },
+    { client: "سارة أحمد", operationType: "followup", amount: null, text: "متابعة عرض السعر", taskNotes: "الاتصال غداً للتأكيد", extra: "", date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null },
+    { client: "محمد إبراهيم", operationType: "supply", amount: 25000, text: "تجهيز الطلبية", taskNotes: "تم تجهيز 50% من الطلب", extra: "", date: new Date(Date.now() + 10*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null },
+    { client: "فاطمة حسن", operationType: "bank", amount: 30000, text: "تحويل بنكي", taskNotes: "تم استلام الحوالة", extra: "", date: new Date(Date.now() - 2*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: true, completedAt: new Date().toISOString() }
+];
+
+// دوال مساعدة
+function getOperationTypeText(type) {
+    var t = translations[currentLang];
+    var types = {
+        'quotation': t['op_quotation'] || '📄 طلب عرض سعر',
+        'followup': t['op_followup'] || '👀 متابعة عرض سعر',
+        'supply': t['op_supply'] || '🚚 توريد',
+        'bank': t['op_bank'] || '🏦 بنك',
+        'cash': t['op_cash'] || '💵 كاش'
     };
-    
-    // تعريف المتغيرات العامة
-    var clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [];
-    var editIdx = -1, editTaskIdx = -1, statusChart = null;
-    var sortColumn = 0, sortDirection = 'asc';
-    var savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '[]');
-    var notifications = [];
-    var speechRecognition = null;
-    var isListening = false;
-    var isOnline = navigator.onLine;
-    var isSyncing = false;
-    var syncInterval = null;
-    var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
-    
-    // مستخدمين تجريبيين افتراضيين للتأكد من وجود بيانات
-    var defaultUsers = [
-        { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
-        { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" },
-        { u: "test", p: "test123", displayName: "مستخدم تجريبي", role: "user" }
-    ];
-    
-    // دوال مساعدة لأنواع العمليات
-    function getOperationTypeText(type) {
-        var t = translations[currentLang];
-        var types = {
-            'quotation': t['op_quotation'] || '📄 طلب عرض سعر',
-            'followup': t['op_followup'] || '👀 متابعة عرض سعر',
-            'supply': t['op_supply'] || '🚚 توريد',
-            'bank': t['op_bank'] || '🏦 بنك',
-            'cash': t['op_cash'] || '💵 كاش'
-        };
-        return types[type] || type;
-    }
-    
-    function getOperationTypeClass(type) {
-        var classes = {
-            'quotation': 'op-quotation',
-            'followup': 'op-followup',
-            'supply': 'op-supply',
-            'bank': 'op-bank',
-            'cash': 'op-cash'
-        };
-        return classes[type] || 'op-quotation';
-    }
-    
-    function updateSyncStatusUI() {
-        var indicator = document.getElementById('syncStatusIndicator');
-        var textSpan = document.getElementById('syncStatusText');
-        if (!indicator) return;
-        if (isSyncing) {
-            indicator.className = 'sync-status syncing';
-            if(textSpan) textSpan.innerText = 'جاري المزامنة...';
-        } else if (isOnline) {
-            indicator.className = 'sync-status online';
-            if(textSpan) textSpan.innerText = 'متصل | متزامن';
-        } else {
-            indicator.className = 'sync-status offline';
-            if(textSpan) textSpan.innerText = 'غير متصل (أوفلاين)';
-        }
-    }
-    
-    function updateUILanguage() {
-        var t = translations[currentLang];
-        var elements = {
-            'm_crm': 'm_crm', 'm_tasks': 'm_tasks', 'm_dash': 'm_dash', 'm_profile': 'm_profile',
-            'm_recycle': 'm_recycle', 'm_admin': 'm_admin', 'm_logout': 'm_logout', 'h_crm': 'h_crm',
-            'h_dash': 'h_dash', 'h_tasks': 'h_tasks', 'recycleTitle': 'recycleTitle', 'adminTitle': 'adminTitle',
-            'usersTitle': 'usersTitle', 'logsTitle': 'logsTitle', 'profileTitle': 'profileTitle',
-            'loginTitle': 'loginTitle', 'loginSubtitle': 'loginSubtitle', 'loginBtn': 'loginBtn',
-            'statTotalLabel': 'statTotalLabel', 'statVipLabel': 'statVipLabel', 'statCompLabel': 'statCompLabel',
-            'statusChartLabel': 'statusChartLabel', 'geoChartLabel': 'geoChartLabel', 'taskClientHeader': 'taskClientHeader',
-            'taskTextHeader': 'taskTextHeader', 'taskNotesHeader': 'taskNotesHeader', 'taskDateHeader': 'taskDateHeader',
-            'taskActionHeader': 'taskActionHeader', 'taskStatusHeader': 'taskStatusHeader',
-            'recycleNameHeader': 'recycleNameHeader', 'recyclePhoneHeader': 'recyclePhoneHeader',
-            'recycleStatusHeader': 'recycleStatusHeader', 'recycleRestoreHeader': 'recycleRestoreHeader',
-            'recycleDeleteHeader': 'recycleDeleteHeader', 'registerBtn': 'registerBtn', 'updatePassBtn': 'updatePassBtn',
-            'changePassLabel': 'changePassLabel', 'loggedInAs': 'loggedInAs', 'kpiConversion': 'kpiConversion',
-            'kpiFollowUp': 'kpiFollowUp', 'kpiForecast': 'kpiForecast', 'kpiTopAgent': 'kpiTopAgent',
-            'aiInsightLabel': 'aiInsightLabel', 'enableNotifBtn': 'enableNotifBtn', 'manualSyncBtn': 'manualSyncBtn',
-            'usersTableUser': 'usersTableUser', 'usersTablePass': 'usersTablePass', 'usersTableName': 'usersTableName',
-            'usersTableRole': 'usersTableRole', 'usersTableAction': 'usersTableAction', 'thName': 'thName',
-            'thPhone': 'thPhone', 'thGov': 'thGov', 'thPriority': 'thPriority', 'thStatus': 'thStatus', 'thActions': 'thActions',
-            'taskTypeHeader': 'taskTypeHeader', 'taskAmountHeader': 'taskAmountHeader'
-        };
-        for (var id in elements) { 
-            var el = document.getElementById(id); 
-            if (el && t[id]) el.innerText = t[id]; 
-        }
-        
-        var searchInput = document.getElementById('search'); if (searchInput) searchInput.placeholder = t['search_placeholder'];
-        var advancedSearch = document.getElementById('advancedSearch'); if (advancedSearch) advancedSearch.placeholder = t['advanced_search'];
-        var taskSearch = document.getElementById('taskSearch'); if (taskSearch) taskSearch.placeholder = t['search_tasks'];
-        var nameInput = document.getElementById('name'); if (nameInput) nameInput.placeholder = t['name_placeholder'];
-        var phoneInput = document.getElementById('phone'); if (phoneInput) phoneInput.placeholder = t['phone_placeholder'];
-        var agentInput = document.getElementById('agent'); if (agentInput) agentInput.placeholder = t['agent_placeholder'];
-        var notesArea = document.getElementById('notes'); if (notesArea) notesArea.placeholder = t['notes_placeholder'];
-        var taskTextInput = document.getElementById('taskText'); if (taskTextInput) taskTextInput.placeholder = t['task_text_placeholder'];
-        var taskNotesArea = document.getElementById('taskNotes'); if (taskNotesArea) taskNotesArea.placeholder = t['task_notes_placeholder'];
-        var extraInfoArea = document.getElementById('extraInfo'); if (extraInfoArea) extraInfoArea.placeholder = t['task_extra_placeholder'];
-        var newUInput = document.getElementById('newU'); if (newUInput) newUInput.placeholder = t['username_placeholder'];
-        var newPInput = document.getElementById('newP'); if (newPInput) newPInput.placeholder = t['password_placeholder'];
-        var newDInput = document.getElementById('newD'); if (newDInput) newDInput.placeholder = t['fullname_placeholder'];
-        var changePassInput = document.getElementById('changePassInput'); if (changePassInput) changePassInput.placeholder = t['change_pass_label'];
-        var voiceBtn = document.getElementById('voiceBtn'); if (voiceBtn) voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + t['voice_search'];
-        
-        var refreshRecycleBtn = document.querySelector('#recycleTab .recycle-header button:first-child');
-        if (refreshRecycleBtn && t['refresh_recycle']) refreshRecycleBtn.innerHTML = t['refresh_recycle'];
-        
-        var clearAllRecycleBtn = document.getElementById('clearAllRecycleBtn');
-        if (clearAllRecycleBtn && t['clear_all_recycle']) clearAllRecycleBtn.innerHTML = t['clear_all_recycle'];
-        
-        var filterStatus = document.getElementById('filterStatus');
-        if (filterStatus) {
-            filterStatus.options[0].text = t['filter_all']; 
-            filterStatus.options[1].text = t['filter_interested'];
-            filterStatus.options[2].text = t['filter_progress']; 
-            filterStatus.options[3].text = t['filter_hold'];
-            filterStatus.options[4].text = t['filter_completed']; 
-            filterStatus.options[5].text = t['filter_vip'];
-        }
-        
-        var taskFilterStatus = document.getElementById('taskFilterStatus');
-        if (taskFilterStatus) {
-            taskFilterStatus.options[0].text = t['all_task_statuses'];
-            taskFilterStatus.options[1].text = t['task_status_pending'];
-            taskFilterStatus.options[2].text = t['task_status_completed'];
-            taskFilterStatus.options[3].text = t['task_status_overdue'];
-        }
-        
-        var taskFilterClient = document.getElementById('taskFilterClient');
-        if (taskFilterClient && taskFilterClient.options.length > 0) {
-            taskFilterClient.options[0].text = t['all_clients'];
-        }
-        
-        var filterGov = document.getElementById('filterGov');
-        if (filterGov && filterGov.options.length > 0) {
-            filterGov.options[0].text = t['all_governorates'];
-        }
-        
-        var filterAgent = document.getElementById('filterAgent');
-        if (filterAgent && filterAgent.options.length > 0) {
-            filterAgent.options[0].text = t['all_agents'];
-        }
-        
-        var filterPriority = document.getElementById('filterPriority');
-        if (filterPriority) {
-            filterPriority.options[0].text = t['all_priorities'];
-            filterPriority.options[1].text = t['high_priority'];
-            filterPriority.options[2].text = t['medium_priority'];
-            filterPriority.options[3].text = t['low_priority'];
-        }
-        
-        var newRole = document.getElementById('newR');
-        if (newRole) { 
-            newRole.options[0].text = t['role_user']; 
-            newRole.options[1].text = t['role_admin']; 
-        }
-        
-        // تحديث خيارات أنواع العمليات في الفلتر
-        var taskFilterOperationType = document.getElementById('taskFilterOperationType');
-        if (taskFilterOperationType) {
-            taskFilterOperationType.options[0].text = t['all_task_statuses'] || 'كل الحالات';
-            taskFilterOperationType.options[1].text = t['op_quotation'] || '📄 طلب عرض سعر';
-            taskFilterOperationType.options[2].text = t['op_followup'] || '👀 متابعة عرض سعر';
-            taskFilterOperationType.options[3].text = t['op_supply'] || '🚚 توريد';
-            taskFilterOperationType.options[4].text = t['op_bank'] || '🏦 بنك';
-            taskFilterOperationType.options[5].text = t['op_cash'] || '💵 كاش';
-        }
-        
-        // تحديث خيارات أنواع العمليات في نموذج الإضافة
-        var taskOperationType = document.getElementById('taskOperationType');
-        if (taskOperationType) {
-            taskOperationType.options[0].text = t['op_quotation'] || '📄 طلب عرض سعر';
-            taskOperationType.options[1].text = t['op_followup'] || '👀 متابعة عرض سعر';
-            taskOperationType.options[2].text = t['op_supply'] || '🚚 توريد';
-            taskOperationType.options[3].text = t['op_bank'] || '🏦 بنك';
-            taskOperationType.options[4].text = t['op_cash'] || '💵 كاش';
-        }
-        
-        var btnSave = document.getElementById('btnSave');
-        if (btnSave && editIdx === -1) {
-            btnSave.innerHTML = t['save_btn'];
-        } else if (btnSave && editIdx > -1) {
-            btnSave.innerHTML = t['update_btn'];
-        }
-        
-        var htmlTag = document.getElementById('htmlTag');
-        if (currentLang === 'ar') { 
-            htmlTag.setAttribute('dir', 'rtl'); 
-            htmlTag.setAttribute('lang', 'ar'); 
-        } else { 
-            htmlTag.setAttribute('dir', 'ltr'); 
-            htmlTag.setAttribute('lang', 'en'); 
-        }
-        
-        var langBtn = document.getElementById('langBtn'); 
-        if (langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
-        
-        var clearFiltersBtn = document.querySelector('#tasksTab .task-filter-bar button');
-        if (clearFiltersBtn && t['clear_filters']) clearFiltersBtn.innerHTML = t['clear_filters'];
-        
-        updateSyncStatusUI();
-    }
-    
-    _0x3d2a['toggle'] = function(){ 
-        currentLang = currentLang === 'en' ? 'ar' : 'en'; 
-        localStorage.setItem('appLang', currentLang);
-        updateUILanguage(); 
-        _0x3d2a['fillClients']();
-        _0x3d2a['updateAgentList']();
-        _0x3d2a['updateTaskClientFilter']();
-        _0x3d2a['renderTasks']();
+    return types[type] || type;
+}
+
+function getOperationTypeClass(type) {
+    var classes = {
+        'quotation': 'op-quotation',
+        'followup': 'op-followup',
+        'supply': 'op-supply',
+        'bank': 'op-bank',
+        'cash': 'op-cash'
     };
-    
-    // Firebase Configuration
-    var _0xkey = atob("QUl6YVN5Q2gzd0ZQbzdtVmVCX2NjdWZXNUx5S2dQRm9lU08wSjAw");
-    var _0xdb = atob("aHR0cHM6Ly9jcm0tYW5kLXRhc2tzLTlmN2MzLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbQ==");
-    var firebaseConfig = {
-        apiKey: _0xkey, authDomain: "crm-and-tasks-9f7c3.firebaseapp.com", databaseURL: _0xdb,
-        projectId: "crm-and-tasks-9f7c3", storageBucket: "crm-and-tasks-9f7c3.firebasestorage.app",
-        messagingSenderId: "762341152156", appId: "1:762341152156:web:91d417128226fc8708a459"
+    return classes[type] || 'op-quotation';
+}
+
+function updateSyncStatusUI() {
+    var indicator = document.getElementById('syncStatusIndicator');
+    var textSpan = document.getElementById('syncStatusText');
+    if (!indicator) return;
+    if (isSyncing) {
+        indicator.className = 'sync-status syncing';
+        if(textSpan) textSpan.innerText = 'جاري المزامنة...';
+    } else if (isOnline) {
+        indicator.className = 'sync-status online';
+        if(textSpan) textSpan.innerText = 'متصل | متزامن';
+    } else {
+        indicator.className = 'sync-status offline';
+        if(textSpan) textSpan.innerText = 'غير متصل (أوفلاين)';
+    }
+}
+
+function updateUILanguage() {
+    var t = translations[currentLang];
+    var elements = {
+        'm_crm': 'm_crm', 'm_tasks': 'm_tasks', 'm_dash': 'm_dash', 'm_profile': 'm_profile',
+        'm_recycle': 'm_recycle', 'm_admin': 'm_admin', 'm_logout': 'm_logout', 'h_crm': 'h_crm',
+        'h_dash': 'h_dash', 'h_tasks': 'h_tasks', 'recycleTitle': 'recycleTitle', 'adminTitle': 'adminTitle',
+        'usersTitle': 'usersTitle', 'logsTitle': 'logsTitle', 'profileTitle': 'profileTitle',
+        'loginTitle': 'loginTitle', 'loginSubtitle': 'loginSubtitle', 'loginBtn': 'loginBtn',
+        'statTotalLabel': 'statTotalLabel', 'statVipLabel': 'statVipLabel', 'statCompLabel': 'statCompLabel',
+        'statusChartLabel': 'statusChartLabel', 'geoChartLabel': 'geoChartLabel', 'taskClientHeader': 'taskClientHeader',
+        'taskTextHeader': 'taskTextHeader', 'taskNotesHeader': 'taskNotesHeader', 'taskDateHeader': 'taskDateHeader',
+        'taskActionHeader': 'taskActionHeader', 'taskStatusHeader': 'taskStatusHeader',
+        'recycleNameHeader': 'recycleNameHeader', 'recyclePhoneHeader': 'recyclePhoneHeader',
+        'recycleStatusHeader': 'recycleStatusHeader', 'recycleRestoreHeader': 'recycleRestoreHeader',
+        'recycleDeleteHeader': 'recycleDeleteHeader', 'registerBtn': 'registerBtn', 'updatePassBtn': 'updatePassBtn',
+        'changePassLabel': 'changePassLabel', 'loggedInAs': 'loggedInAs', 'kpiConversion': 'kpiConversion',
+        'kpiFollowUp': 'kpiFollowUp', 'kpiForecast': 'kpiForecast', 'kpiTopAgent': 'kpiTopAgent',
+        'aiInsightLabel': 'aiInsightLabel', 'enableNotifBtn': 'enableNotifBtn', 'manualSyncBtn': 'manualSyncBtn',
+        'usersTableUser': 'usersTableUser', 'usersTablePass': 'usersTablePass', 'usersTableName': 'usersTableName',
+        'usersTableRole': 'usersTableRole', 'usersTableAction': 'usersTableAction', 'thName': 'thName',
+        'thPhone': 'thPhone', 'thGov': 'thGov', 'thPriority': 'thPriority', 'thStatus': 'thStatus', 'thActions': 'thActions',
+        'taskTypeHeader': 'taskTypeHeader', 'taskAmountHeader': 'taskAmountHeader'
     };
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.database();
+    for (var id in elements) { 
+        var el = document.getElementById(id); 
+        if (el && t[id]) el.innerText = t[id]; 
+    }
     
-    // IndexedDB - تحديث هيكل التخزين ليشمل الحقول الجديدة
-    var localDB = new Dexie("UtopiaCRMOffline");
-    localDB.version(2).stores({
-        clients: "++id, name, phone, status, timestamp",
-        tasks: "++id, client, text, operationType, amount, taskNotes, date, completed, completedAt",
-        deletedClients: "++id, name, phone",
-        users: "++id, u"
-    }).upgrade(function(trans) {
-        return trans.tasks.toCollection().modify(function(task) {
-            if (!task.operationType) task.operationType = 'quotation';
-            if (task.amount === undefined) task.amount = null;
-            if (!task.taskNotes) task.taskNotes = '';
-        });
+    var searchInput = document.getElementById('search'); if (searchInput) searchInput.placeholder = t['search_placeholder'];
+    var advancedSearch = document.getElementById('advancedSearch'); if (advancedSearch) advancedSearch.placeholder = t['advanced_search'];
+    var taskSearch = document.getElementById('taskSearch'); if (taskSearch) taskSearch.placeholder = t['search_tasks'];
+    var nameInput = document.getElementById('name'); if (nameInput) nameInput.placeholder = t['name_placeholder'];
+    var phoneInput = document.getElementById('phone'); if (phoneInput) phoneInput.placeholder = t['phone_placeholder'];
+    var agentInput = document.getElementById('agent'); if (agentInput) agentInput.placeholder = t['agent_placeholder'];
+    var notesArea = document.getElementById('notes'); if (notesArea) notesArea.placeholder = t['notes_placeholder'];
+    var taskTextInput = document.getElementById('taskText'); if (taskTextInput) taskTextInput.placeholder = t['task_text_placeholder'];
+    var taskNotesArea = document.getElementById('taskNotes'); if (taskNotesArea) taskNotesArea.placeholder = t['task_notes_placeholder'];
+    var extraInfoArea = document.getElementById('extraInfo'); if (extraInfoArea) extraInfoArea.placeholder = t['task_extra_placeholder'];
+    var newUInput = document.getElementById('newU'); if (newUInput) newUInput.placeholder = t['username_placeholder'];
+    var newPInput = document.getElementById('newP'); if (newPInput) newPInput.placeholder = t['password_placeholder'];
+    var newDInput = document.getElementById('newD'); if (newDInput) newDInput.placeholder = t['fullname_placeholder'];
+    var changePassInput = document.getElementById('changePassInput'); if (changePassInput) changePassInput.placeholder = t['change_pass_label'];
+    var voiceBtn = document.getElementById('voiceBtn'); if (voiceBtn) voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + t['voice_search'];
+    
+    var refreshRecycleBtn = document.querySelector('#recycleTab .recycle-header button:first-child');
+    if (refreshRecycleBtn && t['refresh_recycle']) refreshRecycleBtn.innerHTML = t['refresh_recycle'];
+    
+    var clearAllRecycleBtn = document.getElementById('clearAllRecycleBtn');
+    if (clearAllRecycleBtn && t['clear_all_recycle']) clearAllRecycleBtn.innerHTML = t['clear_all_recycle'];
+    
+    var filterStatus = document.getElementById('filterStatus');
+    if (filterStatus) {
+        filterStatus.options[0].text = t['filter_all']; 
+        filterStatus.options[1].text = 'Interested';
+        filterStatus.options[2].text = 'In Progress';
+        filterStatus.options[3].text = 'Hold';
+        filterStatus.options[4].text = 'Completed';
+        filterStatus.options[5].text = 'VIP';
+    }
+    
+    var taskFilterStatus = document.getElementById('taskFilterStatus');
+    if (taskFilterStatus) {
+        taskFilterStatus.options[0].text = t['all_task_statuses'];
+        taskFilterStatus.options[1].text = t['task_status_pending'];
+        taskFilterStatus.options[2].text = t['task_status_completed'];
+        taskFilterStatus.options[3].text = t['task_status_overdue'];
+    }
+    
+    var filterGov = document.getElementById('filterGov');
+    if (filterGov && filterGov.options.length > 0) {
+        filterGov.options[0].text = t['all_governorates'];
+    }
+    
+    var filterAgent = document.getElementById('filterAgent');
+    if (filterAgent && filterAgent.options.length > 0) {
+        filterAgent.options[0].text = t['all_agents'];
+    }
+    
+    var filterPriority = document.getElementById('filterPriority');
+    if (filterPriority) {
+        filterPriority.options[0].text = t['all_priorities'];
+        filterPriority.options[1].text = t['high_priority'];
+        filterPriority.options[2].text = t['medium_priority'];
+        filterPriority.options[3].text = t['low_priority'];
+    }
+    
+    var newRole = document.getElementById('newR');
+    if (newRole) { 
+        newRole.options[0].text = t['role_user']; 
+        newRole.options[1].text = t['role_admin']; 
+    }
+    
+    var taskFilterOperationType = document.getElementById('taskFilterOperationType');
+    if (taskFilterOperationType) {
+        taskFilterOperationType.options[0].text = t['all_task_statuses'] || 'كل الحالات';
+        taskFilterOperationType.options[1].text = t['op_quotation'] || '📄 طلب عرض سعر';
+        taskFilterOperationType.options[2].text = t['op_followup'] || '👀 متابعة عرض سعر';
+        taskFilterOperationType.options[3].text = t['op_supply'] || '🚚 توريد';
+        taskFilterOperationType.options[4].text = t['op_bank'] || '🏦 بنك';
+        taskFilterOperationType.options[5].text = t['op_cash'] || '💵 كاش';
+    }
+    
+    var taskOperationType = document.getElementById('taskOperationType');
+    if (taskOperationType) {
+        taskOperationType.options[0].text = t['op_quotation'] || '📄 طلب عرض سعر';
+        taskOperationType.options[1].text = t['op_followup'] || '👀 متابعة عرض سعر';
+        taskOperationType.options[2].text = t['op_supply'] || '🚚 توريد';
+        taskOperationType.options[3].text = t['op_bank'] || '🏦 بنك';
+        taskOperationType.options[4].text = t['op_cash'] || '💵 كاش';
+    }
+    
+    var btnSave = document.getElementById('btnSave');
+    if (btnSave && editIdx === -1) {
+        btnSave.innerHTML = t['save_btn'];
+    } else if (btnSave && editIdx > -1) {
+        btnSave.innerHTML = t['update_btn'];
+    }
+    
+    var htmlTag = document.getElementById('htmlTag');
+    if (currentLang === 'ar') { 
+        htmlTag.setAttribute('dir', 'rtl'); 
+        htmlTag.setAttribute('lang', 'ar'); 
+    } else { 
+        htmlTag.setAttribute('dir', 'ltr'); 
+        htmlTag.setAttribute('lang', 'en'); 
+    }
+    
+    var langBtn = document.getElementById('langBtn'); 
+    if (langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
+    
+    var clearFiltersBtn = document.querySelector('#tasksTab .task-filter-bar button');
+    if (clearFiltersBtn && t['clear_filters']) clearFiltersBtn.innerHTML = t['clear_filters'];
+    
+    updateSyncStatusUI();
+}
+
+window._0x3d2a.toggle = function(){ 
+    currentLang = currentLang === 'en' ? 'ar' : 'en'; 
+    localStorage.setItem('appLang', currentLang);
+    updateUILanguage(); 
+    window._0x3d2a.fillClients();
+    window._0x3d2a.updateAgentList();
+    window._0x3d2a.updateTaskClientFilter();
+    window._0x3d2a.renderTasks();
+};
+
+// دالة إضافة بيانات تجريبية
+window._0x3d2a.addDemoData = function() {
+    if (confirm("⚠️ هل تريد إضافة بيانات تجريبية؟ سيتم إضافة 5 عملاء و4 مهام كبيانات تجريبية.")) {
+        // إضافة العملاء التجريبيين
+        for (var i = 0; i < demoClients.length; i++) {
+            clients.push(demoClients[i]);
+        }
+        
+        // إضافة المهام التجريبية
+        for (var i = 0; i < demoTasks.length; i++) {
+            tasks.push(demoTasks[i]);
+        }
+        
+        // حفظ البيانات
+        window._0x3d2a.saveToLocalDB('clients', clients);
+        window._0x3d2a.saveToLocalDB('tasks', tasks);
+        
+        // تحديث الواجهة
+        window._0x3d2a.renderCRM();
+        window._0x3d2a.renderTasks();
+        window._0x3d2a.updateDash();
+        window._0x3d2a.updateGeo();
+        window._0x3d2a.updateAIInsights();
+        window._0x3d2a.fillClients();
+        window._0x3d2a.updateAgentList();
+        window._0x3d2a.updateTaskClientFilter();
+        
+        window._0x3d2a.showToast('✅ تم إضافة البيانات التجريبية بنجاح!', 'success');
+    }
+};
+
+// IndexedDB
+var localDB = new Dexie("UtopiaCRMOffline");
+localDB.version(2).stores({
+    clients: "++id, name, phone, status, timestamp",
+    tasks: "++id, client, text, operationType, amount, taskNotes, date, completed, completedAt",
+    deletedClients: "++id, name, phone",
+    users: "++id, u"
+}).upgrade(function(trans) {
+    return trans.tasks.toCollection().modify(function(task) {
+        if (!task.operationType) task.operationType = 'quotation';
+        if (task.amount === undefined) task.amount = null;
+        if (!task.taskNotes) task.taskNotes = '';
     });
-    
-    async function syncFromFirebase() {
-        if (!isOnline || isSyncing) return;
-        isSyncing = true;
-        updateSyncStatusUI();
+});
+
+async function syncFromFirebase() {
+    // تم تعطيل Firebase مؤقتاً للسماح بالعمل المحلي
+    console.log("Firebase sync disabled - working offline");
+    return;
+}
+
+async function syncToFirebase() {
+    console.log("Firebase sync disabled - working offline");
+    return;
+}
+
+async function fullSync() {
+    console.log("Full sync - working offline");
+    await loadDataFromLocalDB();
+    window._0x3d2a.renderCRM();
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.renderRecycle();
+    window._0x3d2a.renderUsers();
+    window._0x3d2a.updateDash();
+    window._0x3d2a.updateGeo();
+    window._0x3d2a.updateAIInsights();
+    window._0x3d2a.fillClients();
+    window._0x3d2a.updateTaskClientFilter();
+}
+
+async function loadDataFromLocalDB() {
+    try {
+        clients = await localDB.clients.toArray() || [];
+        tasks = await localDB.tasks.toArray() || [];
+        deletedClients = await localDB.deletedClients.toArray() || [];
+        var usersArray = await localDB.users.toArray() || [];
+        
+        if (usersArray.length === 0) {
+            await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+            usersArray = await localDB.users.toArray();
+        }
+        
+        authSystem.users = usersArray;
+        console.log("Data loaded - Clients:", clients.length, "Tasks:", tasks.length, "Deleted:", deletedClients.length, "Users:", authSystem.users.length);
+        
+        // إذا كانت البيانات فارغة، أضف بيانات تجريبية تلقائياً
+        if (clients.length === 0 && tasks.length === 0) {
+            console.log("No data found, adding demo data automatically");
+            for (var i = 0; i < demoClients.length; i++) {
+                clients.push(demoClients[i]);
+            }
+            for (var i = 0; i < demoTasks.length; i++) {
+                tasks.push(demoTasks[i]);
+            }
+            await window._0x3d2a.saveToLocalDB('clients', clients);
+            await window._0x3d2a.saveToLocalDB('tasks', tasks);
+        }
+    } catch (err) {
+        console.error("Error loading from IndexedDB:", err);
+        clients = [];
+        tasks = [];
+        deletedClients = [];
         try {
-            var clientsSnapshot = await db.ref('clients').once('value');
-            var firebaseClients = clientsSnapshot.val() ? Object.values(clientsSnapshot.val()) : [];
+            await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+            authSystem.users = await localDB.users.toArray();
+        } catch(e) {
+            console.error("Failed to add default users:", e);
+            authSystem.users = defaultUsers;
+        }
+    }
+}
+
+window._0x3d2a.saveToLocalDB = async function(type, data) {
+    try {
+        if (type === 'clients') {
             await localDB.clients.clear();
-            if (firebaseClients.length > 0) {
-                await localDB.clients.bulkAdd(firebaseClients.map(c => ({ ...c, id: c.timestamp || Date.now() })));
-            }
-            
-            var tasksSnapshot = await db.ref('tasks').once('value');
-            var firebaseTasks = tasksSnapshot.val() ? Object.values(tasksSnapshot.val()) : [];
+            if (data.length > 0) await localDB.clients.bulkAdd(data);
+        } else if (type === 'tasks') {
             await localDB.tasks.clear();
-            if (firebaseTasks.length > 0) {
-                await localDB.tasks.bulkAdd(firebaseTasks.map(t => ({ ...t, id: t.timestamp || Date.now(), completed: t.completed || false, operationType: t.operationType || 'quotation', amount: t.amount || null, taskNotes: t.taskNotes || '' })));
-            }
-            
-            var deletedSnapshot = await db.ref('deletedClients').once('value');
-            var firebaseDeleted = deletedSnapshot.val() ? Object.values(deletedSnapshot.val()) : [];
+            if (data.length > 0) await localDB.tasks.bulkAdd(data);
+        } else if (type === 'deletedClients') {
             await localDB.deletedClients.clear();
-            if (firebaseDeleted.length > 0) {
-                await localDB.deletedClients.bulkAdd(firebaseDeleted.map(d => ({ ...d, id: d.timestamp || Date.now() })));
-            }
-            
-            var usersSnapshot = await db.ref('authSystem/users').once('value');
-            var firebaseUsers = usersSnapshot.val() ? Object.values(usersSnapshot.val()) : [];
+            if (data.length > 0) await localDB.deletedClients.bulkAdd(data);
+        } else if (type === 'users') {
             await localDB.users.clear();
-            if (firebaseUsers.length > 0) {
-                await localDB.users.bulkAdd(firebaseUsers.map(u => ({ ...u, id: u.u || Date.now() })));
-            } else {
-                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
-            }
-            
-            _0x3d2a['showToast']('✅ تمت المزامنة من السحابة بنجاح', 'success');
-        } catch (err) {
-            console.error("Sync error:", err);
-            _0x3d2a['showToast']('⚠️ فشل المزامنة من السحابة، سيتم العمل محلياً', 'warning');
-            var localUsers = await localDB.users.toArray();
-            if (localUsers.length === 0) {
-                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
-            }
-        } finally {
-            isSyncing = false;
-            updateSyncStatusUI();
+            if (data.length > 0) await localDB.users.bulkAdd(data);
+            authSystem.users = data;
         }
+    } catch (err) {
+        console.error("Error saving to IndexedDB:", err);
+    }
+};
+
+window.addEventListener('online', async function() {
+    isOnline = true;
+    window._0x3d2a.showToast('🌐 تم استعادة الاتصال بالإنترنت', 'success');
+    updateSyncStatusUI();
+});
+window.addEventListener('offline', function() {
+    isOnline = false;
+    window._0x3d2a.showToast('📡 لا يوجد إنترنت - ستعمل بشكل أوفلاين', 'warning');
+    updateSyncStatusUI();
+});
+
+window._0x3d2a.manualSync = async function() { 
+    await fullSync(); 
+    window._0x3d2a.showToast('✅ تمت المزامنة بنجاح', 'success');
+};
+
+function startPeriodicSync() {
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(() => {
+        if (isOnline && !isSyncing) { fullSync(); }
+    }, 30000);
+}
+
+window._0x3d2a.notify = function(msg, type) {
+    var notificationDiv = document.getElementById('notification');
+    if(notificationDiv){
+        notificationDiv.innerText = msg;
+        notificationDiv.style.backgroundColor = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--info)');
+        notificationDiv.style.display = 'block';
+        setTimeout(function(){ notificationDiv.style.display = 'none'; }, 3000);
+    }
+    window._0x3d2a.showToast(msg, type);
+};
+
+window._0x3d2a.check = async function(){
+    var u = document.getElementById('userInput').value.trim();
+    var p = document.getElementById('passInput').value.trim();
+    document.getElementById('loginError').style.display = 'none';
+    
+    if(u === "admin" && p === "@Mody6699"){
+        window._0x3d2a.loginSuccess("admin", "Master Admin", -1);
+        return;
     }
     
-    async function syncToFirebase() {
-        if (!isOnline || isSyncing) return;
-        isSyncing = true;
-        updateSyncStatusUI();
-        try {
-            var localClients = await localDB.clients.toArray();
-            var localTasks = await localDB.tasks.toArray();
-            var localDeleted = await localDB.deletedClients.toArray();
-            var localUsers = await localDB.users.toArray();
-            
-            await db.ref('clients').set(localClients);
-            await db.ref('tasks').set(localTasks);
-            await db.ref('deletedClients').set(localDeleted);
-            await db.ref('authSystem/users').set(localUsers);
-            
-            _0x3d2a['showToast']('✅ تم رفع البيانات إلى السحابة بنجاح', 'success');
-        } catch (err) {
-            console.error("Sync to Firebase error:", err);
-            _0x3d2a['showToast']('⚠️ فشل رفع البيانات إلى السحابة', 'error');
-        } finally {
-            isSyncing = false;
-            updateSyncStatusUI();
-        }
-    }
-    
-    async function fullSync() {
-        if (!isOnline) {
-            _0x3d2a['showToast']('⚠️ لا يوجد اتصال بالإنترنت، سيتم المزامنة تلقائياً عند عودة الاتصال', 'warning');
-            return;
-        }
-        if (isSyncing) {
-            _0x3d2a['showToast']('⏳ المزامنة قيد التنفيذ بالفعل...', 'info');
-            return;
-        }
-        await syncFromFirebase();
-        await syncToFirebase();
+    if (authSystem.users.length === 0) {
         await loadDataFromLocalDB();
-        _0x3d2a['renderCRM']();
-        _0x3d2a['renderTasks']();
-        _0x3d2a['renderRecycle']();
-        _0x3d2a['renderUsers']();
-        _0x3d2a['updateDash']();
-        _0x3d2a['updateGeo']();
-        _0x3d2a['updateAIInsights']();
-        _0x3d2a['fillClients']();
-        _0x3d2a['updateTaskClientFilter']();
     }
     
-    async function loadDataFromLocalDB() {
-        try {
-            clients = await localDB.clients.toArray() || [];
-            tasks = await localDB.tasks.toArray() || [];
-            deletedClients = await localDB.deletedClients.toArray() || [];
-            var usersArray = await localDB.users.toArray() || [];
-            
-            if (usersArray.length === 0) {
-                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
-                usersArray = await localDB.users.toArray();
-            }
-            
-            authSystem.users = usersArray;
-            console.log("Data loaded - Clients:", clients.length, "Tasks:", tasks.length, "Deleted:", deletedClients.length, "Users:", authSystem.users.length);
-        } catch (err) {
-            console.error("Error loading from IndexedDB:", err);
-            clients = [];
-            tasks = [];
-            deletedClients = [];
-            try {
-                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
-                authSystem.users = await localDB.users.toArray();
-            } catch(e) {
-                console.error("Failed to add default users:", e);
-                authSystem.users = defaultUsers;
-            }
-        }
+    var users = authSystem.users;
+    var found = users.find(function(acc){ return acc && acc.u && acc.u.toString().trim() === u && acc.p.toString().trim() === p; });
+    
+    if(found){
+        window._0x3d2a.loginSuccess(found.role, found.displayName, users.indexOf(found));
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        window._0x3d2a.play('soundAlert');
     }
-    
-    async function saveToLocalDB(type, data) {
-        try {
-            if (type === 'clients') {
-                await localDB.clients.clear();
-                if (data.length > 0) await localDB.clients.bulkAdd(data);
-            } else if (type === 'tasks') {
-                await localDB.tasks.clear();
-                if (data.length > 0) await localDB.tasks.bulkAdd(data);
-            } else if (type === 'deletedClients') {
-                await localDB.deletedClients.clear();
-                if (data.length > 0) await localDB.deletedClients.bulkAdd(data);
-            } else if (type === 'users') {
-                await localDB.users.clear();
-                if (data.length > 0) await localDB.users.bulkAdd(data);
-                authSystem.users = data;
-            }
-            if (isOnline && !isSyncing) {
-                setTimeout(() => { syncToFirebase(); }, 2000);
-            }
-        } catch (err) {
-            console.error("Error saving to IndexedDB:", err);
-        }
+};
+
+window._0x3d2a.loginSuccess = function(role, name, idx){
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('userRole', role);
+    sessionStorage.setItem('userDisplayName', name);
+    sessionStorage.setItem('userIdx', idx);
+    logs.push({ user: name, action: "Logged in", time: new Date().toLocaleString() });
+    window._0x3d2a.play('soundSuccess');
+    setTimeout(function(){ location.reload(); }, 300);
+};
+
+window._0x3d2a.out = function(){
+    if(confirm("Confirm logout?")){
+        sessionStorage.clear();
+        location.reload();
     }
-    
-    window.addEventListener('online', async function() {
-        isOnline = true;
-        _0x3d2a['showToast']('🌐 تم استعادة الاتصال بالإنترنت، جاري المزامنة التلقائية...', 'success');
-        updateSyncStatusUI();
-        await fullSync();
-    });
-    window.addEventListener('offline', function() {
-        isOnline = false;
-        _0x3d2a['showToast']('📡 لا يوجد إنترنت - ستعمل بشكل أوفلاين، وسيتم المزامنة عند عودة الاتصال', 'warning');
-        updateSyncStatusUI();
-    });
-    
-    _0x3d2a['manualSync'] = async function() { await fullSync(); };
-    
-    function startPeriodicSync() {
-        if (syncInterval) clearInterval(syncInterval);
-        syncInterval = setInterval(() => {
-            if (isOnline && !isSyncing) { fullSync(); }
-        }, 30000);
+};
+
+window._0x3d2a.analyzeSentiment = function(text) {
+    if (!text || text.length < 5) { 
+        var sentimentDiv = document.getElementById('sentimentResult');
+        if(sentimentDiv) sentimentDiv.style.display = 'none'; 
+        return; 
     }
-    
-    // دالة الإشعار الأساسية
-    _0x3d2a['notify'] = function(msg, type) {
-        var notificationDiv = document.getElementById('notification');
-        if(notificationDiv){
-            notificationDiv.innerText = msg;
-            notificationDiv.style.backgroundColor = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--info)');
-            notificationDiv.style.display = 'block';
-            setTimeout(function(){ notificationDiv.style.display = 'none'; }, 3000);
-        }
-        _0x3d2a['showToast'](msg, type);
-    };
-    
-    _0x3d2a['check'] = async function(){
-        var u = document.getElementById('userInput').value.trim();
-        var p = document.getElementById('passInput').value.trim();
-        document.getElementById('loginError').style.display = 'none';
-        
-        if(u === "admin" && p === "@Mody6699"){
-            _0x3d2a['loginSuccess']("admin", "Master Admin", -1);
-            return;
-        }
-        
-        if (authSystem.users.length === 0) {
-            await loadDataFromLocalDB();
-        }
-        
-        var users = authSystem.users;
-        var found = users.find(function(acc){ return acc && acc.u && acc.p && acc.u.toString().trim() === u && acc.p.toString().trim() === p; });
-        
-        if(found){
-            _0x3d2a['loginSuccess'](found.role, found.displayName, users.indexOf(found));
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-            _0x3d2a['play']('soundAlert');
-        }
-    };
-    
-    _0x3d2a['loginSuccess'] = function(role, name, idx){
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userRole', role);
-        sessionStorage.setItem('userDisplayName', name);
-        sessionStorage.setItem('userIdx', idx);
-        logs.push({ user: name, action: "Logged in", time: new Date().toLocaleString() });
-        _0x3d2a['play']('soundSuccess');
-        setTimeout(function(){ location.reload(); }, 300);
-    };
-    
-    _0x3d2a['out'] = function(){
-        if(confirm("Confirm logout?")){
-            sessionStorage.clear();
-            location.reload();
-        }
-    };
-    
-    _0x3d2a['analyzeSentiment'] = function(text) {
-        if (!text || text.length < 5) { document.getElementById('sentimentResult').style.display = 'none'; return; }
-        var positive = ['مهتم', 'موافق', 'رائع', 'ممتاز', 'شكرا', 'نعم', 'متحمس', 'جاهز', 'اتفق', 'رائعة', 'جيد', 'great', 'good', 'excellent', 'interested', 'agree', 'ready'];
-        var negative = ['لا', 'مش مهتم', 'رفض', 'غالي', 'مكلف', 'سيء', 'صعب', 'مشكلة', 'متعب', 'لاحقا', 'no', 'not interested', 'refuse', 'expensive', 'bad', 'problem', 'later', 'busy'];
-        var lowerText = text.toLowerCase();
-        var posScore = positive.filter(word => lowerText.includes(word)).length;
-        var negScore = negative.filter(word => lowerText.includes(word)).length;
-        var sentiment = posScore > negScore ? 'positive' : (negScore > posScore ? 'negative' : 'neutral');
-        var sentimentText = sentiment === 'positive' ? '😊 إيجابي' : (sentiment === 'negative' ? '😞 سلبي' : '😐 محايد');
-        var sentimentColor = sentiment === 'positive' ? '#28a745' : (sentiment === 'negative' ? '#dc3545' : '#ffcc00');
-        var resultDiv = document.getElementById('sentimentResult');
+    var positive = ['مهتم', 'موافق', 'رائع', 'ممتاز', 'شكرا', 'نعم', 'متحمس', 'جاهز', 'اتفق', 'رائعة', 'جيد', 'great', 'good', 'excellent', 'interested', 'agree', 'ready'];
+    var negative = ['لا', 'مش مهتم', 'رفض', 'غالي', 'مكلف', 'سيء', 'صعب', 'مشكلة', 'متعب', 'لاحقا', 'no', 'not interested', 'refuse', 'expensive', 'bad', 'problem', 'later', 'busy'];
+    var lowerText = text.toLowerCase();
+    var posScore = positive.filter(word => lowerText.includes(word)).length;
+    var negScore = negative.filter(word => lowerText.includes(word)).length;
+    var sentiment = posScore > negScore ? 'positive' : (negScore > posScore ? 'negative' : 'neutral');
+    var sentimentText = sentiment === 'positive' ? '😊 إيجابي' : (sentiment === 'negative' ? '😞 سلبي' : '😐 محايد');
+    var sentimentColor = sentiment === 'positive' ? '#28a745' : (sentiment === 'negative' ? '#dc3545' : '#ffcc00');
+    var resultDiv = document.getElementById('sentimentResult');
+    if(resultDiv) {
         resultDiv.innerHTML = '🧠 تحليل المشاعر: ' + sentimentText;
         resultDiv.style.backgroundColor = sentimentColor + '20';
         resultDiv.style.borderLeft = '4px solid ' + sentimentColor;
         resultDiv.style.display = 'block';
-        return sentiment;
-    };
-    
-    _0x3d2a['aiSuggestStatus'] = function() {
-        var name = document.getElementById('name').value;
-        var notes = document.getElementById('notes').value;
-        var phone = document.getElementById('phone').value;
-        if (!name) { _0x3d2a['showToast']('⚠️ أدخل اسم العميل أولاً', 'warning'); return; }
-        var score = 0;
-        var suggestedStatus = 'Interested';
-        if (notes) {
-            var lowerNotes = notes.toLowerCase();
-            if (lowerNotes.includes('مستعجل') || lowerNotes.includes('urgent') || lowerNotes.includes('فوري')) score += 25;
-            if (lowerNotes.includes('صفقة') || lowerNotes.includes('deal') || lowerNotes.includes('اتفاق')) score += 30;
-            if (lowerNotes.includes('شيك') || lowerNotes.includes('دفع') || lowerNotes.includes('cash')) score += 20;
-            if (lowerNotes.includes('معارض') || lowerNotes.includes('منافس')) score -= 15;
-        }
-        if (phone && phone.length >= 10) score += 10;
-        if (score >= 60) suggestedStatus = 'VIP';
-        else if (score >= 40) suggestedStatus = 'In Progress';
-        else if (score <= 10) suggestedStatus = 'Hold';
-        document.getElementById('status').value = suggestedStatus;
-        _0x3d2a['showToast'](`🤖 AI يقترح حالة: ${suggestedStatus} (نسبة الثقة: ${score}%)`, 'info');
-        var recDiv = document.getElementById('aiRecommendations');
+    }
+    return sentiment;
+};
+
+window._0x3d2a.aiSuggestStatus = function() {
+    var name = document.getElementById('name').value;
+    var notes = document.getElementById('notes').value;
+    var phone = document.getElementById('phone').value;
+    if (!name) { window._0x3d2a.showToast('⚠️ أدخل اسم العميل أولاً', 'warning'); return; }
+    var score = 0;
+    var suggestedStatus = 'Interested';
+    if (notes) {
+        var lowerNotes = notes.toLowerCase();
+        if (lowerNotes.includes('مستعجل') || lowerNotes.includes('urgent') || lowerNotes.includes('فوري')) score += 25;
+        if (lowerNotes.includes('صفقة') || lowerNotes.includes('deal') || lowerNotes.includes('اتفاق')) score += 30;
+        if (lowerNotes.includes('شيك') || lowerNotes.includes('دفع') || lowerNotes.includes('cash')) score += 20;
+        if (lowerNotes.includes('معارض') || lowerNotes.includes('منافس')) score -= 15;
+    }
+    if (phone && phone.length >= 10) score += 10;
+    if (score >= 60) suggestedStatus = 'VIP';
+    else if (score >= 40) suggestedStatus = 'In Progress';
+    else if (score <= 10) suggestedStatus = 'Hold';
+    document.getElementById('status').value = suggestedStatus;
+    window._0x3d2a.showToast(`🤖 AI يقترح حالة: ${suggestedStatus} (نسبة الثقة: ${score}%)`, 'info');
+    var recDiv = document.getElementById('aiRecommendations');
+    if(recDiv) {
         recDiv.innerHTML = `💡 <strong>توصية الذكاء الاصطناعي:</strong> بناءً على البيانات المدخلة، يُفضل متابعة هذا العميل كـ "${suggestedStatus}"`;
         recDiv.style.display = 'block';
         setTimeout(() => { recDiv.style.display = 'none'; }, 8000);
-    };
+    }
+};
+
+window._0x3d2a.calculateWinProbability = function(client) {
+    if (!client) return 0;
+    var probability = 30;
+    switch(client.status) {
+        case 'VIP': probability += 45; break;
+        case 'Completed': probability += 50; break;
+        case 'In Progress': probability += 25; break;
+        case 'Interested': probability += 15; break;
+        case 'Hold': probability -= 20; break;
+    }
+    if (client.notes) {
+        var notes = client.notes.toLowerCase();
+        if (notes.includes('اتفاق') || notes.includes('deal')) probability += 20;
+        if (notes.includes('متابعة') || notes.includes('follow')) probability += 10;
+        if (notes.includes('مشكلة') || notes.includes('شكوى')) probability -= 15;
+    }
+    var highGovs = ['Cairo', 'Giza', 'Alexandria'];
+    if (client.gov && highGovs.includes(client.gov)) probability += 5;
+    return Math.min(95, Math.max(5, probability));
+};
+
+window._0x3d2a.predictClientBehavior = function(client) {
+    var prob = window._0x3d2a.calculateWinProbability(client);
+    if (prob >= 70) return { priority: 'high', text: 'عالية - متابعة فورية', daysToFollow: 1 };
+    if (prob >= 40) return { priority: 'medium', text: 'متوسطة - متابعة أسبوعية', daysToFollow: 7 };
+    return { priority: 'low', text: 'منخفضة - متابعة شهرية', daysToFollow: 30 };
+};
+
+window._0x3d2a.updateAdvancedKPIs = function() {
+    if (!clients.length) return;
+    var completed = clients.filter(c => c.status === 'Completed').length;
+    var conversionRate = ((completed / clients.length) * 100).toFixed(1);
+    var convRateEl = document.getElementById('conversionRate');
+    if(convRateEl) convRateEl.innerText = conversionRate + '%';
+    var conversionTrendEl = document.getElementById('conversionTrend');
+    if(conversionTrendEl) conversionTrendEl.innerHTML = conversionRate > 30 ? '<i class="fas fa-arrow-up trend-up"></i> جيد' : '<i class="fas fa-arrow-down trend-down"></i> يحتاج تحسين';
     
-    _0x3d2a['calculateWinProbability'] = function(client) {
-        if (!client) return 0;
-        var probability = 30;
-        switch(client.status) {
-            case 'VIP': probability += 45; break;
-            case 'Completed': probability += 50; break;
-            case 'In Progress': probability += 25; break;
-            case 'Interested': probability += 15; break;
-            case 'Hold': probability -= 20; break;
-        }
-        if (client.notes) {
-            var notes = client.notes.toLowerCase();
-            if (notes.includes('اتفاق') || notes.includes('deal')) probability += 20;
-            if (notes.includes('متابعة') || notes.includes('follow')) probability += 10;
-            if (notes.includes('مشكلة') || notes.includes('شكوى')) probability -= 15;
-        }
-        var highGovs = ['Cairo', 'Giza', 'Alexandria'];
-        if (client.gov && highGovs.includes(client.gov)) probability += 5;
-        return Math.min(95, Math.max(5, probability));
-    };
-    
-    _0x3d2a['predictClientBehavior'] = function(client) {
-        var prob = _0x3d2a['calculateWinProbability'](client);
-        if (prob >= 70) return { priority: 'high', text: 'عالية - متابعة فورية', daysToFollow: 1 };
-        if (prob >= 40) return { priority: 'medium', text: 'متوسطة - متابعة أسبوعية', daysToFollow: 7 };
-        return { priority: 'low', text: 'منخفضة - متابعة شهرية', daysToFollow: 30 };
-    };
-    
-    _0x3d2a['updateAdvancedKPIs'] = function() {
-        if (!clients.length) return;
-        var completed = clients.filter(c => c.status === 'Completed').length;
-        var conversionRate = ((completed / clients.length) * 100).toFixed(1);
-        document.getElementById('conversionRate').innerText = conversionRate + '%';
-        document.getElementById('conversionTrend').innerHTML = conversionRate > 30 ? '<i class="fas fa-arrow-up trend-up"></i> جيد' : '<i class="fas fa-arrow-down trend-down"></i> يحتاج تحسين';
-        var agentPerformance = {};
-        clients.forEach(c => { if (c.agent) { if (!agentPerformance[c.agent]) agentPerformance[c.agent] = { total: 0, completed: 0 }; agentPerformance[c.agent].total++; if (c.status === 'Completed') agentPerformance[c.agent].completed++; } });
-        var bestAgent = null; var bestScore = 0;
-        for (var agent in agentPerformance) { var score = (agentPerformance[agent].completed / agentPerformance[agent].total) * 100; if (score > bestScore) { bestScore = score; bestAgent = agent; } }
-        if (bestAgent) { document.getElementById('topAgent').innerText = bestAgent; document.getElementById('topAgentScore').innerHTML = `نسبة إنجاز: ${bestScore.toFixed(0)}%`; }
-        var nextWeekForecast = Math.round(clients.filter(c => _0x3d2a['calculateWinProbability'](c) >= 60).length * 0.4);
-        document.getElementById('nextWeekForecast').innerText = nextWeekForecast;
-    };
-    
-    _0x3d2a['checkSmartNotifications'] = function() {
-        var newNotifications = [];
-        clients.forEach(client => { var prediction = _0x3d2a['predictClientBehavior'](client); if (prediction.priority === 'high' && client.status !== 'Completed') { newNotifications.push(`🎯 عميل ذو أولوية عالية: ${client.name} - احتمالية إتمام الصفقة عالية`); } });
-        tasks.forEach(task => { if (task.date && new Date(task.date) < new Date() && !task.completed) { newNotifications.push(`⏰ مهمة متأخرة: ${task.text} - للعميل ${task.client}`); } });
-        if (newNotifications.length > 0 && notifications.length !== newNotifications.length) {
-            notifications = newNotifications;
-            var badge = document.getElementById('notificationBadge');
+    var agentPerformance = {};
+    clients.forEach(c => { if (c.agent) { if (!agentPerformance[c.agent]) agentPerformance[c.agent] = { total: 0, completed: 0 }; agentPerformance[c.agent].total++; if (c.status === 'Completed') agentPerformance[c.agent].completed++; } });
+    var bestAgent = null; var bestScore = 0;
+    for (var agent in agentPerformance) { var score = (agentPerformance[agent].completed / agentPerformance[agent].total) * 100; if (score > bestScore) { bestScore = score; bestAgent = agent; } }
+    if (bestAgent) { 
+        var topAgentEl = document.getElementById('topAgent');
+        if(topAgentEl) topAgentEl.innerText = bestAgent; 
+        var topAgentScoreEl = document.getElementById('topAgentScore');
+        if(topAgentScoreEl) topAgentScoreEl.innerHTML = `نسبة إنجاز: ${bestScore.toFixed(0)}%`; 
+    }
+    var nextWeekForecast = Math.round(clients.filter(c => window._0x3d2a.calculateWinProbability(c) >= 60).length * 0.4);
+    var nextWeekForecastEl = document.getElementById('nextWeekForecast');
+    if(nextWeekForecastEl) nextWeekForecastEl.innerText = nextWeekForecast;
+};
+
+window._0x3d2a.checkSmartNotifications = function() {
+    var newNotifications = [];
+    clients.forEach(client => { var prediction = window._0x3d2a.predictClientBehavior(client); if (prediction.priority === 'high' && client.status !== 'Completed') { newNotifications.push(`🎯 عميل ذو أولوية عالية: ${client.name} - احتمالية إتمام الصفقة عالية`); } });
+    tasks.forEach(task => { if (task.date && new Date(task.date) < new Date() && !task.completed) { newNotifications.push(`⏰ مهمة متأخرة: ${task.text} - للعميل ${task.client}`); } });
+    if (newNotifications.length > 0 && notifications.length !== newNotifications.length) {
+        notifications = newNotifications;
+        var badge = document.getElementById('notificationBadge');
+        if(badge) {
             badge.innerText = notifications.length;
             badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
-            if (Notification.permission === 'granted') { newNotifications.slice(0, 3).forEach(n => { new Notification('🔔 Utopia CRM', { body: n, icon: 'https://cdn-icons-png.flaticon.com/512/565/565547.png' }); }); }
         }
-    };
+        if (Notification.permission === 'granted') { newNotifications.slice(0, 3).forEach(n => { new Notification('🔔 Utopia CRM', { body: n, icon: 'https://cdn-icons-png.flaticon.com/512/565/565547.png' }); }); }
+    }
+};
+
+window._0x3d2a.showNotificationsPanel = function() {
+    if (notifications.length === 0) { window._0x3d2a.showToast('📭 لا توجد إشعارات جديدة', 'info'); return; }
+    var panel = document.createElement('div');
+    panel.style.cssText = 'position:fixed; top:80px; right:20px; width:350px; background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:30002; padding:15px; max-height:400px; overflow-y:auto;';
+    panel.innerHTML = '<h4 style="margin:0 0 10px 0; color:var(--primary)">🔔 الإشعارات</h4><hr>';
+    notifications.forEach(n => { panel.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">${n}</div>`; });
+    panel.innerHTML += '<button onclick="this.remove()" style="margin-top:10px; width:100%; padding:8px; background:var(--info); color:white; border:none; border-radius:10px;">إغلاق</button>';
+    document.body.appendChild(panel);
+};
+
+window._0x3d2a.enableDesktopNotifications = function() {
+    if (Notification.permission === 'granted') { window._0x3d2a.showToast('✅ الإشعارات مفعلة مسبقاً', 'success'); }
+    else if (Notification.permission !== 'denied') { Notification.requestPermission().then(perm => { if (perm === 'granted') { window._0x3d2a.showToast('🔔 تم تفعيل الإشعارات بنجاح', 'success'); } }); }
+    else { window._0x3d2a.showToast('❌ لا يمكن تفعيل الإشعارات - تم حظرها مسبقاً', 'error'); }
+};
+
+window._0x3d2a.startVoiceInput = function() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { window._0x3d2a.showToast('❌ المتصفح لا يدعم خاصية البحث الصوتي', 'error'); return; }
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    speechRecognition = new SpeechRecognition();
+    speechRecognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+    speechRecognition.continuous = false;
+    speechRecognition.interimResults = false;
+    speechRecognition.onstart = function() { isListening = true; var btn = document.getElementById('voiceBtn'); if(btn) { btn.classList.add('listening'); btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...'; } window._0x3d2a.showToast('🎤 تحدث الآن...', 'info'); };
+    speechRecognition.onresult = function(event) { var transcript = event.results[0][0].transcript; var advSearch = document.getElementById('advancedSearch'); if(advSearch) advSearch.value = transcript; window._0x3d2a.renderCRM(); window._0x3d2a.showToast(`🔍 بحث عن: "${transcript}"`, 'success'); };
+    speechRecognition.onerror = function() { window._0x3d2a.showToast('⚠️ لم يتم التعرف على الصوت، حاول مرة أخرى', 'warning'); };
+    speechRecognition.onend = function() { isListening = false; var btn = document.getElementById('voiceBtn'); if(btn) { btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> ' + (translations[currentLang]['voice_search'] || 'بحث صوتي'); } };
+    speechRecognition.start();
+};
+
+window._0x3d2a.saveCurrentFilter = function() {
+    var filterName = prompt('أدخل اسم للفلتر:');
+    if (!filterName) return;
+    var filter = { name: filterName, search: document.getElementById('advancedSearch').value, gov: document.getElementById('filterGov').value, agent: document.getElementById('filterAgent').value, priority: document.getElementById('filterPriority').value, status: document.getElementById('filterStatus').value };
+    savedFilters.push(filter);
+    localStorage.setItem('savedFilters', JSON.stringify(savedFilters));
+    window._0x3d2a.showToast('✅ تم حفظ الفلتر بنجاح', 'success');
+};
+
+window._0x3d2a.loadSavedFilters = function() {
+    if (savedFilters.length === 0) { window._0x3d2a.showToast('📭 لا توجد فلاتر محفوظة', 'info'); return; }
+    var menu = document.createElement('div');
+    menu.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border-radius:20px; padding:20px; min-width:300px; z-index:30003; box-shadow:0 10px 30px rgba(0,0,0,0.3);';
+    menu.innerHTML = '<h3>📂 الفلاتر المحفوظة</h3><hr>';
+    savedFilters.forEach((f, idx) => { menu.innerHTML += `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="window._0x3d2a.applyFilter(${idx}); this.parentElement.remove();">🔍 ${f.name}</div>`; });
+    menu.innerHTML += '<button onclick="this.parentElement.remove()" style="margin-top:15px; width:100%; padding:8px; background:var(--danger); color:white; border:none; border-radius:10px;">إغلاق</button>';
+    document.body.appendChild(menu);
+};
+
+window._0x3d2a.applyFilter = function(idx) {
+    var f = savedFilters[idx];
+    var advSearch = document.getElementById('advancedSearch');
+    var filterGov = document.getElementById('filterGov');
+    var filterAgent = document.getElementById('filterAgent');
+    var filterPriority = document.getElementById('filterPriority');
+    var filterStatus = document.getElementById('filterStatus');
+    if(advSearch) advSearch.value = f.search;
+    if(filterGov) filterGov.value = f.gov;
+    if(filterAgent) filterAgent.value = f.agent;
+    if(filterPriority) filterPriority.value = f.priority;
+    if(filterStatus) filterStatus.value = f.status;
+    window._0x3d2a.renderCRM();
+    window._0x3d2a.showToast(`✅ تم تطبيق الفلتر: ${f.name}`, 'success');
+};
+
+window._0x3d2a.updateAIInsights = function() {
+    var insightSpan = document.getElementById('aiInsightText');
+    if(!insightSpan) return;
+    if (!clients.length) { insightSpan.innerHTML = 'لا توجد بيانات كافية للتحليل. أضف عملاء للحصول على توصيات ذكية.'; return; }
+    var highPotential = clients.filter(c => window._0x3d2a.calculateWinProbability(c) >= 70);
+    var pendingTasks = tasks.filter(t => !t.completed);
+    var insight = '';
+    if (highPotential.length > 0) { insight += `🎯 هناك ${highPotential.length} عميل/عملاء لديهم احتمالية إتمام صفقة عالية (أكثر من 70%). الأولوية: ${highPotential[0].name}`; }
+    else { insight += '📊 لا يوجد عملاء ذو احتمالية عالية حالياً. ركز على تحسين جودة المتابعة.'; }
+    if (pendingTasks.length > 5) { insight += ` | ⚠️ ${pendingTasks.length} مهمة غير مكتملة تحتاج إلى متابعة.`; }
+    insightSpan.innerHTML = insight;
+    window._0x3d2a.updateAdvancedKPIs();
+    window._0x3d2a.checkSmartNotifications();
+};
+
+window._0x3d2a.showToast = function(message, type) {
+    var toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    var icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : (type === 'warning' ? '⚠️' : 'ℹ️'));
+    toast.innerHTML = `${icon} ${message}`;
+    toast.style.backgroundColor = type === 'success' ? '#28a745' : (type === 'error' ? '#dc3545' : (type === 'warning' ? '#ffc107' : '#17a2b8'));
+    toast.style.color = type === 'warning' ? '#333' : 'white';
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, 4000);
+};
+
+window._0x3d2a.renderCRM = function(){
+    var body = document.getElementById('tableBody');
+    if(!body) return;
     
-    _0x3d2a['showNotificationsPanel'] = function() {
-        if (notifications.length === 0) { _0x3d2a['showToast']('📭 لا توجد إشعارات جديدة', 'info'); return; }
-        var panel = document.createElement('div');
-        panel.style.cssText = 'position:fixed; top:80px; right:20px; width:350px; background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:30002; padding:15px; max-height:400px; overflow-y:auto;';
-        panel.innerHTML = '<h4 style="margin:0 0 10px 0; color:var(--primary)">🔔 الإشعارات</h4><hr>';
-        notifications.forEach(n => { panel.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">${n}</div>`; });
-        panel.innerHTML += '<button onclick="this.remove()" style="margin-top:10px; width:100%; padding:8px; background:var(--info); color:white; border:none; border-radius:10px;">إغلاق</button>';
-        document.body.appendChild(panel);
-    };
+    var searchTerm = document.getElementById('search') ? document.getElementById('search').value.toLowerCase().trim() : '';
+    var advancedSearch = document.getElementById('advancedSearch') ? document.getElementById('advancedSearch').value.toLowerCase().trim() : '';
+    var filterStatus = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : 'All';
+    var filterGov = document.getElementById('filterGov') ? document.getElementById('filterGov').value : '';
+    var filterAgent = document.getElementById('filterAgent') ? document.getElementById('filterAgent').value : '';
+    var filterPriority = document.getElementById('filterPriority') ? document.getElementById('filterPriority').value : '';
     
-    _0x3d2a['enableDesktopNotifications'] = function() {
-        if (Notification.permission === 'granted') { _0x3d2a['showToast']('✅ الإشعارات مفعلة مسبقاً', 'success'); }
-        else if (Notification.permission !== 'denied') { Notification.requestPermission().then(perm => { if (perm === 'granted') { _0x3d2a['showToast']('🔔 تم تفعيل الإشعارات بنجاح', 'success'); } }); }
-        else { _0x3d2a['showToast']('❌ لا يمكن تفعيل الإشعارات - تم حظرها مسبقاً', 'error'); }
-    };
-    
-    _0x3d2a['startVoiceInput'] = function() {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { _0x3d2a['showToast']('❌ المتصفح لا يدعم خاصية البحث الصوتي', 'error'); return; }
-        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        speechRecognition = new SpeechRecognition();
-        speechRecognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
-        speechRecognition.continuous = false;
-        speechRecognition.interimResults = false;
-        speechRecognition.onstart = function() { isListening = true; var btn = document.getElementById('voiceBtn'); btn.classList.add('listening'); btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...'; _0x3d2a['showToast']('🎤 تحدث الآن...', 'info'); };
-        speechRecognition.onresult = function(event) { var transcript = event.results[0][0].transcript; document.getElementById('advancedSearch').value = transcript; _0x3d2a['renderCRM'](); _0x3d2a['showToast'](`🔍 بحث عن: "${transcript}"`, 'success'); };
-        speechRecognition.onerror = function() { _0x3d2a['showToast']('⚠️ لم يتم التعرف على الصوت، حاول مرة أخرى', 'warning'); };
-        speechRecognition.onend = function() { isListening = false; var btn = document.getElementById('voiceBtn'); btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> ' + (translations[currentLang]['voice_search'] || 'بحث صوتي'); };
-        speechRecognition.start();
-    };
-    
-    _0x3d2a['saveCurrentFilter'] = function() {
-        var filterName = prompt('أدخل اسم للفلتر:');
-        if (!filterName) return;
-        var filter = { name: filterName, search: document.getElementById('advancedSearch').value, gov: document.getElementById('filterGov').value, agent: document.getElementById('filterAgent').value, priority: document.getElementById('filterPriority').value, status: document.getElementById('filterStatus').value };
-        savedFilters.push(filter);
-        localStorage.setItem('savedFilters', JSON.stringify(savedFilters));
-        _0x3d2a['showToast']('✅ تم حفظ الفلتر بنجاح', 'success');
-    };
-    
-    _0x3d2a['loadSavedFilters'] = function() {
-        if (savedFilters.length === 0) { _0x3d2a['showToast']('📭 لا توجد فلاتر محفوظة', 'info'); return; }
-        var menu = document.createElement('div');
-        menu.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border-radius:20px; padding:20px; min-width:300px; z-index:30003; box-shadow:0 10px 30px rgba(0,0,0,0.3);';
-        menu.innerHTML = '<h3>📂 الفلاتر المحفوظة</h3><hr>';
-        savedFilters.forEach((f, idx) => { menu.innerHTML += `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="_0x3d2a['applyFilter'](${idx}); this.parentElement.remove();">🔍 ${f.name}</div>`; });
-        menu.innerHTML += '<button onclick="this.parentElement.remove()" style="margin-top:15px; width:100%; padding:8px; background:var(--danger); color:white; border:none; border-radius:10px;">إغلاق</button>';
-        document.body.appendChild(menu);
-    };
-    
-    _0x3d2a['applyFilter'] = function(idx) {
-        var f = savedFilters[idx];
-        document.getElementById('advancedSearch').value = f.search;
-        document.getElementById('filterGov').value = f.gov;
-        document.getElementById('filterAgent').value = f.agent;
-        document.getElementById('filterPriority').value = f.priority;
-        document.getElementById('filterStatus').value = f.status;
-        _0x3d2a['renderCRM']();
-        _0x3d2a['showToast'](`✅ تم تطبيق الفلتر: ${f.name}`, 'success');
-    };
-    
-    _0x3d2a['updateAIInsights'] = function() {
-        if (!clients.length) { document.getElementById('aiInsightText').innerHTML = 'لا توجد بيانات كافية للتحليل. أضف عملاء للحصول على توصيات ذكية.'; return; }
-        var highPotential = clients.filter(c => _0x3d2a['calculateWinProbability'](c) >= 70);
-        var pendingTasks = tasks.filter(t => !t.completed);
-        var insight = '';
-        if (highPotential.length > 0) { insight += `🎯 هناك ${highPotential.length} عميل/عملاء لديهم احتمالية إتمام صفقة عالية (أكثر من 70%). الأولوية: ${highPotential[0].name}`; }
-        else { insight += '📊 لا يوجد عملاء ذو احتمالية عالية حالياً. ركز على تحسين جودة المتابعة.'; }
-        if (pendingTasks.length > 5) { insight += ` | ⚠️ ${pendingTasks.length} مهمة غير مكتملة تحتاج إلى متابعة.`; }
-        document.getElementById('aiInsightText').innerHTML = insight;
-        _0x3d2a['updateAdvancedKPIs']();
-        _0x3d2a['checkSmartNotifications']();
-    };
-    
-    _0x3d2a['showToast'] = function(message, type) {
-        var toast = document.createElement('div');
-        toast.className = 'toast-notification';
-        var icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : (type === 'warning' ? '⚠️' : 'ℹ️'));
-        toast.innerHTML = `${icon} ${message}`;
-        toast.style.backgroundColor = type === 'success' ? '#28a745' : (type === 'error' ? '#dc3545' : (type === 'warning' ? '#ffc107' : '#17a2b8'));
-        toast.style.color = type === 'warning' ? '#333' : 'white';
-        document.body.appendChild(toast);
-        setTimeout(() => { toast.remove(); }, 4000);
-    };
-    
-    _0x3d2a['renderCRM'] = function(){
-        var body = document.getElementById('tableBody');
-        if(!body) return;
-        body.innerHTML = '';
-        var searchTerm = document.getElementById('search').value.toLowerCase().trim();
-        var advancedSearch = document.getElementById('advancedSearch').value.toLowerCase().trim();
-        var filterStatus = document.getElementById('filterStatus').value;
-        var filterGov = document.getElementById('filterGov').value;
-        var filterAgent = document.getElementById('filterAgent').value;
-        var filterPriority = document.getElementById('filterPriority').value;
+    var filteredClients = clients.filter(function(c){
+        var matchesSearch = (c.name && c.name.toLowerCase().includes(searchTerm)) || (c.phone && c.phone.toLowerCase().includes(searchTerm)) || (c.status && c.status.toLowerCase().includes(searchTerm));
+        var matchesAdvanced = !advancedSearch || (c.name && c.name.toLowerCase().includes(advancedSearch)) || (c.phone && c.phone.toLowerCase().includes(advancedSearch)) || (c.gov && c.gov.toLowerCase().includes(advancedSearch)) || (c.agent && c.agent.toLowerCase().includes(advancedSearch));
+        var matchesFilter = (filterStatus === 'All' || c.status === filterStatus);
+        var matchesGov = !filterGov || c.gov === filterGov;
+        var matchesAgent = !filterAgent || c.agent === filterAgent;
+        var aiProb = window._0x3d2a.calculateWinProbability(c);
+        var matchesPriority = true;
+        if (filterPriority === 'high') matchesPriority = aiProb >= 70;
+        else if (filterPriority === 'medium') matchesPriority = aiProb >= 40 && aiProb < 70;
+        else if (filterPriority === 'low') matchesPriority = aiProb < 40;
         
-        clients.forEach(function(c, i){
-            var matchesSearch = (c.name && c.name.toLowerCase().includes(searchTerm)) || (c.phone && c.phone.toLowerCase().includes(searchTerm)) || (c.status && c.status.toLowerCase().includes(searchTerm));
-            var matchesAdvanced = !advancedSearch || (c.name && c.name.toLowerCase().includes(advancedSearch)) || (c.phone && c.phone.toLowerCase().includes(advancedSearch)) || (c.gov && c.gov.toLowerCase().includes(advancedSearch)) || (c.agent && c.agent.toLowerCase().includes(advancedSearch));
-            var matchesFilter = (filterStatus === 'All' || c.status === filterStatus);
-            var matchesGov = !filterGov || c.gov === filterGov;
-            var matchesAgent = !filterAgent || c.agent === filterAgent;
-            var aiProb = _0x3d2a['calculateWinProbability'](c);
-            var matchesPriority = true;
-            if (filterPriority === 'high') matchesPriority = aiProb >= 70;
-            else if (filterPriority === 'medium') matchesPriority = aiProb >= 40 && aiProb < 70;
-            else if (filterPriority === 'low') matchesPriority = aiProb < 40;
-            
-            if(matchesSearch && matchesFilter && matchesGov && matchesAgent && matchesPriority && matchesAdvanced){
-                var rowClass = "";
-                if(c.status === 'VIP') rowClass = "vip-row";
-                if(c.status === 'Hold') rowClass = "hold-row";
-                var prediction = _0x3d2a['predictClientBehavior'](c);
-                rowClass += ' priority-' + prediction.priority;
-                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + ' <span class="ai-score">🤖 ' + aiProb + '%</span>' + '</td><td>' + (c.phone || '') + '</td><td>' + (c.gov || '') + '</td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></td></tr>';
+        return matchesSearch && matchesFilter && matchesGov && matchesAgent && matchesPriority && matchesAdvanced;
+    });
+    
+    if (filteredClients.length === 0 && clients.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 لا يوجد عملاء. قم بإضافة عميل جديد أو استخدم زر "إضافة بيانات تجريبية"</td></tr>';
+        return;
+    }
+    
+    if (filteredClients.length === 0 && clients.length > 0) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">⚠️ لا توجد نتائج تطابق معايير البحث</td></tr>';
+        return;
+    }
+    
+    body.innerHTML = '';
+    filteredClients.forEach(function(c, idx){
+        var aiProb = window._0x3d2a.calculateWinProbability(c);
+        var prediction = window._0x3d2a.predictClientBehavior(c);
+        var rowClass = "";
+        if(c.status === 'VIP') rowClass = "vip-row";
+        if(c.status === 'Hold') rowClass = "hold-row";
+        rowClass += ' priority-' + prediction.priority;
+        
+        var statusColor = window._0x3d2a.statusColor(c.status);
+        
+        body.innerHTML += '<tr class="' + rowClass + '">' +
+            '<td style="font-weight:bold">' + (c.name || '') + ' <span class="ai-score">🤖 ' + aiProb + '%</span>' + '</td>' +
+            '<td>' + (c.phone || '') + '</td>' +
+            '<td>' + (c.gov || '') + '</td>' +
+            '<td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + aiProb + '%; border-radius:4px;"></div></div><small>' + aiProb + '%</small></td>' +
+            '<td><span class="status-badge" style="background:' + statusColor + '; color:white">' + (c.status || 'Interested') + '</span></td>' +
+            '<td>' +
+                '<button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button>' +
+                '<button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button>' +
+                '<button class="action-btn btn-edit" onclick="window._0x3d2a.edit(' + clients.indexOf(c) + ')">✏️</button>' +
+                '<button class="action-btn btn-del" onclick="window._0x3d2a.delClient(' + clients.indexOf(c) + ')">✕</button>' +
+            '</td>' +
+        '</tr>';
+    });
+    
+    window._0x3d2a.updateAIInsights();
+};
+
+window._0x3d2a.save = function(){
+    var name = document.getElementById('name').value;
+    if(!name){ window._0x3d2a.notify("Name required!", "error"); return; }
+    var data = {
+        name: name, 
+        phone: document.getElementById('phone').value, 
+        gov: document.getElementById('gov').value,
+        status: document.getElementById('status').value, 
+        notes: document.getElementById('notes').value,
+        agent: document.getElementById('agent').value, 
+        date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+        timestamp: Date.now(), 
+        lastUpdatedBy: sessionStorage.getItem('userDisplayName'),
+        aiProbability: window._0x3d2a.calculateWinProbability({ status: document.getElementById('status').value, notes: document.getElementById('notes').value, gov: document.getElementById('gov').value })
+    };
+    if(editIdx > -1 && clients[editIdx]){
+        clients[editIdx] = data;
+        window._0x3d2a.addLog("Updated: " + name);
+        editIdx = -1;
+        var btnSave = document.getElementById('btnSave');
+        if(btnSave) {
+            btnSave.innerHTML = translations[currentLang]['save_btn'];
+            btnSave.style.background = "var(--success)";
+        }
+        window._0x3d2a.showToast('✅ تم تحديث العميل بنجاح', 'success');
+    } else {
+        clients.push(data);
+        window._0x3d2a.addLog("Added: " + name);
+        window._0x3d2a.showToast('✅ تم إضافة عميل جديد بنجاح', 'success');
+    }
+    window._0x3d2a.saveToLocalDB('clients', clients);
+    window._0x3d2a.clearForm();
+    window._0x3d2a.play('soundSuccess');
+    var sentimentDiv = document.getElementById('sentimentResult');
+    if(sentimentDiv) sentimentDiv.style.display = 'none';
+    var recDiv = document.getElementById('aiRecommendations');
+    if(recDiv) recDiv.style.display = 'none';
+    window._0x3d2a.renderCRM();
+    window._0x3d2a.updateAgentList();
+    window._0x3d2a.fillClients();
+    window._0x3d2a.updateTaskClientFilter();
+};
+
+window._0x3d2a.updateAgentList = function() {
+    var agents = new Set();
+    clients.forEach(c => { if (c.agent) agents.add(c.agent); });
+    var agentSel = document.getElementById('filterAgent');
+    if (!agentSel) return;
+    var currentVal = agentSel.value;
+    var t = translations[currentLang];
+    agentSel.innerHTML = '<option value="">' + (t['all_agents'] || 'كل المندوبين') + '</option>';
+    agents.forEach(a => { var opt = document.createElement('option'); opt.value = a; opt.innerText = a; agentSel.appendChild(opt); });
+    agentSel.value = currentVal;
+};
+
+window._0x3d2a.updateTaskClientFilter = function() {
+    var taskFilterClient = document.getElementById('taskFilterClient');
+    if (!taskFilterClient) return;
+    var currentVal = taskFilterClient.value;
+    var t = translations[currentLang];
+    taskFilterClient.innerHTML = '<option value="">' + (t['all_clients'] || 'كل العملاء') + '</option>';
+    var uniqueClients = new Set();
+    tasks.forEach(t => { if (t.client) uniqueClients.add(t.client); });
+    uniqueClients.forEach(c => { var opt = document.createElement('option'); opt.value = c; opt.innerText = c; taskFilterClient.appendChild(opt); });
+    taskFilterClient.value = currentVal;
+};
+
+window._0x3d2a.addUser = function() {
+    var u = document.getElementById('newU').value;
+    var p = document.getElementById('newP').value;
+    var d = document.getElementById('newD').value;
+    var r = document.getElementById('newR').value;
+    if(!u || !p || !d){ alert("All fields required"); return; }
+    
+    var newUser = { u: u, p: p, displayName: d, role: r };
+    authSystem.users.push(newUser);
+    window._0x3d2a.saveToLocalDB('users', authSystem.users);
+    window._0x3d2a.addLog("User created: " + d);
+    document.getElementById('newU').value = '';
+    document.getElementById('newP').value = '';
+    document.getElementById('newD').value = '';
+    window._0x3d2a.showToast('✅ تم إنشاء المستخدم بنجاح', 'success');
+    window._0x3d2a.renderUsers();
+};
+
+window._0x3d2a.delUser = function(i) {
+    if(confirm("Delete user?")){
+        authSystem.users.splice(i,1);
+        window._0x3d2a.saveToLocalDB('users', authSystem.users);
+        window._0x3d2a.renderUsers();
+        window._0x3d2a.showToast('✅ تم حذف المستخدم بنجاح', 'success');
+    }
+};
+
+window._0x3d2a.addLog = function(msg){ 
+    logs.push({ user: sessionStorage.getItem('userDisplayName') || "System", action: msg, time: new Date().toLocaleString() }); 
+    window._0x3d2a.renderLogs();
+};
+window._0x3d2a.renderLogs = function(){ 
+    var cont = document.getElementById('logsContainer'); 
+    if(!cont) return; 
+    cont.innerHTML = logs.slice().reverse().map(function(l){ 
+        return '<div class="log-entry"><span style="color:var(--info); font-weight:bold">[' + l.user + ']</span> <span>' + l.action + '</span><br><small style="color:#999">' + l.time + '</small></div>'; 
+    }).join(''); 
+};
+
+window._0x3d2a.sort = function(col){
+    if(sortColumn === col){ sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'; }
+    else { sortColumn = col; sortDirection = 'asc'; }
+    clients.sort(function(a,b){
+        var va, vb;
+        switch(col){
+            case 0: va = a.name || ''; vb = b.name || ''; break;
+            case 1: va = a.phone || ''; vb = b.phone || ''; break;
+            case 2: va = a.gov || ''; vb = b.gov || ''; break;
+            case 3: va = window._0x3d2a.calcScore(a); vb = window._0x3d2a.calcScore(b); break;
+            case 4: va = a.status || ''; vb = b.status || ''; break;
+            default: va = a.name || ''; vb = b.name || '';
+        }
+        if(typeof va === 'number'){ return sortDirection === 'asc' ? va - vb : vb - va; }
+        va = va.toString().toLowerCase(); vb = vb.toString().toLowerCase();
+        if(va < vb) return sortDirection === 'asc' ? -1 : 1;
+        if(va > vb) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    window._0x3d2a.renderCRM();
+};
+
+window._0x3d2a.show = function(id, btn){ 
+    document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); }); 
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); }); 
+    var tab = document.getElementById(id); 
+    if(tab) tab.classList.add('active'); 
+    if(btn) btn.classList.add('active'); 
+};
+
+window._0x3d2a.clearForm = function(){ 
+    ['name','phone','notes','agent','date'].forEach(function(id){ 
+        var el = document.getElementById(id); 
+        if(el) el.value = ''; 
+    }); 
+    var st = document.getElementById('status'); 
+    if(st) st.value = 'Interested'; 
+    var gv = document.getElementById('gov'); 
+    if(gv) gv.value = ''; 
+};
+
+window._0x3d2a.play = function(id){ 
+    try{ 
+        var snd = document.getElementById(id); 
+        if(snd) snd.play(); 
+    } catch(e){} 
+};
+
+window._0x3d2a.exportCSV = function(){
+    var csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date,AI_Probability,Priority\n";
+    clients.forEach(function(c){ 
+        var pred = window._0x3d2a.predictClientBehavior(c); 
+        csv += '"' + (c.name || '') + '","' + (c.phone || '') + '","' + (c.gov || '') + '","' + (c.status || '') + '","' + (c.agent || '') + '","' + (c.notes || '') + '","' + (c.date || '') + '","' + window._0x3d2a.calculateWinProbability(c) + '%","' + pred.priority + '"\n'; 
+    }); 
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
+    var link = document.createElement("a"); 
+    link.href = URL.createObjectURL(blob); 
+    link.download = 'Utopia_AI_Secure_Data_' + new Date().toLocaleDateString() + '.csv'; 
+    link.click(); 
+    window._0x3d2a.showToast('📁 تم تصدير البيانات مع تقييمات الذكاء الاصطناعي', 'success');
+};
+
+window._0x3d2a.updatePass = function(){ 
+    var np = document.getElementById('changePassInput').value; 
+    var idx = sessionStorage.getItem('userIdx'); 
+    if(!np){ alert("Enter password"); return; } 
+    if(idx == -1){ alert("Master password cannot be changed here"); return; } 
+    if(authSystem.users[idx]){ 
+        authSystem.users[idx].p = np; 
+        window._0x3d2a.saveToLocalDB('users', authSystem.users); 
+        window._0x3d2a.notify("Password updated", "success"); 
+        document.getElementById('changePassInput').value = ''; 
+    } else { alert("User not found"); } 
+};
+
+window._0x3d2a.clearTaskFilters = function() {
+    var taskSearch = document.getElementById('taskSearch');
+    var taskFilterClient = document.getElementById('taskFilterClient');
+    var taskFilterStatus = document.getElementById('taskFilterStatus');
+    var taskFilterOperationType = document.getElementById('taskFilterOperationType');
+    var taskFilterDate = document.getElementById('taskFilterDate');
+    if(taskSearch) taskSearch.value = '';
+    if(taskFilterClient) taskFilterClient.value = '';
+    if(taskFilterStatus) taskFilterStatus.value = 'all';
+    if(taskFilterOperationType) taskFilterOperationType.value = '';
+    if(taskFilterDate) taskFilterDate.value = '';
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.showToast('✅ تم مسح جميع فلاتر المهام', 'success');
+};
+
+window._0x3d2a.renderTasks = function(){
+    var body = document.getElementById('taskBody');
+    if(!body) return;
+    
+    var searchTerm = document.getElementById('taskSearch') ? document.getElementById('taskSearch').value.toLowerCase().trim() : '';
+    var filterClient = document.getElementById('taskFilterClient') ? document.getElementById('taskFilterClient').value : '';
+    var filterStatus = document.getElementById('taskFilterStatus') ? document.getElementById('taskFilterStatus').value : 'all';
+    var filterOperationType = document.getElementById('taskFilterOperationType') ? document.getElementById('taskFilterOperationType').value : '';
+    var filterDate = document.getElementById('taskFilterDate') ? document.getElementById('taskFilterDate').value : '';
+    var t = translations[currentLang];
+    
+    var filteredTasks = tasks.filter(function(task){
+        var matchesSearch = !searchTerm || (task.client && task.client.toLowerCase().includes(searchTerm)) || (task.text && task.text.toLowerCase().includes(searchTerm));
+        var matchesClient = !filterClient || task.client === filterClient;
+        var matchesOperationType = !filterOperationType || task.operationType === filterOperationType;
+        var matchesDate = !filterDate || task.date === filterDate;
+        var taskCompleted = task.completed || false;
+        var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
+        
+        var matchesStatus = true;
+        if (filterStatus === 'pending') matchesStatus = !taskCompleted;
+        else if (filterStatus === 'completed') matchesStatus = taskCompleted === true;
+        else if (filterStatus === 'overdue') matchesStatus = isOverdue;
+        
+        return matchesSearch && matchesClient && matchesOperationType && matchesDate && matchesStatus;
+    });
+    
+    if (filteredTasks.length === 0 && tasks.length === 0) {
+        body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
+        return;
+    }
+    
+    if (filteredTasks.length === 0 && tasks.length > 0) {
+        body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">⚠️ لا توجد مهام تطابق معايير البحث</b></td>';
+        return;
+    }
+    
+    body.innerHTML = '';
+    filteredTasks.forEach(function(task){
+        var originalIdx = tasks.findIndex(function(t){ return t === task; });
+        var taskCompleted = task.completed || false;
+        var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
+        var statusText = taskCompleted ? (t['task_status_completed'] || 'مكتملة') : (isOverdue ? (t['task_status_overdue'] || 'متأخرة') : (t['task_status_pending'] || 'قيد التنفيذ'));
+        var statusClass = taskCompleted ? 'task-status-completed' : (isOverdue ? 'task-status-overdue' : 'task-status-pending');
+        var operationTypeText = getOperationTypeText(task.operationType || 'quotation');
+        var operationTypeClass = getOperationTypeClass(task.operationType || 'quotation');
+        var amountDisplay = task.amount ? (currentLang === 'ar' ? task.amount + ' ج.م' : task.amount + ' EGP') : '—';
+        
+        body.innerHTML += '<tr>' +
+            '<td><b>' + (task.client || '') + '</b></td>' +
+            '<td><span class="operation-type-badge ' + operationTypeClass + '">' + operationTypeText + '</span></td>' +
+            '<td class="amount-field">' + amountDisplay + '</td>' +
+            '<td>' + (task.text || '') + '</td>' +
+            '<td><textarea style="margin:0; font-size:12px; width:100%;" onchange="window._0x3d2a.updateTaskNotes(' + originalIdx + ', this.value)">' + (task.taskNotes || '') + '</textarea></td>' +
+            '<td><span style="color:var(--danger)">' + (task.date || '') + '</span></td>' +
+            '<td><span class="task-status-badge ' + statusClass + '">' + statusText + '</span><br>' +
+            (!taskCompleted ? '<button class="btn-ai" style="margin-top:5px; font-size:10px;" onclick="window._0x3d2a.completeTask(' + originalIdx + ')">✓ إكمال</button>' : '') +
+            '</td>' +
+            '<td>' +
+                '<button class="action-btn btn-edit" onclick="window._0x3d2a.editTask(' + originalIdx + ')">✏️</button>' +
+                '<button class="action-btn btn-del" onclick="window._0x3d2a.delTask(' + originalIdx + ')">✕</button>' +
+            '</td>' +
+        '</tr>';
+    });
+};
+
+window._0x3d2a.updateTaskNotes = function(i, v){ 
+    if(tasks[i]) {
+        tasks[i].taskNotes = v; 
+        window._0x3d2a.saveToLocalDB('tasks', tasks);
+    }
+};
+
+window._0x3d2a.completeTask = function(i){
+    if(tasks[i]){
+        tasks[i].completed = true;
+        tasks[i].completedAt = new Date().toISOString();
+        window._0x3d2a.saveToLocalDB('tasks', tasks);
+        window._0x3d2a.renderTasks();
+        window._0x3d2a.showToast('✅ تم إكمال المهمة بنجاح', 'success');
+    }
+};
+
+window._0x3d2a.saveTask = function(){
+    var clientSelect = document.getElementById('taskClientSelect');
+    var operationTypeSelect = document.getElementById('taskOperationType');
+    var amountInput = document.getElementById('taskAmount');
+    var taskTextInput = document.getElementById('taskText');
+    var taskNotesArea = document.getElementById('taskNotes');
+    var extraInfoArea = document.getElementById('extraInfo');
+    var taskDateInput = document.getElementById('taskDate');
+    
+    var clientValue = clientSelect ? clientSelect.value : '';
+    var operationTypeValue = operationTypeSelect ? operationTypeSelect.value : 'quotation';
+    var amountValue = amountInput && amountInput.value ? parseFloat(amountInput.value) : null;
+    var taskTextValue = taskTextInput ? taskTextInput.value : '';
+    var taskNotesValue = taskNotesArea ? taskNotesArea.value : '';
+    var extraInfoValue = extraInfoArea ? extraInfoArea.value : '';
+    var taskDateValue = taskDateInput ? taskDateInput.value : '';
+    
+    if(!clientValue || clientValue === ''){
+        window._0x3d2a.showToast('⚠️ الرجاء اختيار عميل من القائمة', 'warning');
+        return;
+    }
+    if(!taskTextValue || taskTextValue.trim() === ''){
+        window._0x3d2a.showToast('⚠️ الرجاء إدخال وصف العملية', 'warning');
+        return;
+    }
+    
+    var task = { 
+        client: clientValue, 
+        operationType: operationTypeValue,
+        amount: amountValue,
+        text: taskTextValue,
+        taskNotes: taskNotesValue,
+        extra: extraInfoValue,
+        date: taskDateValue,
+        timestamp: Date.now(),
+        completed: false,
+        completedAt: null
+    };
+    
+    if(editTaskIdx > -1 && tasks[editTaskIdx]){ 
+        task.completed = tasks[editTaskIdx].completed || false;
+        task.completedAt = tasks[editTaskIdx].completedAt || null;
+        tasks[editTaskIdx] = task; 
+        editTaskIdx = -1; 
+        window._0x3d2a.showToast('✅ تم تحديث العملية بنجاح', 'success');
+    } else { 
+        tasks.push(task); 
+        window._0x3d2a.showToast('✅ تم إضافة العملية بنجاح', 'success');
+    }
+    
+    window._0x3d2a.saveToLocalDB('tasks', tasks);
+    
+    if(taskTextInput) taskTextInput.value = '';
+    if(taskNotesArea) taskNotesArea.value = '';
+    if(extraInfoArea) extraInfoArea.value = '';
+    if(taskDateInput) taskDateInput.value = '';
+    if(amountInput) amountInput.value = '';
+    if(clientSelect) clientSelect.value = '';
+    if(operationTypeSelect) operationTypeSelect.value = 'quotation';
+    
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.updateTaskClientFilter();
+    window._0x3d2a.play('soundSuccess');
+};
+
+window._0x3d2a.delTask = function(i){ 
+    if(confirm("Delete?")){ 
+        tasks.splice(i,1); 
+        window._0x3d2a.saveToLocalDB('tasks', tasks); 
+        window._0x3d2a.renderTasks();
+        window._0x3d2a.updateTaskClientFilter();
+        window._0x3d2a.showToast('✅ تم حذف العملية بنجاح', 'success');
+    } 
+};
+
+window._0x3d2a.editTask = function(i){ 
+    var task = tasks[i]; 
+    editTaskIdx = i; 
+    var clientSelect = document.getElementById('taskClientSelect');
+    var operationTypeSelect = document.getElementById('taskOperationType');
+    var amountInput = document.getElementById('taskAmount');
+    var taskTextInput = document.getElementById('taskText');
+    var taskNotesArea = document.getElementById('taskNotes');
+    var extraInfoArea = document.getElementById('extraInfo');
+    var taskDateInput = document.getElementById('taskDate');
+    
+    if(clientSelect) clientSelect.value = task.client || ''; 
+    if(operationTypeSelect) operationTypeSelect.value = task.operationType || 'quotation';
+    if(amountInput && task.amount) amountInput.value = task.amount;
+    if(taskTextInput) taskTextInput.value = task.text || ''; 
+    if(taskNotesArea) taskNotesArea.value = task.taskNotes || ''; 
+    if(extraInfoArea) extraInfoArea.value = task.extra || ''; 
+    if(taskDateInput) taskDateInput.value = task.date || ''; 
+    window._0x3d2a.showToast('✏️ جاري تعديل العملية، اضغط حفظ للتحديث', 'info');
+    window.scrollTo(0,0); 
+};
+
+window._0x3d2a.fillClients = function(){ 
+    var sel = document.getElementById('taskClientSelect'); 
+    if(!sel) return; 
+    var t = translations[currentLang];
+    var options = '<option value="">' + (t['task_client_placeholder'] || 'ربط بعميل') + '</option>';
+    
+    if(clients.length === 0){
+        options += '<option value="" disabled>⚠️ لا يوجد عملاء - أضف عميل أولاً</option>';
+    } else {
+        clients.forEach(function(c){ 
+            if(c && c.name){
+                options += '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; 
             }
         });
-        _0x3d2a['updateAIInsights']();
-    };
+    }
+    sel.innerHTML = options;
+    console.log("Fill clients - Total clients:", clients.length);
+};
+
+window._0x3d2a.autoFill = function(){ 
+    var name = document.getElementById('taskClientSelect').value; 
+    if(!name) return;
+    var client = clients.find(function(c){ return c.name === name; }); 
+    if(client){ 
+        var extraInfo = document.getElementById('extraInfo');
+        if(extraInfo) extraInfo.value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || ''); 
+        window._0x3d2a.showToast('✅ تم تعبئة بيانات العميل تلقائياً', 'success');
+    } 
+};
+
+// دوال سلة المحذوفات
+window._0x3d2a.renderRecycle = function(){ 
+    var body = document.getElementById('recycleBody'); 
+    if(!body) return;
     
-    _0x3d2a['save'] = function(){
-        var name = document.getElementById('name').value;
-        if(!name){ _0x3d2a['notify']("Name required!", "error"); return; }
-        var data = {
-            name: name, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value,
-            status: document.getElementById('status').value, notes: document.getElementById('notes').value,
-            agent: document.getElementById('agent').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-            timestamp: Date.now(), lastUpdatedBy: sessionStorage.getItem('userDisplayName'),
-            aiProbability: _0x3d2a['calculateWinProbability']({ status: document.getElementById('status').value, notes: document.getElementById('notes').value, gov: document.getElementById('gov').value })
-        };
-        if(editIdx > -1){
-            clients[editIdx] = data;
-            _0x3d2a['addLog']("Updated: " + name);
-            editIdx = -1;
-            document.getElementById('btnSave').innerHTML = translations[currentLang]['save_btn'];
-            document.getElementById('btnSave').style.background = "var(--success)";
-            _0x3d2a['showToast']('✅ تم تحديث العميل بنجاح', 'success');
-        } else {
-            clients.push(data);
-            _0x3d2a['addLog']("Added: " + name);
-            _0x3d2a['showToast']('✅ تم إضافة عميل جديد بنجاح', 'success');
-        }
-        saveToLocalDB('clients', clients);
-        _0x3d2a['clearForm']();
-        _0x3d2a['play']('soundSuccess');
-        document.getElementById('sentimentResult').style.display = 'none';
-        document.getElementById('aiRecommendations').style.display = 'none';
-        _0x3d2a['renderCRM']();
-        _0x3d2a['updateAgentList']();
-        _0x3d2a['fillClients']();
-        _0x3d2a['updateTaskClientFilter']();
-    };
+    if(deletedClients.length === 0){
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">📭 سلة المحذوفات فارغة</b></tr>';
+        return;
+    }
     
-    _0x3d2a['updateAgentList'] = function() {
-        var agents = new Set();
-        clients.forEach(c => { if (c.agent) agents.add(c.agent); });
-        var agentSel = document.getElementById('filterAgent');
-        if (!agentSel) return;
-        var currentVal = agentSel.value;
-        var t = translations[currentLang];
-        agentSel.innerHTML = '<option value="">' + (t['all_agents'] || 'كل المندوبين') + '</option>';
-        agents.forEach(a => { var opt = document.createElement('option'); opt.value = a; opt.innerText = a; agentSel.appendChild(opt); });
-        agentSel.value = currentVal;
-    };
-    
-    _0x3d2a['updateTaskClientFilter'] = function() {
-        var taskFilterClient = document.getElementById('taskFilterClient');
-        if (!taskFilterClient) return;
-        var currentVal = taskFilterClient.value;
-        var t = translations[currentLang];
-        taskFilterClient.innerHTML = '<option value="">' + (t['all_clients'] || 'كل العملاء') + '</option>';
-        var uniqueClients = new Set();
-        tasks.forEach(t => { if (t.client) uniqueClients.add(t.client); });
-        uniqueClients.forEach(c => { var opt = document.createElement('option'); opt.value = c; opt.innerText = c; taskFilterClient.appendChild(opt); });
-        taskFilterClient.value = currentVal;
-    };
-    
-    _0x3d2a['addUser'] = function() {
-        var u = document.getElementById('newU').value;
-        var p = document.getElementById('newP').value;
-        var d = document.getElementById('newD').value;
-        var r = document.getElementById('newR').value;
-        if(!u || !p || !d){ alert("All fields required"); return; }
-        
-        var newUser = { u: u, p: p, displayName: d, role: r };
-        authSystem.users.push(newUser);
-        saveToLocalDB('users', authSystem.users);
-        _0x3d2a['addLog']("User created: " + d);
-        document.getElementById('newU').value = '';
-        document.getElementById('newP').value = '';
-        document.getElementById('newD').value = '';
-        _0x3d2a['showToast']('✅ تم إنشاء المستخدم بنجاح', 'success');
-        _0x3d2a['renderUsers']();
-    };
-    
-    _0x3d2a['delUser'] = function(i) {
-        if(confirm("Delete user?")){
-            authSystem.users.splice(i,1);
-            saveToLocalDB('users', authSystem.users);
-            _0x3d2a['renderUsers']();
-            _0x3d2a['showToast']('✅ تم حذف المستخدم بنجاح', 'success');
-        }
-    };
-    
-    _0x3d2a['addLog'] = function(msg){ logs.push({ user: sessionStorage.getItem('userDisplayName') || "System", action: msg, time: new Date().toLocaleString() }); };
-    _0x3d2a['renderLogs'] = function(){ var cont = document.getElementById('logsContainer'); if(!cont) return; cont.innerHTML = logs.slice().reverse().map(function(l){ return '<div class="log-entry"><span style="color:var(--info); font-weight:bold">[' + l.user + ']</span> <span>' + l.action + '</span><br><small style="color:#999">' + l.time + '</small></div>'; }).join(''); };
-    _0x3d2a['sort'] = function(col){
-        if(sortColumn === col){ sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'; }
-        else { sortColumn = col; sortDirection = 'asc'; }
-        clients.sort(function(a,b){
-            var va, vb;
-            switch(col){
-                case 0: va = a.name || ''; vb = b.name || ''; break;
-                case 1: va = a.phone || ''; vb = b.phone || ''; break;
-                case 2: va = a.gov || ''; vb = b.gov || ''; break;
-                case 3: va = _0x3d2a['calcScore'](a); vb = _0x3d2a['calcScore'](b); break;
-                case 4: va = a.status || ''; vb = b.status || ''; break;
-                default: va = a.name || ''; vb = b.name || '';
-            }
-            if(typeof va === 'number'){ return sortDirection === 'asc' ? va - vb : vb - va; }
-            va = va.toString().toLowerCase(); vb = vb.toString().toLowerCase();
-            if(va < vb) return sortDirection === 'asc' ? -1 : 1;
-            if(va > vb) return sortDirection === 'asc' ? 1 : -1;
-            return 0;
-        });
-        _0x3d2a['renderCRM']();
-    };
-    _0x3d2a['show'] = function(id, btn){ document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); }); document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); }); var tab = document.getElementById(id); if(tab) tab.classList.add('active'); if(btn) btn.classList.add('active'); };
-    _0x3d2a['clearForm'] = function(){ ['name','phone','notes','agent','date'].forEach(function(id){ var el = document.getElementById(id); if(el) el.value = ''; }); var st = document.getElementById('status'); if(st) st.value = 'Interested'; var gv = document.getElementById('gov'); if(gv) gv.value = ''; };
-    _0x3d2a['play'] = function(id){ try{ var snd = document.getElementById(id); if(snd) snd.play(); } catch(e){} };
-    _0x3d2a['exportCSV'] = function(){
-        var csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date,AI_Probability,Priority\n";
-        clients.forEach(function(c){ var pred = _0x3d2a['predictClientBehavior'](c); csv += '"' + (c.name || '') + '","' + (c.phone || '') + '","' + (c.gov || '') + '","' + (c.status || '') + '","' + (c.agent || '') + '","' + (c.notes || '') + '","' + (c.date || '') + '","' + _0x3d2a['calculateWinProbability'](c) + '%","' + pred.priority + '"\n'; });
-        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); var link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = 'Utopia_AI_Secure_Data_' + new Date().toLocaleDateString() + '.csv'; link.click(); _0x3d2a['showToast']('📁 تم تصدير البيانات مع تقييمات الذكاء الاصطناعي', 'success');
-    };
-    _0x3d2a['updatePass'] = function(){ var np = document.getElementById('changePassInput').value; var idx = sessionStorage.getItem('userIdx'); if(!np){ alert("Enter password"); return; } if(idx == -1){ alert("Master password cannot be changed here"); return; } if(authSystem.users[idx]){ authSystem.users[idx].p = np; saveToLocalDB('users', authSystem.users); _0x3d2a['notify']("Password updated", "success"); document.getElementById('changePassInput').value = ''; } else { alert("User not found"); } };
-    
-    _0x3d2a['clearTaskFilters'] = function() {
-        document.getElementById('taskSearch').value = '';
-        document.getElementById('taskFilterClient').value = '';
-        document.getElementById('taskFilterStatus').value = 'all';
-        document.getElementById('taskFilterOperationType').value = '';
-        document.getElementById('taskFilterDate').value = '';
-        _0x3d2a['renderTasks']();
-        _0x3d2a['showToast']('✅ تم مسح جميع فلاتر المهام', 'success');
-    };
-    
-    _0x3d2a['renderTasks'] = function(){
-        var body = document.getElementById('taskBody');
-        if(!body) return;
-        body.innerHTML = '';
-        
-        var searchTerm = document.getElementById('taskSearch').value.toLowerCase().trim();
-        var filterClient = document.getElementById('taskFilterClient').value;
-        var filterStatus = document.getElementById('taskFilterStatus').value;
-        var filterOperationType = document.getElementById('taskFilterOperationType').value;
-        var filterDate = document.getElementById('taskFilterDate').value;
-        var t = translations[currentLang];
-        
-        var filteredTasks = tasks.filter(function(task, idx){
-            var matchesSearch = !searchTerm || (task.client && task.client.toLowerCase().includes(searchTerm)) || (task.text && task.text.toLowerCase().includes(searchTerm));
-            var matchesClient = !filterClient || task.client === filterClient;
-            var matchesOperationType = !filterOperationType || task.operationType === filterOperationType;
-            var matchesDate = !filterDate || task.date === filterDate;
-            var taskCompleted = task.completed || false;
-            var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
-            
-            var matchesStatus = true;
-            if (filterStatus === 'pending') matchesStatus = !taskCompleted;
-            else if (filterStatus === 'completed') matchesStatus = taskCompleted === true;
-            else if (filterStatus === 'overdue') matchesStatus = isOverdue;
-            
-            return matchesSearch && matchesClient && matchesOperationType && matchesDate && matchesStatus;
-        });
-        
-        if (filteredTasks.length === 0 && tasks.length > 0) {
-            body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">⚠️ لا توجد مهام تطابق معايير البحث</b></tr>';
-        }
-        
-        filteredTasks.forEach(function(task, idx){
-            var originalIdx = tasks.findIndex(function(t, i){ return t === task; });
-            var taskCompleted = task.completed || false;
-            var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
-            var statusText = taskCompleted ? (t['task_status_completed'] || 'مكتملة') : (isOverdue ? (t['task_status_overdue'] || 'متأخرة') : (t['task_status_pending'] || 'قيد التنفيذ'));
-            var statusClass = taskCompleted ? 'task-status-completed' : (isOverdue ? 'task-status-overdue' : 'task-status-pending');
-            var operationTypeText = getOperationTypeText(task.operationType || 'quotation');
-            var operationTypeClass = getOperationTypeClass(task.operationType || 'quotation');
-            var amountDisplay = task.amount ? (currentLang === 'ar' ? task.amount + ' ج.م' : task.amount + ' EGP') : '—';
-            
-            body.innerHTML += '<tr>' +
-                '<td><b>' + (task.client || '') + '</b></td>' +
-                '<td><span class="operation-type-badge ' + operationTypeClass + '">' + operationTypeText + '</span></td>' +
-                '<td class="amount-field">' + amountDisplay + '</td>' +
-                '<td>' + (task.text || '') + '</td>' +
-                '<td><textarea style="margin:0; font-size:12px; width:100%;" onchange="_0x3d2a[\'updateTaskNotes\'](' + originalIdx + ', this.value)">' + (task.taskNotes || '') + '</textarea></td>' +
-                '<td><span style="color:var(--danger)">' + (task.date || '') + '</span></td>' +
-                '<td><span class="task-status-badge ' + statusClass + '">' + statusText + '</span><br>' +
-                (!taskCompleted ? '<button class="btn-ai" style="margin-top:5px; font-size:10px;" onclick="_0x3d2a[\'completeTask\'](' + originalIdx + ')">✓ إكمال</button>' : '') +
-                '</td>' +
-                '<td>' +
-                '<button class="action-btn btn-edit" onclick="_0x3d2a[\'editTask\'](' + originalIdx + ')">✏️</button>' +
-                '<button class="action-btn btn-del" onclick="_0x3d2a[\'delTask\'](' + originalIdx + ')">✕</button>' +
-                '</td>' +
-                '</tr>';
-        });
-        
-        if (tasks.length === 0) {
-            body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
-        }
-    };
-    
-    _0x3d2a['updateTaskNotes'] = function(i, v){ 
-        if(tasks[i]) {
-            tasks[i].taskNotes = v; 
-            saveToLocalDB('tasks', tasks);
-        }
-    };
-    
-    _0x3d2a['completeTask'] = function(i){
-        if(tasks[i]){
-            tasks[i].completed = true;
-            tasks[i].completedAt = new Date().toISOString();
-            saveToLocalDB('tasks', tasks);
-            _0x3d2a['renderTasks']();
-            _0x3d2a['showToast']('✅ تم إكمال المهمة بنجاح', 'success');
-        }
-    };
-    
-    _0x3d2a['saveTask'] = function(){
-        var clientSelect = document.getElementById('taskClientSelect');
-        var operationTypeSelect = document.getElementById('taskOperationType');
-        var amountInput = document.getElementById('taskAmount');
-        var taskTextInput = document.getElementById('taskText');
-        var taskNotesArea = document.getElementById('taskNotes');
-        var extraInfoArea = document.getElementById('extraInfo');
-        var taskDateInput = document.getElementById('taskDate');
-        
-        var clientValue = clientSelect ? clientSelect.value : '';
-        var operationTypeValue = operationTypeSelect ? operationTypeSelect.value : 'quotation';
-        var amountValue = amountInput && amountInput.value ? parseFloat(amountInput.value) : null;
-        var taskTextValue = taskTextInput ? taskTextInput.value : '';
-        var taskNotesValue = taskNotesArea ? taskNotesArea.value : '';
-        var extraInfoValue = extraInfoArea ? extraInfoArea.value : '';
-        var taskDateValue = taskDateInput ? taskDateInput.value : '';
-        
-        console.log("Saving task - Client:", clientValue, "Type:", operationTypeValue, "Text:", taskTextValue);
-        
-        if(!clientValue || clientValue === ''){
-            _0x3d2a['showToast']('⚠️ الرجاء اختيار عميل من القائمة', 'warning');
+    body.innerHTML = deletedClients.map(function(c, i){
+        return '<tr>' +
+            '<td><b>' + (c.name || '') + '</b></td>' +
+            '<td>' + (c.phone || '') + '</td>' +
+            '<td>' + (c.status || '') + '</td>' +
+            '<td><button class="action-btn btn-edit" onclick="window._0x3d2a.restore(' + i + ')">🔄</button></td>' +
+            '<td><button class="action-btn btn-del" onclick="window._0x3d2a.hardDelete(' + i + ')">🗑️</button></td>' +
+        '<tr>';
+    }).join(''); 
+};
+
+window._0x3d2a.refreshRecycle = function(){
+    window._0x3d2a.renderRecycle();
+    window._0x3d2a.showToast('✅ تم تحديث سلة المحذوفات', 'success');
+};
+
+window._0x3d2a.clearAllRecycle = function(){
+    if(confirm("⚠️ تحذير: هذا الإجراء سيقوم بحذف جميع العملاء في سلة المحذوفات نهائياً! هل أنت متأكد؟")){
+        var count = deletedClients.length;
+        if(count === 0){
+            window._0x3d2a.showToast('📭 سلة المحذوفات فارغة بالفعل', 'info');
             return;
         }
-        if(!taskTextValue || taskTextValue.trim() === ''){
-            _0x3d2a['showToast']('⚠️ الرجاء إدخال وصف العملية', 'warning');
-            return;
-        }
-        
-        var task = { 
-            client: clientValue, 
-            operationType: operationTypeValue,
-            amount: amountValue,
-            text: taskTextValue,
-            taskNotes: taskNotesValue,
-            extra: extraInfoValue,
-            date: taskDateValue,
-            timestamp: Date.now(),
-            completed: false,
-            completedAt: null
-        };
-        
-        if(editTaskIdx > -1){ 
-            task.completed = tasks[editTaskIdx].completed || false;
-            task.completedAt = tasks[editTaskIdx].completedAt || null;
-            tasks[editTaskIdx] = task; 
-            editTaskIdx = -1; 
-            _0x3d2a['showToast']('✅ تم تحديث العملية بنجاح', 'success');
-        } else { 
-            tasks.push(task); 
-            _0x3d2a['showToast']('✅ تم إضافة العملية بنجاح', 'success');
-        }
-        
-        saveToLocalDB('tasks', tasks);
-        
-        if(taskTextInput) taskTextInput.value = '';
-        if(taskNotesArea) taskNotesArea.value = '';
-        if(extraInfoArea) extraInfoArea.value = '';
-        if(taskDateInput) taskDateInput.value = '';
-        if(amountInput) amountInput.value = '';
-        if(clientSelect) clientSelect.value = '';
-        if(operationTypeSelect) operationTypeSelect.value = 'quotation';
-        
-        _0x3d2a['renderTasks']();
-        _0x3d2a['updateTaskClientFilter']();
-        _0x3d2a['play']('soundSuccess');
-    };
-    
-    _0x3d2a['updateTaskExtra'] = function(i, v){ 
-        if(tasks[i]) {
-            tasks[i].extra = v; 
-            saveToLocalDB('tasks', tasks);
-        }
-    };
-    _0x3d2a['delTask'] = function(i){ 
-        if(confirm("Delete?")){ 
-            tasks.splice(i,1); 
-            saveToLocalDB('tasks', tasks); 
-            _0x3d2a['renderTasks']();
-            _0x3d2a['updateTaskClientFilter']();
-            _0x3d2a['showToast']('✅ تم حذف العملية بنجاح', 'success');
-        } 
-    };
-    _0x3d2a['editTask'] = function(i){ 
-        var task = tasks[i]; 
-        editTaskIdx = i; 
-        document.getElementById('taskClientSelect').value = task.client || ''; 
-        document.getElementById('taskOperationType').value = task.operationType || 'quotation';
-        if(task.amount) document.getElementById('taskAmount').value = task.amount;
-        document.getElementById('taskText').value = task.text || ''; 
-        document.getElementById('taskNotes').value = task.taskNotes || ''; 
-        document.getElementById('extraInfo').value = task.extra || ''; 
-        document.getElementById('taskDate').value = task.date || ''; 
-        _0x3d2a['showToast']('✏️ جاري تعديل العملية، اضغط حفظ للتحديث', 'info');
-        window.scrollTo(0,0); 
-    };
-    _0x3d2a['fillClients'] = function(){ 
-        var sel = document.getElementById('taskClientSelect'); 
-        if(!sel) return; 
-        var t = translations[currentLang];
-        var options = '<option value="">' + (t['task_client_placeholder'] || 'ربط بعميل') + '</option>';
-        
-        if(clients.length === 0){
-            options += '<option value="" disabled>⚠️ لا يوجد عملاء - أضف عميل أولاً</option>';
-        } else {
-            clients.forEach(function(c){ 
-                if(c && c.name){
-                    options += '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; 
-                }
-            });
-        }
-        sel.innerHTML = options;
-        console.log("Fill clients - Total clients:", clients.length);
-    };
-    _0x3d2a['autoFill'] = function(){ 
-        var name = document.getElementById('taskClientSelect').value; 
-        if(!name) return;
-        var client = clients.find(function(c){ return c.name === name; }); 
-        if(client){ 
-            document.getElementById('extraInfo').value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || ''); 
-            _0x3d2a['showToast']('✅ تم تعبئة بيانات العميل تلقائياً', 'success');
-        } 
-    };
-    
-    // ==================== دوال سلة المحذوفات المحسنة ====================
-    
-    _0x3d2a['renderRecycle'] = function(){ 
-        var body = document.getElementById('recycleBody'); 
-        if(!body) {
-            console.log("recycleBody not found");
-            return; 
-        }
-        console.log("Rendering recycle bin, items:", deletedClients.length);
-        
-        if(deletedClients.length === 0){
-            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">📭 سلة المحذوفات فارغة</b></tr>';
-            return;
-        }
-        
-        body.innerHTML = deletedClients.map(function(c, i){
-            return '<tr>' +
-                '<td><b>' + (c.name || '') + '</b></td>' +
-                '<td>' + (c.phone || '') + '</td>' +
-                '<td>' + (c.status || '') + '</td>' +
-                '<td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td>' +
-                '<td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td>' +
-                '</tr>';
-        }).join(''); 
-    };
-    
-    _0x3d2a['refreshRecycle'] = function(){
-        _0x3d2a['renderRecycle']();
-        _0x3d2a['showToast']('✅ تم تحديث سلة المحذوفات', 'success');
-    };
-    
-    _0x3d2a['clearAllRecycle'] = function(){
-        if(confirm("⚠️ تحذير: هذا الإجراء سيقوم بحذف جميع العملاء في سلة المحذوفات نهائياً! هل أنت متأكد؟")){
-            var count = deletedClients.length;
-            if(count === 0){
-                _0x3d2a['showToast']('📭 سلة المحذوفات فارغة بالفعل', 'info');
-                return;
-            }
-            deletedClients = [];
-            saveToLocalDB('deletedClients', deletedClients);
-            _0x3d2a['renderRecycle']();
-            _0x3d2a['addLog']("Cleared all recycle bin (" + count + " items)");
-            _0x3d2a['showToast'](`🗑️ تم إفراغ سلة المحذوفات بالكامل (${count} عميل)`, 'success');
-            _0x3d2a['play']('soundAlert');
-        }
-    };
-    
-    _0x3d2a['delClient'] = function(i){
-        if(confirm("هل تريد نقل هذا العميل إلى سلة المحذوفات؟")){
-            var c = clients[i];
-            if(!c) {
-                console.log("Client not found at index:", i);
-                return;
-            }
-            console.log("Moving to recycle:", c.name);
-            _0x3d2a['addLog']("Archived: " + c.name);
-            
-            deletedClients.push(c);
-            clients.splice(i,1);
-            
-            saveToLocalDB('clients', clients);
-            saveToLocalDB('deletedClients', deletedClients);
-            
-            _0x3d2a['notify']("✅ تم نقل العميل إلى سلة المحذوفات", "success");
-            _0x3d2a['renderCRM']();
-            _0x3d2a['renderRecycle']();
-            _0x3d2a['updateAgentList']();
-            _0x3d2a['fillClients']();
-            _0x3d2a['play']('soundSuccess');
-        }
-    };
-    
-    _0x3d2a['restore'] = function(i){
-        if(confirm("هل تريد استعادة هذا العميل؟")){
-            var c = deletedClients[i];
-            if(!c) {
-                console.log("Deleted client not found at index:", i);
-                return;
-            }
-            console.log("Restoring client:", c.name);
-            
-            clients.push(c);
-            deletedClients.splice(i,1);
-            
-            saveToLocalDB('clients', clients);
-            saveToLocalDB('deletedClients', deletedClients);
-            
-            _0x3d2a['notify']("✅ تم استعادة العميل بنجاح", "success");
-            _0x3d2a['renderCRM']();
-            _0x3d2a['renderRecycle']();
-            _0x3d2a['updateAgentList']();
-            _0x3d2a['fillClients']();
-            _0x3d2a['play']('soundSuccess');
-        }
-    };
-    
-    _0x3d2a['hardDelete'] = function(i){
-        if(confirm("⚠️ تحذير: هذا الإجراء نهائي ولا يمكن التراجع عنه! هل تريد حذف هذا العميل نهائياً؟")){
-            var c = deletedClients[i];
-            if(!c) {
-                console.log("Deleted client not found at index:", i);
-                return;
-            }
-            console.log("Permanently deleting client:", c.name);
-            _0x3d2a['addLog']("Permanently deleted: " + c.name);
-            
-            deletedClients.splice(i,1);
-            saveToLocalDB('deletedClients', deletedClients);
-            
-            _0x3d2a['notify']("🗑️ تم حذف العميل نهائياً", "error");
-            _0x3d2a['renderRecycle']();
-            _0x3d2a['play']('soundAlert');
-        }
-    };
-    
-    _0x3d2a['renderUsers'] = function(){
-        var body = document.getElementById('usersBody');
-        if(!body) return;
-        if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
-            body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></tr>";
-            return;
-        }
-        if (authSystem.users && authSystem.users.length > 0) {
-            body.innerHTML = authSystem.users.map(function(u,i){
-                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</b><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></b></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></b></tr>';
-            }).join('');
-        } else {
-            body.innerHTML = "<tr><td colspan='5'>No users found</b></tr>";
-        }
-    };
-    
-    _0x3d2a['edit'] = function(i){
+        deletedClients = [];
+        window._0x3d2a.saveToLocalDB('deletedClients', deletedClients);
+        window._0x3d2a.renderRecycle();
+        window._0x3d2a.addLog("Cleared all recycle bin (" + count + " items)");
+        window._0x3d2a.showToast(`🗑️ تم إفراغ سلة المحذوفات بالكامل (${count} عميل)`, 'success');
+        window._0x3d2a.play('soundAlert');
+    }
+};
+
+window._0x3d2a.delClient = function(i){
+    if(confirm("هل تريد نقل هذا العميل إلى سلة المحذوفات؟")){
         var c = clients[i];
-        editIdx = i;
-        document.getElementById('name').value = c.name || '';
-        document.getElementById('phone').value = c.phone || '';
-        document.getElementById('gov').value = c.gov || '';
-        document.getElementById('status').value = c.status || 'Interested';
-        document.getElementById('notes').value = c.notes || '';
-        document.getElementById('agent').value = c.agent || '';
-        document.getElementById('date').value = c.date || '';
-        document.getElementById('btnSave').innerHTML = translations[currentLang]['update_btn'];
-        document.getElementById('btnSave').style.background = "var(--info)";
-        _0x3d2a['show']('crmTab', null);
-        window.scrollTo(0,0);
-    };
-    
-    _0x3d2a['calcScore'] = function(c){
-        var s = 40;
-        if(c.status === 'VIP') s += 50;
-        if(c.status === 'Completed') s += 60;
-        if(c.status === 'Interested') s += 20;
-        if(c.status === 'Hold') s -= 30;
-        if(c.notes && c.notes.length > 20) s += 10;
-        return Math.min(100, Math.max(0, s));
-    };
-    
-    _0x3d2a['statusColor'] = function(s){
-        var cols = { 'Interested': '#17a2b8', 'In Progress': '#ffcc00', 'Hold': '#dc3545', 'Completed': '#28a745', 'VIP': '#9b59b6' };
-        return cols[s] || '#333';
-    };
-    
-    _0x3d2a['updateDash'] = function(){
-        document.getElementById('countTotal').innerText = clients.length;
-        document.getElementById('countVip').innerText = clients.filter(function(c){ return c.status === 'VIP'; }).length;
-        document.getElementById('countComp').innerText = clients.filter(function(c){ return c.status === 'Completed'; }).length;
-        var ctx = document.getElementById('statusChart').getContext('2d');
-        var counts = { Interested:0, "In Progress":0, Hold:0, Completed:0, VIP:0 };
-        clients.forEach(function(c){ if(c.status) counts[c.status]++; });
-        if(statusChart) statusChart.destroy();
-        statusChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745', '#9b59b6'], borderWidth: 0 }] },
-            options: { plugins: { legend: { position: 'bottom' } } }
-        });
-    };
-    
-    _0x3d2a['updateGeo'] = function(){
-        var div = document.getElementById('geoStats');
-        if(!div) return;
-        div.innerHTML = '';
-        var cnt = {};
-        clients.forEach(function(c){ if(c.gov) cnt[c.gov] = (cnt[c.gov] || 0) + 1; });
-        Object.entries(cnt).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(g){
-            div.innerHTML += '<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between;"><span>' + g[0] + '</span><b style="color:var(--info)">' + g[1] + '</b></div>';
-        });
-    };
-    
-    _0x3d2a['init'] = async function(){
-        if(!sessionStorage.getItem('isLoggedIn')) return;
+        if(!c) return;
+        window._0x3d2a.addLog("Archived: " + c.name);
         
-        await loadDataFromLocalDB();
+        deletedClients.push(c);
+        clients.splice(i,1);
         
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
+        window._0x3d2a.saveToLocalDB('clients', clients);
+        window._0x3d2a.saveToLocalDB('deletedClients', deletedClients);
         
-        updateUILanguage();
+        window._0x3d2a.notify("✅ تم نقل العميل إلى سلة المحذوفات", "success");
+        window._0x3d2a.renderCRM();
+        window._0x3d2a.renderRecycle();
+        window._0x3d2a.updateAgentList();
+        window._0x3d2a.fillClients();
+        window._0x3d2a.play('soundSuccess');
+    }
+};
+
+window._0x3d2a.restore = function(i){
+    if(confirm("هل تريد استعادة هذا العميل؟")){
+        var c = deletedClients[i];
+        if(!c) return;
         
-        setTimeout(function(){
-            var userName = sessionStorage.getItem('userDisplayName');
-            if(userName){
-                var els = document.querySelectorAll('span, div, b, p, h3');
-                els.forEach(function(el){
-                    if(el.innerText && el.innerText.trim() === userName.trim() && el.children.length === 0){
-                        el.style.display = 'inline-flex';
-                        el.style.alignItems = 'center';
-                        el.style.gap = '10px';
-                        el.innerHTML = userName + ' <a href="tel:01222153415" style="background:#00ff88 !important; color:#000 !important; padding:2px 10px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:bold; box-shadow:0 0 10px rgba(0,255,136,0.5); margin-left:5px;">📞 01222153415</a>';
-                    }
-                });
-            }
-        }, 1500);
+        clients.push(c);
+        deletedClients.splice(i,1);
         
-        var badge = document.getElementById('userBadge');
-        if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
+        window._0x3d2a.saveToLocalDB('clients', clients);
+        window._0x3d2a.saveToLocalDB('deletedClients', deletedClients);
+        
+        window._0x3d2a.notify("✅ تم استعادة العميل بنجاح", "success");
+        window._0x3d2a.renderCRM();
+        window._0x3d2a.renderRecycle();
+        window._0x3d2a.updateAgentList();
+        window._0x3d2a.fillClients();
+        window._0x3d2a.play('soundSuccess');
+    }
+};
+
+window._0x3d2a.hardDelete = function(i){
+    if(confirm("⚠️ تحذير: هذا الإجراء نهائي ولا يمكن التراجع عنه! هل تريد حذف هذا العميل نهائياً؟")){
+        var c = deletedClients[i];
+        if(!c) return;
+        window._0x3d2a.addLog("Permanently deleted: " + c.name);
+        
+        deletedClients.splice(i,1);
+        window._0x3d2a.saveToLocalDB('deletedClients', deletedClients);
+        
+        window._0x3d2a.notify("🗑️ تم حذف العميل نهائياً", "error");
+        window._0x3d2a.renderRecycle();
+        window._0x3d2a.play('soundAlert');
+    }
+};
+
+window._0x3d2a.renderUsers = function(){
+    var body = document.getElementById('usersBody');
+    if(!body) return;
+    if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
+        body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></tr>";
+        return;
+    }
+    if (authSystem.users && authSystem.users.length > 0) {
+        body.innerHTML = authSystem.users.map(function(u,i){
+            return '<tr>' +
+                '<td>' + (u.u || '') + '</td>' +
+                '<td class="mask-pass">**</b></td>' +
+                '<td>' + (u.displayName || '') + '</td>' +
+                '<td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></b></td>' +
+                '<td><button class="action-btn btn-del" onclick="window._0x3d2a.delUser(' + i + ')">✕</button></b></td>' +
+            '</tr>';
+        }).join('');
+    } else {
+        body.innerHTML = "<tr><td colspan='5'>No users found</b></tr>";
+    }
+};
+
+window._0x3d2a.edit = function(i){
+    var c = clients[i];
+    editIdx = i;
+    var nameInput = document.getElementById('name');
+    var phoneInput = document.getElementById('phone');
+    var govSelect = document.getElementById('gov');
+    var statusSelect = document.getElementById('status');
+    var notesArea = document.getElementById('notes');
+    var agentInput = document.getElementById('agent');
+    var dateInput = document.getElementById('date');
+    var btnSave = document.getElementById('btnSave');
+    
+    if(nameInput) nameInput.value = c.name || '';
+    if(phoneInput) phoneInput.value = c.phone || '';
+    if(govSelect) govSelect.value = c.gov || '';
+    if(statusSelect) statusSelect.value = c.status || 'Interested';
+    if(notesArea) notesArea.value = c.notes || '';
+    if(agentInput) agentInput.value = c.agent || '';
+    if(dateInput) dateInput.value = c.date || '';
+    if(btnSave) {
+        btnSave.innerHTML = translations[currentLang]['update_btn'];
+        btnSave.style.background = "var(--info)";
+    }
+    window._0x3d2a.show('crmTab', null);
+    window.scrollTo(0,0);
+};
+
+window._0x3d2a.calcScore = function(c){
+    var s = 40;
+    if(c.status === 'VIP') s += 50;
+    if(c.status === 'Completed') s += 60;
+    if(c.status === 'Interested') s += 20;
+    if(c.status === 'Hold') s -= 30;
+    if(c.notes && c.notes.length > 20) s += 10;
+    return Math.min(100, Math.max(0, s));
+};
+
+window._0x3d2a.statusColor = function(s){
+    var cols = { 'Interested': '#17a2b8', 'In Progress': '#ffcc00', 'Hold': '#dc3545', 'Completed': '#28a745', 'VIP': '#9b59b6' };
+    return cols[s] || '#333';
+};
+
+window._0x3d2a.updateDash = function(){
+    var countTotal = document.getElementById('countTotal');
+    var countVip = document.getElementById('countVip');
+    var countComp = document.getElementById('countComp');
+    if(countTotal) countTotal.innerText = clients.length;
+    if(countVip) countVip.innerText = clients.filter(function(c){ return c.status === 'VIP'; }).length;
+    if(countComp) countComp.innerText = clients.filter(function(c){ return c.status === 'Completed'; }).length;
+    
+    var ctx = document.getElementById('statusChart');
+    if(!ctx) return;
+    var counts = { Interested:0, "In Progress":0, Hold:0, Completed:0, VIP:0 };
+    clients.forEach(function(c){ if(c.status) counts[c.status]++; });
+    if(statusChart) statusChart.destroy();
+    statusChart = new Chart(ctx.getContext('2d'), {
+        type: 'doughnut',
+        data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745', '#9b59b6'], borderWidth: 0 }] },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
+};
+
+window._0x3d2a.updateGeo = function(){
+    var div = document.getElementById('geoStats');
+    if(!div) return;
+    div.innerHTML = '';
+    var cnt = {};
+    clients.forEach(function(c){ if(c.gov) cnt[c.gov] = (cnt[c.gov] || 0) + 1; });
+    Object.entries(cnt).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(g){
+        div.innerHTML += '<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between;"><span>' + g[0] + '</span><b style="color:var(--info)">' + g[1] + '</b></div>';
+    });
+};
+
+window._0x3d2a.init = async function(){
+    if(!sessionStorage.getItem('isLoggedIn')) return;
+    
+    await loadDataFromLocalDB();
+    
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    
+    updateUILanguage();
+    
+    var badge = document.getElementById('userBadge');
+    if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
+        if(badge) {
             badge.innerText = "👑 MASTER ACCESS";
             badge.style.background = "var(--vip)";
             badge.style.display = "inline-block";
-        } else { badge.style.display = "none"; }
-        
-        if(sessionStorage.getItem('userRole') === 'admin'){
-            document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = 'block'; });
         }
-        
-        var govSel = document.getElementById('gov');
-        if(govSel && govSel.options.length <= 1){
-            govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; govSel.appendChild(opt); });
-        }
-        
-        var filterGovSel = document.getElementById('filterGov');
-        if(filterGovSel && filterGovSel.options.length <= 1){
-            govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; filterGovSel.appendChild(opt); });
-        }
-        
-        _0x3d2a['renderUsers']();
-        _0x3d2a['renderCRM']();
-        _0x3d2a['renderTasks']();
-        _0x3d2a['renderRecycle']();
-        _0x3d2a['updateDash']();
-        _0x3d2a['updateGeo']();
-        _0x3d2a['fillClients']();
-        _0x3d2a['updateAgentList']();
-        _0x3d2a['updateTaskClientFilter']();
-        
-        var prof = document.getElementById('profName');
-        if(prof) prof.innerText = sessionStorage.getItem('userDisplayName') || "User";
-        
-        _0x3d2a['showToast']('🤖 AI Enhancement Active | نظام آمن بالكامل | Ultra Secure Mode', 'info');
-        
-        startPeriodicSync();
-        if (isOnline) { setTimeout(() => { fullSync(); }, 1000); }
-        
-        if (Notification.permission === 'default') {
-            setTimeout(() => {
-                if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { _0x3d2a['enableDesktopNotifications'](); }
-            }, 2000);
-        }
-    };
+    } else { 
+        if(badge) badge.style.display = "none"; 
+    }
     
-    _0x3d2a['init']();
-})();
+    if(sessionStorage.getItem('userRole') === 'admin'){
+        document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = 'block'; });
+    }
+    
+    var govSel = document.getElementById('gov');
+    if(govSel && govSel.options.length <= 1){
+        govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; govSel.appendChild(opt); });
+    }
+    
+    var filterGovSel = document.getElementById('filterGov');
+    if(filterGovSel && filterGovSel.options.length <= 1){
+        govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; filterGovSel.appendChild(opt); });
+    }
+    
+    window._0x3d2a.renderUsers();
+    window._0x3d2a.renderCRM();
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.renderRecycle();
+    window._0x3d2a.updateDash();
+    window._0x3d2a.updateGeo();
+    window._0x3d2a.fillClients();
+    window._0x3d2a.updateAgentList();
+    window._0x3d2a.updateTaskClientFilter();
+    
+    var profName = document.getElementById('profName');
+    if(profName) profName.innerText = sessionStorage.getItem('userDisplayName') || "User";
+    
+    window._0x3d2a.showToast('🤖 AI Enhancement Active | نظام آمن بالكامل | Ultra Secure Mode', 'info');
+    
+    startPeriodicSync();
+    
+    if (Notification.permission === 'default') {
+        setTimeout(() => {
+            if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { window._0x3d2a.enableDesktopNotifications(); }
+        }, 2000);
+    }
+};
+
+// بدء التشغيل
+if(sessionStorage.getItem('isLoggedIn') === 'true'){
+    window._0x3d2a.init();
+}
 </script>
 </body>
 </html>
