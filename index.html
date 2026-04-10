@@ -343,6 +343,16 @@
             font-weight: bold;
             color: var(--success);
         }
+        
+        /* زر تحديث سلة المحذوفات */
+        .recycle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;"> 
@@ -463,7 +473,7 @@
             <div id="aiRecommendations" class="ai-recommendation" style="display: none;"></div>
 
             <div class="table-container">
-                <table>
+                </table>
                     <thead>
                         <tr>
                             <th onclick="_0x3d2a['sort'](0)" id="thName">Name ↕️</th>
@@ -568,6 +578,10 @@
 
         <div id="recycleTab" class="tab-content">
             <h2 id="recycleTitle" style="color:var(--danger)">♻️ سلة المحذوفات (المؤرشفة)</h2>
+            <div class="recycle-header">
+                <button onclick="_0x3d2a['refreshRecycle']()" class="btn-ai" style="background: #17a2b8;">🔄 تحديث سلة المحذوفات</button>
+                <button onclick="_0x3d2a['clearAllRecycle']()" class="btn-ai" style="background: #dc3545;" id="clearAllRecycleBtn">🗑️ إفراغ السلة بالكامل</button>
+            </div>
             <div class="table-container">
                 <table>
                     <thead>
@@ -600,7 +614,7 @@
                     </select>
                     <button onclick="_0x3d2a['addUser']()" class="btn-save" style="background:var(--primary)" id="registerBtn">تسجيل مستخدم جديد</button>
                     <div class="table-container" style="margin-top:20px;">
-                        </table>
+                        <table>
                             <thead>
                                 <tr>
                                     <th id="usersTableUser">المستخدم</th>
@@ -819,7 +833,8 @@
             'task_type_header': 'Operation Type', 'task_amount_header': 'Amount',
             'op_quotation': 'Quotation Request', 'op_followup': 'Quotation Follow-up',
             'op_supply': 'Supply', 'op_bank': 'Bank', 'op_cash': 'Cash',
-            'task_notes_placeholder': 'Additional notes about the operation...'
+            'task_notes_placeholder': 'Additional notes about the operation...',
+            'refresh_recycle': '🔄 Refresh Recycle Bin', 'clear_all_recycle': '🗑️ Clear All'
         },
         ar: {
             'm_crm': '👥 إدارة العملاء', 'm_tasks': '📅 المهام والعمليات', 'm_dash': '📊 التحليلات الذكية',
@@ -861,7 +876,8 @@
             'task_type_header': 'نوع العملية', 'task_amount_header': 'المبلغ',
             'op_quotation': '📄 طلب عرض سعر', 'op_followup': '👀 متابعة عرض سعر',
             'op_supply': '🚚 توريد', 'op_bank': '🏦 بنك', 'op_cash': '💵 كاش',
-            'task_notes_placeholder': 'ملاحظات إضافية عن العملية...'
+            'task_notes_placeholder': 'ملاحظات إضافية عن العملية...',
+            'refresh_recycle': '🔄 تحديث سلة المحذوفات', 'clear_all_recycle': '🗑️ إفراغ السلة بالكامل'
         }
     };
     
@@ -968,6 +984,12 @@
         var newDInput = document.getElementById('newD'); if (newDInput) newDInput.placeholder = t['fullname_placeholder'];
         var changePassInput = document.getElementById('changePassInput'); if (changePassInput) changePassInput.placeholder = t['change_pass_label'];
         var voiceBtn = document.getElementById('voiceBtn'); if (voiceBtn) voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + t['voice_search'];
+        
+        var refreshRecycleBtn = document.querySelector('#recycleTab .recycle-header button:first-child');
+        if (refreshRecycleBtn && t['refresh_recycle']) refreshRecycleBtn.innerHTML = t['refresh_recycle'];
+        
+        var clearAllRecycleBtn = document.getElementById('clearAllRecycleBtn');
+        if (clearAllRecycleBtn && t['clear_all_recycle']) clearAllRecycleBtn.innerHTML = t['clear_all_recycle'];
         
         var filterStatus = document.getElementById('filterStatus');
         if (filterStatus) {
@@ -1091,7 +1113,6 @@
         deletedClients: "++id, name, phone",
         users: "++id, u"
     }).upgrade(function(trans) {
-        // تحديث المهام القديمة لإضافة الحقول الجديدة
         return trans.tasks.toCollection().modify(function(task) {
             if (!task.operationType) task.operationType = 'quotation';
             if (task.amount === undefined) task.amount = null;
@@ -1198,10 +1219,10 @@
     
     async function loadDataFromLocalDB() {
         try {
-            clients = await localDB.clients.toArray();
-            tasks = await localDB.tasks.toArray();
-            deletedClients = await localDB.deletedClients.toArray();
-            var usersArray = await localDB.users.toArray();
+            clients = await localDB.clients.toArray() || [];
+            tasks = await localDB.tasks.toArray() || [];
+            deletedClients = await localDB.deletedClients.toArray() || [];
+            var usersArray = await localDB.users.toArray() || [];
             
             if (usersArray.length === 0) {
                 await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
@@ -1209,14 +1230,18 @@
             }
             
             authSystem.users = usersArray;
-            console.log("Data loaded - Clients:", clients.length, "Tasks:", tasks.length, "Users:", authSystem.users.length);
+            console.log("Data loaded - Clients:", clients.length, "Tasks:", tasks.length, "Deleted:", deletedClients.length, "Users:", authSystem.users.length);
         } catch (err) {
             console.error("Error loading from IndexedDB:", err);
+            clients = [];
+            tasks = [];
+            deletedClients = [];
             try {
                 await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
                 authSystem.users = await localDB.users.toArray();
             } catch(e) {
                 console.error("Failed to add default users:", e);
+                authSystem.users = defaultUsers;
             }
         }
     }
@@ -1695,7 +1720,7 @@
         });
         
         if (filteredTasks.length === 0 && tasks.length > 0) {
-            body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">⚠️ لا توجد مهام تطابق معايير البحث</td></tr>';
+            body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">⚠️ لا توجد مهام تطابق معايير البحث</b></tr>';
         }
         
         filteredTasks.forEach(function(task, idx){
@@ -1726,7 +1751,7 @@
         });
         
         if (tasks.length === 0) {
-            body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</td></tr>';
+            body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
         }
     };
     
@@ -1869,39 +1894,135 @@
             _0x3d2a['showToast']('✅ تم تعبئة بيانات العميل تلقائياً', 'success');
         } 
     };
-    _0x3d2a['renderRecycle'] = function(){ var body = document.getElementById('recycleBody'); if(!body) return; body.innerHTML = deletedClients.map(function(c,i){ return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td></tr>'; }).join(''); };
-    _0x3d2a['restore'] = function(i){ clients.push(deletedClients[i]); deletedClients.splice(i,1); saveToLocalDB('clients', clients); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['notify']("Restored", "success"); _0x3d2a['renderCRM'](); _0x3d2a['renderRecycle'](); _0x3d2a['fillClients'](); };
-    _0x3d2a['hardDelete'] = function(i){ if(confirm("Permanent delete?")){ deletedClients.splice(i,1); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['renderRecycle'](); } };
+    
+    // ==================== دوال سلة المحذوفات المحسنة ====================
+    
+    _0x3d2a['renderRecycle'] = function(){ 
+        var body = document.getElementById('recycleBody'); 
+        if(!body) {
+            console.log("recycleBody not found");
+            return; 
+        }
+        console.log("Rendering recycle bin, items:", deletedClients.length);
+        
+        if(deletedClients.length === 0){
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">📭 سلة المحذوفات فارغة</b></tr>';
+            return;
+        }
+        
+        body.innerHTML = deletedClients.map(function(c, i){
+            return '<tr>' +
+                '<td><b>' + (c.name || '') + '</b></td>' +
+                '<td>' + (c.phone || '') + '</td>' +
+                '<td>' + (c.status || '') + '</td>' +
+                '<td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td>' +
+                '<td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td>' +
+                '</tr>';
+        }).join(''); 
+    };
+    
+    _0x3d2a['refreshRecycle'] = function(){
+        _0x3d2a['renderRecycle']();
+        _0x3d2a['showToast']('✅ تم تحديث سلة المحذوفات', 'success');
+    };
+    
+    _0x3d2a['clearAllRecycle'] = function(){
+        if(confirm("⚠️ تحذير: هذا الإجراء سيقوم بحذف جميع العملاء في سلة المحذوفات نهائياً! هل أنت متأكد؟")){
+            var count = deletedClients.length;
+            if(count === 0){
+                _0x3d2a['showToast']('📭 سلة المحذوفات فارغة بالفعل', 'info');
+                return;
+            }
+            deletedClients = [];
+            saveToLocalDB('deletedClients', deletedClients);
+            _0x3d2a['renderRecycle']();
+            _0x3d2a['addLog']("Cleared all recycle bin (" + count + " items)");
+            _0x3d2a['showToast'](`🗑️ تم إفراغ سلة المحذوفات بالكامل (${count} عميل)`, 'success');
+            _0x3d2a['play']('soundAlert');
+        }
+    };
+    
+    _0x3d2a['delClient'] = function(i){
+        if(confirm("هل تريد نقل هذا العميل إلى سلة المحذوفات؟")){
+            var c = clients[i];
+            if(!c) {
+                console.log("Client not found at index:", i);
+                return;
+            }
+            console.log("Moving to recycle:", c.name);
+            _0x3d2a['addLog']("Archived: " + c.name);
+            
+            deletedClients.push(c);
+            clients.splice(i,1);
+            
+            saveToLocalDB('clients', clients);
+            saveToLocalDB('deletedClients', deletedClients);
+            
+            _0x3d2a['notify']("✅ تم نقل العميل إلى سلة المحذوفات", "success");
+            _0x3d2a['renderCRM']();
+            _0x3d2a['renderRecycle']();
+            _0x3d2a['updateAgentList']();
+            _0x3d2a['fillClients']();
+            _0x3d2a['play']('soundSuccess');
+        }
+    };
+    
+    _0x3d2a['restore'] = function(i){
+        if(confirm("هل تريد استعادة هذا العميل؟")){
+            var c = deletedClients[i];
+            if(!c) {
+                console.log("Deleted client not found at index:", i);
+                return;
+            }
+            console.log("Restoring client:", c.name);
+            
+            clients.push(c);
+            deletedClients.splice(i,1);
+            
+            saveToLocalDB('clients', clients);
+            saveToLocalDB('deletedClients', deletedClients);
+            
+            _0x3d2a['notify']("✅ تم استعادة العميل بنجاح", "success");
+            _0x3d2a['renderCRM']();
+            _0x3d2a['renderRecycle']();
+            _0x3d2a['updateAgentList']();
+            _0x3d2a['fillClients']();
+            _0x3d2a['play']('soundSuccess');
+        }
+    };
+    
+    _0x3d2a['hardDelete'] = function(i){
+        if(confirm("⚠️ تحذير: هذا الإجراء نهائي ولا يمكن التراجع عنه! هل تريد حذف هذا العميل نهائياً؟")){
+            var c = deletedClients[i];
+            if(!c) {
+                console.log("Deleted client not found at index:", i);
+                return;
+            }
+            console.log("Permanently deleting client:", c.name);
+            _0x3d2a['addLog']("Permanently deleted: " + c.name);
+            
+            deletedClients.splice(i,1);
+            saveToLocalDB('deletedClients', deletedClients);
+            
+            _0x3d2a['notify']("🗑️ تم حذف العميل نهائياً", "error");
+            _0x3d2a['renderRecycle']();
+            _0x3d2a['play']('soundAlert');
+        }
+    };
     
     _0x3d2a['renderUsers'] = function(){
         var body = document.getElementById('usersBody');
         if(!body) return;
         if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
-            body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
+            body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></tr>";
             return;
         }
         if (authSystem.users && authSystem.users.length > 0) {
             body.innerHTML = authSystem.users.map(function(u,i){
-                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</td><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></td></tr>';
+                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</b><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></b></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></b></tr>';
             }).join('');
         } else {
-            body.innerHTML = "<tr><td colspan='5'>No users found</td></tr>";
-        }
-    };
-    
-    _0x3d2a['delClient'] = function(i){
-        if(confirm("Move to recycle?")){
-            var c = clients[i];
-            _0x3d2a['addLog']("Archived: " + c.name);
-            deletedClients.push(c);
-            clients.splice(i,1);
-            saveToLocalDB('clients', clients);
-            saveToLocalDB('deletedClients', deletedClients);
-            _0x3d2a['notify']("Archived", "success");
-            _0x3d2a['renderCRM']();
-            _0x3d2a['renderRecycle']();
-            _0x3d2a['updateAgentList']();
-            _0x3d2a['fillClients']();
+            body.innerHTML = "<tr><td colspan='5'>No users found</b></tr>";
         }
     };
     
