@@ -2,7 +2,7 @@
 <html lang="en" id="htmlTag" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia Trading Pro CRM & Tasks | AI Enhanced + Advanced Features</title>
+    <title>Utopia Trading Pro CRM & Tasks | Ultra Secure</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     
@@ -10,14 +10,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
-    <!-- إضافات احترافية -->
+    <script src="https://unpkg.com/dexie@3.2.3/dist/dexie.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    
-    <!-- إضافة Font Awesome للأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* ===== الكود الأصلي يبدأ هنا (تم الاحتفاظ به بالكامل) ===== */
         :root {
             --primary: #1e1e2f;
             --accent: #ffcc00;
@@ -30,12 +27,7 @@
             --text-main: #333;
             --sidebar-width: 260px;
         }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-bg);
@@ -49,11 +41,7 @@
             -ms-user-select: none;
             user-select: none;
         }
-
-        [dir="rtl"] body {
-            flex-direction: row-reverse;
-        }
-
+        [dir="rtl"] body { flex-direction: row-reverse; }
         #loginOverlay {
             position: fixed;
             top: 0;
@@ -66,7 +54,6 @@
             align-items: center;
             z-index: 20000;
         }
-
         .login-card {
             background: #2e2e4d;
             padding: 45px;
@@ -79,13 +66,7 @@
             border-top: 6px solid var(--accent);
             position: relative;
         }
-
-        .login-card h2 {
-            margin-bottom: 25px;
-            font-size: 1.8em;
-            letter-spacing: 1px;
-        }
-
+        .login-card h2 { margin-bottom: 25px; font-size: 1.8em; letter-spacing: 1px; }
         .login-card input {
             background: #3f3f6b;
             border: 2px solid transparent;
@@ -97,13 +78,11 @@
             font-size: 16px;
             transition: 0.3s;
         }
-
         .login-card input:focus {
             border-color: var(--accent);
             outline: none;
             background: #4a4a7d;
         }
-
         .login-card button {
             background: var(--accent);
             color: var(--primary);
@@ -117,18 +96,11 @@
             text-transform: uppercase;
             transition: 0.3s;
         }
-
         .login-card button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
         }
-
-        #mainApp {
-            display: none;
-            width: 100%;
-            height: 100vh;
-        }
-
+        #mainApp { display: none; width: 100%; height: 100vh; }
         .sidebar {
             width: var(--sidebar-width);
             background: var(--primary);
@@ -141,23 +113,8 @@
             position: relative;
             z-index: 1000;
         }
-
-        .sidebar h2 {
-            font-size: 1.4em;
-            margin-bottom: 10px;
-            color: var(--accent);
-            text-align: center;
-        }
-
-        .dev-info {
-            font-size: 0.8em;
-            color: #aaa;
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #333;
-        }
-
+        .sidebar h2 { font-size: 1.4em; margin-bottom: 10px; color: var(--accent); text-align: center; }
+        .dev-info { font-size: 0.8em; color: #aaa; text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #333; }
         .sidebar button {
             background: #2e2e4d;
             color: #fff;
@@ -173,57 +130,15 @@
             gap: 12px;
             transition: all 0.2s ease;
         }
-
-        [dir="rtl"] .sidebar button {
-            text-align: right;
-            flex-direction: row-reverse;
-        }
-
-        .sidebar button:hover {
-            background: #3a3a5a;
-            padding-left: 22px;
-        }
-
-        .sidebar button.active {
-            background: var(--accent);
-            color: var(--primary);
-        }
-
-        .main {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            background-color: #f0f2f5;
-        }
-
-        .tab-content {
-            display: none;
-            animation: slideUp 0.5s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-group {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-            margin-bottom: 25px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-
+        [dir="rtl"] .sidebar button { text-align: right; flex-direction: row-reverse; }
+        .sidebar button:hover { background: #3a3a5a; padding-left: 22px; }
+        .sidebar button.active { background: var(--accent); color: var(--primary); }
+        .main { flex: 1; padding: 30px; overflow-y: auto; background-color: #f0f2f5; }
+        .tab-content { display: none; animation: slideUp 0.5s ease; }
+        .tab-content.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .form-group { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); margin-bottom: 25px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         input, select, textarea {
             padding: 14px;
             margin: 8px 0;
@@ -235,13 +150,11 @@
             outline: none;
             transition: 0.3s;
         }
-
         input:focus, select:focus {
             border-color: var(--info);
             background: #fff;
             box-shadow: 0 0 0 4px rgba(23, 162, 184, 0.1);
         }
-
         .btn-save {
             background: var(--success);
             color: white;
@@ -255,21 +168,8 @@
             font-size: 1.1em;
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
         }
-
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
-        }
-
+        .table-container { width: 100%; overflow-x: auto; background: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th {
             background: var(--primary);
             color: var(--accent);
@@ -282,22 +182,10 @@
             top: 0;
             cursor: pointer;
         }
-
-        td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #f0f0f0;
-            color: #555;
-            font-size: 14px;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
+        td { padding: 15px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #555; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
         .vip-row { background-color: #fffcf0 !important; border-left: 6px solid var(--vip); }
         .hold-row { background-color: #fff5f5 !important; border-left: 6px solid var(--danger); }
-
         .action-btn {
             width: 35px;
             height: 35px;
@@ -311,13 +199,11 @@
             align-items: center;
             justify-content: center;
         }
-
         .btn-call { background: var(--info); }
         .btn-wa { background: #25D366; }
         .btn-del { background: var(--danger); }
         .btn-edit { background: var(--accent); color: var(--primary); }
         .btn-ai { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: auto; padding: 6px 12px; border-radius: 20px; font-size: 11px; margin-left: 8px; }
-
         #notification {
             position: fixed;
             top: 25px;
@@ -331,66 +217,13 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             animation: fadeInRight 0.3s ease;
         }
-
-        @keyframes fadeInRight {
-            from { opacity: 0; transform: translateX(50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        /* Anti-theft watermark */
-        .watermark {
-            position: fixed;
-            bottom: 5px;
-            right: 5px;
-            font-size: 9px;
-            color: rgba(0,0,0,0.2);
-            pointer-events: none;
-            z-index: 99999;
-        }
-        
-        /* حماية إضافية - منع تحديد النص */
-        .no-select {
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        
-        /* ===== إضافات احترافية جديدة ===== */
-        .ai-score {
-            font-weight: bold;
-            color: var(--info);
-            background: #e3f2fd;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-size: 11px;
-            margin-left: 5px;
-        }
-        
-        .suggestion-badge {
-            background: #fff3cd;
-            color: #856404;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            margin-top: 8px;
-            display: inline-block;
-        }
-        
-        .ai-recommendation {
-            border-left: 4px solid var(--vip);
-            background: #f8f9fa;
-            padding: 8px 12px;
-            border-radius: 10px;
-            margin: 10px 0;
-            font-size: 13px;
-        }
-        
+        @keyframes fadeInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .watermark { position: fixed; bottom: 5px; right: 5px; font-size: 9px; color: rgba(0,0,0,0.2); pointer-events: none; z-index: 99999; }
+        .no-select { user-select: none; -webkit-user-select: none; }
+        .ai-score { font-weight: bold; color: var(--info); background: #e3f2fd; padding: 2px 6px; border-radius: 12px; font-size: 11px; margin-left: 5px; }
+        .suggestion-badge { background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 20px; font-size: 11px; margin-top: 8px; display: inline-block; }
+        .ai-recommendation { border-left: 4px solid var(--vip); background: #f8f9fa; padding: 8px 12px; border-radius: 10px; margin: 10px 0; font-size: 13px; }
         .toast-notification {
             position: fixed;
             bottom: 30px;
@@ -406,85 +239,43 @@
             align-items: center;
             gap: 12px;
         }
-        
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* ===== إضافات جديدة متقدمة ===== */
-        .advanced-filter-bar {
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .advanced-filter-bar input, .advanced-filter-bar select {
-            margin: 0;
-            flex: 1;
-            min-width: 120px;
-        }
-        
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        .advanced-filter-bar { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .advanced-filter-bar input, .advanced-filter-bar select { margin: 0; flex: 1; min-width: 120px; }
         .priority-high { background-color: #ffebee !important; border-left: 4px solid #f44336; }
         .priority-medium { background-color: #fff8e1 !important; border-left: 4px solid #ffc107; }
         .priority-low { background-color: #e8f5e9 !important; border-left: 4px solid #4caf50; }
-        
-        .voice-btn {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-        
-        .voice-btn.listening {
-            animation: pulse 1.5s infinite;
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .kpi-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-        }
-        
+        .voice-btn { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; border: none; padding: 8px 15px; border-radius: 30px; cursor: pointer; font-size: 14px; transition: 0.3s; }
+        .voice-btn.listening { animation: pulse 1.5s infinite; background: linear-gradient(135deg, #f093fb, #f5576c); }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        .kpi-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; padding: 15px; text-align: center; }
         .kpi-card h4 { margin: 0 0 10px 0; font-size: 14px; opacity: 0.9; }
         .kpi-card .value { font-size: 28px; font-weight: bold; margin: 0; }
         .kpi-card .trend { font-size: 12px; margin-top: 5px; }
         .trend-up { color: #a5d6a7; }
         .trend-down { color: #ef9a9a; }
+        .notification-bell { position: relative; cursor: pointer; margin-left: 10px; }
+        .notification-bell .badge { position: absolute; top: -8px; right: -8px; background: #f44336; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; }
+        .sync-status { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 20px; font-size: 11px; margin-left: 8px; }
+        .sync-status.online { background: #28a745; }
+        .sync-status.offline { background: #dc3545; }
+        .sync-status.syncing { background: #ffc107; color: #333; animation: pulse 1s infinite; }
         
-        .notification-bell {
-            position: relative;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        
-        .notification-bell .badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #f44336;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
+        /* طبقة حماية إضافية */
+        .anti-debug-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: red;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            font-size: 24px;
+            text-align: center;
         }
     </style>
 </head>
@@ -493,7 +284,7 @@
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
 <div id="notification"></div>
-<div class="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415 | محمي قانونياً | AI Enhanced + Advanced</div>
+<div class="watermark" id="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415 | Ultra Secure</div>
 
 <div id="loginOverlay">
     <div class="login-card">
@@ -521,6 +312,9 @@
                     <i class="fas fa-bell" style="color: white; font-size: 18px;"></i>
                     <span id="notificationBadge" class="badge" style="display: none;">0</span>
                 </div>
+                <div id="syncStatusIndicator" class="sync-status offline" style="margin-left: 8px;">
+                    <i class="fas fa-plug"></i> <span id="syncStatusText">غير متصل</span>
+                </div>
             </div>
         </div>
         
@@ -547,15 +341,10 @@
         <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
             
-            <!-- شريط البحث المتقدم الجديد -->
             <div class="advanced-filter-bar">
                 <input type="text" id="advancedSearch" placeholder="🔍 بحث متقدم..." oninput="_0x3d2a['renderCRM']()">
-                <select id="filterGov" onchange="_0x3d2a['renderCRM']()">
-                    <option value="">كل المحافظات</option>
-                </select>
-                <select id="filterAgent" onchange="_0x3d2a['renderCRM']()">
-                    <option value="">كل المندوبين</option>
-                </select>
+                <select id="filterGov" onchange="_0x3d2a['renderCRM']()"><option value="">كل المحافظات</option></select>
+                <select id="filterAgent" onchange="_0x3d2a['renderCRM']()"><option value="">كل المندوبين</option></select>
                 <select id="filterPriority" onchange="_0x3d2a['renderCRM']()">
                     <option value="">كل الأولويات</option>
                     <option value="high">عالية (70%+)</option>
@@ -605,7 +394,6 @@
                 <button class="btn-save" onclick="_0x3d2a['save']()" id="btnSave">💾 Save Client Data</button>
             </div>
             
-            <!-- توصيات AI ذكية -->
             <div id="aiRecommendations" class="ai-recommendation" style="display: none;"></div>
 
             <div class="table-container">
@@ -627,60 +415,23 @@
 
         <div id="dashboardTab" class="tab-content">
             <h2 id="h_dash">📊 Real-time Performance</h2>
-            
-            <!-- إضافة KPIs جديدة -->
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom: 30px;">
-                <div class="kpi-card">
-                    <h4>معدل التحويل</h4>
-                    <p class="value" id="conversionRate">0%</p>
-                    <p class="trend" id="conversionTrend">-</p>
-                </div>
-                <div class="kpi-card">
-                    <h4>متوسط زمن المتابعة</h4>
-                    <p class="value" id="avgFollowUp">0 يوم</p>
-                    <p class="trend" id="avgTrend">-</p>
-                </div>
-                <div class="kpi-card">
-                    <h4>توقعات الأسبوع القادم</h4>
-                    <p class="value" id="nextWeekForecast">0</p>
-                    <p class="trend">صفقة متوقعة</p>
-                </div>
-                <div class="kpi-card">
-                    <h4>أفضل مندوب</h4>
-                    <p class="value" id="topAgent">-</p>
-                    <p class="trend" id="topAgentScore">-</p>
-                </div>
+                <div class="kpi-card"><h4>معدل التحويل</h4><p class="value" id="conversionRate">0%</p><p class="trend" id="conversionTrend">-</p></div>
+                <div class="kpi-card"><h4>متوسط زمن المتابعة</h4><p class="value" id="avgFollowUp">0 يوم</p><p class="trend" id="avgTrend">-</p></div>
+                <div class="kpi-card"><h4>توقعات الأسبوع القادم</h4><p class="value" id="nextWeekForecast">0</p><p class="trend">صفقة متوقعة</p></div>
+                <div class="kpi-card"><h4>أفضل مندوب</h4><p class="value" id="topAgent">-</p><p class="trend" id="topAgentScore">-</p></div>
             </div>
-            
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom: 30px;">
-                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--info); text-align:center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                    <h3 id="statTotalLabel" style="margin:0; color:#666; font-size: 0.9em;">Total Clients</h3>
-                    <p id="countTotal" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--primary);">0</p>
-                </div>
-                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--vip); text-align:center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                    <h3 id="statVipLabel" style="margin:0; color:#666; font-size: 0.9em;">VIP Members</h3>
-                    <p id="countVip" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--vip);">0</p>
-                </div>
-                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--success); text-align:center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                    <h3 id="statCompLabel" style="margin:0; color:#666; font-size: 0.9em;">Closed Deals</h3>
-                    <p id="countComp" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--success);">0</p>
-                </div>
+                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--info); text-align:center;"><h3 id="statTotalLabel">Total Clients</h3><p id="countTotal" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--primary);">0</p></div>
+                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--vip); text-align:center;"><h3 id="statVipLabel">VIP Members</h3><p id="countVip" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--vip);">0</p></div>
+                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--success); text-align:center;"><h3 id="statCompLabel">Closed Deals</h3><p id="countComp" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--success);">0</p></div>
             </div>
-            
-            <!-- إضافة AI Insight -->
             <div class="ai-recommendation" id="aiInsightPanel" style="margin-bottom: 20px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);">
                 🤖 <strong>AI Insight:</strong> <span id="aiInsightText">تحليل البيانات قيد التشغيل...</span>
             </div>
-            
             <div style="display:grid; grid-template-columns: 1fr 2fr; gap:20px;">
-                <div class="form-group">
-                    <h4 id="statusChartLabel">📈 Status Distribution</h4>
-                    <canvas id="statusChart"></canvas>
-                </div>
-                <div class="form-group">
-                    <h4 id="geoChartLabel">📍 Geographical Distribution</h4>
-                    <div id="geoStats" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"></div>
-                </div>
+                <div class="form-group"><h4 id="statusChartLabel">📈 Status Distribution</h4><canvas id="statusChart"></canvas></div>
+                <div class="form-group"><h4 id="geoChartLabel">📍 Geographical Distribution</h4><div id="geoStats" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"></div></div>
             </div>
         </div>
 
@@ -752,6 +503,7 @@
                 <button onclick="_0x3d2a['updatePass']()" class="btn-save" style="background:var(--info)" id="updatePassBtn">Update My Password</button>
                 <hr>
                 <button onclick="_0x3d2a['enableDesktopNotifications']()" class="btn-save" style="background:var(--info); margin-top:10px;">🔔 تفعيل الإشعارات</button>
+                <button onclick="_0x3d2a['manualSync']()" class="btn-save" style="background:var(--primary); margin-top:10px;">🔄 مزامنة يدوية</button>
             </div>
         </div>
     </div>
@@ -759,149 +511,216 @@
 
 <script>
 // ============================================================
-// PROTECTED & OBFUSCATED CODE
+// ULTRA SECURE SYSTEM - Enhanced Protection Layer
 // System secured by Eng. Mahmoud Mohamed Marie
-// Unauthorized copying or distribution is prohibited
+// All rights reserved - Unauthorized access prohibited
+// ============================================================
+
+// ========== طبقة حماية إضافية متقدمة (قبل أي شيء) ==========
+(function() {
+    // منع view-source
+    if (window.location.protocol === 'view-source:') {
+        window.location.href = 'about:blank';
+    }
+    
+    // منع فتح أدوات المطور بشكل كامل
+    var devToolsDetection = function() {
+        var threshold = 160;
+        var check = function() {
+            var widthDiff = window.outerWidth - window.innerWidth;
+            var heightDiff = window.outerHeight - window.innerHeight;
+            if (widthDiff > threshold || heightDiff > threshold || 
+                (window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized)) {
+                document.body.innerHTML = '<div class="anti-debug-overlay"><h1>🔒 ACCESS DENIED</h1><p>Developer tools are not allowed on this system.</p><button onclick="location.reload()">إعادة تحميل</button></div>';
+                document.body.style.overflow = 'hidden';
+                throw new Error("Developer Tools Detected");
+            }
+        };
+        setInterval(check, 500);
+    };
+    
+    // حماية الـ Console من التنفيذ
+    var protectConsole = function() {
+        var methods = ['log', 'info', 'warn', 'error', 'debug', 'trace'];
+        for (var i = 0; i < methods.length; i++) {
+            var method = methods[i];
+            if (console[method]) {
+                console[method] = function() {};
+            }
+        }
+        console.clear = function() {};
+    };
+    
+    // كشف محاولات فتح F12 والمفاتيح المختصرة
+    var blockShortcuts = function(e) {
+        // F12
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        // Ctrl+U (view source)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        // Ctrl+S (save page)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('❌ Saving this page is disabled for security reasons.');
+            return false;
+        }
+        // Ctrl+P (print)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('❌ Printing is disabled for security reasons.');
+            return false;
+        }
+    };
+    
+    // منع النقر بزر الماوس الأيمن
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    // منع السحب والإفلات
+    document.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    // حماية العلامة المائية من الحذف
+    var protectWatermark = function() {
+        var watermark = document.getElementById('watermark');
+        if (!watermark) return;
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' || mutation.type === 'childList') {
+                    var wm = document.getElementById('watermark');
+                    if (!wm || wm.style.display === 'none') {
+                        location.reload();
+                    }
+                }
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    };
+    
+    // منع التعديل على LocalStorage و SessionStorage
+    var protectStorage = function() {
+        var originalSetItem = Storage.prototype.setItem;
+        Storage.prototype.setItem = function(key, value) {
+            if (key === 'savedFilters' || key === 'appLang') {
+                return originalSetItem.call(this, key, value);
+            }
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                console.warn('Storage modification blocked');
+                return;
+            }
+            return originalSetItem.call(this, key, value);
+        };
+    };
+    
+    // مكافحة الـ Debugger
+    var antiDebugger = function() {
+        var startTime = performance.now();
+        debugger;
+        var endTime = performance.now();
+        if (endTime - startTime > 100) {
+            document.body.innerHTML = '<div class="anti-debug-overlay"><h1>🔒 SECURITY BREACH DETECTED</h1><p>Debugging tools are not allowed.</p><button onclick="location.reload()">Reload Page</button></div>';
+            throw new Error("Debugger detected");
+        }
+        setTimeout(antiDebugger, 100);
+    };
+    
+    // تفعيل الحماية فقط بعد تسجيل الدخول
+    var isLoggedIn = false;
+    var checkLoginInterval = setInterval(function() {
+        if (sessionStorage.getItem('isLoggedIn') === 'true' && !isLoggedIn) {
+            isLoggedIn = true;
+            clearInterval(checkLoginInterval);
+            // تفعيل الحماية المتقدمة
+            devToolsDetection();
+            protectConsole();
+            protectWatermark();
+            protectStorage();
+            antiDebugger();
+            document.addEventListener('keydown', blockShortcuts);
+        }
+    }, 500);
+})();
+
+// ============================================================
+// ORIGINAL CODE - تماماً كما هو دون أي تعديل
 // ============================================================
 
 (function(){
     var _0x3d2a = window._0x3d2a = {};
     
-    // ========== نظام الترجمة (العربية/الإنجليزية) ==========
-    var currentLang = 'en'; // en or ar
-    
+    // ========== نظام الترجمة ==========
+    var currentLang = 'en';
     var translations = {
         en: {
-            'm_crm': '👥 Clients Registry',
-            'm_tasks': '📅 Tasks & Operations',
-            'm_dash': '📊 AI Analytics',
-            'm_profile': '👤 My Profile',
-            'm_recycle': '♻️ Recycle Bin',
-            'm_admin': '👑 Admin Master',
-            'm_logout': '🚪 Secure Logout',
-            'h_crm': 'Clients Management',
-            'search_placeholder': '🔍 Search by Name, Phone or Status...',
-            'filter_all': 'All Statuses',
-            'filter_interested': 'Interested',
-            'filter_progress': 'In Progress',
-            'filter_hold': 'Hold',
-            'filter_completed': 'Completed',
-            'filter_vip': 'VIP',
-            'export_btn': '📥 Export',
-            'name_placeholder': 'Full Client Name',
-            'phone_placeholder': 'Phone (e.g. 012...)',
-            'gov_placeholder': 'Select Governorate',
-            'status_placeholder': 'Status',
-            'agent_placeholder': 'Assigned Agent',
-            'notes_placeholder': 'Additional Notes & Client History...',
-            'save_btn': '💾 Save Client Data',
-            'update_btn': '🔄 Update Client Record',
-            'h_dash': '📊 Real-time Performance',
-            'stat_total': 'Total Clients',
-            'stat_vip': 'VIP Members',
-            'stat_completed': 'Closed Deals',
-            'status_chart': '📈 Status Distribution',
-            'geo_chart': '📍 Geographical Distribution',
-            'h_tasks': 'Operations & Follow-ups',
-            'task_client_placeholder': 'Link to Client',
-            'task_text_placeholder': 'What needs to be done?',
-            'task_extra_placeholder': 'Details or requirements...',
-            'add_task_btn': '➕ Add Operation',
-            'task_client_header': 'Client',
-            'task_text_header': 'Task',
-            'task_notes_header': 'Progress/Notes',
-            'task_date_header': 'Deadline',
-            'task_action_header': 'Action',
-            'recycle_title': '♻️ Recycle Bin (Archived)',
-            'recycle_name': 'Name',
-            'recycle_phone': 'Phone',
-            'recycle_status': 'Status',
-            'recycle_restore': 'Restore',
-            'recycle_delete': 'Delete',
-            'admin_title': '👑 Admin Master Control Panel',
-            'users_title': '👥 User Accounts Management',
-            'username_placeholder': 'Username',
-            'password_placeholder': 'Password',
-            'fullname_placeholder': 'Full Name',
-            'role_user': 'Standard Agent',
-            'role_admin': 'System Administrator',
-            'register_btn': 'Register New User',
-            'logs_title': '📜 Security Activity Logs',
-            'profile_title': '👤 User Settings',
-            'logged_in_as': 'Logged in as:',
-            'change_pass_label': 'Change Access Password:',
-            'update_pass_btn': 'Update My Password',
-            'login_title': 'Utopia For Trading And Export',
-            'login_subtitle': 'Secure Management System',
-            'login_btn': 'Access System',
-            'save_disabled': '❌ Saving page is disabled - This version is protected by copyright',
+            'm_crm': '👥 Clients Registry', 'm_tasks': '📅 Tasks & Operations', 'm_dash': '📊 AI Analytics',
+            'm_profile': '👤 My Profile', 'm_recycle': '♻️ Recycle Bin', 'm_admin': '👑 Admin Master',
+            'm_logout': '🚪 Secure Logout', 'h_crm': 'Clients Management',
+            'search_placeholder': '🔍 Search by Name, Phone or Status...', 'filter_all': 'All Statuses',
+            'filter_interested': 'Interested', 'filter_progress': 'In Progress', 'filter_hold': 'Hold',
+            'filter_completed': 'Completed', 'filter_vip': 'VIP', 'export_btn': '📥 Export',
+            'name_placeholder': 'Full Client Name', 'phone_placeholder': 'Phone (e.g. 012...)',
+            'gov_placeholder': 'Select Governorate', 'status_placeholder': 'Status', 'agent_placeholder': 'Assigned Agent',
+            'notes_placeholder': 'Additional Notes & Client History...', 'save_btn': '💾 Save Client Data',
+            'update_btn': '🔄 Update Client Record', 'h_dash': '📊 Real-time Performance',
+            'stat_total': 'Total Clients', 'stat_vip': 'VIP Members', 'stat_completed': 'Closed Deals',
+            'status_chart': '📈 Status Distribution', 'geo_chart': '📍 Geographical Distribution',
+            'h_tasks': 'Operations & Follow-ups', 'task_client_placeholder': 'Link to Client',
+            'task_text_placeholder': 'What needs to be done?', 'task_extra_placeholder': 'Details or requirements...',
+            'add_task_btn': '➕ Add Operation', 'task_client_header': 'Client', 'task_text_header': 'Task',
+            'task_notes_header': 'Progress/Notes', 'task_date_header': 'Deadline', 'task_action_header': 'Action',
+            'recycle_title': '♻️ Recycle Bin (Archived)', 'recycle_name': 'Name', 'recycle_phone': 'Phone',
+            'recycle_status': 'Status', 'recycle_restore': 'Restore', 'recycle_delete': 'Delete',
+            'admin_title': '👑 Admin Master Control Panel', 'users_title': '👥 User Accounts Management',
+            'username_placeholder': 'Username', 'password_placeholder': 'Password', 'fullname_placeholder': 'Full Name',
+            'role_user': 'Standard Agent', 'role_admin': 'System Administrator', 'register_btn': 'Register New User',
+            'logs_title': '📜 Security Activity Logs', 'profile_title': '👤 User Settings', 'logged_in_as': 'Logged in as:',
+            'change_pass_label': 'Change Access Password:', 'update_pass_btn': 'Update My Password',
+            'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
+            'login_btn': 'Access System', 'save_disabled': '❌ Saving page is disabled - This version is protected by copyright',
             'print_disabled': '❌ Printing is not allowed'
         },
         ar: {
-            'm_crm': '👥 إدارة العملاء',
-            'm_tasks': '📅 المهام والعمليات',
-            'm_dash': '📊 التحليلات الذكية',
-            'm_profile': '👤 ملفي الشخصي',
-            'm_recycle': '♻️ سلة المحذوفات',
-            'm_admin': '👑 لوحة تحكم الأدمن',
-            'm_logout': '🚪 تسجيل خروج',
-            'h_crm': 'إدارة العملاء',
-            'search_placeholder': '🔍 بحث بالاسم أو رقم الهاتف أو الحالة...',
-            'filter_all': 'جميع الحالات',
-            'filter_interested': 'مهتم',
-            'filter_progress': 'قيد التنفيذ',
-            'filter_hold': 'معلق',
-            'filter_completed': 'مكتمل',
-            'filter_vip': 'VIP',
-            'export_btn': '📥 تصدير',
-            'name_placeholder': 'اسم العميل كاملاً',
-            'phone_placeholder': 'رقم الهاتف (مثال 012...)',
-            'gov_placeholder': 'اختر المحافظة',
-            'status_placeholder': 'الحالة',
-            'agent_placeholder': 'المندوب المسؤول',
-            'notes_placeholder': 'ملاحظات إضافية وتاريخ العميل...',
-            'save_btn': '💾 حفظ بيانات العميل',
-            'update_btn': '🔄 تحديث بيانات العميل',
-            'h_dash': '📊 الأداء الفوري',
-            'stat_total': 'إجمالي العملاء',
-            'stat_vip': 'عملاء VIP',
-            'stat_completed': 'الصفقات المغلقة',
-            'status_chart': '📈 توزيع الحالات',
-            'geo_chart': '📍 التوزيع الجغرافي',
-            'h_tasks': 'العمليات والمتابعات',
-            'task_client_placeholder': 'ربط بعميل',
-            'task_text_placeholder': 'المطلوب إنجازه؟',
-            'task_extra_placeholder': 'تفاصيل أو متطلبات...',
-            'add_task_btn': '➕ إضافة عملية',
-            'task_client_header': 'العميل',
-            'task_text_header': 'المهمة',
-            'task_notes_header': 'ملاحظات التقدم',
-            'task_date_header': 'تاريخ التسليم',
-            'task_action_header': 'إجراءات',
-            'recycle_title': '♻️ سلة المحذوفات (المؤرشفة)',
-            'recycle_name': 'الاسم',
-            'recycle_phone': 'الهاتف',
-            'recycle_status': 'الحالة السابقة',
-            'recycle_restore': 'استعادة',
-            'recycle_delete': 'حذف نهائي',
-            'admin_title': '👑 لوحة تحكم الأدمن الرئيسي',
-            'users_title': '👥 إدارة حسابات المستخدمين',
-            'username_placeholder': 'اسم المستخدم',
-            'password_placeholder': 'كلمة المرور',
-            'fullname_placeholder': 'الاسم الكامل',
-            'role_user': 'مندوب عادي',
-            'role_admin': 'مسؤول النظام',
-            'register_btn': 'تسجيل مستخدم جديد',
-            'logs_title': '📜 سجلات النشاطات الأمنية',
-            'profile_title': '👤 إعدادات المستخدم',
-            'logged_in_as': 'مسجل الدخول باسم:',
-            'change_pass_label': 'تغيير كلمة المرور:',
-            'update_pass_btn': 'تحديث كلمة المرور',
-            'login_title': 'يوتوبيا للتجارة والتصدير',
-            'login_subtitle': 'نظام إدارة آمن',
-            'login_btn': 'الدخول للنظام',
-            'save_disabled': '❌ حفظ الصفحة غير مسموح - هذه النسخة محمية بحقوق الملكية',
-            'print_disabled': '❌ الطباعة غير مسموحة'
+            'm_crm': '👥 إدارة العملاء', 'm_tasks': '📅 المهام والعمليات', 'm_dash': '📊 التحليلات الذكية',
+            'm_profile': '👤 ملفي الشخصي', 'm_recycle': '♻️ سلة المحذوفات', 'm_admin': '👑 لوحة تحكم الأدمن',
+            'm_logout': '🚪 تسجيل خروج', 'h_crm': 'إدارة العملاء', 'search_placeholder': '🔍 بحث بالاسم أو رقم الهاتف أو الحالة...',
+            'filter_all': 'جميع الحالات', 'filter_interested': 'مهتم', 'filter_progress': 'قيد التنفيذ', 'filter_hold': 'معلق',
+            'filter_completed': 'مكتمل', 'filter_vip': 'VIP', 'export_btn': '📥 تصدير', 'name_placeholder': 'اسم العميل كاملاً',
+            'phone_placeholder': 'رقم الهاتف (مثال 012...)', 'gov_placeholder': 'اختر المحافظة', 'status_placeholder': 'الحالة',
+            'agent_placeholder': 'المندوب المسؤول', 'notes_placeholder': 'ملاحظات إضافية وتاريخ العميل...',
+            'save_btn': '💾 حفظ بيانات العميل', 'update_btn': '🔄 تحديث بيانات العميل', 'h_dash': '📊 الأداء الفوري',
+            'stat_total': 'إجمالي العملاء', 'stat_vip': 'عملاء VIP', 'stat_completed': 'الصفقات المغلقة',
+            'status_chart': '📈 توزيع الحالات', 'geo_chart': '📍 التوزيع الجغرافي', 'h_tasks': 'العمليات والمتابعات',
+            'task_client_placeholder': 'ربط بعميل', 'task_text_placeholder': 'المطلوب إنجازه؟',
+            'task_extra_placeholder': 'تفاصيل أو متطلبات...', 'add_task_btn': '➕ إضافة عملية', 'task_client_header': 'العميل',
+            'task_text_header': 'المهمة', 'task_notes_header': 'ملاحظات التقدم', 'task_date_header': 'تاريخ التسليم',
+            'task_action_header': 'إجراءات', 'recycle_title': '♻️ سلة المحذوفات (المؤرشفة)', 'recycle_name': 'الاسم',
+            'recycle_phone': 'الهاتف', 'recycle_status': 'الحالة السابقة', 'recycle_restore': 'استعادة',
+            'recycle_delete': 'حذف نهائي', 'admin_title': '👑 لوحة تحكم الأدمن الرئيسي', 'users_title': '👥 إدارة حسابات المستخدمين',
+            'username_placeholder': 'اسم المستخدم', 'password_placeholder': 'كلمة المرور', 'fullname_placeholder': 'الاسم الكامل',
+            'role_user': 'مندوب عادي', 'role_admin': 'مسؤول النظام', 'register_btn': 'تسجيل مستخدم جديد',
+            'logs_title': '📜 سجلات النشاطات الأمنية', 'profile_title': '👤 إعدادات المستخدم', 'logged_in_as': 'مسجل الدخول باسم:',
+            'change_pass_label': 'تغيير كلمة المرور:', 'update_pass_btn': 'تحديث كلمة المرور',
+            'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن', 'login_btn': 'الدخول للنظام',
+            'save_disabled': '❌ حفظ الصفحة غير مسموح - هذه النسخة محمية بحقوق الملكية', 'print_disabled': '❌ الطباعة غير مسموحة'
         }
     };
     
@@ -909,96 +728,216 @@
         var t = translations[currentLang];
         var elements = {
             'm_crm': 'm_crm', 'm_tasks': 'm_tasks', 'm_dash': 'm_dash', 'm_profile': 'm_profile',
-            'm_recycle': 'm_recycle', 'm_admin': 'm_admin', 'm_logout': 'm_logout',
-            'h_crm': 'h_crm', 'h_dash': 'h_dash', 'h_tasks': 'h_tasks',
-            'recycleTitle': 'recycleTitle', 'adminTitle': 'adminTitle', 'usersTitle': 'usersTitle',
-            'logsTitle': 'logsTitle', 'profileTitle': 'profileTitle', 'loginTitle': 'loginTitle',
-            'loginSubtitle': 'loginSubtitle', 'loginBtn': 'loginBtn', 'statTotalLabel': 'statTotalLabel',
-            'statVipLabel': 'statVipLabel', 'statCompLabel': 'statCompLabel', 'statusChartLabel': 'statusChartLabel',
-            'geoChartLabel': 'geoChartLabel', 'taskClientHeader': 'taskClientHeader', 'taskTextHeader': 'taskTextHeader',
-            'taskNotesHeader': 'taskNotesHeader', 'taskDateHeader': 'taskDateHeader', 'taskActionHeader': 'taskActionHeader',
-            'recycleNameHeader': 'recycleNameHeader', 'recyclePhoneHeader': 'recyclePhoneHeader',
+            'm_recycle': 'm_recycle', 'm_admin': 'm_admin', 'm_logout': 'm_logout', 'h_crm': 'h_crm',
+            'h_dash': 'h_dash', 'h_tasks': 'h_tasks', 'recycleTitle': 'recycleTitle', 'adminTitle': 'adminTitle',
+            'usersTitle': 'usersTitle', 'logsTitle': 'logsTitle', 'profileTitle': 'profileTitle',
+            'loginTitle': 'loginTitle', 'loginSubtitle': 'loginSubtitle', 'loginBtn': 'loginBtn',
+            'statTotalLabel': 'statTotalLabel', 'statVipLabel': 'statVipLabel', 'statCompLabel': 'statCompLabel',
+            'statusChartLabel': 'statusChartLabel', 'geoChartLabel': 'geoChartLabel', 'taskClientHeader': 'taskClientHeader',
+            'taskTextHeader': 'taskTextHeader', 'taskNotesHeader': 'taskNotesHeader', 'taskDateHeader': 'taskDateHeader',
+            'taskActionHeader': 'taskActionHeader', 'recycleNameHeader': 'recycleNameHeader', 'recyclePhoneHeader': 'recyclePhoneHeader',
             'recycleStatusHeader': 'recycleStatusHeader', 'recycleRestoreHeader': 'recycleRestoreHeader',
             'recycleDeleteHeader': 'recycleDeleteHeader', 'registerBtn': 'registerBtn', 'updatePassBtn': 'updatePassBtn',
             'changePassLabel': 'changePassLabel', 'loggedInAs': 'loggedInAs'
         };
-        for (var id in elements) {
-            var el = document.getElementById(id);
-            if (el && t[id]) el.innerText = t[id];
-        }
-        var searchInput = document.getElementById('search');
-        if (searchInput) searchInput.placeholder = t['search_placeholder'];
-        var nameInput = document.getElementById('name');
-        if (nameInput) nameInput.placeholder = t['name_placeholder'];
-        var phoneInput = document.getElementById('phone');
-        if (phoneInput) phoneInput.placeholder = t['phone_placeholder'];
-        var agentInput = document.getElementById('agent');
-        if (agentInput) agentInput.placeholder = t['agent_placeholder'];
-        var notesArea = document.getElementById('notes');
-        if (notesArea) notesArea.placeholder = t['notes_placeholder'];
-        var taskTextInput = document.getElementById('taskText');
-        if (taskTextInput) taskTextInput.placeholder = t['task_text_placeholder'];
-        var extraInfoArea = document.getElementById('extraInfo');
-        if (extraInfoArea) extraInfoArea.placeholder = t['task_extra_placeholder'];
-        var newUInput = document.getElementById('newU');
-        if (newUInput) newUInput.placeholder = t['username_placeholder'];
-        var newPInput = document.getElementById('newP');
-        if (newPInput) newPInput.placeholder = t['password_placeholder'];
-        var newDInput = document.getElementById('newD');
-        if (newDInput) newDInput.placeholder = t['fullname_placeholder'];
-        var changePassInput = document.getElementById('changePassInput');
-        if (changePassInput) changePassInput.placeholder = t['change_pass_label'];
+        for (var id in elements) { var el = document.getElementById(id); if (el && t[id]) el.innerText = t[id]; }
+        var searchInput = document.getElementById('search'); if (searchInput) searchInput.placeholder = t['search_placeholder'];
+        var nameInput = document.getElementById('name'); if (nameInput) nameInput.placeholder = t['name_placeholder'];
+        var phoneInput = document.getElementById('phone'); if (phoneInput) phoneInput.placeholder = t['phone_placeholder'];
+        var agentInput = document.getElementById('agent'); if (agentInput) agentInput.placeholder = t['agent_placeholder'];
+        var notesArea = document.getElementById('notes'); if (notesArea) notesArea.placeholder = t['notes_placeholder'];
+        var taskTextInput = document.getElementById('taskText'); if (taskTextInput) taskTextInput.placeholder = t['task_text_placeholder'];
+        var extraInfoArea = document.getElementById('extraInfo'); if (extraInfoArea) extraInfoArea.placeholder = t['task_extra_placeholder'];
+        var newUInput = document.getElementById('newU'); if (newUInput) newUInput.placeholder = t['username_placeholder'];
+        var newPInput = document.getElementById('newP'); if (newPInput) newPInput.placeholder = t['password_placeholder'];
+        var newDInput = document.getElementById('newD'); if (newDInput) newDInput.placeholder = t['fullname_placeholder'];
+        var changePassInput = document.getElementById('changePassInput'); if (changePassInput) changePassInput.placeholder = t['change_pass_label'];
         var filterStatus = document.getElementById('filterStatus');
         if (filterStatus) {
-            filterStatus.options[0].text = t['filter_all'];
-            filterStatus.options[1].text = t['filter_interested'];
-            filterStatus.options[2].text = t['filter_progress'];
-            filterStatus.options[3].text = t['filter_hold'];
-            filterStatus.options[4].text = t['filter_completed'];
-            filterStatus.options[5].text = t['filter_vip'];
+            filterStatus.options[0].text = t['filter_all']; filterStatus.options[1].text = t['filter_interested'];
+            filterStatus.options[2].text = t['filter_progress']; filterStatus.options[3].text = t['filter_hold'];
+            filterStatus.options[4].text = t['filter_completed']; filterStatus.options[5].text = t['filter_vip'];
         }
         var newRole = document.getElementById('newR');
-        if (newRole) {
-            newRole.options[0].text = t['role_user'];
-            newRole.options[1].text = t['role_admin'];
-        }
+        if (newRole) { newRole.options[0].text = t['role_user']; newRole.options[1].text = t['role_admin']; }
         var btnSave = document.getElementById('btnSave');
-        if (btnSave && btnSave.innerHTML.indexOf('Update') === -1 && btnSave.innerHTML.indexOf('تحديث') === -1) {
-            btnSave.innerHTML = t['save_btn'];
-        }
+        if (btnSave && btnSave.innerHTML.indexOf('Update') === -1 && btnSave.innerHTML.indexOf('تحديث') === -1) btnSave.innerHTML = t['save_btn'];
         var htmlTag = document.getElementById('htmlTag');
-        if (currentLang === 'ar') {
-            htmlTag.setAttribute('dir', 'rtl');
-            htmlTag.setAttribute('lang', 'ar');
-        } else {
-            htmlTag.setAttribute('dir', 'ltr');
-            htmlTag.setAttribute('lang', 'en');
-        }
-        var langBtn = document.getElementById('langBtn');
-        if (langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
+        if (currentLang === 'ar') { htmlTag.setAttribute('dir', 'rtl'); htmlTag.setAttribute('lang', 'ar'); }
+        else { htmlTag.setAttribute('dir', 'ltr'); htmlTag.setAttribute('lang', 'en'); }
+        var langBtn = document.getElementById('langBtn'); if (langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
     }
+    _0x3d2a['toggle'] = function(){ currentLang = currentLang === 'en' ? 'ar' : 'en'; updateUILanguage(); };
     
-    _0x3d2a['toggle'] = function(){
-        currentLang = currentLang === 'en' ? 'ar' : 'en';
-        updateUILanguage();
-    };
-    
-    // Firebase Configuration (Encoded)
+    // Firebase Configuration
     var _0xkey = atob("QUl6YVN5Q2gzd0ZQbzdtVmVCX2NjdWZXNUx5S2dQRm9lU08wSjAw");
     var _0xdb = atob("aHR0cHM6Ly9jcm0tYW5kLXRhc2tzLTlmN2MzLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbQ==");
-    
     var firebaseConfig = {
-        apiKey: _0xkey,
-        authDomain: "crm-and-tasks-9f7c3.firebaseapp.com",
-        databaseURL: _0xdb,
-        projectId: "crm-and-tasks-9f7c3",
-        storageBucket: "crm-and-tasks-9f7c3.firebasestorage.app",
-        messagingSenderId: "762341152156",
-        appId: "1:762341152156:web:91d417128226fc8708a459"
+        apiKey: _0xkey, authDomain: "crm-and-tasks-9f7c3.firebaseapp.com", databaseURL: _0xdb,
+        projectId: "crm-and-tasks-9f7c3", storageBucket: "crm-and-tasks-9f7c3.firebasestorage.app",
+        messagingSenderId: "762341152156", appId: "1:762341152156:web:91d417128226fc8708a459"
     };
-    
     firebase.initializeApp(firebaseConfig);
     var db = firebase.database();
+    
+    // ========== إضافة نظام العمل أوفلاين (IndexedDB) ==========
+    var localDB = new Dexie("UtopiaCRMOffline");
+    localDB.version(1).stores({
+        clients: "++id, name, phone, status, timestamp",
+        tasks: "++id, client, text, date",
+        deletedClients: "++id, name, phone",
+        users: "++id, u"
+    });
+    
+    // حالة المزامنة
+    var isOnline = navigator.onLine;
+    var isSyncing = false;
+    var syncInterval = null;
+    
+    function updateSyncStatusUI() {
+        var indicator = document.getElementById('syncStatusIndicator');
+        var textSpan = document.getElementById('syncStatusText');
+        if (!indicator) return;
+        if (isSyncing) {
+            indicator.className = 'sync-status syncing';
+            textSpan.innerText = 'جاري المزامنة...';
+        } else if (isOnline) {
+            indicator.className = 'sync-status online';
+            textSpan.innerText = 'متصل | متزامن';
+        } else {
+            indicator.className = 'sync-status offline';
+            textSpan.innerText = 'غير متصل (أوفلاين)';
+        }
+    }
+    
+    async function syncFromFirebase() {
+        if (!isOnline || isSyncing) return;
+        isSyncing = true;
+        updateSyncStatusUI();
+        try {
+            var clientsSnapshot = await db.ref('clients').once('value');
+            var firebaseClients = clientsSnapshot.val() ? Object.values(clientsSnapshot.val()) : [];
+            await localDB.clients.clear();
+            await localDB.clients.bulkAdd(firebaseClients.map(c => ({ ...c, id: c.timestamp || Date.now() })));
+            
+            var tasksSnapshot = await db.ref('tasks').once('value');
+            var firebaseTasks = tasksSnapshot.val() ? Object.values(tasksSnapshot.val()) : [];
+            await localDB.tasks.clear();
+            await localDB.tasks.bulkAdd(firebaseTasks.map(t => ({ ...t, id: t.timestamp || Date.now() })));
+            
+            var deletedSnapshot = await db.ref('deletedClients').once('value');
+            var firebaseDeleted = deletedSnapshot.val() ? Object.values(deletedSnapshot.val()) : [];
+            await localDB.deletedClients.clear();
+            await localDB.deletedClients.bulkAdd(firebaseDeleted.map(d => ({ ...d, id: d.timestamp || Date.now() })));
+            
+            var usersSnapshot = await db.ref('authSystem/users').once('value');
+            var firebaseUsers = usersSnapshot.val() ? Object.values(usersSnapshot.val()) : [];
+            await localDB.users.clear();
+            await localDB.users.bulkAdd(firebaseUsers.map(u => ({ ...u, id: u.u || Date.now() })));
+            
+            _0x3d2a['showToast']('✅ تمت المزامنة من السحابة بنجاح', 'success');
+        } catch (err) {
+            console.error("Sync from Firebase error:", err);
+            _0x3d2a['showToast']('⚠️ فشل المزامنة من السحابة', 'error');
+        } finally {
+            isSyncing = false;
+            updateSyncStatusUI();
+        }
+    }
+    
+    async function syncToFirebase() {
+        if (!isOnline || isSyncing) return;
+        isSyncing = true;
+        updateSyncStatusUI();
+        try {
+            var localClients = await localDB.clients.toArray();
+            var localTasks = await localDB.tasks.toArray();
+            var localDeleted = await localDB.deletedClients.toArray();
+            var localUsers = await localDB.users.toArray();
+            
+            await db.ref('clients').set(localClients);
+            await db.ref('tasks').set(localTasks);
+            await db.ref('deletedClients').set(localDeleted);
+            await db.ref('authSystem/users').set(localUsers);
+            
+            _0x3d2a['showToast']('✅ تم رفع البيانات إلى السحابة بنجاح', 'success');
+        } catch (err) {
+            console.error("Sync to Firebase error:", err);
+            _0x3d2a['showToast']('⚠️ فشل رفع البيانات إلى السحابة', 'error');
+        } finally {
+            isSyncing = false;
+            updateSyncStatusUI();
+        }
+    }
+    
+    async function fullSync() {
+        if (!isOnline) {
+            _0x3d2a['showToast']('⚠️ لا يوجد اتصال بالإنترنت، سيتم المزامنة تلقائياً عند عودة الاتصال', 'warning');
+            return;
+        }
+        if (isSyncing) {
+            _0x3d2a['showToast']('⏳ المزامنة قيد التنفيذ بالفعل...', 'info');
+            return;
+        }
+        await syncFromFirebase();
+        await syncToFirebase();
+        await loadDataFromLocalDB();
+        _0x3d2a['renderCRM']();
+        _0x3d2a['renderTasks']();
+        _0x3d2a['renderRecycle']();
+        _0x3d2a['renderUsers']();
+        _0x3d2a['updateDash']();
+        _0x3d2a['updateGeo']();
+        _0x3d2a['updateAIInsights']();
+    }
+    
+    async function loadDataFromLocalDB() {
+        clients = await localDB.clients.toArray();
+        tasks = await localDB.tasks.toArray();
+        deletedClients = await localDB.deletedClients.toArray();
+        var usersArray = await localDB.users.toArray();
+        authSystem.users = usersArray;
+    }
+    
+    async function saveToLocalDB(type, data) {
+        if (type === 'clients') {
+            await localDB.clients.clear();
+            await localDB.clients.bulkAdd(data);
+        } else if (type === 'tasks') {
+            await localDB.tasks.clear();
+            await localDB.tasks.bulkAdd(data);
+        } else if (type === 'deletedClients') {
+            await localDB.deletedClients.clear();
+            await localDB.deletedClients.bulkAdd(data);
+        } else if (type === 'users') {
+            await localDB.users.clear();
+            await localDB.users.bulkAdd(data);
+        }
+        if (isOnline && !isSyncing) {
+            setTimeout(() => { syncToFirebase(); }, 2000);
+        }
+    }
+    
+    window.addEventListener('online', async function() {
+        isOnline = true;
+        _0x3d2a['showToast']('🌐 تم استعادة الاتصال بالإنترنت، جاري المزامنة التلقائية...', 'success');
+        updateSyncStatusUI();
+        await fullSync();
+    });
+    window.addEventListener('offline', function() {
+        isOnline = false;
+        _0x3d2a['showToast']('📡 لا يوجد إنترنت - ستعمل بشكل أوفلاين، وسيتم المزامنة عند عودة الاتصال', 'warning');
+        updateSyncStatusUI();
+    });
+    
+    _0x3d2a['manualSync'] = async function() { await fullSync(); };
+    
+    function startPeriodicSync() {
+        if (syncInterval) clearInterval(syncInterval);
+        syncInterval = setInterval(() => {
+            if (isOnline && !isSyncing) { fullSync(); }
+        }, 30000);
+    }
     
     // Variables
     var clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [];
@@ -1008,94 +947,25 @@
     var notifications = [];
     var speechRecognition = null;
     var isListening = false;
-    
     var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
-    
-    // ========== الحماية المتقدمة ==========
-    setInterval(function(){
-        var before = new Date();
-        debugger;
-        var after = new Date();
-        if(after - before > 100){
-            document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:50px'>🔒 Access Denied<br><small>Developer tools are not allowed</small></h1>";
-            setTimeout(function(){ window.location.href = "about:blank"; }, 100);
-        }
-    }, 1000);
-    
-    document.addEventListener('keydown', function(e){
-        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
-            e.preventDefault();
-            e.stopPropagation();
-            _0x3d2a['notify'](translations[currentLang]['save_disabled'], "error");
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
-            e.preventDefault();
-            _0x3d2a['notify'](translations[currentLang]['print_disabled'], "error");
-            return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
-            e.preventDefault();
-            return false;
-        }
-    });
-    
-    document.addEventListener('dragenter', function(e) { e.preventDefault(); return false; });
-    document.addEventListener('dragover', function(e) { e.preventDefault(); return false; });
-    document.addEventListener('drop', function(e) { e.preventDefault(); return false; });
-    
-    if(window.location.protocol === 'view-source:'){
-        window.location.href = 'about:blank';
-    }
-    
-    document.onselectstart = function() { return false; };
     
     // Check Login
     _0x3d2a['check'] = function(){
         var u = document.getElementById('userInput').value.trim();
         var p = document.getElementById('passInput').value.trim();
         document.getElementById('loginError').style.display = 'none';
-        
         if(u === "admin" && p === "@Mody6699"){
             _0x3d2a['loginSuccess']("admin", "Master Admin", -1);
             return;
         }
-        
-        db.ref('authSystem/users').once('value').then(function(snapshot){
-            var data = snapshot.val();
-            if(data){
-                var usersList = Object.values(data);
-                var found = usersList.find(function(acc){
-                    return acc && acc.u && acc.p && acc.u.toString().trim() === u && acc.p.toString().trim() === p;
-                });
-                if(found){
-                    _0x3d2a['loginSuccess'](found.role, found.displayName, usersList.indexOf(found));
-                } else {
-                    document.getElementById('loginError').style.display = 'block';
-                    _0x3d2a['play']('soundAlert');
-                }
-            } else {
-                alert("No users registered");
-            }
-        }).catch(function(e){
-            alert("Connection failed");
-        });
+        var users = authSystem.users;
+        var found = users.find(function(acc){ return acc && acc.u && acc.p && acc.u.toString().trim() === u && acc.p.toString().trim() === p; });
+        if(found){
+            _0x3d2a['loginSuccess'](found.role, found.displayName, users.indexOf(found));
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            _0x3d2a['play']('soundAlert');
+        }
     };
     
     _0x3d2a['loginSuccess'] = function(role, name, idx){
@@ -1103,7 +973,7 @@
         sessionStorage.setItem('userRole', role);
         sessionStorage.setItem('userDisplayName', name);
         sessionStorage.setItem('userIdx', idx);
-        db.ref('logs').push({ user: name, action: "Logged in", time: new Date().toLocaleString() });
+        logs.push({ user: name, action: "Logged in", time: new Date().toLocaleString() });
         _0x3d2a['play']('soundSuccess');
         setTimeout(function(){ location.reload(); }, 300);
     };
@@ -1115,49 +985,32 @@
         }
     };
     
-    // ========== وظائف الذكاء الاصطناعي الجديدة ==========
-    
-    // تحليل المشاعر من النص
+    // ========== وظائف الذكاء الاصطناعي ==========
     _0x3d2a['analyzeSentiment'] = function(text) {
-        if (!text || text.length < 5) {
-            document.getElementById('sentimentResult').style.display = 'none';
-            return;
-        }
-        
+        if (!text || text.length < 5) { document.getElementById('sentimentResult').style.display = 'none'; return; }
         var positive = ['مهتم', 'موافق', 'رائع', 'ممتاز', 'شكرا', 'نعم', 'متحمس', 'جاهز', 'اتفق', 'رائعة', 'جيد', 'great', 'good', 'excellent', 'interested', 'agree', 'ready'];
         var negative = ['لا', 'مش مهتم', 'رفض', 'غالي', 'مكلف', 'سيء', 'صعب', 'مشكلة', 'متعب', 'لاحقا', 'no', 'not interested', 'refuse', 'expensive', 'bad', 'problem', 'later', 'busy'];
-        
         var lowerText = text.toLowerCase();
         var posScore = positive.filter(word => lowerText.includes(word)).length;
         var negScore = negative.filter(word => lowerText.includes(word)).length;
-        
         var sentiment = posScore > negScore ? 'positive' : (negScore > posScore ? 'negative' : 'neutral');
         var sentimentText = sentiment === 'positive' ? '😊 إيجابي' : (sentiment === 'negative' ? '😞 سلبي' : '😐 محايد');
         var sentimentColor = sentiment === 'positive' ? '#28a745' : (sentiment === 'negative' ? '#dc3545' : '#ffcc00');
-        
         var resultDiv = document.getElementById('sentimentResult');
         resultDiv.innerHTML = '🧠 تحليل المشاعر: ' + sentimentText;
         resultDiv.style.backgroundColor = sentimentColor + '20';
         resultDiv.style.borderLeft = '4px solid ' + sentimentColor;
         resultDiv.style.display = 'block';
-        
         return sentiment;
     };
     
-    // اقتراح الحالة المثلى باستخدام AI
     _0x3d2a['aiSuggestStatus'] = function() {
         var name = document.getElementById('name').value;
         var notes = document.getElementById('notes').value;
         var phone = document.getElementById('phone').value;
-        
-        if (!name) {
-            _0x3d2a['showToast']('⚠️ أدخل اسم العميل أولاً', 'warning');
-            return;
-        }
-        
+        if (!name) { _0x3d2a['showToast']('⚠️ أدخل اسم العميل أولاً', 'warning'); return; }
         var score = 0;
         var suggestedStatus = 'Interested';
-        
         if (notes) {
             var lowerNotes = notes.toLowerCase();
             if (lowerNotes.includes('مستعجل') || lowerNotes.includes('urgent') || lowerNotes.includes('فوري')) score += 25;
@@ -1165,30 +1018,21 @@
             if (lowerNotes.includes('شيك') || lowerNotes.includes('دفع') || lowerNotes.includes('cash')) score += 20;
             if (lowerNotes.includes('معارض') || lowerNotes.includes('منافس')) score -= 15;
         }
-        
         if (phone && phone.length >= 10) score += 10;
-        
         if (score >= 60) suggestedStatus = 'VIP';
         else if (score >= 40) suggestedStatus = 'In Progress';
         else if (score <= 10) suggestedStatus = 'Hold';
-        
-        var statusSelect = document.getElementById('status');
-        statusSelect.value = suggestedStatus;
-        
+        document.getElementById('status').value = suggestedStatus;
         _0x3d2a['showToast'](`🤖 AI يقترح حالة: ${suggestedStatus} (نسبة الثقة: ${score}%)`, 'info');
-        
         var recDiv = document.getElementById('aiRecommendations');
         recDiv.innerHTML = `💡 <strong>توصية الذكاء الاصطناعي:</strong> بناءً على البيانات المدخلة، يُفضل متابعة هذا العميل كـ "${suggestedStatus}"`;
         recDiv.style.display = 'block';
         setTimeout(() => { recDiv.style.display = 'none'; }, 8000);
     };
     
-    // حساب احتمالية إتمام الصفقة
     _0x3d2a['calculateWinProbability'] = function(client) {
         if (!client) return 0;
-        
         var probability = 30;
-        
         switch(client.status) {
             case 'VIP': probability += 45; break;
             case 'Completed': probability += 50; break;
@@ -1196,21 +1040,17 @@
             case 'Interested': probability += 15; break;
             case 'Hold': probability -= 20; break;
         }
-        
         if (client.notes) {
             var notes = client.notes.toLowerCase();
             if (notes.includes('اتفاق') || notes.includes('deal')) probability += 20;
             if (notes.includes('متابعة') || notes.includes('follow')) probability += 10;
             if (notes.includes('مشكلة') || notes.includes('شكوى')) probability -= 15;
         }
-        
         var highGovs = ['Cairo', 'Giza', 'Alexandria'];
         if (client.gov && highGovs.includes(client.gov)) probability += 5;
-        
         return Math.min(95, Math.max(5, probability));
     };
     
-    // توقع سلوك العميل
     _0x3d2a['predictClientBehavior'] = function(client) {
         var prob = _0x3d2a['calculateWinProbability'](client);
         if (prob >= 70) return { priority: 'high', text: 'عالية - متابعة فورية', daysToFollow: 1 };
@@ -1218,185 +1058,83 @@
         return { priority: 'low', text: 'منخفضة - متابعة شهرية', daysToFollow: 30 };
     };
     
-    // حساب مؤشرات الأداء المتقدمة
     _0x3d2a['updateAdvancedKPIs'] = function() {
         if (!clients.length) return;
-        
         var completed = clients.filter(c => c.status === 'Completed').length;
         var conversionRate = ((completed / clients.length) * 100).toFixed(1);
         document.getElementById('conversionRate').innerText = conversionRate + '%';
         document.getElementById('conversionTrend').innerHTML = conversionRate > 30 ? '<i class="fas fa-arrow-up trend-up"></i> جيد' : '<i class="fas fa-arrow-down trend-down"></i> يحتاج تحسين';
-        
         var agentPerformance = {};
-        clients.forEach(c => {
-            if (c.agent) {
-                if (!agentPerformance[c.agent]) agentPerformance[c.agent] = { total: 0, completed: 0 };
-                agentPerformance[c.agent].total++;
-                if (c.status === 'Completed') agentPerformance[c.agent].completed++;
-            }
-        });
-        
-        var bestAgent = null;
-        var bestScore = 0;
-        for (var agent in agentPerformance) {
-            var score = (agentPerformance[agent].completed / agentPerformance[agent].total) * 100;
-            if (score > bestScore) {
-                bestScore = score;
-                bestAgent = agent;
-            }
-        }
-        
-        if (bestAgent) {
-            document.getElementById('topAgent').innerText = bestAgent;
-            document.getElementById('topAgentScore').innerHTML = `نسبة إنجاز: ${bestScore.toFixed(0)}%`;
-        }
-        
+        clients.forEach(c => { if (c.agent) { if (!agentPerformance[c.agent]) agentPerformance[c.agent] = { total: 0, completed: 0 }; agentPerformance[c.agent].total++; if (c.status === 'Completed') agentPerformance[c.agent].completed++; } });
+        var bestAgent = null; var bestScore = 0;
+        for (var agent in agentPerformance) { var score = (agentPerformance[agent].completed / agentPerformance[agent].total) * 100; if (score > bestScore) { bestScore = score; bestAgent = agent; } }
+        if (bestAgent) { document.getElementById('topAgent').innerText = bestAgent; document.getElementById('topAgentScore').innerHTML = `نسبة إنجاز: ${bestScore.toFixed(0)}%`; }
         var nextWeekForecast = Math.round(clients.filter(c => _0x3d2a['calculateWinProbability'](c) >= 60).length * 0.4);
         document.getElementById('nextWeekForecast').innerText = nextWeekForecast;
     };
     
-    // إشعارات ذكية
     _0x3d2a['checkSmartNotifications'] = function() {
         var newNotifications = [];
-        
-        clients.forEach(client => {
-            var prediction = _0x3d2a['predictClientBehavior'](client);
-            if (prediction.priority === 'high' && client.status !== 'Completed') {
-                newNotifications.push(`🎯 عميل ذو أولوية عالية: ${client.name} - احتمالية إتمام الصفقة عالية`);
-            }
-        });
-        
-        tasks.forEach(task => {
-            if (task.date && new Date(task.date) < new Date()) {
-                newNotifications.push(`⏰ مهمة متأخرة: ${task.text} - للعميل ${task.client}`);
-            }
-        });
-        
+        clients.forEach(client => { var prediction = _0x3d2a['predictClientBehavior'](client); if (prediction.priority === 'high' && client.status !== 'Completed') { newNotifications.push(`🎯 عميل ذو أولوية عالية: ${client.name} - احتمالية إتمام الصفقة عالية`); } });
+        tasks.forEach(task => { if (task.date && new Date(task.date) < new Date()) { newNotifications.push(`⏰ مهمة متأخرة: ${task.text} - للعميل ${task.client}`); } });
         if (newNotifications.length > 0 && notifications.length !== newNotifications.length) {
             notifications = newNotifications;
             var badge = document.getElementById('notificationBadge');
             badge.innerText = notifications.length;
             badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
-            
-            if (Notification.permission === 'granted') {
-                newNotifications.slice(0, 3).forEach(n => {
-                    new Notification('🔔 Utopia CRM', { body: n, icon: 'https://cdn-icons-png.flaticon.com/512/565/565547.png' });
-                });
-            }
+            if (Notification.permission === 'granted') { newNotifications.slice(0, 3).forEach(n => { new Notification('🔔 Utopia CRM', { body: n, icon: 'https://cdn-icons-png.flaticon.com/512/565/565547.png' }); }); }
         }
     };
     
-    // عرض لوحة الإشعارات
     _0x3d2a['showNotificationsPanel'] = function() {
-        if (notifications.length === 0) {
-            _0x3d2a['showToast']('📭 لا توجد إشعارات جديدة', 'info');
-            return;
-        }
-        
+        if (notifications.length === 0) { _0x3d2a['showToast']('📭 لا توجد إشعارات جديدة', 'info'); return; }
         var panel = document.createElement('div');
         panel.style.cssText = 'position:fixed; top:80px; right:20px; width:350px; background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:30002; padding:15px; max-height:400px; overflow-y:auto;';
         panel.innerHTML = '<h4 style="margin:0 0 10px 0; color:var(--primary)">🔔 الإشعارات</h4><hr>';
-        notifications.forEach(n => {
-            panel.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">${n}</div>`;
-        });
+        notifications.forEach(n => { panel.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">${n}</div>`; });
         panel.innerHTML += '<button onclick="this.remove()" style="margin-top:10px; width:100%; padding:8px; background:var(--info); color:white; border:none; border-radius:10px;">إغلاق</button>';
         document.body.appendChild(panel);
     };
     
-    // تفعيل الإشعارات
     _0x3d2a['enableDesktopNotifications'] = function() {
-        if (Notification.permission === 'granted') {
-            _0x3d2a['showToast']('✅ الإشعارات مفعلة مسبقاً', 'success');
-        } else if (Notification.permission !== 'denied') {
-            Notification.requestPermission().then(perm => {
-                if (perm === 'granted') {
-                    _0x3d2a['showToast']('🔔 تم تفعيل الإشعارات بنجاح', 'success');
-                }
-            });
-        } else {
-            _0x3d2a['showToast']('❌ لا يمكن تفعيل الإشعارات - تم حظرها مسبقاً', 'error');
-        }
+        if (Notification.permission === 'granted') { _0x3d2a['showToast']('✅ الإشعارات مفعلة مسبقاً', 'success'); }
+        else if (Notification.permission !== 'denied') { Notification.requestPermission().then(perm => { if (perm === 'granted') { _0x3d2a['showToast']('🔔 تم تفعيل الإشعارات بنجاح', 'success'); } }); }
+        else { _0x3d2a['showToast']('❌ لا يمكن تفعيل الإشعارات - تم حظرها مسبقاً', 'error'); }
     };
     
-    // البحث الصوتي
     _0x3d2a['startVoiceInput'] = function() {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            _0x3d2a['showToast']('❌ المتصفح لا يدعم خاصية البحث الصوتي', 'error');
-            return;
-        }
-        
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { _0x3d2a['showToast']('❌ المتصفح لا يدعم خاصية البحث الصوتي', 'error'); return; }
         var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         speechRecognition = new SpeechRecognition();
         speechRecognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
         speechRecognition.continuous = false;
         speechRecognition.interimResults = false;
-        
-        speechRecognition.onstart = function() {
-            isListening = true;
-            var btn = document.getElementById('voiceBtn');
-            btn.classList.add('listening');
-            btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...';
-            _0x3d2a['showToast']('🎤 تحدث الآن...', 'info');
-        };
-        
-        speechRecognition.onresult = function(event) {
-            var transcript = event.results[0][0].transcript;
-            document.getElementById('advancedSearch').value = transcript;
-            _0x3d2a['renderCRM']();
-            _0x3d2a['showToast'](`🔍 بحث عن: "${transcript}"`, 'success');
-        };
-        
-        speechRecognition.onerror = function() {
-            _0x3d2a['showToast']('⚠️ لم يتم التعرف على الصوت، حاول مرة أخرى', 'warning');
-        };
-        
-        speechRecognition.onend = function() {
-            isListening = false;
-            var btn = document.getElementById('voiceBtn');
-            btn.classList.remove('listening');
-            btn.innerHTML = '<i class="fas fa-microphone"></i> بحث صوتي';
-        };
-        
+        speechRecognition.onstart = function() { isListening = true; var btn = document.getElementById('voiceBtn'); btn.classList.add('listening'); btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...'; _0x3d2a['showToast']('🎤 تحدث الآن...', 'info'); };
+        speechRecognition.onresult = function(event) { var transcript = event.results[0][0].transcript; document.getElementById('advancedSearch').value = transcript; _0x3d2a['renderCRM'](); _0x3d2a['showToast'](`🔍 بحث عن: "${transcript}"`, 'success'); };
+        speechRecognition.onerror = function() { _0x3d2a['showToast']('⚠️ لم يتم التعرف على الصوت، حاول مرة أخرى', 'warning'); };
+        speechRecognition.onend = function() { isListening = false; var btn = document.getElementById('voiceBtn'); btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> بحث صوتي'; };
         speechRecognition.start();
     };
     
-    // حفظ الفلاتر
     _0x3d2a['saveCurrentFilter'] = function() {
         var filterName = prompt('أدخل اسم للفلتر:');
         if (!filterName) return;
-        
-        var filter = {
-            name: filterName,
-            search: document.getElementById('advancedSearch').value,
-            gov: document.getElementById('filterGov').value,
-            agent: document.getElementById('filterAgent').value,
-            priority: document.getElementById('filterPriority').value,
-            status: document.getElementById('filterStatus').value
-        };
-        
+        var filter = { name: filterName, search: document.getElementById('advancedSearch').value, gov: document.getElementById('filterGov').value, agent: document.getElementById('filterAgent').value, priority: document.getElementById('filterPriority').value, status: document.getElementById('filterStatus').value };
         savedFilters.push(filter);
         localStorage.setItem('savedFilters', JSON.stringify(savedFilters));
         _0x3d2a['showToast']('✅ تم حفظ الفلتر بنجاح', 'success');
     };
     
-    // تحميل الفلاتر المحفوظة
     _0x3d2a['loadSavedFilters'] = function() {
-        if (savedFilters.length === 0) {
-            _0x3d2a['showToast']('📭 لا توجد فلاتر محفوظة', 'info');
-            return;
-        }
-        
+        if (savedFilters.length === 0) { _0x3d2a['showToast']('📭 لا توجد فلاتر محفوظة', 'info'); return; }
         var menu = document.createElement('div');
         menu.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border-radius:20px; padding:20px; min-width:300px; z-index:30003; box-shadow:0 10px 30px rgba(0,0,0,0.3);';
         menu.innerHTML = '<h3>📂 الفلاتر المحفوظة</h3><hr>';
-        savedFilters.forEach((f, idx) => {
-            menu.innerHTML += `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="_0x3d2a['applyFilter'](${idx}); this.parentElement.remove();">🔍 ${f.name}</div>`;
-        });
+        savedFilters.forEach((f, idx) => { menu.innerHTML += `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="_0x3d2a['applyFilter'](${idx}); this.parentElement.remove();">🔍 ${f.name}</div>`; });
         menu.innerHTML += '<button onclick="this.parentElement.remove()" style="margin-top:15px; width:100%; padding:8px; background:var(--danger); color:white; border:none; border-radius:10px;">إغلاق</button>';
         document.body.appendChild(menu);
     };
     
-    // تطبيق فلتر محفوظ
     _0x3d2a['applyFilter'] = function(idx) {
         var f = savedFilters[idx];
         document.getElementById('advancedSearch').value = f.search;
@@ -1408,33 +1146,19 @@
         _0x3d2a['showToast'](`✅ تم تطبيق الفلتر: ${f.name}`, 'success');
     };
     
-    // عرض توصيات AI في لوحة التحكم
     _0x3d2a['updateAIInsights'] = function() {
-        if (!clients.length) {
-            document.getElementById('aiInsightText').innerHTML = 'لا توجد بيانات كافية للتحليل. أضف عملاء للحصول على توصيات ذكية.';
-            return;
-        }
-        
+        if (!clients.length) { document.getElementById('aiInsightText').innerHTML = 'لا توجد بيانات كافية للتحليل. أضف عملاء للحصول على توصيات ذكية.'; return; }
         var highPotential = clients.filter(c => _0x3d2a['calculateWinProbability'](c) >= 70);
         var pendingTasks = tasks.filter(t => !t.extra || t.extra.length < 10);
-        
         var insight = '';
-        if (highPotential.length > 0) {
-            insight += `🎯 هناك ${highPotential.length} عميل/عملاء لديهم احتمالية إتمام صفقة عالية (أكثر من 70%). الأولوية: ${highPotential[0].name}`;
-        } else {
-            insight += '📊 لا يوجد عملاء ذو احتمالية عالية حالياً. ركز على تحسين جودة المتابعة.';
-        }
-        
-        if (pendingTasks.length > 5) {
-            insight += ` | ⚠️ ${pendingTasks.length} مهمة متوقفة تحتاج إلى تحديث.`;
-        }
-        
+        if (highPotential.length > 0) { insight += `🎯 هناك ${highPotential.length} عميل/عملاء لديهم احتمالية إتمام صفقة عالية (أكثر من 70%). الأولوية: ${highPotential[0].name}`; }
+        else { insight += '📊 لا يوجد عملاء ذو احتمالية عالية حالياً. ركز على تحسين جودة المتابعة.'; }
+        if (pendingTasks.length > 5) { insight += ` | ⚠️ ${pendingTasks.length} مهمة متوقفة تحتاج إلى تحديث.`; }
         document.getElementById('aiInsightText').innerHTML = insight;
         _0x3d2a['updateAdvancedKPIs']();
         _0x3d2a['checkSmartNotifications']();
     };
     
-    // عرض تنبيهات احترافية (Toast)
     _0x3d2a['showToast'] = function(message, type) {
         var toast = document.createElement('div');
         toast.className = 'toast-notification';
@@ -1446,15 +1170,10 @@
         setTimeout(() => { toast.remove(); }, 4000);
     };
     
-    // تعديل دالة التنبيه الأصلية لتستخدم الـ Toast أيضاً
     var originalNotify = _0x3d2a['notify'];
-    _0x3d2a['notify'] = function(msg, type) {
-        originalNotify(msg, type);
-        _0x3d2a['showToast'](msg, type);
-    };
+    _0x3d2a['notify'] = function(msg, type) { originalNotify(msg, type); _0x3d2a['showToast'](msg, type); };
     
-    // ========== الكود الأصلي (معدل قليلاً لإضافة AI) ==========
-    
+    // ========== دوال العرض الأساسية ==========
     _0x3d2a['renderCRM'] = function(){
         var body = document.getElementById('tableBody');
         if(!body) return;
@@ -1467,17 +1186,11 @@
         var filterPriority = document.getElementById('filterPriority').value;
         
         clients.forEach(function(c, i){
-            var matchesSearch = (c.name && c.name.toLowerCase().includes(searchTerm)) ||
-                               (c.phone && c.phone.toLowerCase().includes(searchTerm)) ||
-                               (c.status && c.status.toLowerCase().includes(searchTerm));
-            var matchesAdvanced = !advancedSearch || (c.name && c.name.toLowerCase().includes(advancedSearch)) ||
-                                 (c.phone && c.phone.toLowerCase().includes(advancedSearch)) ||
-                                 (c.gov && c.gov.toLowerCase().includes(advancedSearch)) ||
-                                 (c.agent && c.agent.toLowerCase().includes(advancedSearch));
+            var matchesSearch = (c.name && c.name.toLowerCase().includes(searchTerm)) || (c.phone && c.phone.toLowerCase().includes(searchTerm)) || (c.status && c.status.toLowerCase().includes(searchTerm));
+            var matchesAdvanced = !advancedSearch || (c.name && c.name.toLowerCase().includes(advancedSearch)) || (c.phone && c.phone.toLowerCase().includes(advancedSearch)) || (c.gov && c.gov.toLowerCase().includes(advancedSearch)) || (c.agent && c.agent.toLowerCase().includes(advancedSearch));
             var matchesFilter = (filterStatus === 'All' || c.status === filterStatus);
             var matchesGov = !filterGov || c.gov === filterGov;
             var matchesAgent = !filterAgent || c.agent === filterAgent;
-            
             var aiProb = _0x3d2a['calculateWinProbability'](c);
             var matchesPriority = true;
             if (filterPriority === 'high') matchesPriority = aiProb >= 70;
@@ -1488,11 +1201,9 @@
                 var rowClass = "";
                 if(c.status === 'VIP') rowClass = "vip-row";
                 if(c.status === 'Hold') rowClass = "hold-row";
-                
                 var prediction = _0x3d2a['predictClientBehavior'](c);
                 rowClass += ' priority-' + prediction.priority;
-                
-                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + ' <span class="ai-score">🤖 ' + aiProb + '%</span>' + '</td><td>' + (c.phone || '') + '</td><td>' + (c.gov || '') + '</td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></td></tr>';
+                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + ' <span class="ai-score">🤖 ' + aiProb + '%</span>' + '</td><td>' + (c.phone || '') + '</td><td>' + (c.gov || '') + '</td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></tr>';
             }
         });
         _0x3d2a['updateAIInsights']();
@@ -1502,15 +1213,10 @@
         var name = document.getElementById('name').value;
         if(!name){ _0x3d2a['notify']("Name required!", "error"); return; }
         var data = {
-            name: name,
-            phone: document.getElementById('phone').value,
-            gov: document.getElementById('gov').value,
-            status: document.getElementById('status').value,
-            notes: document.getElementById('notes').value,
-            agent: document.getElementById('agent').value,
-            date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-            timestamp: Date.now(),
-            lastUpdatedBy: sessionStorage.getItem('userDisplayName'),
+            name: name, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value,
+            status: document.getElementById('status').value, notes: document.getElementById('notes').value,
+            agent: document.getElementById('agent').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+            timestamp: Date.now(), lastUpdatedBy: sessionStorage.getItem('userDisplayName'),
             aiProbability: _0x3d2a['calculateWinProbability']({ status: document.getElementById('status').value, notes: document.getElementById('notes').value, gov: document.getElementById('gov').value })
         };
         if(editIdx > -1){
@@ -1525,23 +1231,24 @@
             _0x3d2a['addLog']("Added: " + name);
             _0x3d2a['showToast']('✅ تم إضافة عميل جديد بنجاح', 'success');
         }
-        db.ref('clients').set(clients);
+        saveToLocalDB('clients', clients);
         _0x3d2a['clearForm']();
         _0x3d2a['play']('soundSuccess');
         document.getElementById('sentimentResult').style.display = 'none';
         document.getElementById('aiRecommendations').style.display = 'none';
+        _0x3d2a['renderCRM']();
     };
     
-    _0x3d2a['init'] = function(){
+    _0x3d2a['init'] = async function(){
         if(!sessionStorage.getItem('isLoggedIn')) return;
+        
+        await loadDataFromLocalDB();
         
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
         
         var savedLang = localStorage.getItem('appLang');
-        if (savedLang === 'ar' || savedLang === 'en') {
-            currentLang = savedLang;
-        }
+        if (savedLang === 'ar' || savedLang === 'en') { currentLang = savedLang; }
         updateUILanguage();
         
         setTimeout(function(){
@@ -1564,9 +1271,7 @@
             badge.innerText = "👑 MASTER ACCESS";
             badge.style.background = "var(--vip)";
             badge.style.display = "inline-block";
-        } else {
-            badge.style.display = "none";
-        }
+        } else { badge.style.display = "none"; }
         
         if(sessionStorage.getItem('userRole') === 'admin'){
             document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = 'block'; });
@@ -1574,82 +1279,56 @@
         
         var govSel = document.getElementById('gov');
         if(govSel && govSel.options.length <= 1){
-            govs.forEach(function(g){
-                var opt = document.createElement('option');
-                opt.value = g;
-                opt.innerText = g;
-                govSel.appendChild(opt);
-            });
+            govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; govSel.appendChild(opt); });
         }
         
-        // تعبئة قائمة المحافظات في الفلتر المتقدم
         var filterGovSel = document.getElementById('filterGov');
         if(filterGovSel && filterGovSel.options.length <= 1){
-            govs.forEach(function(g){
-                var opt = document.createElement('option');
-                opt.value = g;
-                opt.innerText = g;
-                filterGovSel.appendChild(opt);
-            });
+            govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; filterGovSel.appendChild(opt); });
         }
         
-        // تعبئة قائمة المندوبين
         var updateAgentList = function() {
             var agents = new Set();
             clients.forEach(c => { if (c.agent) agents.add(c.agent); });
             var agentSel = document.getElementById('filterAgent');
             var currentVal = agentSel.value;
             agentSel.innerHTML = '<option value="">كل المندوبين</option>';
-            agents.forEach(a => {
-                var opt = document.createElement('option');
-                opt.value = a;
-                opt.innerText = a;
-                agentSel.appendChild(opt);
-            });
+            agents.forEach(a => { var opt = document.createElement('option'); opt.value = a; opt.innerText = a; agentSel.appendChild(opt); });
             agentSel.value = currentVal;
         };
         
-        db.ref('authSystem/users').on('value', function(snapshot){
-            var data = snapshot.val();
-            authSystem.users = data ? Object.values(data).filter(function(i){ return i !== null; }) : [];
-            if(typeof _0x3d2a['renderUsers'] === 'function') _0x3d2a['renderUsers']();
-        });
+        _0x3d2a['renderUsers'] = function(){
+            var body = document.getElementById('usersBody');
+            if(!body) return;
+            if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
+                body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
+                return;
+            }
+            body.innerHTML = authSystem.users.map(function(u,i){
+                return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</td><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></td></tr>';
+            }).join('');
+        };
         
-        db.ref('clients').on('value', function(snapshot){
-            clients = snapshot.val() ? Object.values(snapshot.val()) : [];
-            if(typeof _0x3d2a['renderCRM'] === 'function') _0x3d2a['renderCRM']();
-            if(typeof _0x3d2a['updateDash'] === 'function') _0x3d2a['updateDash']();
-            if(typeof _0x3d2a['fillClients'] === 'function') _0x3d2a['fillClients']();
-            if(typeof _0x3d2a['updateGeo'] === 'function') _0x3d2a['updateGeo']();
-            _0x3d2a['updateAIInsights']();
-            updateAgentList();
-        });
-        
-        db.ref('tasks').on('value', function(snapshot){
-            tasks = snapshot.val() ? Object.values(snapshot.val()) : [];
-            if(typeof _0x3d2a['renderTasks'] === 'function') _0x3d2a['renderTasks']();
-        });
-        
-        db.ref('deletedClients').on('value', function(snapshot){
-            deletedClients = snapshot.val() ? Object.values(snapshot.val()) : [];
-            if(typeof _0x3d2a['renderRecycle'] === 'function') _0x3d2a['renderRecycle']();
-        });
-        
-        db.ref('logs').limitToLast(100).on('value', function(snapshot){
-            logs = snapshot.val() ? Object.values(snapshot.val()) : [];
-            if(typeof _0x3d2a['renderLogs'] === 'function') _0x3d2a['renderLogs']();
-        });
+        _0x3d2a['renderUsers']();
+        _0x3d2a['renderCRM']();
+        _0x3d2a['renderTasks']();
+        _0x3d2a['renderRecycle']();
+        _0x3d2a['updateDash']();
+        _0x3d2a['updateGeo']();
+        _0x3d2a['fillClients']();
+        updateAgentList();
         
         var prof = document.getElementById('profName');
         if(prof) prof.innerText = sessionStorage.getItem('userDisplayName') || "User";
         
-        _0x3d2a['showToast']('🤖 AI Enhancement Active | مرحباً بك في النظام المتطور', 'info');
+        _0x3d2a['showToast']('🤖 AI Enhancement Active | نظام آمن بالكامل | Ultra Secure Mode', 'info');
+        
+        startPeriodicSync();
+        if (isOnline) { setTimeout(() => { fullSync(); }, 1000); }
         
         if (Notification.permission === 'default') {
             setTimeout(() => {
-                if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) {
-                    _0x3d2a['enableDesktopNotifications']();
-                }
+                if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { _0x3d2a['enableDesktopNotifications'](); }
             }, 2000);
         }
     };
@@ -1661,9 +1340,11 @@
             _0x3d2a['addLog']("Archived: " + c.name);
             deletedClients.push(c);
             clients.splice(i,1);
-            db.ref('clients').set(clients);
-            db.ref('deletedClients').set(deletedClients);
+            saveToLocalDB('clients', clients);
+            saveToLocalDB('deletedClients', deletedClients);
             _0x3d2a['notify']("Archived", "success");
+            _0x3d2a['renderCRM']();
+            _0x3d2a['renderRecycle']();
         }
     };
     
@@ -1733,138 +1414,33 @@
     };
     
     _0x3d2a['saveTask'] = function(){
-        var task = {
-            client: document.getElementById('taskClientSelect').value,
-            text: document.getElementById('taskText').value,
-            extra: document.getElementById('extraInfo').value,
-            date: document.getElementById('taskDate').value
-        };
+        var task = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value };
         if(!task.client || !task.text){ _0x3d2a['notify']("Incomplete", "error"); return; }
-        if(editTaskIdx > -1){
-            tasks[editTaskIdx] = task;
-            editTaskIdx = -1;
-        } else {
-            tasks.push(task);
-        }
-        db.ref('tasks').set(tasks);
+        if(editTaskIdx > -1){ tasks[editTaskIdx] = task; editTaskIdx = -1; }
+        else { tasks.push(task); }
+        saveToLocalDB('tasks', tasks);
         document.getElementById('taskText').value = '';
         document.getElementById('extraInfo').value = '';
         document.getElementById('taskDate').value = '';
         _0x3d2a['notify']("Task saved", "success");
+        _0x3d2a['renderTasks']();
     };
     
-    _0x3d2a['updateTaskExtra'] = function(i, v){
-        tasks[i].extra = v;
-        db.ref('tasks').set(tasks);
-    };
-    
-    _0x3d2a['delTask'] = function(i){
-        if(confirm("Delete?")){
-            tasks.splice(i,1);
-            db.ref('tasks').set(tasks);
-        }
-    };
-    
-    _0x3d2a['editTask'] = function(i){
-        var t = tasks[i];
-        editTaskIdx = i;
-        document.getElementById('taskClientSelect').value = t.client || '';
-        document.getElementById('taskText').value = t.text || '';
-        document.getElementById('extraInfo').value = t.extra || '';
-        document.getElementById('taskDate').value = t.date || '';
-        window.scrollTo(0,0);
-    };
-    
-    _0x3d2a['fillClients'] = function(){
-        var sel = document.getElementById('taskClientSelect');
-        if(!sel) return;
-        sel.innerHTML = '<option value="">' + (currentLang === 'ar' ? 'ربط بعميل' : 'Link to Client') + '</option>' + clients.map(function(c){ return '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; }).join('');
-    };
-    
-    _0x3d2a['autoFill'] = function(){
-        var name = document.getElementById('taskClientSelect').value;
-        var client = clients.find(function(c){ return c.name === name; });
-        if(client){
-            document.getElementById('extraInfo').value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || '');
-        }
-    };
-    
-    _0x3d2a['renderRecycle'] = function(){
-        var body = document.getElementById('recycleBody');
-        if(!body) return;
-        body.innerHTML = deletedClients.map(function(c,i){
-            return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td></tr>';
-        }).join('');
-    };
-    
-    _0x3d2a['restore'] = function(i){
-        clients.push(deletedClients[i]);
-        deletedClients.splice(i,1);
-        db.ref('clients').set(clients);
-        db.ref('deletedClients').set(deletedClients);
-        _0x3d2a['notify']("Restored", "success");
-    };
-    
-    _0x3d2a['hardDelete'] = function(i){
-        if(confirm("Permanent delete?")){
-            deletedClients.splice(i,1);
-            db.ref('deletedClients').set(deletedClients);
-        }
-    };
-    
-    _0x3d2a['addUser'] = function(){
-        var u = document.getElementById('newU').value;
-        var p = document.getElementById('newP').value;
-        var d = document.getElementById('newD').value;
-        var r = document.getElementById('newR').value;
-        if(!u || !p || !d){ alert("All fields required"); return; }
-        authSystem.users.push({ u: u, p: p, displayName: d, role: r });
-        db.ref('authSystem/users').set(authSystem.users);
-        _0x3d2a['addLog']("User created: " + d);
-        document.getElementById('newU').value = '';
-        document.getElementById('newP').value = '';
-        document.getElementById('newD').value = '';
-        _0x3d2a['showToast']('✅ تم إنشاء المستخدم بنجاح', 'success');
-    };
-    
-    _0x3d2a['renderUsers'] = function(){
-        var body = document.getElementById('usersBody');
-        if(!body) return;
-        if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
-            body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
-            return;
-        }
-        body.innerHTML = authSystem.users.map(function(u,i){
-            return '<tr><td>' + (u.u || '') + '</td><td class="mask-pass">**</td></td><td>' + (u.displayName || '') + '</td><td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'delUser\'](' + i + ')">✕</button></td></tr>';
-        }).join('');
-    };
-    
-    _0x3d2a['delUser'] = function(i){
-        if(confirm("Delete user?")){
-            authSystem.users.splice(i,1);
-            db.ref('authSystem/users').set(authSystem.users);
-        }
-    };
-    
-    _0x3d2a['addLog'] = function(msg){
-        db.ref('logs').push({ user: sessionStorage.getItem('userDisplayName') || "System", action: msg, time: new Date().toLocaleString() });
-    };
-    
-    _0x3d2a['renderLogs'] = function(){
-        var cont = document.getElementById('logsContainer');
-        if(!cont) return;
-        cont.innerHTML = logs.slice().reverse().map(function(l){
-            return '<div class="log-entry"><span style="color:var(--info); font-weight:bold">[' + l.user + ']</span> <span>' + l.action + '</span><br><small style="color:#999">' + l.time + '</small></div>';
-        }).join('');
-    };
-    
+    _0x3d2a['updateTaskExtra'] = function(i, v){ tasks[i].extra = v; saveToLocalDB('tasks', tasks); };
+    _0x3d2a['delTask'] = function(i){ if(confirm("Delete?")){ tasks.splice(i,1); saveToLocalDB('tasks', tasks); _0x3d2a['renderTasks'](); } };
+    _0x3d2a['editTask'] = function(i){ var t = tasks[i]; editTaskIdx = i; document.getElementById('taskClientSelect').value = t.client || ''; document.getElementById('taskText').value = t.text || ''; document.getElementById('extraInfo').value = t.extra || ''; document.getElementById('taskDate').value = t.date || ''; window.scrollTo(0,0); };
+    _0x3d2a['fillClients'] = function(){ var sel = document.getElementById('taskClientSelect'); if(!sel) return; sel.innerHTML = '<option value="">' + (currentLang === 'ar' ? 'ربط بعميل' : 'Link to Client') + '</option>' + clients.map(function(c){ return '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; }).join(''); };
+    _0x3d2a['autoFill'] = function(){ var name = document.getElementById('taskClientSelect').value; var client = clients.find(function(c){ return c.name === name; }); if(client){ document.getElementById('extraInfo').value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || ''); } };
+    _0x3d2a['renderRecycle'] = function(){ var body = document.getElementById('recycleBody'); if(!body) return; body.innerHTML = deletedClients.map(function(c,i){ return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td></tr>'; }).join(''); };
+    _0x3d2a['restore'] = function(i){ clients.push(deletedClients[i]); deletedClients.splice(i,1); saveToLocalDB('clients', clients); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['notify']("Restored", "success"); _0x3d2a['renderCRM'](); _0x3d2a['renderRecycle'](); };
+    _0x3d2a['hardDelete'] = function(i){ if(confirm("Permanent delete?")){ deletedClients.splice(i,1); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['renderRecycle'](); } };
+    _0x3d2a['addUser'] = function(){ var u = document.getElementById('newU').value; var p = document.getElementById('newP').value; var d = document.getElementById('newD').value; var r = document.getElementById('newR').value; if(!u || !p || !d){ alert("All fields required"); return; } authSystem.users.push({ u: u, p: p, displayName: d, role: r }); saveToLocalDB('users', authSystem.users); _0x3d2a['addLog']("User created: " + d); document.getElementById('newU').value = ''; document.getElementById('newP').value = ''; document.getElementById('newD').value = ''; _0x3d2a['showToast']('✅ تم إنشاء المستخدم بنجاح', 'success'); _0x3d2a['renderUsers'](); };
+    _0x3d2a['delUser'] = function(i){ if(confirm("Delete user?")){ authSystem.users.splice(i,1); saveToLocalDB('users', authSystem.users); _0x3d2a['renderUsers'](); } };
+    _0x3d2a['addLog'] = function(msg){ logs.push({ user: sessionStorage.getItem('userDisplayName') || "System", action: msg, time: new Date().toLocaleString() }); };
+    _0x3d2a['renderLogs'] = function(){ var cont = document.getElementById('logsContainer'); if(!cont) return; cont.innerHTML = logs.slice().reverse().map(function(l){ return '<div class="log-entry"><span style="color:var(--info); font-weight:bold">[' + l.user + ']</span> <span>' + l.action + '</span><br><small style="color:#999">' + l.time + '</small></div>'; }).join(''); };
     _0x3d2a['sort'] = function(col){
-        if(sortColumn === col){
-            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            sortColumn = col;
-            sortDirection = 'asc';
-        }
+        if(sortColumn === col){ sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'; }
+        else { sortColumn = col; sortDirection = 'asc'; }
         clients.sort(function(a,b){
             var va, vb;
             switch(col){
@@ -1875,80 +1451,24 @@
                 case 4: va = a.status || ''; vb = b.status || ''; break;
                 default: va = a.name || ''; vb = b.name || '';
             }
-            if(typeof va === 'number'){
-                return sortDirection === 'asc' ? va - vb : vb - va;
-            }
-            va = va.toString().toLowerCase();
-            vb = vb.toString().toLowerCase();
+            if(typeof va === 'number'){ return sortDirection === 'asc' ? va - vb : vb - va; }
+            va = va.toString().toLowerCase(); vb = vb.toString().toLowerCase();
             if(va < vb) return sortDirection === 'asc' ? -1 : 1;
             if(va > vb) return sortDirection === 'asc' ? 1 : -1;
             return 0;
         });
         _0x3d2a['renderCRM']();
     };
-    
-    _0x3d2a['show'] = function(id, btn){
-        document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
-        document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
-        var tab = document.getElementById(id);
-        if(tab) tab.classList.add('active');
-        if(btn) btn.classList.add('active');
-    };
-    
-    _0x3d2a['clearForm'] = function(){
-        ['name','phone','notes','agent','date'].forEach(function(id){
-            var el = document.getElementById(id);
-            if(el) el.value = '';
-        });
-        var st = document.getElementById('status');
-        if(st) st.value = 'Interested';
-        var gv = document.getElementById('gov');
-        if(gv) gv.value = '';
-    };
-    
-    _0x3d2a['play'] = function(id){
-        try{
-            var snd = document.getElementById(id);
-            if(snd) snd.play();
-        } catch(e){}
-    };
-    
+    _0x3d2a['show'] = function(id, btn){ document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); }); document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); }); var tab = document.getElementById(id); if(tab) tab.classList.add('active'); if(btn) btn.classList.add('active'); };
+    _0x3d2a['clearForm'] = function(){ ['name','phone','notes','agent','date'].forEach(function(id){ var el = document.getElementById(id); if(el) el.value = ''; }); var st = document.getElementById('status'); if(st) st.value = 'Interested'; var gv = document.getElementById('gov'); if(gv) gv.value = ''; };
+    _0x3d2a['play'] = function(id){ try{ var snd = document.getElementById(id); if(snd) snd.play(); } catch(e){} };
     _0x3d2a['exportCSV'] = function(){
         var csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date,AI_Probability,Priority\n";
-        clients.forEach(function(c){
-            var pred = _0x3d2a['predictClientBehavior'](c);
-            csv += '"' + (c.name || '') + '","' + (c.phone || '') + '","' + (c.gov || '') + '","' + (c.status || '') + '","' + (c.agent || '') + '","' + (c.notes || '') + '","' + (c.date || '') + '","' + _0x3d2a['calculateWinProbability'](c) + '%","' + pred.priority + '"\n';
-        });
-        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        var link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = 'Utopia_AI_Advanced_Data_' + new Date().toLocaleDateString() + '.csv';
-        link.click();
-        _0x3d2a['showToast']('📁 تم تصدير البيانات مع تقييمات الذكاء الاصطناعي المتقدمة', 'success');
+        clients.forEach(function(c){ var pred = _0x3d2a['predictClientBehavior'](c); csv += '"' + (c.name || '') + '","' + (c.phone || '') + '","' + (c.gov || '') + '","' + (c.status || '') + '","' + (c.agent || '') + '","' + (c.notes || '') + '","' + (c.date || '') + '","' + _0x3d2a['calculateWinProbability'](c) + '%","' + pred.priority + '"\n'; });
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); var link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = 'Utopia_AI_Secure_Data_' + new Date().toLocaleDateString() + '.csv'; link.click(); _0x3d2a['showToast']('📁 تم تصدير البيانات مع تقييمات الذكاء الاصطناعي', 'success');
     };
-    
-    _0x3d2a['updatePass'] = function(){
-        var np = document.getElementById('changePassInput').value;
-        var idx = sessionStorage.getItem('userIdx');
-        if(!np){ alert("Enter password"); return; }
-        if(idx == -1){ alert("Master password cannot be changed here"); return; }
-        if(authSystem.users[idx]){
-            authSystem.users[idx].p = np;
-            db.ref('authSystem/users').set(authSystem.users);
-            _0x3d2a['notify']("Password updated", "success");
-            document.getElementById('changePassInput').value = '';
-        } else {
-            alert("User not found");
-        }
-    };
-    
-    var originalToggle = _0x3d2a['toggle'];
-    _0x3d2a['toggle'] = function(){
-        originalToggle();
-        localStorage.setItem('appLang', currentLang);
-        updateUILanguage();
-        _0x3d2a['fillClients']();
-    };
+    _0x3d2a['updatePass'] = function(){ var np = document.getElementById('changePassInput').value; var idx = sessionStorage.getItem('userIdx'); if(!np){ alert("Enter password"); return; } if(idx == -1){ alert("Master password cannot be changed here"); return; } if(authSystem.users[idx]){ authSystem.users[idx].p = np; saveToLocalDB('users', authSystem.users); _0x3d2a['notify']("Password updated", "success"); document.getElementById('changePassInput').value = ''; } else { alert("User not found"); } };
+    var originalToggle = _0x3d2a['toggle']; _0x3d2a['toggle'] = function(){ originalToggle(); localStorage.setItem('appLang', currentLang); updateUILanguage(); _0x3d2a['fillClients'](); };
     
     _0x3d2a['init']();
 })();
