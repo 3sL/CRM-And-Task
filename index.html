@@ -348,15 +348,11 @@
             gap: 10px;
         }
         
-        .demo-data-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-bottom: 15px;
-            font-weight: bold;
+        .loading-indicator {
+            text-align: center;
+            padding: 40px;
+            color: var(--info);
+            font-size: 16px;
         }
     </style>
 </head>
@@ -394,7 +390,7 @@
                     <span id="notificationBadge" class="badge" style="display: none;">0</span>
                 </div>
                 <div id="syncStatusIndicator" class="sync-status offline" style="margin-left: 8px;">
-                    <i class="fas fa-plug"></i> <span id="syncStatusText">غير متصل</span>
+                    <i class="fas fa-plug"></i> <span id="syncStatusText">جاري التحميل...</span>
                 </div>
             </div>
         </div>
@@ -421,9 +417,6 @@
     <div class="main">
         <div id="crmTab" class="tab-content active">
             <h2 id="h_crm">Clients Management</h2>
-            
-            <!-- زر إضافة بيانات تجريبية -->
-            <button class="demo-data-btn" onclick="window._0x3d2a.addDemoData()">📊 إضافة بيانات تجريبية (Demo)</button>
             
             <div class="advanced-filter-bar">
                 <input type="text" id="advancedSearch" placeholder="🔍 بحث متقدم..." oninput="window._0x3d2a.renderCRM()">
@@ -494,8 +487,8 @@
                     </thead>
                     <tbody id="tableBody">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:40px;">
-                                ⏳ جاري تحميل البيانات... يرجى الانتظار
+                            <td colspan="6" class="loading-indicator">
+                                ⏳ جاري تحميل البيانات من السحابة...
                             </td>
                         </tr>
                     </tbody>
@@ -587,7 +580,7 @@
                     </thead>
                     <tbody id="taskBody">
                         <tr>
-                            <td colspan="8" style="text-align:center; padding:40px;">
+                            <td colspan="8" class="loading-indicator">
                                 ⏳ جاري تحميل المهام...
                             </td>
                         </tr>
@@ -675,7 +668,6 @@
 // ============================================================
 // ULTRA SECURE SYSTEM - Enhanced Protection Layer
 // System secured by Eng. Mahmoud Mohamed Marie
-// All rights reserved - Unauthorized access prohibited
 // ============================================================
 
 window._0x3d2a = {};
@@ -788,6 +780,7 @@ var isListening = false;
 var isOnline = navigator.onLine;
 var isSyncing = false;
 var syncInterval = null;
+var isLoadingData = false;
 var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
 // مستخدمين تجريبيين
@@ -797,22 +790,19 @@ var defaultUsers = [
     { u: "test", p: "test123", displayName: "مستخدم تجريبي", role: "user" }
 ];
 
-// بيانات تجريبية للعملاء
-var demoClients = [
-    { name: "أحمد محمد", phone: "01234567890", gov: "Cairo", status: "VIP", notes: "عميل مهم جداً - مهتم بمنتجاتنا", agent: "محمد علي", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 85 },
-    { name: "سارة أحمد", phone: "01122334455", gov: "Alexandria", status: "In Progress", notes: "تتفاوض على السعر - متابعة مستمرة", agent: "أحمد حسن", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 65 },
-    { name: "محمد إبراهيم", phone: "01099887766", gov: "Giza", status: "Interested", notes: "طلب عرض سعر - سيتم الرد قريباً", agent: "محمد علي", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 45 },
-    { name: "فاطمة حسن", phone: "01233445566", gov: "Dakahlia", status: "Completed", notes: "تم إتمام الصفقة بنجاح", agent: "سامي ربيع", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 95 },
-    { name: "عمر خالد", phone: "01155667788", gov: "Sharqia", status: "Hold", notes: "يطلب مهلة للتفكير", agent: "أحمد حسن", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System", aiProbability: 25 }
-];
-
-// بيانات تجريبية للمهام
-var demoTasks = [
-    { client: "أحمد محمد", operationType: "quotation", amount: 15000, text: "تقديم عرض سعر للمنتجات", taskNotes: "تم إرسال العرض عبر الواتساب", extra: "", date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null },
-    { client: "سارة أحمد", operationType: "followup", amount: null, text: "متابعة عرض السعر", taskNotes: "الاتصال غداً للتأكيد", extra: "", date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null },
-    { client: "محمد إبراهيم", operationType: "supply", amount: 25000, text: "تجهيز الطلبية", taskNotes: "تم تجهيز 50% من الطلب", extra: "", date: new Date(Date.now() + 10*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null },
-    { client: "فاطمة حسن", operationType: "bank", amount: 30000, text: "تحويل بنكي", taskNotes: "تم استلام الحوالة", extra: "", date: new Date(Date.now() - 2*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: true, completedAt: new Date().toISOString() }
-];
+// بيانات تجريبية للعرض عند عدم وجود بيانات
+var demoData = {
+    clients: [
+        { name: "شركة النور للتجارة", phone: "01234567890", gov: "Cairo", status: "VIP", notes: "عميل مهم - تعاقدات كبيرة", agent: "محمد علي", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" },
+        { name: "مؤسسة السلام", phone: "01122334455", gov: "Alexandria", status: "In Progress", notes: "قيد التفاوض على الأسعار", agent: "أحمد حسن", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" },
+        { name: "شركة الفجر", phone: "01099887766", gov: "Giza", status: "Interested", notes: "طلب عرض سعر للمنتجات", agent: "سامي ربيع", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" },
+        { name: "مؤسسة المستقبل", phone: "01233445566", gov: "Dakahlia", status: "Completed", notes: "تم إتمام الصفقة بنجاح", agent: "محمد علي", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" }
+    ],
+    tasks: [
+        { client: "شركة النور للتجارة", operationType: "quotation", amount: 50000, text: "تقديم عرض سعر للمعدات", taskNotes: "تم الإرسال عبر الإيميل", extra: "", date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null },
+        { client: "مؤسسة السلام", operationType: "followup", amount: null, text: "متابعة عرض السعر", taskNotes: "اتصال يوم الأحد", extra: "", date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null }
+    ]
+};
 
 // دوال مساعدة
 function getOperationTypeText(type) {
@@ -850,86 +840,73 @@ function updateSyncStatusUI() {
         if(textSpan) textSpan.innerText = 'متصل | متزامن';
     } else {
         indicator.className = 'sync-status offline';
-        if(textSpan) textSpan.innerText = 'غير متصل (أوفلاين)';
+        if(textSpan) textSpan.innerText = 'غير متصل';
     }
 }
 
 function updateUILanguage() {
     var t = translations[currentLang];
-    var elements = {
-        'm_crm': 'm_crm', 'm_tasks': 'm_tasks', 'm_dash': 'm_dash', 'm_profile': 'm_profile',
-        'm_recycle': 'm_recycle', 'm_admin': 'm_admin', 'm_logout': 'm_logout', 'h_crm': 'h_crm',
-        'h_dash': 'h_dash', 'h_tasks': 'h_tasks', 'recycleTitle': 'recycleTitle', 'adminTitle': 'adminTitle',
-        'usersTitle': 'usersTitle', 'logsTitle': 'logsTitle', 'profileTitle': 'profileTitle',
-        'loginTitle': 'loginTitle', 'loginSubtitle': 'loginSubtitle', 'loginBtn': 'loginBtn',
-        'statTotalLabel': 'statTotalLabel', 'statVipLabel': 'statVipLabel', 'statCompLabel': 'statCompLabel',
-        'statusChartLabel': 'statusChartLabel', 'geoChartLabel': 'geoChartLabel', 'taskClientHeader': 'taskClientHeader',
-        'taskTextHeader': 'taskTextHeader', 'taskNotesHeader': 'taskNotesHeader', 'taskDateHeader': 'taskDateHeader',
-        'taskActionHeader': 'taskActionHeader', 'taskStatusHeader': 'taskStatusHeader',
-        'recycleNameHeader': 'recycleNameHeader', 'recyclePhoneHeader': 'recyclePhoneHeader',
-        'recycleStatusHeader': 'recycleStatusHeader', 'recycleRestoreHeader': 'recycleRestoreHeader',
-        'recycleDeleteHeader': 'recycleDeleteHeader', 'registerBtn': 'registerBtn', 'updatePassBtn': 'updatePassBtn',
-        'changePassLabel': 'changePassLabel', 'loggedInAs': 'loggedInAs', 'kpiConversion': 'kpiConversion',
-        'kpiFollowUp': 'kpiFollowUp', 'kpiForecast': 'kpiForecast', 'kpiTopAgent': 'kpiTopAgent',
-        'aiInsightLabel': 'aiInsightLabel', 'enableNotifBtn': 'enableNotifBtn', 'manualSyncBtn': 'manualSyncBtn',
-        'usersTableUser': 'usersTableUser', 'usersTablePass': 'usersTablePass', 'usersTableName': 'usersTableName',
-        'usersTableRole': 'usersTableRole', 'usersTableAction': 'usersTableAction', 'thName': 'thName',
-        'thPhone': 'thPhone', 'thGov': 'thGov', 'thPriority': 'thPriority', 'thStatus': 'thStatus', 'thActions': 'thActions',
-        'taskTypeHeader': 'taskTypeHeader', 'taskAmountHeader': 'taskAmountHeader'
-    };
-    for (var id in elements) { 
-        var el = document.getElementById(id); 
-        if (el && t[id]) el.innerText = t[id]; 
+    var elements = ['m_crm', 'm_tasks', 'm_dash', 'm_profile', 'm_recycle', 'm_admin', 'm_logout', 'h_crm', 'h_dash', 'h_tasks', 'recycleTitle', 'adminTitle', 'usersTitle', 'logsTitle', 'profileTitle', 'loginTitle', 'loginSubtitle', 'loginBtn', 'statTotalLabel', 'statVipLabel', 'statCompLabel', 'statusChartLabel', 'geoChartLabel', 'taskClientHeader', 'taskTypeHeader', 'taskAmountHeader', 'taskTextHeader', 'taskNotesHeader', 'taskDateHeader', 'taskActionHeader', 'taskStatusHeader', 'recycleNameHeader', 'recyclePhoneHeader', 'recycleStatusHeader', 'recycleRestoreHeader', 'recycleDeleteHeader', 'registerBtn', 'updatePassBtn', 'changePassLabel', 'loggedInAs', 'kpiConversion', 'kpiFollowUp', 'kpiForecast', 'kpiTopAgent', 'aiInsightLabel', 'enableNotifBtn', 'manualSyncBtn', 'usersTableUser', 'usersTablePass', 'usersTableName', 'usersTableRole', 'usersTableAction', 'thName', 'thPhone', 'thGov', 'thPriority', 'thStatus', 'thActions'];
+    
+    for (var i = 0; i < elements.length; i++) {
+        var el = document.getElementById(elements[i]);
+        if (el && t[elements[i]]) el.innerText = t[elements[i]];
     }
     
-    var searchInput = document.getElementById('search'); if (searchInput) searchInput.placeholder = t['search_placeholder'];
-    var advancedSearch = document.getElementById('advancedSearch'); if (advancedSearch) advancedSearch.placeholder = t['advanced_search'];
-    var taskSearch = document.getElementById('taskSearch'); if (taskSearch) taskSearch.placeholder = t['search_tasks'];
-    var nameInput = document.getElementById('name'); if (nameInput) nameInput.placeholder = t['name_placeholder'];
-    var phoneInput = document.getElementById('phone'); if (phoneInput) phoneInput.placeholder = t['phone_placeholder'];
-    var agentInput = document.getElementById('agent'); if (agentInput) agentInput.placeholder = t['agent_placeholder'];
-    var notesArea = document.getElementById('notes'); if (notesArea) notesArea.placeholder = t['notes_placeholder'];
-    var taskTextInput = document.getElementById('taskText'); if (taskTextInput) taskTextInput.placeholder = t['task_text_placeholder'];
-    var taskNotesArea = document.getElementById('taskNotes'); if (taskNotesArea) taskNotesArea.placeholder = t['task_notes_placeholder'];
-    var extraInfoArea = document.getElementById('extraInfo'); if (extraInfoArea) extraInfoArea.placeholder = t['task_extra_placeholder'];
-    var newUInput = document.getElementById('newU'); if (newUInput) newUInput.placeholder = t['username_placeholder'];
-    var newPInput = document.getElementById('newP'); if (newPInput) newPInput.placeholder = t['password_placeholder'];
-    var newDInput = document.getElementById('newD'); if (newDInput) newDInput.placeholder = t['fullname_placeholder'];
-    var changePassInput = document.getElementById('changePassInput'); if (changePassInput) changePassInput.placeholder = t['change_pass_label'];
-    var voiceBtn = document.getElementById('voiceBtn'); if (voiceBtn) voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + t['voice_search'];
+    var searchInput = document.getElementById('search');
+    if(searchInput) searchInput.placeholder = t['search_placeholder'];
     
-    var refreshRecycleBtn = document.querySelector('#recycleTab .recycle-header button:first-child');
-    if (refreshRecycleBtn && t['refresh_recycle']) refreshRecycleBtn.innerHTML = t['refresh_recycle'];
+    var advancedSearch = document.getElementById('advancedSearch');
+    if(advancedSearch) advancedSearch.placeholder = t['advanced_search'];
     
-    var clearAllRecycleBtn = document.getElementById('clearAllRecycleBtn');
-    if (clearAllRecycleBtn && t['clear_all_recycle']) clearAllRecycleBtn.innerHTML = t['clear_all_recycle'];
+    var taskSearch = document.getElementById('taskSearch');
+    if(taskSearch) taskSearch.placeholder = t['search_tasks'];
+    
+    var nameInput = document.getElementById('name');
+    if(nameInput) nameInput.placeholder = t['name_placeholder'];
+    
+    var phoneInput = document.getElementById('phone');
+    if(phoneInput) phoneInput.placeholder = t['phone_placeholder'];
+    
+    var agentInput = document.getElementById('agent');
+    if(agentInput) agentInput.placeholder = t['agent_placeholder'];
+    
+    var notesArea = document.getElementById('notes');
+    if(notesArea) notesArea.placeholder = t['notes_placeholder'];
+    
+    var taskTextInput = document.getElementById('taskText');
+    if(taskTextInput) taskTextInput.placeholder = t['task_text_placeholder'];
+    
+    var taskNotesArea = document.getElementById('taskNotes');
+    if(taskNotesArea) taskNotesArea.placeholder = t['task_notes_placeholder'];
+    
+    var extraInfoArea = document.getElementById('extraInfo');
+    if(extraInfoArea) extraInfoArea.placeholder = t['task_extra_placeholder'];
+    
+    var newUInput = document.getElementById('newU');
+    if(newUInput) newUInput.placeholder = t['username_placeholder'];
+    
+    var newPInput = document.getElementById('newP');
+    if(newPInput) newPInput.placeholder = t['password_placeholder'];
+    
+    var newDInput = document.getElementById('newD');
+    if(newDInput) newDInput.placeholder = t['fullname_placeholder'];
+    
+    var changePassInput = document.getElementById('changePassInput');
+    if(changePassInput) changePassInput.placeholder = t['change_pass_label'];
+    
+    var voiceBtn = document.getElementById('voiceBtn');
+    if(voiceBtn) voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + t['voice_search'];
     
     var filterStatus = document.getElementById('filterStatus');
     if (filterStatus) {
-        filterStatus.options[0].text = t['filter_all']; 
-        filterStatus.options[1].text = 'Interested';
-        filterStatus.options[2].text = 'In Progress';
-        filterStatus.options[3].text = 'Hold';
-        filterStatus.options[4].text = 'Completed';
-        filterStatus.options[5].text = 'VIP';
+        filterStatus.options[0].text = t['filter_all'];
     }
     
-    var taskFilterStatus = document.getElementById('taskFilterStatus');
-    if (taskFilterStatus) {
-        taskFilterStatus.options[0].text = t['all_task_statuses'];
-        taskFilterStatus.options[1].text = t['task_status_pending'];
-        taskFilterStatus.options[2].text = t['task_status_completed'];
-        taskFilterStatus.options[3].text = t['task_status_overdue'];
-    }
-    
-    var filterGov = document.getElementById('filterGov');
-    if (filterGov && filterGov.options.length > 0) {
-        filterGov.options[0].text = t['all_governorates'];
-    }
-    
-    var filterAgent = document.getElementById('filterAgent');
-    if (filterAgent && filterAgent.options.length > 0) {
-        filterAgent.options[0].text = t['all_agents'];
+    var newRole = document.getElementById('newR');
+    if (newRole) {
+        newRole.options[0].text = t['role_user'];
+        newRole.options[1].text = t['role_admin'];
     }
     
     var filterPriority = document.getElementById('filterPriority');
@@ -940,31 +917,6 @@ function updateUILanguage() {
         filterPriority.options[3].text = t['low_priority'];
     }
     
-    var newRole = document.getElementById('newR');
-    if (newRole) { 
-        newRole.options[0].text = t['role_user']; 
-        newRole.options[1].text = t['role_admin']; 
-    }
-    
-    var taskFilterOperationType = document.getElementById('taskFilterOperationType');
-    if (taskFilterOperationType) {
-        taskFilterOperationType.options[0].text = t['all_task_statuses'] || 'كل الحالات';
-        taskFilterOperationType.options[1].text = t['op_quotation'] || '📄 طلب عرض سعر';
-        taskFilterOperationType.options[2].text = t['op_followup'] || '👀 متابعة عرض سعر';
-        taskFilterOperationType.options[3].text = t['op_supply'] || '🚚 توريد';
-        taskFilterOperationType.options[4].text = t['op_bank'] || '🏦 بنك';
-        taskFilterOperationType.options[5].text = t['op_cash'] || '💵 كاش';
-    }
-    
-    var taskOperationType = document.getElementById('taskOperationType');
-    if (taskOperationType) {
-        taskOperationType.options[0].text = t['op_quotation'] || '📄 طلب عرض سعر';
-        taskOperationType.options[1].text = t['op_followup'] || '👀 متابعة عرض سعر';
-        taskOperationType.options[2].text = t['op_supply'] || '🚚 توريد';
-        taskOperationType.options[3].text = t['op_bank'] || '🏦 بنك';
-        taskOperationType.options[4].text = t['op_cash'] || '💵 كاش';
-    }
-    
     var btnSave = document.getElementById('btnSave');
     if (btnSave && editIdx === -1) {
         btnSave.innerHTML = t['save_btn'];
@@ -973,63 +925,53 @@ function updateUILanguage() {
     }
     
     var htmlTag = document.getElementById('htmlTag');
-    if (currentLang === 'ar') { 
-        htmlTag.setAttribute('dir', 'rtl'); 
-        htmlTag.setAttribute('lang', 'ar'); 
-    } else { 
-        htmlTag.setAttribute('dir', 'ltr'); 
-        htmlTag.setAttribute('lang', 'en'); 
+    if (currentLang === 'ar') {
+        htmlTag.setAttribute('dir', 'rtl');
+        htmlTag.setAttribute('lang', 'ar');
+    } else {
+        htmlTag.setAttribute('dir', 'ltr');
+        htmlTag.setAttribute('lang', 'en');
     }
     
-    var langBtn = document.getElementById('langBtn'); 
+    var langBtn = document.getElementById('langBtn');
     if (langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
-    
-    var clearFiltersBtn = document.querySelector('#tasksTab .task-filter-bar button');
-    if (clearFiltersBtn && t['clear_filters']) clearFiltersBtn.innerHTML = t['clear_filters'];
-    
-    updateSyncStatusUI();
 }
 
-window._0x3d2a.toggle = function(){ 
-    currentLang = currentLang === 'en' ? 'ar' : 'en'; 
+window._0x3d2a.toggle = function(){
+    currentLang = currentLang === 'en' ? 'ar' : 'en';
     localStorage.setItem('appLang', currentLang);
-    updateUILanguage(); 
+    updateUILanguage();
     window._0x3d2a.fillClients();
     window._0x3d2a.updateAgentList();
     window._0x3d2a.updateTaskClientFilter();
     window._0x3d2a.renderTasks();
 };
 
-// دالة إضافة بيانات تجريبية
-window._0x3d2a.addDemoData = function() {
-    if (confirm("⚠️ هل تريد إضافة بيانات تجريبية؟ سيتم إضافة 5 عملاء و4 مهام كبيانات تجريبية.")) {
-        // إضافة العملاء التجريبيين
-        for (var i = 0; i < demoClients.length; i++) {
-            clients.push(demoClients[i]);
-        }
-        
-        // إضافة المهام التجريبية
-        for (var i = 0; i < demoTasks.length; i++) {
-            tasks.push(demoTasks[i]);
-        }
-        
-        // حفظ البيانات
-        window._0x3d2a.saveToLocalDB('clients', clients);
-        window._0x3d2a.saveToLocalDB('tasks', tasks);
-        
-        // تحديث الواجهة
-        window._0x3d2a.renderCRM();
-        window._0x3d2a.renderTasks();
-        window._0x3d2a.updateDash();
-        window._0x3d2a.updateGeo();
-        window._0x3d2a.updateAIInsights();
-        window._0x3d2a.fillClients();
-        window._0x3d2a.updateAgentList();
-        window._0x3d2a.updateTaskClientFilter();
-        
-        window._0x3d2a.showToast('✅ تم إضافة البيانات التجريبية بنجاح!', 'success');
-    }
+// Firebase Configuration
+var firebaseConfig = {
+    apiKey: "AIzaSyCh3wFPo7mVeB_ccufW5LyKgPFoeSO0J00",
+    authDomain: "crm-and-tasks-9f7c3.firebaseapp.com",
+    databaseURL: "https://crm-and-tasks-9f7c3-default-rtdb.firebaseio.com",
+    projectId: "crm-and-tasks-9f7c3",
+    storageBucket: "crm-and-tasks-9f7c3.firebasestorage.app",
+    messagingSenderId: "762341152156",
+    appId: "1:762341152156:web:91d417128226fc8708a459"
 };
+
+var firebaseApp = null;
+var database = null;
+
+try {
+    firebaseApp = firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    console.log("Firebase initialized successfully");
+} catch(e) {
+    console.warn("Firebase already initialized or error:", e);
+    if(firebase.apps.length > 0) {
+        firebaseApp = firebase.apps[0];
+        database = firebaseApp.database();
+    }
+}
 
 // IndexedDB
 var localDB = new Dexie("UtopiaCRMOffline");
@@ -1038,28 +980,176 @@ localDB.version(2).stores({
     tasks: "++id, client, text, operationType, amount, taskNotes, date, completed, completedAt",
     deletedClients: "++id, name, phone",
     users: "++id, u"
-}).upgrade(function(trans) {
-    return trans.tasks.toCollection().modify(function(task) {
-        if (!task.operationType) task.operationType = 'quotation';
-        if (task.amount === undefined) task.amount = null;
-        if (!task.taskNotes) task.taskNotes = '';
-    });
 });
 
 async function syncFromFirebase() {
-    // تم تعطيل Firebase مؤقتاً للسماح بالعمل المحلي
-    console.log("Firebase sync disabled - working offline");
-    return;
+    if (!database || isLoadingData) return;
+    isLoadingData = true;
+    
+    try {
+        console.log("Syncing from Firebase...");
+        
+        // جلب العملاء
+        var clientsSnapshot = await database.ref('clients').once('value');
+        var firebaseClients = [];
+        clientsSnapshot.forEach(function(child) {
+            firebaseClients.push({ id: child.key, ...child.val() });
+        });
+        
+        if (firebaseClients.length > 0) {
+            await localDB.clients.clear();
+            await localDB.clients.bulkAdd(firebaseClients);
+            clients = firebaseClients;
+            console.log("Loaded " + clients.length + " clients from Firebase");
+        } else {
+            // إذا كانت Firebase فارغة، جلب من IndexedDB المحلي
+            var localClients = await localDB.clients.toArray();
+            if (localClients.length > 0) {
+                clients = localClients;
+                console.log("Loaded " + clients.length + " clients from IndexedDB");
+            } else {
+                // إذا كان كل شيء فارغ، أضف بيانات تجريبية
+                clients = demoData.clients;
+                await localDB.clients.bulkAdd(clients);
+                console.log("Added demo clients");
+            }
+        }
+        
+        // جلب المهام
+        var tasksSnapshot = await database.ref('tasks').once('value');
+        var firebaseTasks = [];
+        tasksSnapshot.forEach(function(child) {
+            firebaseTasks.push({ id: child.key, ...child.val() });
+        });
+        
+        if (firebaseTasks.length > 0) {
+            await localDB.tasks.clear();
+            await localDB.tasks.bulkAdd(firebaseTasks);
+            tasks = firebaseTasks;
+            console.log("Loaded " + tasks.length + " tasks from Firebase");
+        } else {
+            var localTasks = await localDB.tasks.toArray();
+            if (localTasks.length > 0) {
+                tasks = localTasks;
+                console.log("Loaded " + tasks.length + " tasks from IndexedDB");
+            } else {
+                tasks = demoData.tasks;
+                await localDB.tasks.bulkAdd(tasks);
+                console.log("Added demo tasks");
+            }
+        }
+        
+        // جلب سلة المحذوفات
+        var deletedSnapshot = await database.ref('deletedClients').once('value');
+        var firebaseDeleted = [];
+        deletedSnapshot.forEach(function(child) {
+            firebaseDeleted.push({ id: child.key, ...child.val() });
+        });
+        
+        if (firebaseDeleted.length > 0) {
+            await localDB.deletedClients.clear();
+            await localDB.deletedClients.bulkAdd(firebaseDeleted);
+            deletedClients = firebaseDeleted;
+        } else {
+            deletedClients = await localDB.deletedClients.toArray() || [];
+        }
+        
+        // جلب المستخدمين
+        var usersSnapshot = await database.ref('authSystem/users').once('value');
+        var firebaseUsers = [];
+        usersSnapshot.forEach(function(child) {
+            firebaseUsers.push(child.val());
+        });
+        
+        if (firebaseUsers.length > 0) {
+            await localDB.users.clear();
+            await localDB.users.bulkAdd(firebaseUsers);
+            authSystem.users = firebaseUsers;
+        } else {
+            var localUsers = await localDB.users.toArray();
+            if (localUsers.length > 0) {
+                authSystem.users = localUsers;
+            } else {
+                authSystem.users = defaultUsers;
+                await localDB.users.bulkAdd(defaultUsers);
+            }
+        }
+        
+        console.log("Sync complete - Clients:", clients.length, "Tasks:", tasks.length);
+        
+    } catch (err) {
+        console.error("Sync error:", err);
+        // في حالة خطأ Firebase، جلب من IndexedDB المحلي
+        clients = await localDB.clients.toArray() || [];
+        tasks = await localDB.tasks.toArray() || [];
+        deletedClients = await localDB.deletedClients.toArray() || [];
+        var usersArray = await localDB.users.toArray() || [];
+        
+        if (usersArray.length === 0) {
+            await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+            usersArray = await localDB.users.toArray();
+        }
+        authSystem.users = usersArray;
+        
+        if (clients.length === 0) {
+            clients = demoData.clients;
+            await localDB.clients.bulkAdd(clients);
+        }
+        if (tasks.length === 0) {
+            tasks = demoData.tasks;
+            await localDB.tasks.bulkAdd(tasks);
+        }
+        
+        console.log("Loaded from IndexedDB - Clients:", clients.length, "Tasks:", tasks.length);
+    } finally {
+        isLoadingData = false;
+        updateSyncStatusUI();
+    }
 }
 
 async function syncToFirebase() {
-    console.log("Firebase sync disabled - working offline");
-    return;
+    if (!database || isSyncing) return;
+    isSyncing = true;
+    updateSyncStatusUI();
+    
+    try {
+        // رفع العملاء
+        var clientsToSync = clients.map(c => {
+            var { id, ...rest } = c;
+            return rest;
+        });
+        await database.ref('clients').set(clientsToSync);
+        
+        // رفع المهام
+        var tasksToSync = tasks.map(t => {
+            var { id, ...rest } = t;
+            return rest;
+        });
+        await database.ref('tasks').set(tasksToSync);
+        
+        // رفع سلة المحذوفات
+        var deletedToSync = deletedClients.map(d => {
+            var { id, ...rest } = d;
+            return rest;
+        });
+        await database.ref('deletedClients').set(deletedToSync);
+        
+        // رفع المستخدمين
+        await database.ref('authSystem/users').set(authSystem.users);
+        
+        console.log("Data synced to Firebase successfully");
+        window._0x3d2a.showToast('✅ تم رفع البيانات إلى السحابة', 'success');
+    } catch (err) {
+        console.error("Sync to Firebase error:", err);
+    } finally {
+        isSyncing = false;
+        updateSyncStatusUI();
+    }
 }
 
 async function fullSync() {
-    console.log("Full sync - working offline");
-    await loadDataFromLocalDB();
+    await syncFromFirebase();
+    await syncToFirebase();
     window._0x3d2a.renderCRM();
     window._0x3d2a.renderTasks();
     window._0x3d2a.renderRecycle();
@@ -1068,6 +1158,7 @@ async function fullSync() {
     window._0x3d2a.updateGeo();
     window._0x3d2a.updateAIInsights();
     window._0x3d2a.fillClients();
+    window._0x3d2a.updateAgentList();
     window._0x3d2a.updateTaskClientFilter();
 }
 
@@ -1084,32 +1175,21 @@ async function loadDataFromLocalDB() {
         }
         
         authSystem.users = usersArray;
-        console.log("Data loaded - Clients:", clients.length, "Tasks:", tasks.length, "Deleted:", deletedClients.length, "Users:", authSystem.users.length);
+        console.log("Local data loaded - Clients:", clients.length, "Tasks:", tasks.length);
         
-        // إذا كانت البيانات فارغة، أضف بيانات تجريبية تلقائياً
         if (clients.length === 0 && tasks.length === 0) {
-            console.log("No data found, adding demo data automatically");
-            for (var i = 0; i < demoClients.length; i++) {
-                clients.push(demoClients[i]);
-            }
-            for (var i = 0; i < demoTasks.length; i++) {
-                tasks.push(demoTasks[i]);
-            }
-            await window._0x3d2a.saveToLocalDB('clients', clients);
-            await window._0x3d2a.saveToLocalDB('tasks', tasks);
+            clients = demoData.clients;
+            tasks = demoData.tasks;
+            await localDB.clients.bulkAdd(clients);
+            await localDB.tasks.bulkAdd(tasks);
+            console.log("Added demo data to IndexedDB");
         }
     } catch (err) {
         console.error("Error loading from IndexedDB:", err);
-        clients = [];
-        tasks = [];
+        clients = demoData.clients;
+        tasks = demoData.tasks;
         deletedClients = [];
-        try {
-            await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
-            authSystem.users = await localDB.users.toArray();
-        } catch(e) {
-            console.error("Failed to add default users:", e);
-            authSystem.users = defaultUsers;
-        }
+        authSystem.users = defaultUsers;
     }
 }
 
@@ -1129,6 +1209,11 @@ window._0x3d2a.saveToLocalDB = async function(type, data) {
             if (data.length > 0) await localDB.users.bulkAdd(data);
             authSystem.users = data;
         }
+        
+        // رفع إلى Firebase في الخلفية
+        if (database && isOnline && !isSyncing) {
+            setTimeout(() => { syncToFirebase(); }, 1000);
+        }
     } catch (err) {
         console.error("Error saving to IndexedDB:", err);
     }
@@ -1136,25 +1221,31 @@ window._0x3d2a.saveToLocalDB = async function(type, data) {
 
 window.addEventListener('online', async function() {
     isOnline = true;
-    window._0x3d2a.showToast('🌐 تم استعادة الاتصال بالإنترنت', 'success');
+    window._0x3d2a.showToast('🌐 تم استعادة الاتصال بالإنترنت، جاري المزامنة...', 'success');
     updateSyncStatusUI();
+    await syncFromFirebase();
+    window._0x3d2a.renderCRM();
+    window._0x3d2a.renderTasks();
 });
+
 window.addEventListener('offline', function() {
     isOnline = false;
     window._0x3d2a.showToast('📡 لا يوجد إنترنت - ستعمل بشكل أوفلاين', 'warning');
     updateSyncStatusUI();
 });
 
-window._0x3d2a.manualSync = async function() { 
-    await fullSync(); 
+window._0x3d2a.manualSync = async function() {
+    await fullSync();
     window._0x3d2a.showToast('✅ تمت المزامنة بنجاح', 'success');
 };
 
 function startPeriodicSync() {
     if (syncInterval) clearInterval(syncInterval);
     syncInterval = setInterval(() => {
-        if (isOnline && !isSyncing) { fullSync(); }
-    }, 30000);
+        if (isOnline && !isSyncing && database) {
+            syncToFirebase();
+        }
+    }, 60000);
 }
 
 window._0x3d2a.notify = function(msg, type) {
@@ -1178,15 +1269,12 @@ window._0x3d2a.check = async function(){
         return;
     }
     
-    if (authSystem.users.length === 0) {
-        await loadDataFromLocalDB();
-    }
-    
-    var users = authSystem.users;
-    var found = users.find(function(acc){ return acc && acc.u && acc.u.toString().trim() === u && acc.p.toString().trim() === p; });
+    var found = authSystem.users.find(function(acc){ 
+        return acc && acc.u && acc.u.toString().trim() === u && acc.p.toString().trim() === p; 
+    });
     
     if(found){
-        window._0x3d2a.loginSuccess(found.role, found.displayName, users.indexOf(found));
+        window._0x3d2a.loginSuccess(found.role, found.displayName, authSystem.users.indexOf(found));
     } else {
         document.getElementById('loginError').style.display = 'block';
         window._0x3d2a.play('soundAlert');
@@ -1211,10 +1299,10 @@ window._0x3d2a.out = function(){
 };
 
 window._0x3d2a.analyzeSentiment = function(text) {
-    if (!text || text.length < 5) { 
+    if (!text || text.length < 5) {
         var sentimentDiv = document.getElementById('sentimentResult');
-        if(sentimentDiv) sentimentDiv.style.display = 'none'; 
-        return; 
+        if(sentimentDiv) sentimentDiv.style.display = 'none';
+        return;
     }
     var positive = ['مهتم', 'موافق', 'رائع', 'ممتاز', 'شكرا', 'نعم', 'متحمس', 'جاهز', 'اتفق', 'رائعة', 'جيد', 'great', 'good', 'excellent', 'interested', 'agree', 'ready'];
     var negative = ['لا', 'مش مهتم', 'رفض', 'غالي', 'مكلف', 'سيء', 'صعب', 'مشكلة', 'متعب', 'لاحقا', 'no', 'not interested', 'refuse', 'expensive', 'bad', 'problem', 'later', 'busy'];
@@ -1253,13 +1341,7 @@ window._0x3d2a.aiSuggestStatus = function() {
     else if (score >= 40) suggestedStatus = 'In Progress';
     else if (score <= 10) suggestedStatus = 'Hold';
     document.getElementById('status').value = suggestedStatus;
-    window._0x3d2a.showToast(`🤖 AI يقترح حالة: ${suggestedStatus} (نسبة الثقة: ${score}%)`, 'info');
-    var recDiv = document.getElementById('aiRecommendations');
-    if(recDiv) {
-        recDiv.innerHTML = `💡 <strong>توصية الذكاء الاصطناعي:</strong> بناءً على البيانات المدخلة، يُفضل متابعة هذا العميل كـ "${suggestedStatus}"`;
-        recDiv.style.display = 'block';
-        setTimeout(() => { recDiv.style.display = 'none'; }, 8000);
-    }
+    window._0x3d2a.showToast(`🤖 AI يقترح حالة: ${suggestedStatus}`, 'info');
 };
 
 window._0x3d2a.calculateWinProbability = function(client) {
@@ -1296,8 +1378,6 @@ window._0x3d2a.updateAdvancedKPIs = function() {
     var conversionRate = ((completed / clients.length) * 100).toFixed(1);
     var convRateEl = document.getElementById('conversionRate');
     if(convRateEl) convRateEl.innerText = conversionRate + '%';
-    var conversionTrendEl = document.getElementById('conversionTrend');
-    if(conversionTrendEl) conversionTrendEl.innerHTML = conversionRate > 30 ? '<i class="fas fa-arrow-up trend-up"></i> جيد' : '<i class="fas fa-arrow-down trend-down"></i> يحتاج تحسين';
     
     var agentPerformance = {};
     clients.forEach(c => { if (c.agent) { if (!agentPerformance[c.agent]) agentPerformance[c.agent] = { total: 0, completed: 0 }; agentPerformance[c.agent].total++; if (c.status === 'Completed') agentPerformance[c.agent].completed++; } });
@@ -1305,9 +1385,7 @@ window._0x3d2a.updateAdvancedKPIs = function() {
     for (var agent in agentPerformance) { var score = (agentPerformance[agent].completed / agentPerformance[agent].total) * 100; if (score > bestScore) { bestScore = score; bestAgent = agent; } }
     if (bestAgent) { 
         var topAgentEl = document.getElementById('topAgent');
-        if(topAgentEl) topAgentEl.innerText = bestAgent; 
-        var topAgentScoreEl = document.getElementById('topAgentScore');
-        if(topAgentScoreEl) topAgentScoreEl.innerHTML = `نسبة إنجاز: ${bestScore.toFixed(0)}%`; 
+        if(topAgentEl) topAgentEl.innerText = bestAgent;
     }
     var nextWeekForecast = Math.round(clients.filter(c => window._0x3d2a.calculateWinProbability(c) >= 60).length * 0.4);
     var nextWeekForecastEl = document.getElementById('nextWeekForecast');
@@ -1316,8 +1394,8 @@ window._0x3d2a.updateAdvancedKPIs = function() {
 
 window._0x3d2a.checkSmartNotifications = function() {
     var newNotifications = [];
-    clients.forEach(client => { var prediction = window._0x3d2a.predictClientBehavior(client); if (prediction.priority === 'high' && client.status !== 'Completed') { newNotifications.push(`🎯 عميل ذو أولوية عالية: ${client.name} - احتمالية إتمام الصفقة عالية`); } });
-    tasks.forEach(task => { if (task.date && new Date(task.date) < new Date() && !task.completed) { newNotifications.push(`⏰ مهمة متأخرة: ${task.text} - للعميل ${task.client}`); } });
+    clients.forEach(client => { var prediction = window._0x3d2a.predictClientBehavior(client); if (prediction.priority === 'high' && client.status !== 'Completed') { newNotifications.push(`🎯 عميل ذو أولوية عالية: ${client.name}`); } });
+    tasks.forEach(task => { if (task.date && new Date(task.date) < new Date() && !task.completed) { newNotifications.push(`⏰ مهمة متأخرة: ${task.text}`); } });
     if (newNotifications.length > 0 && notifications.length !== newNotifications.length) {
         notifications = newNotifications;
         var badge = document.getElementById('notificationBadge');
@@ -1325,7 +1403,6 @@ window._0x3d2a.checkSmartNotifications = function() {
             badge.innerText = notifications.length;
             badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
         }
-        if (Notification.permission === 'granted') { newNotifications.slice(0, 3).forEach(n => { new Notification('🔔 Utopia CRM', { body: n, icon: 'https://cdn-icons-png.flaticon.com/512/565/565547.png' }); }); }
     }
 };
 
@@ -1342,19 +1419,19 @@ window._0x3d2a.showNotificationsPanel = function() {
 window._0x3d2a.enableDesktopNotifications = function() {
     if (Notification.permission === 'granted') { window._0x3d2a.showToast('✅ الإشعارات مفعلة مسبقاً', 'success'); }
     else if (Notification.permission !== 'denied') { Notification.requestPermission().then(perm => { if (perm === 'granted') { window._0x3d2a.showToast('🔔 تم تفعيل الإشعارات بنجاح', 'success'); } }); }
-    else { window._0x3d2a.showToast('❌ لا يمكن تفعيل الإشعارات - تم حظرها مسبقاً', 'error'); }
+    else { window._0x3d2a.showToast('❌ لا يمكن تفعيل الإشعارات', 'error'); }
 };
 
 window._0x3d2a.startVoiceInput = function() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { window._0x3d2a.showToast('❌ المتصفح لا يدعم خاصية البحث الصوتي', 'error'); return; }
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { window._0x3d2a.showToast('❌ المتصفح لا يدعم البحث الصوتي', 'error'); return; }
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     speechRecognition = new SpeechRecognition();
     speechRecognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
     speechRecognition.continuous = false;
     speechRecognition.interimResults = false;
-    speechRecognition.onstart = function() { isListening = true; var btn = document.getElementById('voiceBtn'); if(btn) { btn.classList.add('listening'); btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...'; } window._0x3d2a.showToast('🎤 تحدث الآن...', 'info'); };
+    speechRecognition.onstart = function() { isListening = true; var btn = document.getElementById('voiceBtn'); if(btn) { btn.classList.add('listening'); btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...'; } };
     speechRecognition.onresult = function(event) { var transcript = event.results[0][0].transcript; var advSearch = document.getElementById('advancedSearch'); if(advSearch) advSearch.value = transcript; window._0x3d2a.renderCRM(); window._0x3d2a.showToast(`🔍 بحث عن: "${transcript}"`, 'success'); };
-    speechRecognition.onerror = function() { window._0x3d2a.showToast('⚠️ لم يتم التعرف على الصوت، حاول مرة أخرى', 'warning'); };
+    speechRecognition.onerror = function() { window._0x3d2a.showToast('⚠️ لم يتم التعرف على الصوت', 'warning'); };
     speechRecognition.onend = function() { isListening = false; var btn = document.getElementById('voiceBtn'); if(btn) { btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> ' + (translations[currentLang]['voice_search'] || 'بحث صوتي'); } };
     speechRecognition.start();
 };
@@ -1362,7 +1439,14 @@ window._0x3d2a.startVoiceInput = function() {
 window._0x3d2a.saveCurrentFilter = function() {
     var filterName = prompt('أدخل اسم للفلتر:');
     if (!filterName) return;
-    var filter = { name: filterName, search: document.getElementById('advancedSearch').value, gov: document.getElementById('filterGov').value, agent: document.getElementById('filterAgent').value, priority: document.getElementById('filterPriority').value, status: document.getElementById('filterStatus').value };
+    var filter = { 
+        name: filterName, 
+        search: document.getElementById('advancedSearch').value, 
+        gov: document.getElementById('filterGov').value, 
+        agent: document.getElementById('filterAgent').value, 
+        priority: document.getElementById('filterPriority').value, 
+        status: document.getElementById('filterStatus').value 
+    };
     savedFilters.push(filter);
     localStorage.setItem('savedFilters', JSON.stringify(savedFilters));
     window._0x3d2a.showToast('✅ تم حفظ الفلتر بنجاح', 'success');
@@ -1397,13 +1481,13 @@ window._0x3d2a.applyFilter = function(idx) {
 window._0x3d2a.updateAIInsights = function() {
     var insightSpan = document.getElementById('aiInsightText');
     if(!insightSpan) return;
-    if (!clients.length) { insightSpan.innerHTML = 'لا توجد بيانات كافية للتحليل. أضف عملاء للحصول على توصيات ذكية.'; return; }
+    if (!clients.length) { insightSpan.innerHTML = 'لا توجد بيانات كافية للتحليل.'; return; }
     var highPotential = clients.filter(c => window._0x3d2a.calculateWinProbability(c) >= 70);
     var pendingTasks = tasks.filter(t => !t.completed);
     var insight = '';
-    if (highPotential.length > 0) { insight += `🎯 هناك ${highPotential.length} عميل/عملاء لديهم احتمالية إتمام صفقة عالية (أكثر من 70%). الأولوية: ${highPotential[0].name}`; }
-    else { insight += '📊 لا يوجد عملاء ذو احتمالية عالية حالياً. ركز على تحسين جودة المتابعة.'; }
-    if (pendingTasks.length > 5) { insight += ` | ⚠️ ${pendingTasks.length} مهمة غير مكتملة تحتاج إلى متابعة.`; }
+    if (highPotential.length > 0) { insight += `🎯 ${highPotential.length} عميل لديهم احتمالية إتمام صفقة عالية.`; }
+    else { insight += '📊 لا يوجد عملاء ذو احتمالية عالية حالياً.'; }
+    if (pendingTasks.length > 5) { insight += ` ⚠️ ${pendingTasks.length} مهمة غير مكتملة.`; }
     insightSpan.innerHTML = insight;
     window._0x3d2a.updateAdvancedKPIs();
     window._0x3d2a.checkSmartNotifications();
@@ -1424,6 +1508,11 @@ window._0x3d2a.renderCRM = function(){
     var body = document.getElementById('tableBody');
     if(!body) return;
     
+    if (clients.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</td></tr>';
+        return;
+    }
+    
     var searchTerm = document.getElementById('search') ? document.getElementById('search').value.toLowerCase().trim() : '';
     var advancedSearch = document.getElementById('advancedSearch') ? document.getElementById('advancedSearch').value.toLowerCase().trim() : '';
     var filterStatus = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : 'All';
@@ -1432,8 +1521,8 @@ window._0x3d2a.renderCRM = function(){
     var filterPriority = document.getElementById('filterPriority') ? document.getElementById('filterPriority').value : '';
     
     var filteredClients = clients.filter(function(c){
-        var matchesSearch = (c.name && c.name.toLowerCase().includes(searchTerm)) || (c.phone && c.phone.toLowerCase().includes(searchTerm)) || (c.status && c.status.toLowerCase().includes(searchTerm));
-        var matchesAdvanced = !advancedSearch || (c.name && c.name.toLowerCase().includes(advancedSearch)) || (c.phone && c.phone.toLowerCase().includes(advancedSearch)) || (c.gov && c.gov.toLowerCase().includes(advancedSearch)) || (c.agent && c.agent.toLowerCase().includes(advancedSearch));
+        var matchesSearch = (c.name && c.name.toLowerCase().includes(searchTerm)) || (c.phone && c.phone.toLowerCase().includes(searchTerm));
+        var matchesAdvanced = !advancedSearch || (c.name && c.name.toLowerCase().includes(advancedSearch)) || (c.phone && c.phone.toLowerCase().includes(advancedSearch));
         var matchesFilter = (filterStatus === 'All' || c.status === filterStatus);
         var matchesGov = !filterGov || c.gov === filterGov;
         var matchesAgent = !filterAgent || c.agent === filterAgent;
@@ -1446,18 +1535,15 @@ window._0x3d2a.renderCRM = function(){
         return matchesSearch && matchesFilter && matchesGov && matchesAgent && matchesPriority && matchesAdvanced;
     });
     
-    if (filteredClients.length === 0 && clients.length === 0) {
-        body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 لا يوجد عملاء. قم بإضافة عميل جديد أو استخدم زر "إضافة بيانات تجريبية"</td></tr>';
-        return;
-    }
-    
-    if (filteredClients.length === 0 && clients.length > 0) {
-        body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">⚠️ لا توجد نتائج تطابق معايير البحث</td></tr>';
+    if (filteredClients.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">⚠️ لا توجد نتائج تطابق معايير البحث</td></tr>';
         return;
     }
     
     body.innerHTML = '';
-    filteredClients.forEach(function(c, idx){
+    for (var i = 0; i < filteredClients.length; i++) {
+        var c = filteredClients[i];
+        var originalIndex = clients.indexOf(c);
         var aiProb = window._0x3d2a.calculateWinProbability(c);
         var prediction = window._0x3d2a.predictClientBehavior(c);
         var rowClass = "";
@@ -1476,11 +1562,11 @@ window._0x3d2a.renderCRM = function(){
             '<td>' +
                 '<button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button>' +
                 '<button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button>' +
-                '<button class="action-btn btn-edit" onclick="window._0x3d2a.edit(' + clients.indexOf(c) + ')">✏️</button>' +
-                '<button class="action-btn btn-del" onclick="window._0x3d2a.delClient(' + clients.indexOf(c) + ')">✕</button>' +
+                '<button class="action-btn btn-edit" onclick="window._0x3d2a.edit(' + originalIndex + ')">✏️</button>' +
+                '<button class="action-btn btn-del" onclick="window._0x3d2a.delClient(' + originalIndex + ')">✕</button>' +
             '</td>' +
         '</tr>';
-    });
+    }
     
     window._0x3d2a.updateAIInsights();
 };
@@ -1497,8 +1583,7 @@ window._0x3d2a.save = function(){
         agent: document.getElementById('agent').value, 
         date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
         timestamp: Date.now(), 
-        lastUpdatedBy: sessionStorage.getItem('userDisplayName'),
-        aiProbability: window._0x3d2a.calculateWinProbability({ status: document.getElementById('status').value, notes: document.getElementById('notes').value, gov: document.getElementById('gov').value })
+        lastUpdatedBy: sessionStorage.getItem('userDisplayName')
     };
     if(editIdx > -1 && clients[editIdx]){
         clients[editIdx] = data;
@@ -1518,10 +1603,6 @@ window._0x3d2a.save = function(){
     window._0x3d2a.saveToLocalDB('clients', clients);
     window._0x3d2a.clearForm();
     window._0x3d2a.play('soundSuccess');
-    var sentimentDiv = document.getElementById('sentimentResult');
-    if(sentimentDiv) sentimentDiv.style.display = 'none';
-    var recDiv = document.getElementById('aiRecommendations');
-    if(recDiv) recDiv.style.display = 'none';
     window._0x3d2a.renderCRM();
     window._0x3d2a.updateAgentList();
     window._0x3d2a.fillClients();
@@ -1534,8 +1615,7 @@ window._0x3d2a.updateAgentList = function() {
     var agentSel = document.getElementById('filterAgent');
     if (!agentSel) return;
     var currentVal = agentSel.value;
-    var t = translations[currentLang];
-    agentSel.innerHTML = '<option value="">' + (t['all_agents'] || 'كل المندوبين') + '</option>';
+    agentSel.innerHTML = '<option value="">كل المندوبين</option>';
     agents.forEach(a => { var opt = document.createElement('option'); opt.value = a; opt.innerText = a; agentSel.appendChild(opt); });
     agentSel.value = currentVal;
 };
@@ -1544,10 +1624,9 @@ window._0x3d2a.updateTaskClientFilter = function() {
     var taskFilterClient = document.getElementById('taskFilterClient');
     if (!taskFilterClient) return;
     var currentVal = taskFilterClient.value;
-    var t = translations[currentLang];
-    taskFilterClient.innerHTML = '<option value="">' + (t['all_clients'] || 'كل العملاء') + '</option>';
+    taskFilterClient.innerHTML = '<option value="">كل العملاء</option>';
     var uniqueClients = new Set();
-    tasks.forEach(t => { if (t.client) uniqueClients.add(t.client); });
+    clients.forEach(c => { if (c.name) uniqueClients.add(c.name); });
     uniqueClients.forEach(c => { var opt = document.createElement('option'); opt.value = c; opt.innerText = c; taskFilterClient.appendChild(opt); });
     taskFilterClient.value = currentVal;
 };
@@ -1583,6 +1662,7 @@ window._0x3d2a.addLog = function(msg){
     logs.push({ user: sessionStorage.getItem('userDisplayName') || "System", action: msg, time: new Date().toLocaleString() }); 
     window._0x3d2a.renderLogs();
 };
+
 window._0x3d2a.renderLogs = function(){ 
     var cont = document.getElementById('logsContainer'); 
     if(!cont) return; 
@@ -1640,17 +1720,16 @@ window._0x3d2a.play = function(id){
 };
 
 window._0x3d2a.exportCSV = function(){
-    var csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date,AI_Probability,Priority\n";
+    var csv = "\uFEFFName,Phone,Governorate,Status,Agent,Notes,Date\n";
     clients.forEach(function(c){ 
-        var pred = window._0x3d2a.predictClientBehavior(c); 
-        csv += '"' + (c.name || '') + '","' + (c.phone || '') + '","' + (c.gov || '') + '","' + (c.status || '') + '","' + (c.agent || '') + '","' + (c.notes || '') + '","' + (c.date || '') + '","' + window._0x3d2a.calculateWinProbability(c) + '%","' + pred.priority + '"\n'; 
+        csv += '"' + (c.name || '') + '","' + (c.phone || '') + '","' + (c.gov || '') + '","' + (c.status || '') + '","' + (c.agent || '') + '","' + (c.notes || '') + '","' + (c.date || '') + '"\n'; 
     }); 
     var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
     var link = document.createElement("a"); 
     link.href = URL.createObjectURL(blob); 
-    link.download = 'Utopia_AI_Secure_Data_' + new Date().toLocaleDateString() + '.csv'; 
+    link.download = 'Utopia_Data_' + new Date().toLocaleDateString() + '.csv'; 
     link.click(); 
-    window._0x3d2a.showToast('📁 تم تصدير البيانات مع تقييمات الذكاء الاصطناعي', 'success');
+    window._0x3d2a.showToast('📁 تم تصدير البيانات', 'success');
 };
 
 window._0x3d2a.updatePass = function(){ 
@@ -1685,6 +1764,11 @@ window._0x3d2a.renderTasks = function(){
     var body = document.getElementById('taskBody');
     if(!body) return;
     
+    if (tasks.length === 0) {
+        body.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
+        return;
+    }
+    
     var searchTerm = document.getElementById('taskSearch') ? document.getElementById('taskSearch').value.toLowerCase().trim() : '';
     var filterClient = document.getElementById('taskFilterClient') ? document.getElementById('taskFilterClient').value : '';
     var filterStatus = document.getElementById('taskFilterStatus') ? document.getElementById('taskFilterStatus').value : 'all';
@@ -1708,19 +1792,15 @@ window._0x3d2a.renderTasks = function(){
         return matchesSearch && matchesClient && matchesOperationType && matchesDate && matchesStatus;
     });
     
-    if (filteredTasks.length === 0 && tasks.length === 0) {
-        body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
-        return;
-    }
-    
-    if (filteredTasks.length === 0 && tasks.length > 0) {
-        body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">⚠️ لا توجد مهام تطابق معايير البحث</b></td>';
+    if (filteredTasks.length === 0) {
+        body.innerHTML = '<tr><td colspan="8" class="loading-indicator">⚠️ لا توجد مهام تطابق معايير البحث</b></tr>';
         return;
     }
     
     body.innerHTML = '';
-    filteredTasks.forEach(function(task){
-        var originalIdx = tasks.findIndex(function(t){ return t === task; });
+    for (var i = 0; i < filteredTasks.length; i++) {
+        var task = filteredTasks[i];
+        var originalIdx = tasks.indexOf(task);
         var taskCompleted = task.completed || false;
         var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
         var statusText = taskCompleted ? (t['task_status_completed'] || 'مكتملة') : (isOverdue ? (t['task_status_overdue'] || 'متأخرة') : (t['task_status_pending'] || 'قيد التنفيذ'));
@@ -1735,7 +1815,7 @@ window._0x3d2a.renderTasks = function(){
             '<td class="amount-field">' + amountDisplay + '</td>' +
             '<td>' + (task.text || '') + '</td>' +
             '<td><textarea style="margin:0; font-size:12px; width:100%;" onchange="window._0x3d2a.updateTaskNotes(' + originalIdx + ', this.value)">' + (task.taskNotes || '') + '</textarea></td>' +
-            '<td><span style="color:var(--danger)">' + (task.date || '') + '</span></td>' +
+            '<td><span>' + (task.date || '') + '</span></td>' +
             '<td><span class="task-status-badge ' + statusClass + '">' + statusText + '</span><br>' +
             (!taskCompleted ? '<button class="btn-ai" style="margin-top:5px; font-size:10px;" onclick="window._0x3d2a.completeTask(' + originalIdx + ')">✓ إكمال</button>' : '') +
             '</td>' +
@@ -1744,7 +1824,7 @@ window._0x3d2a.renderTasks = function(){
                 '<button class="action-btn btn-del" onclick="window._0x3d2a.delTask(' + originalIdx + ')">✕</button>' +
             '</td>' +
         '</tr>';
-    });
+    }
 };
 
 window._0x3d2a.updateTaskNotes = function(i, v){ 
@@ -1864,29 +1944,33 @@ window._0x3d2a.editTask = function(i){
 window._0x3d2a.fillClients = function(){ 
     var sel = document.getElementById('taskClientSelect'); 
     if(!sel) return; 
-    var t = translations[currentLang];
-    var options = '<option value="">' + (t['task_client_placeholder'] || 'ربط بعميل') + '</option>';
+    var options = '<option value="">ربط بعميل</option>';
     
     if(clients.length === 0){
         options += '<option value="" disabled>⚠️ لا يوجد عملاء - أضف عميل أولاً</option>';
     } else {
-        clients.forEach(function(c){ 
-            if(c && c.name){
-                options += '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; 
+        for (var i = 0; i < clients.length; i++) {
+            if(clients[i] && clients[i].name){
+                options += '<option value="' + (clients[i].name || '') + '">' + (clients[i].name || '') + '</option>'; 
             }
-        });
+        }
     }
     sel.innerHTML = options;
-    console.log("Fill clients - Total clients:", clients.length);
 };
 
 window._0x3d2a.autoFill = function(){ 
     var name = document.getElementById('taskClientSelect').value; 
     if(!name) return;
-    var client = clients.find(function(c){ return c.name === name; }); 
+    var client = null;
+    for (var i = 0; i < clients.length; i++) {
+        if(clients[i].name === name) {
+            client = clients[i];
+            break;
+        }
+    }
     if(client){ 
         var extraInfo = document.getElementById('extraInfo');
-        if(extraInfo) extraInfo.value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || ''); 
+        if(extraInfo) extraInfo.value = '📞 هاتف: ' + (client.phone || '') + ' | 📍 محافظة: ' + (client.gov || '') + ' | 👤 مندوب: ' + (client.agent || ''); 
         window._0x3d2a.showToast('✅ تم تعبئة بيانات العميل تلقائياً', 'success');
     } 
 };
@@ -1897,19 +1981,21 @@ window._0x3d2a.renderRecycle = function(){
     if(!body) return;
     
     if(deletedClients.length === 0){
-        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">📭 سلة المحذوفات فارغة</b></tr>';
+        body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></tr>';
         return;
     }
     
-    body.innerHTML = deletedClients.map(function(c, i){
-        return '<tr>' +
+    body.innerHTML = '';
+    for (var i = 0; i < deletedClients.length; i++) {
+        var c = deletedClients[i];
+        body.innerHTML += '<tr>' +
             '<td><b>' + (c.name || '') + '</b></td>' +
             '<td>' + (c.phone || '') + '</td>' +
             '<td>' + (c.status || '') + '</td>' +
             '<td><button class="action-btn btn-edit" onclick="window._0x3d2a.restore(' + i + ')">🔄</button></td>' +
             '<td><button class="action-btn btn-del" onclick="window._0x3d2a.hardDelete(' + i + ')">🗑️</button></td>' +
-        '<tr>';
-    }).join(''); 
+        '</tr>';
+    }
 };
 
 window._0x3d2a.refreshRecycle = function(){
@@ -1997,15 +2083,17 @@ window._0x3d2a.renderUsers = function(){
         return;
     }
     if (authSystem.users && authSystem.users.length > 0) {
-        body.innerHTML = authSystem.users.map(function(u,i){
-            return '<tr>' +
+        body.innerHTML = '';
+        for (var i = 0; i < authSystem.users.length; i++) {
+            var u = authSystem.users[i];
+            body.innerHTML += '<tr>' +
                 '<td>' + (u.u || '') + '</td>' +
                 '<td class="mask-pass">**</b></td>' +
                 '<td>' + (u.displayName || '') + '</td>' +
                 '<td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></b></td>' +
                 '<td><button class="action-btn btn-del" onclick="window._0x3d2a.delUser(' + i + ')">✕</button></b></td>' +
             '</tr>';
-        }).join('');
+        }
     } else {
         body.innerHTML = "<tr><td colspan='5'>No users found</b></tr>";
     }
@@ -2079,21 +2167,64 @@ window._0x3d2a.updateGeo = function(){
     div.innerHTML = '';
     var cnt = {};
     clients.forEach(function(c){ if(c.gov) cnt[c.gov] = (cnt[c.gov] || 0) + 1; });
-    Object.entries(cnt).sort(function(a,b){ return b[1]-a[1]; }).forEach(function(g){
+    var entries = Object.entries(cnt);
+    entries.sort(function(a,b){ return b[1]-a[1]; });
+    for (var i = 0; i < entries.length; i++) {
+        var g = entries[i];
         div.innerHTML += '<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between;"><span>' + g[0] + '</span><b style="color:var(--info)">' + g[1] + '</b></div>';
-    });
+    }
 };
 
 window._0x3d2a.init = async function(){
     if(!sessionStorage.getItem('isLoggedIn')) return;
     
-    await loadDataFromLocalDB();
-    
+    // إظهار شاشة التحميل
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
     
+    // تحميل البيانات من Firebase أو IndexedDB
+    await syncFromFirebase();
+    
+    // تحديث واجهة المستخدم
     updateUILanguage();
     
+    // تعبئة المحافظات
+    var govSel = document.getElementById('gov');
+    if(govSel && govSel.options.length <= 1){
+        for (var i = 0; i < govs.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = govs[i];
+            opt.innerText = govs[i];
+            govSel.appendChild(opt);
+        }
+    }
+    
+    var filterGovSel = document.getElementById('filterGov');
+    if(filterGovSel && filterGovSel.options.length <= 1){
+        for (var i = 0; i < govs.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = govs[i];
+            opt.innerText = govs[i];
+            filterGovSel.appendChild(opt);
+        }
+    }
+    
+    // عرض البيانات
+    window._0x3d2a.renderCRM();
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.renderRecycle();
+    window._0x3d2a.renderUsers();
+    window._0x3d2a.updateDash();
+    window._0x3d2a.updateGeo();
+    window._0x3d2a.fillClients();
+    window._0x3d2a.updateAgentList();
+    window._0x3d2a.updateTaskClientFilter();
+    
+    // عرض اسم المستخدم
+    var profName = document.getElementById('profName');
+    if(profName) profName.innerText = sessionStorage.getItem('userDisplayName') || "User";
+    
+    // إظهار حالة المزامنة
     var badge = document.getElementById('userBadge');
     if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
         if(badge) {
@@ -2101,49 +2232,31 @@ window._0x3d2a.init = async function(){
             badge.style.background = "var(--vip)";
             badge.style.display = "inline-block";
         }
-    } else { 
-        if(badge) badge.style.display = "none"; 
     }
     
     if(sessionStorage.getItem('userRole') === 'admin'){
-        document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = 'block'; });
+        var adminBtns = document.querySelectorAll('.admin-only');
+        for (var i = 0; i < adminBtns.length; i++) {
+            adminBtns[i].style.display = 'block';
+        }
     }
     
-    var govSel = document.getElementById('gov');
-    if(govSel && govSel.options.length <= 1){
-        govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; govSel.appendChild(opt); });
-    }
+    window._0x3d2a.showToast('🤖 AI Enhancement Active | نظام إدارة متكامل', 'info');
     
-    var filterGovSel = document.getElementById('filterGov');
-    if(filterGovSel && filterGovSel.options.length <= 1){
-        govs.forEach(function(g){ var opt = document.createElement('option'); opt.value = g; opt.innerText = g; filterGovSel.appendChild(opt); });
-    }
-    
-    window._0x3d2a.renderUsers();
-    window._0x3d2a.renderCRM();
-    window._0x3d2a.renderTasks();
-    window._0x3d2a.renderRecycle();
-    window._0x3d2a.updateDash();
-    window._0x3d2a.updateGeo();
-    window._0x3d2a.fillClients();
-    window._0x3d2a.updateAgentList();
-    window._0x3d2a.updateTaskClientFilter();
-    
-    var profName = document.getElementById('profName');
-    if(profName) profName.innerText = sessionStorage.getItem('userDisplayName') || "User";
-    
-    window._0x3d2a.showToast('🤖 AI Enhancement Active | نظام آمن بالكامل | Ultra Secure Mode', 'info');
-    
+    // بدء المزامنة الدورية
     startPeriodicSync();
     
+    // طلب إذن الإشعارات
     if (Notification.permission === 'default') {
-        setTimeout(() => {
-            if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { window._0x3d2a.enableDesktopNotifications(); }
+        setTimeout(function() {
+            if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { 
+                window._0x3d2a.enableDesktopNotifications(); 
+            }
         }, 2000);
     }
 };
 
-// بدء التشغيل
+// بدء التطبيق
 if(sessionStorage.getItem('isLoggedIn') === 'true'){
     window._0x3d2a.init();
 }
