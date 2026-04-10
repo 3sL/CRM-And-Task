@@ -504,7 +504,7 @@
                 <button onclick="_0x3d2a['saveTask']()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ Add Operation</button>
             </div>
             <div class="table-container">
-                <table>
+                <tr>
                     <thead>
                         <tr>
                             <th id="taskClientHeader">Client</th>
@@ -824,6 +824,12 @@
     var syncInterval = null;
     var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
     
+    // مستخدمين تجريبيين افتراضيين للتأكد من وجود بيانات
+    var defaultUsers = [
+        { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
+        { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" }
+    ];
+    
     function updateSyncStatusUI() {
         var indicator = document.getElementById('syncStatusIndicator');
         var textSpan = document.getElementById('syncStatusText');
@@ -1015,11 +1021,18 @@
             await localDB.users.clear();
             if (firebaseUsers.length > 0) {
                 await localDB.users.bulkAdd(firebaseUsers.map(u => ({ ...u, id: u.u || Date.now() })));
+            } else {
+                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
             }
             
             _0x3d2a['showToast']('✅ تمت المزامنة من السحابة بنجاح', 'success');
         } catch (err) {
-            _0x3d2a['showToast']('⚠️ فشل المزامنة من السحابة', 'error');
+            console.error("Sync error:", err);
+            _0x3d2a['showToast']('⚠️ فشل المزامنة من السحابة، سيتم العمل محلياً', 'warning');
+            var localUsers = await localDB.users.toArray();
+            if (localUsers.length === 0) {
+                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+            }
         } finally {
             isSyncing = false;
             updateSyncStatusUI();
@@ -1043,6 +1056,7 @@
             
             _0x3d2a['showToast']('✅ تم رفع البيانات إلى السحابة بنجاح', 'success');
         } catch (err) {
+            console.error("Sync to Firebase error:", err);
             _0x3d2a['showToast']('⚠️ فشل رفع البيانات إلى السحابة', 'error');
         } finally {
             isSyncing = false;
@@ -1079,9 +1093,22 @@
             tasks = await localDB.tasks.toArray();
             deletedClients = await localDB.deletedClients.toArray();
             var usersArray = await localDB.users.toArray();
+            
+            if (usersArray.length === 0) {
+                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+                usersArray = await localDB.users.toArray();
+            }
+            
             authSystem.users = usersArray;
+            console.log("Data loaded - Users:", authSystem.users.length);
         } catch (err) {
             console.error("Error loading from IndexedDB:", err);
+            try {
+                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+                authSystem.users = await localDB.users.toArray();
+            } catch(e) {
+                console.error("Failed to add default users:", e);
+            }
         }
     }
     
@@ -1099,6 +1126,7 @@
             } else if (type === 'users') {
                 await localDB.users.clear();
                 if (data.length > 0) await localDB.users.bulkAdd(data);
+                authSystem.users = data;
             }
             if (isOnline && !isSyncing) {
                 setTimeout(() => { syncToFirebase(); }, 2000);
@@ -1141,16 +1169,24 @@
         _0x3d2a['showToast'](msg, type);
     };
     
-    _0x3d2a['check'] = function(){
+    _0x3d2a['check'] = async function(){
         var u = document.getElementById('userInput').value.trim();
         var p = document.getElementById('passInput').value.trim();
         document.getElementById('loginError').style.display = 'none';
+        
         if(u === "admin" && p === "@Mody6699"){
             _0x3d2a['loginSuccess']("admin", "Master Admin", -1);
             return;
         }
+        
+        // التأكد من تحميل المستخدمين قبل التحقق
+        if (authSystem.users.length === 0) {
+            await loadDataFromLocalDB();
+        }
+        
         var users = authSystem.users;
         var found = users.find(function(acc){ return acc && acc.u && acc.p && acc.u.toString().trim() === u && acc.p.toString().trim() === p; });
+        
         if(found){
             _0x3d2a['loginSuccess'](found.role, found.displayName, users.indexOf(found));
         } else {
@@ -1459,7 +1495,8 @@
         var r = document.getElementById('newR').value;
         if(!u || !p || !d){ alert("All fields required"); return; }
         
-        authSystem.users.push({ u: u, p: p, displayName: d, role: r });
+        var newUser = { u: u, p: p, displayName: d, role: r };
+        authSystem.users.push(newUser);
         saveToLocalDB('users', authSystem.users);
         _0x3d2a['addLog']("User created: " + d);
         document.getElementById('newU').value = '';
@@ -1643,7 +1680,7 @@
             document.getElementById('extraInfo').value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || ''); 
         } 
     };
-    _0x3d2a['renderRecycle'] = function(){ var body = document.getElementById('recycleBody'); if(!body) return; body.innerHTML = deletedClients.map(function(c,i){ return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td></tr>'; }).join(''); };
+    _0x3d2a['renderRecycle'] = function(){ var body = document.getElementById('recycleBody'); if(!body) return; body.innerHTML = deletedClients.map(function(c,i){ return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td><tr>'; }).join(''); };
     _0x3d2a['restore'] = function(i){ clients.push(deletedClients[i]); deletedClients.splice(i,1); saveToLocalDB('clients', clients); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['notify']("Restored", "success"); _0x3d2a['renderCRM'](); _0x3d2a['renderRecycle'](); };
     _0x3d2a['hardDelete'] = function(i){ if(confirm("Permanent delete?")){ deletedClients.splice(i,1); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['renderRecycle'](); } };
     
