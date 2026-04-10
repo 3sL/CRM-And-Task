@@ -295,6 +295,32 @@
             right: auto;
             left: 30px;
         }
+        
+        /* تحسينات فلاتر المهام */
+        .task-filter-bar {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .task-filter-bar input, .task-filter-bar select {
+            margin: 0;
+            flex: 1;
+            min-width: 120px;
+        }
+        .task-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .task-status-pending { background: #ffc107; color: #333; }
+        .task-status-completed { background: #28a745; color: white; }
+        .task-status-overdue { background: #dc3545; color: white; }
     </style>
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;"> 
@@ -455,6 +481,23 @@
 
         <div id="tasksTab" class="tab-content">
             <h2 id="h_tasks">Operations & Follow-ups</h2>
+            
+            <!-- إضافة فلاتر شاملة للمهام -->
+            <div class="task-filter-bar">
+                <input type="text" id="taskSearch" placeholder="🔍 بحث في المهام..." oninput="_0x3d2a['renderTasks']()" style="flex:2;">
+                <select id="taskFilterClient" onchange="_0x3d2a['renderTasks']()">
+                    <option value="">كل العملاء</option>
+                </select>
+                <select id="taskFilterStatus" onchange="_0x3d2a['renderTasks']()">
+                    <option value="all">كل الحالات</option>
+                    <option value="pending">قيد التنفيذ</option>
+                    <option value="completed">مكتملة</option>
+                    <option value="overdue">متأخرة</option>
+                </select>
+                <input type="date" id="taskFilterDate" onchange="_0x3d2a['renderTasks']()" placeholder="تاريخ محدد">
+                <button onclick="_0x3d2a['clearTaskFilters']()" class="btn-ai" style="background: #6c5ce7;">🗑️ مسح الفلاتر</button>
+            </div>
+            
             <div class="form-group">
                 <div class="grid-3">
                     <select id="taskClientSelect" onchange="_0x3d2a['autoFill']()"><option value="">Link to Client</option></select>
@@ -466,7 +509,16 @@
             </div>
             <div class="table-container">
                 <table>
-                    <thead><tr><th id="taskClientHeader">Client</th><th id="taskTextHeader">Task</th><th id="taskNotesHeader">Progress/Notes</th><th id="taskDateHeader">Deadline</th><th id="taskActionHeader">Action</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th id="taskClientHeader">Client</th>
+                            <th id="taskTextHeader">Task</th>
+                            <th id="taskNotesHeader">Progress/Notes</th>
+                            <th id="taskDateHeader">Deadline</th>
+                            <th id="taskStatusHeader">Status</th>
+                            <th id="taskActionHeader">Action</th>
+                        </tr>
+                    </thead>
                     <tbody id="taskBody"></tbody>
                 </table>
             </div>
@@ -476,7 +528,15 @@
             <h2 id="recycleTitle" style="color:var(--danger)">♻️ Recycle Bin (Archived)</h2>
             <div class="table-container">
                 <table>
-                    <thead><tr><th id="recycleNameHeader">Name</th><th id="recyclePhoneHeader">Phone</th><th id="recycleStatusHeader">Status</th><th id="recycleRestoreHeader">Restore</th><th id="recycleDeleteHeader">Delete</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th id="recycleNameHeader">Name</th>
+                            <th id="recyclePhoneHeader">Phone</th>
+                            <th id="recycleStatusHeader">Status</th>
+                            <th id="recycleRestoreHeader">Restore</th>
+                            <th id="recycleDeleteHeader">Delete</th>
+                        </tr>
+                    </thead>
                     <tbody id="recycleBody"></tbody>
                 </table>
             </div>
@@ -499,7 +559,15 @@
                     <button onclick="_0x3d2a['addUser']()" class="btn-save" style="background:var(--primary)" id="registerBtn">Register New User</button>
                     <div class="table-container" style="margin-top:20px;">
                         <table>
-                            <thead><tr><th id="usersTableUser">User</th><th id="usersTablePass">Pass</th><th id="usersTableName">Name</th><th id="usersTableRole">Role</th><th id="usersTableAction">Action</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th id="usersTableUser">User</th>
+                                    <th id="usersTablePass">Pass</th>
+                                    <th id="usersTableName">Name</th>
+                                    <th id="usersTableRole">Role</th>
+                                    <th id="usersTableAction">Action</th>
+                                </tr>
+                            </thead>
                             <tbody id="usersBody"></tbody>
                         </table>
                     </div>
@@ -571,32 +639,27 @@
     
     // كشف محاولات فتح F12 والمفاتيح المختصرة
     var blockShortcuts = function(e) {
-        // F12
         if (e.key === 'F12' || e.keyCode === 123) {
             e.preventDefault();
             e.stopPropagation();
             return false;
         }
-        // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
         if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
             e.preventDefault();
             e.stopPropagation();
             return false;
         }
-        // Ctrl+U (view source)
         if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
             e.preventDefault();
             e.stopPropagation();
             return false;
         }
-        // Ctrl+S (save page)
         if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
             e.preventDefault();
             e.stopPropagation();
             alert('❌ Saving this page is disabled for security reasons.');
             return false;
         }
-        // Ctrl+P (print)
         if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
             e.preventDefault();
             e.stopPropagation();
@@ -605,19 +668,16 @@
         }
     };
     
-    // منع النقر بزر الماوس الأيمن
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         return false;
     });
     
-    // منع السحب والإفلات
     document.addEventListener('dragstart', function(e) {
         e.preventDefault();
         return false;
     });
     
-    // حماية العلامة المائية من الحذف
     var protectWatermark = function() {
         var watermark = document.getElementById('watermark');
         if (!watermark) return;
@@ -634,11 +694,10 @@
         observer.observe(document.body, { childList: true, subtree: true, attributes: true });
     };
     
-    // منع التعديل على LocalStorage و SessionStorage
     var protectStorage = function() {
         var originalSetItem = Storage.prototype.setItem;
         Storage.prototype.setItem = function(key, value) {
-            if (key === 'savedFilters' || key === 'appLang') {
+            if (key === 'savedFilters' || key === 'appLang' || key === 'taskSavedFilters') {
                 return originalSetItem.call(this, key, value);
             }
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
@@ -649,7 +708,6 @@
         };
     };
     
-    // مكافحة الـ Debugger
     var antiDebugger = function() {
         var startTime = performance.now();
         debugger;
@@ -661,13 +719,11 @@
         setTimeout(antiDebugger, 100);
     };
     
-    // تفعيل الحماية فقط بعد تسجيل الدخول
     var isLoggedIn = false;
     var checkLoginInterval = setInterval(function() {
         if (sessionStorage.getItem('isLoggedIn') === 'true' && !isLoggedIn) {
             isLoggedIn = true;
             clearInterval(checkLoginInterval);
-            // تفعيل الحماية المتقدمة
             devToolsDetection();
             protectConsole();
             protectWatermark();
@@ -678,14 +734,9 @@
     }, 500);
 })();
 
-// ============================================================
-// ORIGINAL CODE - تماماً كما هو دون أي تعديل
-// ============================================================
-
 (function(){
     var _0x3d2a = window._0x3d2a = {};
     
-    // ========== نظام الترجمة المتكامل ==========
     var currentLang = localStorage.getItem('appLang') || 'en';
     var translations = {
         en: {
@@ -724,7 +775,10 @@
             'users_table_user': 'User', 'users_table_pass': 'Pass', 'users_table_name': 'Name', 
             'users_table_role': 'Role', 'users_table_action': 'Action', 'th_name': 'Name ↕️',
             'th_phone': 'Phone', 'th_gov': 'Governorate ↕️', 'th_priority': 'AI Priority',
-            'th_status': 'Status ↕️', 'th_actions': 'Actions'
+            'th_status': 'Status ↕️', 'th_actions': 'Actions', 'task_status_header': 'Status',
+            'task_status_pending': 'Pending', 'task_status_completed': 'Completed', 'task_status_overdue': 'Overdue',
+            'clear_filters': '🗑️ Clear Filters', 'search_tasks': '🔍 Search Tasks...', 'all_clients': 'All Clients',
+            'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date'
         },
         ar: {
             'm_crm': '👥 إدارة العملاء', 'm_tasks': '📅 المهام والعمليات', 'm_dash': '📊 التحليلات الذكية',
@@ -759,7 +813,10 @@
             'users_table_user': 'المستخدم', 'users_table_pass': 'كلمة المرور', 'users_table_name': 'الاسم',
             'users_table_role': 'الصلاحية', 'users_table_action': 'إجراء', 'th_name': 'الاسم ↕️',
             'th_phone': 'الهاتف', 'th_gov': 'المحافظة ↕️', 'th_priority': 'أولوية AI',
-            'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات'
+            'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات', 'task_status_header': 'الحالة',
+            'task_status_pending': 'قيد التنفيذ', 'task_status_completed': 'مكتملة', 'task_status_overdue': 'متأخرة',
+            'clear_filters': '🗑️ مسح الفلاتر', 'search_tasks': '🔍 بحث في المهام...', 'all_clients': 'كل العملاء',
+            'all_task_statuses': 'كل الحالات', 'specific_date': 'تاريخ محدد'
         }
     };
     
@@ -774,7 +831,8 @@
             'statTotalLabel': 'statTotalLabel', 'statVipLabel': 'statVipLabel', 'statCompLabel': 'statCompLabel',
             'statusChartLabel': 'statusChartLabel', 'geoChartLabel': 'geoChartLabel', 'taskClientHeader': 'taskClientHeader',
             'taskTextHeader': 'taskTextHeader', 'taskNotesHeader': 'taskNotesHeader', 'taskDateHeader': 'taskDateHeader',
-            'taskActionHeader': 'taskActionHeader', 'recycleNameHeader': 'recycleNameHeader', 'recyclePhoneHeader': 'recyclePhoneHeader',
+            'taskActionHeader': 'taskActionHeader', 'taskStatusHeader': 'taskStatusHeader',
+            'recycleNameHeader': 'recycleNameHeader', 'recyclePhoneHeader': 'recyclePhoneHeader',
             'recycleStatusHeader': 'recycleStatusHeader', 'recycleRestoreHeader': 'recycleRestoreHeader',
             'recycleDeleteHeader': 'recycleDeleteHeader', 'registerBtn': 'registerBtn', 'updatePassBtn': 'updatePassBtn',
             'changePassLabel': 'changePassLabel', 'loggedInAs': 'loggedInAs', 'kpiConversion': 'kpiConversion',
@@ -789,9 +847,9 @@
             if (el && t[id]) el.innerText = t[id]; 
         }
         
-        // تحديث الـ placeholders
         var searchInput = document.getElementById('search'); if (searchInput) searchInput.placeholder = t['search_placeholder'];
         var advancedSearch = document.getElementById('advancedSearch'); if (advancedSearch) advancedSearch.placeholder = t['advanced_search'];
+        var taskSearch = document.getElementById('taskSearch'); if (taskSearch) taskSearch.placeholder = t['search_tasks'];
         var nameInput = document.getElementById('name'); if (nameInput) nameInput.placeholder = t['name_placeholder'];
         var phoneInput = document.getElementById('phone'); if (phoneInput) phoneInput.placeholder = t['phone_placeholder'];
         var agentInput = document.getElementById('agent'); if (agentInput) agentInput.placeholder = t['agent_placeholder'];
@@ -804,7 +862,6 @@
         var changePassInput = document.getElementById('changePassInput'); if (changePassInput) changePassInput.placeholder = t['change_pass_label'];
         var voiceBtn = document.getElementById('voiceBtn'); if (voiceBtn) voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + t['voice_search'];
         
-        // تحديث خيارات الـ selects
         var filterStatus = document.getElementById('filterStatus');
         if (filterStatus) {
             filterStatus.options[0].text = t['filter_all']; 
@@ -813,6 +870,19 @@
             filterStatus.options[3].text = t['filter_hold'];
             filterStatus.options[4].text = t['filter_completed']; 
             filterStatus.options[5].text = t['filter_vip'];
+        }
+        
+        var taskFilterStatus = document.getElementById('taskFilterStatus');
+        if (taskFilterStatus) {
+            taskFilterStatus.options[0].text = t['all_task_statuses'];
+            taskFilterStatus.options[1].text = t['task_status_pending'];
+            taskFilterStatus.options[2].text = t['task_status_completed'];
+            taskFilterStatus.options[3].text = t['task_status_overdue'];
+        }
+        
+        var taskFilterClient = document.getElementById('taskFilterClient');
+        if (taskFilterClient && taskFilterClient.options.length > 0) {
+            taskFilterClient.options[0].text = t['all_clients'];
         }
         
         var filterGov = document.getElementById('filterGov');
@@ -839,7 +909,6 @@
             newRole.options[1].text = t['role_admin']; 
         }
         
-        // تحديث زر الحفظ
         var btnSave = document.getElementById('btnSave');
         if (btnSave && editIdx === -1) {
             btnSave.innerHTML = t['save_btn'];
@@ -847,7 +916,6 @@
             btnSave.innerHTML = t['update_btn'];
         }
         
-        // تحديث اتجاه الصفحة
         var htmlTag = document.getElementById('htmlTag');
         if (currentLang === 'ar') { 
             htmlTag.setAttribute('dir', 'rtl'); 
@@ -857,23 +925,12 @@
             htmlTag.setAttribute('lang', 'en'); 
         }
         
-        // تحديث نص زر اللغة
         var langBtn = document.getElementById('langBtn'); 
         if (langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
         
-        // تحديث عنوان الجدول في Admin
-        var usersTableUser = document.getElementById('usersTableUser');
-        if (usersTableUser && t['users_table_user']) usersTableUser.innerText = t['users_table_user'];
-        var usersTablePass = document.getElementById('usersTablePass');
-        if (usersTablePass && t['users_table_pass']) usersTablePass.innerText = t['users_table_pass'];
-        var usersTableName = document.getElementById('usersTableName');
-        if (usersTableName && t['users_table_name']) usersTableName.innerText = t['users_table_name'];
-        var usersTableRole = document.getElementById('usersTableRole');
-        if (usersTableRole && t['users_table_role']) usersTableRole.innerText = t['users_table_role'];
-        var usersTableAction = document.getElementById('usersTableAction');
-        if (usersTableAction && t['users_table_action']) usersTableAction.innerText = t['users_table_action'];
+        var clearFiltersBtn = document.querySelector('#tasksTab .task-filter-bar button');
+        if (clearFiltersBtn && t['clear_filters']) clearFiltersBtn.innerHTML = t['clear_filters'];
         
-        // تحديث مؤشر المزامنة
         var syncStatusText = document.getElementById('syncStatusText');
         if (syncStatusText) {
             if (isSyncing) syncStatusText.innerText = 'جاري المزامنة...';
@@ -886,11 +943,12 @@
         currentLang = currentLang === 'en' ? 'ar' : 'en'; 
         localStorage.setItem('appLang', currentLang);
         updateUILanguage(); 
-        _0x3d2a['fillClients'](); // تحديث قائمة العملاء في المهام
-        _0x3d2a['updateAgentList'](); // تحديث قائمة المندوبين
+        _0x3d2a['fillClients']();
+        _0x3d2a['updateAgentList']();
+        _0x3d2a['updateTaskClientFilter']();
+        _0x3d2a['renderTasks']();
     };
     
-    // Firebase Configuration
     var _0xkey = atob("QUl6YVN5Q2gzd0ZQbzdtVmVCX2NjdWZXNUx5S2dQRm9lU08wSjAw");
     var _0xdb = atob("aHR0cHM6Ly9jcm0tYW5kLXRhc2tzLTlmN2MzLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbQ==");
     var firebaseConfig = {
@@ -901,16 +959,14 @@
     firebase.initializeApp(firebaseConfig);
     var db = firebase.database();
     
-    // ========== إضافة نظام العمل أوفلاين (IndexedDB) ==========
     var localDB = new Dexie("UtopiaCRMOffline");
     localDB.version(1).stores({
         clients: "++id, name, phone, status, timestamp",
-        tasks: "++id, client, text, date",
+        tasks: "++id, client, text, date, completed, completedAt",
         deletedClients: "++id, name, phone",
         users: "++id, u"
     });
     
-    // حالة المزامنة
     var isOnline = navigator.onLine;
     var isSyncing = false;
     var syncInterval = null;
@@ -919,7 +975,6 @@
         var indicator = document.getElementById('syncStatusIndicator');
         var textSpan = document.getElementById('syncStatusText');
         if (!indicator) return;
-        var t = translations[currentLang];
         if (isSyncing) {
             indicator.className = 'sync-status syncing';
             textSpan.innerText = 'جاري المزامنة...';
@@ -940,22 +995,30 @@
             var clientsSnapshot = await db.ref('clients').once('value');
             var firebaseClients = clientsSnapshot.val() ? Object.values(clientsSnapshot.val()) : [];
             await localDB.clients.clear();
-            await localDB.clients.bulkAdd(firebaseClients.map(c => ({ ...c, id: c.timestamp || Date.now() })));
+            if (firebaseClients.length > 0) {
+                await localDB.clients.bulkAdd(firebaseClients.map(c => ({ ...c, id: c.timestamp || Date.now() })));
+            }
             
             var tasksSnapshot = await db.ref('tasks').once('value');
             var firebaseTasks = tasksSnapshot.val() ? Object.values(tasksSnapshot.val()) : [];
             await localDB.tasks.clear();
-            await localDB.tasks.bulkAdd(firebaseTasks.map(t => ({ ...t, id: t.timestamp || Date.now() })));
+            if (firebaseTasks.length > 0) {
+                await localDB.tasks.bulkAdd(firebaseTasks.map(t => ({ ...t, id: t.timestamp || Date.now(), completed: t.completed || false })));
+            }
             
             var deletedSnapshot = await db.ref('deletedClients').once('value');
             var firebaseDeleted = deletedSnapshot.val() ? Object.values(deletedSnapshot.val()) : [];
             await localDB.deletedClients.clear();
-            await localDB.deletedClients.bulkAdd(firebaseDeleted.map(d => ({ ...d, id: d.timestamp || Date.now() })));
+            if (firebaseDeleted.length > 0) {
+                await localDB.deletedClients.bulkAdd(firebaseDeleted.map(d => ({ ...d, id: d.timestamp || Date.now() })));
+            }
             
             var usersSnapshot = await db.ref('authSystem/users').once('value');
             var firebaseUsers = usersSnapshot.val() ? Object.values(usersSnapshot.val()) : [];
             await localDB.users.clear();
-            await localDB.users.bulkAdd(firebaseUsers.map(u => ({ ...u, id: u.u || Date.now() })));
+            if (firebaseUsers.length > 0) {
+                await localDB.users.bulkAdd(firebaseUsers.map(u => ({ ...u, id: u.u || Date.now() })));
+            }
             
             _0x3d2a['showToast']('✅ تمت المزامنة من السحابة بنجاح', 'success');
         } catch (err) {
@@ -1011,32 +1074,43 @@
         _0x3d2a['updateDash']();
         _0x3d2a['updateGeo']();
         _0x3d2a['updateAIInsights']();
+        _0x3d2a['fillClients']();
+        _0x3d2a['updateTaskClientFilter']();
     }
     
     async function loadDataFromLocalDB() {
-        clients = await localDB.clients.toArray();
-        tasks = await localDB.tasks.toArray();
-        deletedClients = await localDB.deletedClients.toArray();
-        var usersArray = await localDB.users.toArray();
-        authSystem.users = usersArray;
+        try {
+            clients = await localDB.clients.toArray();
+            tasks = await localDB.tasks.toArray();
+            deletedClients = await localDB.deletedClients.toArray();
+            var usersArray = await localDB.users.toArray();
+            authSystem.users = usersArray;
+            console.log("Data loaded from IndexedDB:", { clients: clients.length, tasks: tasks.length, users: usersArray.length });
+        } catch (err) {
+            console.error("Error loading from IndexedDB:", err);
+        }
     }
     
     async function saveToLocalDB(type, data) {
-        if (type === 'clients') {
-            await localDB.clients.clear();
-            await localDB.clients.bulkAdd(data);
-        } else if (type === 'tasks') {
-            await localDB.tasks.clear();
-            await localDB.tasks.bulkAdd(data);
-        } else if (type === 'deletedClients') {
-            await localDB.deletedClients.clear();
-            await localDB.deletedClients.bulkAdd(data);
-        } else if (type === 'users') {
-            await localDB.users.clear();
-            await localDB.users.bulkAdd(data);
-        }
-        if (isOnline && !isSyncing) {
-            setTimeout(() => { syncToFirebase(); }, 2000);
+        try {
+            if (type === 'clients') {
+                await localDB.clients.clear();
+                if (data.length > 0) await localDB.clients.bulkAdd(data);
+            } else if (type === 'tasks') {
+                await localDB.tasks.clear();
+                if (data.length > 0) await localDB.tasks.bulkAdd(data);
+            } else if (type === 'deletedClients') {
+                await localDB.deletedClients.clear();
+                if (data.length > 0) await localDB.deletedClients.bulkAdd(data);
+            } else if (type === 'users') {
+                await localDB.users.clear();
+                if (data.length > 0) await localDB.users.bulkAdd(data);
+            }
+            if (isOnline && !isSyncing) {
+                setTimeout(() => { syncToFirebase(); }, 2000);
+            }
+        } catch (err) {
+            console.error("Error saving to IndexedDB:", err);
         }
     }
     
@@ -1061,7 +1135,6 @@
         }, 30000);
     }
     
-    // Variables
     var clients = [], tasks = [], deletedClients = [], authSystem = { users: [] }, logs = [];
     var editIdx = -1, editTaskIdx = -1, statusChart = null;
     var sortColumn = 0, sortDirection = 'asc';
@@ -1071,7 +1144,6 @@
     var isListening = false;
     var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
     
-    // Check Login
     _0x3d2a['check'] = function(){
         var u = document.getElementById('userInput').value.trim();
         var p = document.getElementById('passInput').value.trim();
@@ -1107,7 +1179,6 @@
         }
     };
     
-    // ========== وظائف الذكاء الاصطناعي ==========
     _0x3d2a['analyzeSentiment'] = function(text) {
         if (!text || text.length < 5) { document.getElementById('sentimentResult').style.display = 'none'; return; }
         var positive = ['مهتم', 'موافق', 'رائع', 'ممتاز', 'شكرا', 'نعم', 'متحمس', 'جاهز', 'اتفق', 'رائعة', 'جيد', 'great', 'good', 'excellent', 'interested', 'agree', 'ready'];
@@ -1127,7 +1198,6 @@
     };
     
     _0x3d2a['aiSuggestStatus'] = function() {
-        var t = translations[currentLang];
         var name = document.getElementById('name').value;
         var notes = document.getElementById('notes').value;
         var phone = document.getElementById('phone').value;
@@ -1183,7 +1253,6 @@
     
     _0x3d2a['updateAdvancedKPIs'] = function() {
         if (!clients.length) return;
-        var t = translations[currentLang];
         var completed = clients.filter(c => c.status === 'Completed').length;
         var conversionRate = ((completed / clients.length) * 100).toFixed(1);
         document.getElementById('conversionRate').innerText = conversionRate + '%';
@@ -1195,14 +1264,12 @@
         if (bestAgent) { document.getElementById('topAgent').innerText = bestAgent; document.getElementById('topAgentScore').innerHTML = `نسبة إنجاز: ${bestScore.toFixed(0)}%`; }
         var nextWeekForecast = Math.round(clients.filter(c => _0x3d2a['calculateWinProbability'](c) >= 60).length * 0.4);
         document.getElementById('nextWeekForecast').innerText = nextWeekForecast;
-        var forecastTrend = document.getElementById('forecastTrend');
-        if (forecastTrend && t['forecast_deals']) forecastTrend.innerText = t['forecast_deals'];
     };
     
     _0x3d2a['checkSmartNotifications'] = function() {
         var newNotifications = [];
         clients.forEach(client => { var prediction = _0x3d2a['predictClientBehavior'](client); if (prediction.priority === 'high' && client.status !== 'Completed') { newNotifications.push(`🎯 عميل ذو أولوية عالية: ${client.name} - احتمالية إتمام الصفقة عالية`); } });
-        tasks.forEach(task => { if (task.date && new Date(task.date) < new Date()) { newNotifications.push(`⏰ مهمة متأخرة: ${task.text} - للعميل ${task.client}`); } });
+        tasks.forEach(task => { if (task.date && new Date(task.date) < new Date() && !task.completed) { newNotifications.push(`⏰ مهمة متأخرة: ${task.text} - للعميل ${task.client}`); } });
         if (newNotifications.length > 0 && notifications.length !== newNotifications.length) {
             notifications = newNotifications;
             var badge = document.getElementById('notificationBadge');
@@ -1213,7 +1280,6 @@
     };
     
     _0x3d2a['showNotificationsPanel'] = function() {
-        var t = translations[currentLang];
         if (notifications.length === 0) { _0x3d2a['showToast']('📭 لا توجد إشعارات جديدة', 'info'); return; }
         var panel = document.createElement('div');
         panel.style.cssText = 'position:fixed; top:80px; right:20px; width:350px; background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:30002; padding:15px; max-height:400px; overflow-y:auto;';
@@ -1224,14 +1290,12 @@
     };
     
     _0x3d2a['enableDesktopNotifications'] = function() {
-        var t = translations[currentLang];
         if (Notification.permission === 'granted') { _0x3d2a['showToast']('✅ الإشعارات مفعلة مسبقاً', 'success'); }
         else if (Notification.permission !== 'denied') { Notification.requestPermission().then(perm => { if (perm === 'granted') { _0x3d2a['showToast']('🔔 تم تفعيل الإشعارات بنجاح', 'success'); } }); }
         else { _0x3d2a['showToast']('❌ لا يمكن تفعيل الإشعارات - تم حظرها مسبقاً', 'error'); }
     };
     
     _0x3d2a['startVoiceInput'] = function() {
-        var t = translations[currentLang];
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { _0x3d2a['showToast']('❌ المتصفح لا يدعم خاصية البحث الصوتي', 'error'); return; }
         var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         speechRecognition = new SpeechRecognition();
@@ -1241,12 +1305,11 @@
         speechRecognition.onstart = function() { isListening = true; var btn = document.getElementById('voiceBtn'); btn.classList.add('listening'); btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...'; _0x3d2a['showToast']('🎤 تحدث الآن...', 'info'); };
         speechRecognition.onresult = function(event) { var transcript = event.results[0][0].transcript; document.getElementById('advancedSearch').value = transcript; _0x3d2a['renderCRM'](); _0x3d2a['showToast'](`🔍 بحث عن: "${transcript}"`, 'success'); };
         speechRecognition.onerror = function() { _0x3d2a['showToast']('⚠️ لم يتم التعرف على الصوت، حاول مرة أخرى', 'warning'); };
-        speechRecognition.onend = function() { isListening = false; var btn = document.getElementById('voiceBtn'); btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> ' + t['voice_search']; };
+        speechRecognition.onend = function() { isListening = false; var btn = document.getElementById('voiceBtn'); btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> ' + (translations[currentLang]['voice_search'] || 'بحث صوتي'); };
         speechRecognition.start();
     };
     
     _0x3d2a['saveCurrentFilter'] = function() {
-        var t = translations[currentLang];
         var filterName = prompt('أدخل اسم للفلتر:');
         if (!filterName) return;
         var filter = { name: filterName, search: document.getElementById('advancedSearch').value, gov: document.getElementById('filterGov').value, agent: document.getElementById('filterAgent').value, priority: document.getElementById('filterPriority').value, status: document.getElementById('filterStatus').value };
@@ -1256,7 +1319,6 @@
     };
     
     _0x3d2a['loadSavedFilters'] = function() {
-        var t = translations[currentLang];
         if (savedFilters.length === 0) { _0x3d2a['showToast']('📭 لا توجد فلاتر محفوظة', 'info'); return; }
         var menu = document.createElement('div');
         menu.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border-radius:20px; padding:20px; min-width:300px; z-index:30003; box-shadow:0 10px 30px rgba(0,0,0,0.3);';
@@ -1278,17 +1340,14 @@
     };
     
     _0x3d2a['updateAIInsights'] = function() {
-        var t = translations[currentLang];
         if (!clients.length) { document.getElementById('aiInsightText').innerHTML = 'لا توجد بيانات كافية للتحليل. أضف عملاء للحصول على توصيات ذكية.'; return; }
         var highPotential = clients.filter(c => _0x3d2a['calculateWinProbability'](c) >= 70);
-        var pendingTasks = tasks.filter(t => !t.extra || t.extra.length < 10);
+        var pendingTasks = tasks.filter(t => !t.completed);
         var insight = '';
         if (highPotential.length > 0) { insight += `🎯 هناك ${highPotential.length} عميل/عملاء لديهم احتمالية إتمام صفقة عالية (أكثر من 70%). الأولوية: ${highPotential[0].name}`; }
         else { insight += '📊 لا يوجد عملاء ذو احتمالية عالية حالياً. ركز على تحسين جودة المتابعة.'; }
-        if (pendingTasks.length > 5) { insight += ` | ⚠️ ${pendingTasks.length} مهمة متوقفة تحتاج إلى تحديث.`; }
+        if (pendingTasks.length > 5) { insight += ` | ⚠️ ${pendingTasks.length} مهمة غير مكتملة تحتاج إلى متابعة.`; }
         document.getElementById('aiInsightText').innerHTML = insight;
-        var aiInsightLabel = document.getElementById('aiInsightLabel');
-        if (aiInsightLabel && t['ai_insight']) aiInsightLabel.innerText = t['ai_insight'];
         _0x3d2a['updateAdvancedKPIs']();
         _0x3d2a['checkSmartNotifications']();
     };
@@ -1307,7 +1366,6 @@
     var originalNotify = _0x3d2a['notify'];
     _0x3d2a['notify'] = function(msg, type) { originalNotify(msg, type); _0x3d2a['showToast'](msg, type); };
     
-    // ========== دوال العرض الأساسية ==========
     _0x3d2a['renderCRM'] = function(){
         var body = document.getElementById('tableBody');
         if(!body) return;
@@ -1337,14 +1395,13 @@
                 if(c.status === 'Hold') rowClass = "hold-row";
                 var prediction = _0x3d2a['predictClientBehavior'](c);
                 rowClass += ' priority-' + prediction.priority;
-                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + ' <span class="ai-score">🤖 ' + aiProb + '%</span>' + '</td><td>' + (c.phone || '') + '</td><td>' + (c.gov || '') + '</td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></td></tr>';
+                body.innerHTML += '<tr class="' + rowClass + '"><td style="font-weight:bold">' + (c.name || '') + ' <span class="ai-score">🤖 ' + aiProb + '%</span>' + '</td><td>' + (c.phone || '') + '</b></td><td>' + (c.gov || '') + '</b></td><td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + _0x3d2a['calcScore'](c) + '%; border-radius:4px;"></div></div><small>' + _0x3d2a['calcScore'](c) + '%</small></b></td><td><span class="status-badge" style="background:' + _0x3d2a['statusColor'](c.status) + '; color:white">' + (c.status || 'Interested') + '</span></b></td><td><button class="action-btn btn-call" onclick="window.open(\'tel:' + (c.phone || '') + '\')">📞</button><button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (c.phone || '') + '\')">💬</button><button class="action-btn btn-edit" onclick="_0x3d2a[\'edit\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delClient\'](' + i + ')">✕</button></b></tr>';
             }
         });
         _0x3d2a['updateAIInsights']();
     };
     
     _0x3d2a['save'] = function(){
-        var t = translations[currentLang];
         var name = document.getElementById('name').value;
         if(!name){ _0x3d2a['notify']("Name required!", "error"); return; }
         var data = {
@@ -1358,7 +1415,7 @@
             clients[editIdx] = data;
             _0x3d2a['addLog']("Updated: " + name);
             editIdx = -1;
-            document.getElementById('btnSave').innerHTML = t['save_btn'];
+            document.getElementById('btnSave').innerHTML = translations[currentLang]['save_btn'];
             document.getElementById('btnSave').style.background = "var(--success)";
             _0x3d2a['showToast']('✅ تم تحديث العميل بنجاح', 'success');
         } else {
@@ -1374,6 +1431,7 @@
         _0x3d2a['renderCRM']();
         _0x3d2a['updateAgentList']();
         _0x3d2a['fillClients']();
+        _0x3d2a['updateTaskClientFilter']();
     };
     
     _0x3d2a['updateAgentList'] = function() {
@@ -1386,6 +1444,18 @@
         agentSel.innerHTML = '<option value="">' + (t['all_agents'] || 'كل المندوبين') + '</option>';
         agents.forEach(a => { var opt = document.createElement('option'); opt.value = a; opt.innerText = a; agentSel.appendChild(opt); });
         agentSel.value = currentVal;
+    };
+    
+    _0x3d2a['updateTaskClientFilter'] = function() {
+        var taskFilterClient = document.getElementById('taskFilterClient');
+        if (!taskFilterClient) return;
+        var currentVal = taskFilterClient.value;
+        var t = translations[currentLang];
+        taskFilterClient.innerHTML = '<option value="">' + (t['all_clients'] || 'كل العملاء') + '</option>';
+        var uniqueClients = new Set();
+        tasks.forEach(t => { if (t.client) uniqueClients.add(t.client); });
+        uniqueClients.forEach(c => { var opt = document.createElement('option'); opt.value = c; opt.innerText = c; taskFilterClient.appendChild(opt); });
+        taskFilterClient.value = currentVal;
     };
     
     _0x3d2a['addUser'] = function() {
@@ -1447,6 +1517,142 @@
     };
     _0x3d2a['updatePass'] = function(){ var np = document.getElementById('changePassInput').value; var idx = sessionStorage.getItem('userIdx'); if(!np){ alert("Enter password"); return; } if(idx == -1){ alert("Master password cannot be changed here"); return; } if(authSystem.users[idx]){ authSystem.users[idx].p = np; saveToLocalDB('users', authSystem.users); _0x3d2a['notify']("Password updated", "success"); document.getElementById('changePassInput').value = ''; } else { alert("User not found"); } };
     
+    _0x3d2a['clearTaskFilters'] = function() {
+        document.getElementById('taskSearch').value = '';
+        document.getElementById('taskFilterClient').value = '';
+        document.getElementById('taskFilterStatus').value = 'all';
+        document.getElementById('taskFilterDate').value = '';
+        _0x3d2a['renderTasks']();
+        _0x3d2a['showToast']('✅ تم مسح جميع فلاتر المهام', 'success');
+    };
+    
+    _0x3d2a['renderTasks'] = function(){
+        var body = document.getElementById('taskBody');
+        if(!body) return;
+        body.innerHTML = '';
+        
+        var searchTerm = document.getElementById('taskSearch').value.toLowerCase().trim();
+        var filterClient = document.getElementById('taskFilterClient').value;
+        var filterStatus = document.getElementById('taskFilterStatus').value;
+        var filterDate = document.getElementById('taskFilterDate').value;
+        var t = translations[currentLang];
+        
+        var filteredTasks = tasks.filter(function(task, idx){
+            var matchesSearch = !searchTerm || (task.client && task.client.toLowerCase().includes(searchTerm)) || (task.text && task.text.toLowerCase().includes(searchTerm));
+            var matchesClient = !filterClient || task.client === filterClient;
+            var matchesDate = !filterDate || task.date === filterDate;
+            var taskCompleted = task.completed || false;
+            var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
+            
+            var matchesStatus = true;
+            if (filterStatus === 'pending') matchesStatus = !taskCompleted;
+            else if (filterStatus === 'completed') matchesStatus = taskCompleted === true;
+            else if (filterStatus === 'overdue') matchesStatus = isOverdue;
+            
+            return matchesSearch && matchesClient && matchesDate && matchesStatus;
+        });
+        
+        filteredTasks.forEach(function(task, idx){
+            var originalIdx = tasks.findIndex(function(t, i){ return t === task; });
+            var taskCompleted = task.completed || false;
+            var isOverdue = task.date && new Date(task.date) < new Date() && !taskCompleted;
+            var statusText = taskCompleted ? (t['task_status_completed'] || 'مكتملة') : (isOverdue ? (t['task_status_overdue'] || 'متأخرة') : (t['task_status_pending'] || 'قيد التنفيذ'));
+            var statusClass = taskCompleted ? 'task-status-completed' : (isOverdue ? 'task-status-overdue' : 'task-status-pending');
+            
+            body.innerHTML += '<tr>' +
+                '<td><b>' + (task.client || '') + '</b></td>' +
+                '<td>' + (task.text || '') + '</td>' +
+                '<td><textarea style="margin:0; font-size:12px; width:100%;" onchange="_0x3d2a[\'updateTaskExtra\'](' + originalIdx + ', this.value)">' + (task.extra || '') + '</textarea></td>' +
+                '<td><span style="color:var(--danger)">' + (task.date || '') + '</span></td>' +
+                '<td><span class="task-status-badge ' + statusClass + '">' + statusText + '</span><br>' +
+                (!taskCompleted ? '<button class="btn-ai" style="margin-top:5px; font-size:10px;" onclick="_0x3d2a[\'completeTask\'](' + originalIdx + ')">✓ إكمال</button>' : '') +
+                '</td>' +
+                '<td>' +
+                '<button class="action-btn btn-edit" onclick="_0x3d2a[\'editTask\'](' + originalIdx + ')">✏️</button>' +
+                '<button class="action-btn btn-del" onclick="_0x3d2a[\'delTask\'](' + originalIdx + ')">✕</button>' +
+                '</td>' +
+                '</tr>';
+        });
+    };
+    
+    _0x3d2a['completeTask'] = function(i){
+        if(tasks[i]){
+            tasks[i].completed = true;
+            tasks[i].completedAt = new Date().toISOString();
+            saveToLocalDB('tasks', tasks);
+            _0x3d2a['renderTasks']();
+            _0x3d2a['showToast']('✅ تم إكمال المهمة بنجاح', 'success');
+        }
+    };
+    
+    _0x3d2a['saveTask'] = function(){
+        var task = { 
+            client: document.getElementById('taskClientSelect').value, 
+            text: document.getElementById('taskText').value, 
+            extra: document.getElementById('extraInfo').value, 
+            date: document.getElementById('taskDate').value,
+            timestamp: Date.now(),
+            completed: false,
+            completedAt: null
+        };
+        if(!task.client || !task.text){ _0x3d2a['notify']("Incomplete", "error"); return; }
+        if(editTaskIdx > -1){ 
+            task.completed = tasks[editTaskIdx].completed || false;
+            task.completedAt = tasks[editTaskIdx].completedAt || null;
+            tasks[editTaskIdx] = task; 
+            editTaskIdx = -1; 
+        } else { 
+            tasks.push(task); 
+        }
+        saveToLocalDB('tasks', tasks);
+        document.getElementById('taskText').value = '';
+        document.getElementById('extraInfo').value = '';
+        document.getElementById('taskDate').value = '';
+        _0x3d2a['notify']("Task saved", "success");
+        _0x3d2a['renderTasks']();
+        _0x3d2a['updateTaskClientFilter']();
+    };
+    
+    _0x3d2a['updateTaskExtra'] = function(i, v){ 
+        if(tasks[i]) {
+            tasks[i].extra = v; 
+            saveToLocalDB('tasks', tasks);
+        }
+    };
+    _0x3d2a['delTask'] = function(i){ 
+        if(confirm("Delete?")){ 
+            tasks.splice(i,1); 
+            saveToLocalDB('tasks', tasks); 
+            _0x3d2a['renderTasks']();
+            _0x3d2a['updateTaskClientFilter']();
+        } 
+    };
+    _0x3d2a['editTask'] = function(i){ 
+        var task = tasks[i]; 
+        editTaskIdx = i; 
+        document.getElementById('taskClientSelect').value = task.client || ''; 
+        document.getElementById('taskText').value = task.text || ''; 
+        document.getElementById('extraInfo').value = task.extra || ''; 
+        document.getElementById('taskDate').value = task.date || ''; 
+        window.scrollTo(0,0); 
+    };
+    _0x3d2a['fillClients'] = function(){ 
+        var sel = document.getElementById('taskClientSelect'); 
+        if(!sel) return; 
+        var t = translations[currentLang];
+        sel.innerHTML = '<option value="">' + (t['task_client_placeholder'] || 'ربط بعميل') + '</option>' + clients.map(function(c){ return '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; }).join(''); 
+    };
+    _0x3d2a['autoFill'] = function(){ 
+        var name = document.getElementById('taskClientSelect').value; 
+        var client = clients.find(function(c){ return c.name === name; }); 
+        if(client){ 
+            document.getElementById('extraInfo').value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || ''); 
+        } 
+    };
+    _0x3d2a['renderRecycle'] = function(){ var body = document.getElementById('recycleBody'); if(!body) return; body.innerHTML = deletedClients.map(function(c,i){ return '<tr><td>' + (c.name || '') + '</td><td>' + (c.phone || '') + '</td><td>' + (c.status || '') + '</td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></td></tr>'; }).join(''); };
+    _0x3d2a['restore'] = function(i){ clients.push(deletedClients[i]); deletedClients.splice(i,1); saveToLocalDB('clients', clients); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['notify']("Restored", "success"); _0x3d2a['renderCRM'](); _0x3d2a['renderRecycle'](); };
+    _0x3d2a['hardDelete'] = function(i){ if(confirm("Permanent delete?")){ deletedClients.splice(i,1); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['renderRecycle'](); } };
+    
     _0x3d2a['init'] = async function(){
         if(!sessionStorage.getItem('isLoggedIn')) return;
         
@@ -1496,7 +1702,6 @@
         _0x3d2a['renderUsers'] = function(){
             var body = document.getElementById('usersBody');
             if(!body) return;
-            var t = translations[currentLang];
             if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
                 body.innerHTML = "<tr><td colspan='5'>Restricted Access</td></tr>";
                 return;
@@ -1518,6 +1723,7 @@
         _0x3d2a['updateGeo']();
         _0x3d2a['fillClients']();
         _0x3d2a['updateAgentList']();
+        _0x3d2a['updateTaskClientFilter']();
         
         var prof = document.getElementById('profName');
         if(prof) prof.innerText = sessionStorage.getItem('userDisplayName') || "User";
@@ -1534,7 +1740,6 @@
         }
     };
     
-    // ========== باقي الدوال الأصلية ==========
     _0x3d2a['delClient'] = function(i){
         if(confirm("Move to recycle?")){
             var c = clients[i];
@@ -1547,11 +1752,11 @@
             _0x3d2a['renderCRM']();
             _0x3d2a['renderRecycle']();
             _0x3d2a['updateAgentList']();
+            _0x3d2a['fillClients']();
         }
     };
     
     _0x3d2a['edit'] = function(i){
-        var t = translations[currentLang];
         var c = clients[i];
         editIdx = i;
         document.getElementById('name').value = c.name || '';
@@ -1561,7 +1766,7 @@
         document.getElementById('notes').value = c.notes || '';
         document.getElementById('agent').value = c.agent || '';
         document.getElementById('date').value = c.date || '';
-        document.getElementById('btnSave').innerHTML = t['update_btn'];
+        document.getElementById('btnSave').innerHTML = translations[currentLang]['update_btn'];
         document.getElementById('btnSave').style.background = "var(--info)";
         _0x3d2a['show']('crmTab', null);
         window.scrollTo(0,0);
@@ -1583,7 +1788,6 @@
     };
     
     _0x3d2a['updateDash'] = function(){
-        var t = translations[currentLang];
         document.getElementById('countTotal').innerText = clients.length;
         document.getElementById('countVip').innerText = clients.filter(function(c){ return c.status === 'VIP'; }).length;
         document.getElementById('countComp').innerText = clients.filter(function(c){ return c.status === 'Completed'; }).length;
@@ -1608,48 +1812,6 @@
             div.innerHTML += '<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between;"><span>' + g[0] + '</span><b style="color:var(--info)">' + g[1] + '</b></div>';
         });
     };
-    
-    _0x3d2a['renderTasks'] = function(){
-        var body = document.getElementById('taskBody');
-        if(!body) return;
-        body.innerHTML = tasks.map(function(t,i){
-            return '<tr><td><b>' + (t.client || '') + '</b></td><td>' + (t.text || '') + '</b></td><td><textarea style="margin:0; font-size:12px" onchange="_0x3d2a[\'updateTaskExtra\'](' + i + ', this.value)">' + (t.extra || '') + '</textarea></b></td><td><span style="color:var(--danger)">' + (t.date || '') + '</span></b></td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'editTask\'](' + i + ')">✏️</button><button class="action-btn btn-del" onclick="_0x3d2a[\'delTask\'](' + i + ')">✕</button></b></tr>';
-        }).join('');
-    };
-    
-    _0x3d2a['saveTask'] = function(){
-        var task = { client: document.getElementById('taskClientSelect').value, text: document.getElementById('taskText').value, extra: document.getElementById('extraInfo').value, date: document.getElementById('taskDate').value };
-        if(!task.client || !task.text){ _0x3d2a['notify']("Incomplete", "error"); return; }
-        if(editTaskIdx > -1){ tasks[editTaskIdx] = task; editTaskIdx = -1; }
-        else { tasks.push(task); }
-        saveToLocalDB('tasks', tasks);
-        document.getElementById('taskText').value = '';
-        document.getElementById('extraInfo').value = '';
-        document.getElementById('taskDate').value = '';
-        _0x3d2a['notify']("Task saved", "success");
-        _0x3d2a['renderTasks']();
-    };
-    
-    _0x3d2a['updateTaskExtra'] = function(i, v){ tasks[i].extra = v; saveToLocalDB('tasks', tasks); };
-    _0x3d2a['delTask'] = function(i){ if(confirm("Delete?")){ tasks.splice(i,1); saveToLocalDB('tasks', tasks); _0x3d2a['renderTasks'](); } };
-    _0x3d2a['editTask'] = function(i){ var t = tasks[i]; editTaskIdx = i; document.getElementById('taskClientSelect').value = t.client || ''; document.getElementById('taskText').value = t.text || ''; document.getElementById('extraInfo').value = t.extra || ''; document.getElementById('taskDate').value = t.date || ''; window.scrollTo(0,0); };
-    _0x3d2a['fillClients'] = function(){ 
-        var sel = document.getElementById('taskClientSelect'); 
-        if(!sel) return; 
-        var t = translations[currentLang];
-        sel.innerHTML = '<option value="">' + (t['task_client_placeholder'] || 'ربط بعميل') + '</option>' + clients.map(function(c){ return '<option value="' + (c.name || '') + '">' + (c.name || '') + '</option>'; }).join(''); 
-    };
-    _0x3d2a['autoFill'] = function(){ 
-        var t = translations[currentLang];
-        var name = document.getElementById('taskClientSelect').value; 
-        var client = clients.find(function(c){ return c.name === name; }); 
-        if(client){ 
-            document.getElementById('extraInfo').value = (currentLang === 'ar' ? '📞 هاتف: ' : 'Phone: ') + (client.phone || '') + ' | ' + (currentLang === 'ar' ? '📍 محافظة: ' : 'Gov: ') + (client.gov || '') + ' | ' + (currentLang === 'ar' ? '👤 مندوب: ' : 'Agent: ') + (client.agent || ''); 
-        } 
-    };
-    _0x3d2a['renderRecycle'] = function(){ var body = document.getElementById('recycleBody'); if(!body) return; body.innerHTML = deletedClients.map(function(c,i){ return '<tr><td>' + (c.name || '') + '</b></td><td>' + (c.phone || '') + '</b></td><td>' + (c.status || '') + '</b></td><td><button class="action-btn btn-edit" onclick="_0x3d2a[\'restore\'](' + i + ')">🔄</button></b></td><td><button class="action-btn btn-del" onclick="_0x3d2a[\'hardDelete\'](' + i + ')">🗑️</button></b></tr>'; }).join(''); };
-    _0x3d2a['restore'] = function(i){ clients.push(deletedClients[i]); deletedClients.splice(i,1); saveToLocalDB('clients', clients); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['notify']("Restored", "success"); _0x3d2a['renderCRM'](); _0x3d2a['renderRecycle'](); };
-    _0x3d2a['hardDelete'] = function(i){ if(confirm("Permanent delete?")){ deletedClients.splice(i,1); saveToLocalDB('deletedClients', deletedClients); _0x3d2a['renderRecycle'](); } };
     
     _0x3d2a['init']();
 })();
