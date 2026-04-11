@@ -6,10 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     
-    <!-- حماية إضافية -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval';">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -19,7 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* نفس الـ CSS السابق مع إضافات حماية */
         :root {
             --primary: #1e1e2f;
             --accent: #ffcc00;
@@ -47,25 +42,9 @@
             overflow: hidden;
             transition: all 0.3s ease;
         }
-        /* منع تحديد النصوص بالكامل */
-        body, .sidebar, .main, .form-group, table {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-        /* السماح بتحديد النص في حقول الإدخال فقط */
-        input, textarea, select {
-            user-select: text;
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-        }
         [dir="rtl"] body { flex-direction: row-reverse; }
         [dir="rtl"] .sidebar button { text-align: right; flex-direction: row-reverse; }
         [dir="rtl"] .action-btn { margin: 0 3px; }
-        
-        /* باقي الـ CSS كما هو مع إضافة تأثيرات أمان */
         #loginOverlay {
             position: fixed;
             top: 0;
@@ -375,27 +354,14 @@
             color: var(--info);
             font-size: 16px;
         }
-        
-        /* علامة مائية ديناميكية */
-        .dynamic-watermark {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            font-size: 10px;
-            color: rgba(0,0,0,0.15);
-            pointer-events: none;
-            z-index: 99999;
-            font-family: monospace;
-        }
     </style>
 </head>
-<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;"> 
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;"> 
 <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
 <div id="notification"></div>
 <div class="watermark" id="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415 | Ultra Secure</div>
-<div class="dynamic-watermark" id="dynamicWatermark"></div>
 
 <div id="loginOverlay">
     <div class="login-card">
@@ -700,133 +666,11 @@
 
 <script>
 // ============================================================
-// ULTRA SECURE SYSTEM - Enhanced Protection Layer v2.0
+// ULTRA SECURE SYSTEM - Enhanced Protection Layer
 // System secured by Eng. Mahmoud Mohamed Marie
 // ============================================================
 
-// ========== طبقات الحماية المتقدمة ==========
-
-// 1. منع أدوات المطور المتقدمة
-(function antiDebugger() {
-    // كشف أدوات المطور
-    function detectDevTools() {
-        var start = performance.now();
-        debugger;
-        var end = performance.now();
-        if (end - start > 100) {
-            document.body.innerHTML = '<div class="anti-debug-overlay"><div><h1>🔒 Access Denied</h1><p>Developer tools are not allowed</p><p>System secured by Eng. Mahmoud Marie</p></div></div>';
-            throw new Error("Debugger detected");
-        }
-    }
-    
-    // فحص كل ثانية
-    setInterval(detectDevTools, 1000);
-    
-    // منع console.log والـ debugging
-    var noop = function() {};
-    if (window.console) {
-        console.log = noop;
-        console.warn = noop;
-        console.error = noop;
-        console.debug = noop;
-        console.info = noop;
-        console.table = noop;
-        console.clear = noop;
-    }
-    
-    // منع الـ breakpoints
-    window.addEventListener('beforeunload', function() {
-        debugger;
-    });
-})();
-
-// 2. حماية ضد التلاعب بالـ DOM
-(function protectDOM() {
-    var originalCreateElement = document.createElement;
-    document.createElement = function(tagName) {
-        var element = originalCreateElement.call(document, tagName);
-        if (tagName.toLowerCase() === 'script') {
-            Object.defineProperty(element, 'src', {
-                set: function(value) {
-                    if (!value.includes('firebase') && !value.includes('chart.js') && !value.includes('dexie')) {
-                        console.warn('Blocked external script');
-                        return;
-                    }
-                    originalCreateElement.call(document, 'script').src = value;
-                }
-            });
-        }
-        return element;
-    };
-})();
-
-// 3. تشفير بسيط للمفاتيح الهامة
-(function encryptSensitiveData() {
-    var masterKey = btoa('UtopiaSecure2024');
-    var encryptedAdminPass = btoa('@Mody6699');
-    window._0x3d2a = window._0x3d2a || {};
-    window._0x3d2a.decrypt = function(encrypted) {
-        try {
-            return atob(encrypted);
-        } catch(e) {
-            return null;
-        }
-    };
-})();
-
-// 4. منع التعديل على الكود أثناء التشغيل
-(function preventCodeModification() {
-    if (window.__defineGetter__) {
-        window.__defineGetter__('_0x3d2a', function() { return window._0x3d2a; });
-    }
-    
-    // تجميد الكائنات الهامة
-    Object.freeze(window._0x3d2a);
-    Object.seal(window);
-})();
-
-// 5. علامة مائية ديناميكية
-(function dynamicWatermark() {
-    var watermarkDiv = document.getElementById('dynamicWatermark');
-    if (watermarkDiv) {
-        var date = new Date();
-        var watermarkText = `Licensed to: Eng. Mahmoud Marie | ${date.getFullYear()} | License ID: UTOPIA-${btoa(date.toString()).substring(0, 15)}`;
-        watermarkDiv.innerText = watermarkText;
-        setInterval(function() {
-            var newDate = new Date();
-            var newText = `Licensed to: Eng. Mahmoud Marie | ${newDate.getFullYear()} | Session: ${Math.random().toString(36).substring(2, 8)}`;
-            watermarkDiv.innerText = newText;
-        }, 30000);
-    }
-})();
-
-// 6. كشف التعديل على الـ HTML
-(function detectHTMLModification() {
-    var originalHTML = document.documentElement.outerHTML;
-    setInterval(function() {
-        if (document.documentElement.outerHTML !== originalHTML) {
-            console.warn('HTML modification detected');
-            // يمكن إضافة إجراءات هنا
-        }
-    }, 5000);
-})();
-
-// 7. منع الـ Iframe embedding
-if (window.self !== window.top) {
-    window.top.location = window.self.location;
-}
-
-// 8. حماية CSP إضافية
-(function enhanceCSP() {
-    var meta = document.createElement('meta');
-    meta.httpEquiv = 'Content-Security-Policy';
-    meta.content = "default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline';";
-    document.head.appendChild(meta);
-})();
-
-// ========== الكود الأصلي المعدل ==========
-
-window._0x3d2a = window._0x3d2a || {};
+window._0x3d2a = {};
 
 var currentLang = localStorage.getItem('appLang') || 'en';
 var translations = {
@@ -939,7 +783,7 @@ var syncInterval = null;
 var isLoadingData = false;
 var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
-// مستخدمين تجريبيين (مشفرين)
+// مستخدمين تجريبيين
 var defaultUsers = [
     { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
     { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" },
@@ -960,7 +804,7 @@ var demoData = {
     ]
 };
 
-// دوال مساعدة (نفس الكود الأصلي مع تعديلات بسيطة)
+// دوال مساعدة
 function getOperationTypeText(type) {
     var t = translations[currentLang];
     var types = {
@@ -1103,7 +947,7 @@ window._0x3d2a.toggle = function(){
     window._0x3d2a.renderTasks();
 };
 
-// Firebase Configuration (مشفى جزئياً)
+// Firebase Configuration
 var firebaseConfig = {
     apiKey: "AIzaSyCh3wFPo7mVeB_ccufW5LyKgPFoeSO0J00",
     authDomain: "crm-and-tasks-9f7c3.firebaseapp.com",
@@ -1138,7 +982,6 @@ localDB.version(2).stores({
     users: "++id, u"
 });
 
-// نفس دوال المزامنة والتخزين المحلي (نفس الكود الأصلي)
 async function syncFromFirebase() {
     if (!database || isLoadingData) return;
     isLoadingData = true;
@@ -1146,6 +989,7 @@ async function syncFromFirebase() {
     try {
         console.log("Syncing from Firebase...");
         
+        // جلب العملاء
         var clientsSnapshot = await database.ref('clients').once('value');
         var firebaseClients = [];
         clientsSnapshot.forEach(function(child) {
@@ -1158,17 +1002,20 @@ async function syncFromFirebase() {
             clients = firebaseClients;
             console.log("Loaded " + clients.length + " clients from Firebase");
         } else {
+            // إذا كانت Firebase فارغة، جلب من IndexedDB المحلي
             var localClients = await localDB.clients.toArray();
             if (localClients.length > 0) {
                 clients = localClients;
                 console.log("Loaded " + clients.length + " clients from IndexedDB");
             } else {
+                // إذا كان كل شيء فارغ، أضف بيانات تجريبية
                 clients = demoData.clients;
                 await localDB.clients.bulkAdd(clients);
                 console.log("Added demo clients");
             }
         }
         
+        // جلب المهام
         var tasksSnapshot = await database.ref('tasks').once('value');
         var firebaseTasks = [];
         tasksSnapshot.forEach(function(child) {
@@ -1192,6 +1039,7 @@ async function syncFromFirebase() {
             }
         }
         
+        // جلب سلة المحذوفات
         var deletedSnapshot = await database.ref('deletedClients').once('value');
         var firebaseDeleted = [];
         deletedSnapshot.forEach(function(child) {
@@ -1206,6 +1054,7 @@ async function syncFromFirebase() {
             deletedClients = await localDB.deletedClients.toArray() || [];
         }
         
+        // جلب المستخدمين
         var usersSnapshot = await database.ref('authSystem/users').once('value');
         var firebaseUsers = [];
         usersSnapshot.forEach(function(child) {
@@ -1230,6 +1079,7 @@ async function syncFromFirebase() {
         
     } catch (err) {
         console.error("Sync error:", err);
+        // في حالة خطأ Firebase، جلب من IndexedDB المحلي
         clients = await localDB.clients.toArray() || [];
         tasks = await localDB.tasks.toArray() || [];
         deletedClients = await localDB.deletedClients.toArray() || [];
@@ -1263,24 +1113,28 @@ async function syncToFirebase() {
     updateSyncStatusUI();
     
     try {
+        // رفع العملاء
         var clientsToSync = clients.map(c => {
             var { id, ...rest } = c;
             return rest;
         });
         await database.ref('clients').set(clientsToSync);
         
+        // رفع المهام
         var tasksToSync = tasks.map(t => {
             var { id, ...rest } = t;
             return rest;
         });
         await database.ref('tasks').set(tasksToSync);
         
+        // رفع سلة المحذوفات
         var deletedToSync = deletedClients.map(d => {
             var { id, ...rest } = d;
             return rest;
         });
         await database.ref('deletedClients').set(deletedToSync);
         
+        // رفع المستخدمين
         await database.ref('authSystem/users').set(authSystem.users);
         
         console.log("Data synced to Firebase successfully");
@@ -1356,6 +1210,7 @@ window._0x3d2a.saveToLocalDB = async function(type, data) {
             authSystem.users = data;
         }
         
+        // رفع إلى Firebase في الخلفية
         if (database && isOnline && !isSyncing) {
             setTimeout(() => { syncToFirebase(); }, 1000);
         }
@@ -1404,32 +1259,14 @@ window._0x3d2a.notify = function(msg, type) {
     window._0x3d2a.showToast(msg, type);
 };
 
-// دالة تسجيل الدخول المحسنة
 window._0x3d2a.check = async function(){
     var u = document.getElementById('userInput').value.trim();
     var p = document.getElementById('passInput').value.trim();
     document.getElementById('loginError').style.display = 'none';
     
-    // التحقق من المدير الرئيسي
     if(u === "admin" && p === "@Mody6699"){
         window._0x3d2a.loginSuccess("admin", "Master Admin", -1);
         return;
-    }
-    
-    // تحميل المستخدمين إذا لزم الأمر
-    if (authSystem.users.length === 0) {
-        try {
-            var loadedUsers = await localDB.users.toArray();
-            if (loadedUsers && loadedUsers.length > 0) {
-                authSystem.users = loadedUsers;
-            } else {
-                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
-                authSystem.users = await localDB.users.toArray();
-            }
-        } catch(e) {
-            console.error("Error loading users during login:", e);
-            authSystem.users = defaultUsers;
-        }
     }
     
     var found = authSystem.users.find(function(acc){ 
@@ -1461,7 +1298,6 @@ window._0x3d2a.out = function(){
     }
 };
 
-// باقي دوال النظام (نفس الكود الأصلي)
 window._0x3d2a.analyzeSentiment = function(text) {
     if (!text || text.length < 5) {
         var sentimentDiv = document.getElementById('sentimentResult');
@@ -1673,7 +1509,7 @@ window._0x3d2a.renderCRM = function(){
     if(!body) return;
     
     if (clients.length === 0) {
-        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</b></td>';
+        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</td></tr>';
         return;
     }
     
@@ -1700,7 +1536,7 @@ window._0x3d2a.renderCRM = function(){
     });
     
     if (filteredClients.length === 0) {
-        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">⚠️ لا توجد نتائج تطابق معايير البحث</b></td>';
+        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">⚠️ لا توجد نتائج تطابق معايير البحث</td></tr>';
         return;
     }
     
@@ -1844,7 +1680,7 @@ window._0x3d2a.sort = function(col){
             case 0: va = a.name || ''; vb = b.name || ''; break;
             case 1: va = a.phone || ''; vb = b.phone || ''; break;
             case 2: va = a.gov || ''; vb = b.gov || ''; break;
-            case 3: va = window._0x3d2a.calculateWinProbability(a); vb = window._0x3d2a.calculateWinProbability(b); break;
+            case 3: va = window._0x3d2a.calcScore(a); vb = window._0x3d2a.calcScore(b); break;
             case 4: va = a.status || ''; vb = b.status || ''; break;
             default: va = a.name || ''; vb = b.name || '';
         }
@@ -1929,7 +1765,7 @@ window._0x3d2a.renderTasks = function(){
     if(!body) return;
     
     if (tasks.length === 0) {
-        body.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></td>';
+        body.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
         return;
     }
     
@@ -2139,12 +1975,13 @@ window._0x3d2a.autoFill = function(){
     } 
 };
 
+// دوال سلة المحذوفات
 window._0x3d2a.renderRecycle = function(){ 
     var body = document.getElementById('recycleBody'); 
     if(!body) return;
     
     if(deletedClients.length === 0){
-        body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></td>';
+        body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></tr>';
         return;
     }
     
@@ -2241,7 +2078,7 @@ window._0x3d2a.hardDelete = function(i){
 window._0x3d2a.renderUsers = function(){
     var body = document.getElementById('usersBody');
     if(!body) return;
-    if(sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin"){
+    if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
         body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></tr>";
         return;
     }
@@ -2289,6 +2126,16 @@ window._0x3d2a.edit = function(i){
     window.scrollTo(0,0);
 };
 
+window._0x3d2a.calcScore = function(c){
+    var s = 40;
+    if(c.status === 'VIP') s += 50;
+    if(c.status === 'Completed') s += 60;
+    if(c.status === 'Interested') s += 20;
+    if(c.status === 'Hold') s -= 30;
+    if(c.notes && c.notes.length > 20) s += 10;
+    return Math.min(100, Math.max(0, s));
+};
+
 window._0x3d2a.statusColor = function(s){
     var cols = { 'Interested': '#17a2b8', 'In Progress': '#ffcc00', 'Hold': '#dc3545', 'Completed': '#28a745', 'VIP': '#9b59b6' };
     return cols[s] || '#333';
@@ -2331,13 +2178,17 @@ window._0x3d2a.updateGeo = function(){
 window._0x3d2a.init = async function(){
     if(!sessionStorage.getItem('isLoggedIn')) return;
     
+    // إظهار شاشة التحميل
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
     
+    // تحميل البيانات من Firebase أو IndexedDB
     await syncFromFirebase();
     
+    // تحديث واجهة المستخدم
     updateUILanguage();
     
+    // تعبئة المحافظات
     var govSel = document.getElementById('gov');
     if(govSel && govSel.options.length <= 1){
         for (var i = 0; i < govs.length; i++) {
@@ -2358,6 +2209,7 @@ window._0x3d2a.init = async function(){
         }
     }
     
+    // عرض البيانات
     window._0x3d2a.renderCRM();
     window._0x3d2a.renderTasks();
     window._0x3d2a.renderRecycle();
@@ -2368,9 +2220,11 @@ window._0x3d2a.init = async function(){
     window._0x3d2a.updateAgentList();
     window._0x3d2a.updateTaskClientFilter();
     
+    // عرض اسم المستخدم
     var profName = document.getElementById('profName');
     if(profName) profName.innerText = sessionStorage.getItem('userDisplayName') || "User";
     
+    // إظهار حالة المزامنة
     var badge = document.getElementById('userBadge');
     if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
         if(badge) {
@@ -2380,17 +2234,19 @@ window._0x3d2a.init = async function(){
         }
     }
     
-    if(sessionStorage.getItem('userRole') === 'admin' || sessionStorage.getItem('userDisplayName') === "Master Admin"){
+    if(sessionStorage.getItem('userRole') === 'admin'){
         var adminBtns = document.querySelectorAll('.admin-only');
         for (var i = 0; i < adminBtns.length; i++) {
             adminBtns[i].style.display = 'block';
         }
     }
     
-    window._0x3d2a.showToast('🔒 نظام إدارة متكامل | جميع الحقوق محفوظة للمبرمج مهندس محمود محمد مرعي', 'info');
+    window._0x3d2a.showToast('🤖 AI Enhancement Active | نظام إدارة متكامل', 'info');
     
+    // بدء المزامنة الدورية
     startPeriodicSync();
     
+    // طلب إذن الإشعارات
     if (Notification.permission === 'default') {
         setTimeout(function() {
             if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { 
@@ -2400,6 +2256,7 @@ window._0x3d2a.init = async function(){
     }
 };
 
+// بدء التطبيق
 if(sessionStorage.getItem('isLoggedIn') === 'true'){
     window._0x3d2a.init();
 }
