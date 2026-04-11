@@ -495,24 +495,35 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Voice Button */
+        /* Voice Button - Improved */
         .voice-btn {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 12px 24px;
             border-radius: 30px;
             cursor: pointer;
             transition: var(--transition);
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
         }
 
         .voice-btn.listening {
-            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            animation: voicePulse 1.2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        @keyframes voicePulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(233,69,96,0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(233,69,96,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(233,69,96,0); }
         }
 
         /* Sync Status */
@@ -591,12 +602,39 @@
             font-size: 12px;
             margin-top: 8px;
         }
+        
+        /* Voice Status Indicator */
+        .voice-status {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 30004;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.3s ease;
+        }
+        
+        .voice-status .fa-microphone {
+            color: #ff6b6b;
+            animation: voicePulse 1s infinite;
+        }
     </style>
 </head>
 <body>
 
 <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+<div id="notification"></div>
+<div class="watermark" id="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415</div>
 
 <div id="loginOverlay">
     <div class="login-card">
@@ -681,7 +719,9 @@
                     <button onclick="app.saveCurrentFilter()" class="btn btn-info" style="background: #6c5ce7;">💾 Save Filter</button>
                     <button onclick="app.loadSavedFilters()" class="btn btn-info">📂 Load Filters</button>
                     <button onclick="app.exportCSV()" class="btn btn-primary">📥 Export CSV</button>
-                    <button onclick="app.startVoiceInput()" class="voice-btn" id="voiceBtn"><i class="fas fa-microphone"></i> Voice Search</button>
+                    <button onclick="app.startVoiceSearch()" class="voice-btn" id="voiceBtn">
+                        <i class="fas fa-microphone"></i> <span id="voiceBtnText">Voice Search</span>
+                    </button>
                 </div>
             </div>
             
@@ -963,11 +1003,15 @@
     </div>
 </div>
 
-<div class="watermark" id="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415</div>
+<!-- Voice Status Indicator -->
+<div id="voiceStatus" class="voice-status">
+    <i class="fas fa-microphone"></i>
+    <span id="voiceStatusText">جاري الاستماع...</span>
+</div>
 
 <script>
 // ============================================================
-// COMPLETE CRM SYSTEM - All Features Working - FULL ARABIC SUPPORT
+// COMPLETE CRM SYSTEM - WITH WORKING VOICE SEARCH
 // Developed by Eng. Mahmoud Mohamed Marie
 // ============================================================
 
@@ -987,10 +1031,13 @@ let sortColumn = 0;
 let sortDirection = 'asc';
 let savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '[]');
 let notifications = [];
-let speechRecognition = null;
 let isOnline = navigator.onLine;
 let isSyncing = false;
 let syncInterval = null;
+
+// Voice recognition variables
+let recognition = null;
+let isListening = false;
 
 const govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gharbia", "Kafr El Sheikh", "Beheira", "Damietta", "Port Said", "Ismailia", "Suez", "Beni Suef", "Fayoum", "Minya", "Assiut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai", "South Sinai", "Qalyubia"];
 
@@ -1010,48 +1057,40 @@ const demoData = {
     ]
 };
 
-// ==================== FULL TRANSLATIONS ====================
+// ==================== TRANSLATIONS ====================
 const translations = {
     en: {
-        // Sidebar
         'm_crm': '👥 Clients', 'm_tasks': '📅 Tasks', 'm_dash': '📊 Analytics', 
         'm_profile': '👤 Profile', 'm_recycle': '♻️ Recycle', 'm_admin': '👑 Admin', 
         'm_logout': '🚪 Logout',
-        // Headers
         'h_crm': '👥 Clients Management', 'h_dash': '📊 Analytics Dashboard', 
         'h_tasks': '📋 Operations & Tasks', 'recycleTitle': '♻️ Recycle Bin',
         'adminTitle': '👑 Admin Control Panel', 'usersTitle': '👥 User Management',
         'logsTitle': '📜 Activity Logs', 'profileTitle': '👤 User Profile',
-        // Form Labels
         'labelName': 'Full Name *', 'labelPhone': 'Phone Number', 'labelGov': 'Governorate',
         'labelStatus': 'Status', 'labelAgent': 'Assigned Agent', 'labelDate': 'Date',
         'labelNotes': 'Notes', 'labelTaskClient': 'Client', 'labelTaskType': 'Operation Type',
         'labelTaskAmount': 'Amount', 'labelTaskDate': 'Due Date', 'labelTaskDesc': 'Description',
         'labelTaskNotes': 'Notes', 'labelTaskExtra': 'Extra Details',
-        // Placeholders
         'namePlaceholder': 'Enter client name', 'phonePlaceholder': 'e.g., 01234567890',
         'agentPlaceholder': 'Agent name', 'notesPlaceholder': 'Additional notes & client history...',
         'taskSearchPlaceholder': '🔍 Search tasks...', 'advancedSearchPlaceholder': '🔍 Advanced Search...',
         'searchPlaceholder': '🔍 Search by Name, Phone or Status...', 'taskTextPlaceholder': 'Task description',
         'taskNotesPlaceholder': 'Additional notes...', 'taskExtraPlaceholder': 'Requirements or extra info...',
         'taskAmountPlaceholder': 'Amount (if any)',
-        // Buttons
         'save_btn': '💾 Save Client', 'update_btn': '🔄 Update Client', 'add_task_btn': '➕ Add Task',
         'save_filter': '💾 Save Filter', 'load_filters': '📂 Load Filters', 'export_btn': '📥 Export CSV',
-        'voice_search': 'Voice Search', 'ai_suggest': '🤖 AI Suggest', 'manual_sync': '🔄 Manual Sync',
+        'voice_search': '🎤 Voice Search', 'ai_suggest': '🤖 AI Suggest', 'manual_sync': '🔄 Manual Sync',
         'enable_notifications': '🔔 Enable Notifications', 'update_pass_btn': 'Update Password',
         'register_btn': '➕ Register New User', 'clear_filters': '🗑️ Clear Filters',
-        // Filter options
         'all_governorates': 'All Governorates', 'all_agents': 'All Agents', 'all_priorities': 'All Priorities',
         'high_priority': 'High Priority (70%+)', 'medium_priority': 'Medium (40-69%)', 'low_priority': 'Low (-40%)',
         'all_clients': 'All Clients', 'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date',
-        // KPI
         'kpi_conversion': 'Conversion Rate', 'kpi_followup': 'Avg Follow-up', 
         'kpi_forecast': 'Next Week Forecast', 'kpi_top_agent': 'Top Agent',
         'stat_total': 'Total Clients', 'stat_vip': 'VIP Members', 'stat_completed': 'Closed Deals',
         'status_chart': '📈 Status Distribution', 'geo_chart': '📍 Geographical Distribution',
         'ai_insight': 'AI Insight:', 'forecast_deals': 'Expected Deals',
-        // Table headers
         'th_name': 'Name ↕️', 'th_phone': 'Phone', 'th_gov': 'Governorate ↕️',
         'th_priority': 'AI Priority', 'th_status': 'Status ↕️', 'th_actions': 'Actions',
         'task_client_header': 'Client', 'task_type_header': 'Type', 'task_amount_header': 'Amount',
@@ -1061,55 +1100,47 @@ const translations = {
         'recycle_restore': 'Restore', 'recycle_delete': 'Delete',
         'users_table_user': 'User', 'users_table_pass': 'Pass', 'users_table_name': 'Name',
         'users_table_role': 'Role', 'users_table_action': 'Action',
-        // Login
         'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
         'login_btn': '🔐 Access System', 'logged_in_as': 'Logged in as:', 'change_pass_label': 'Change Password:',
-        // Task status
         'task_status_pending': 'Pending', 'task_status_completed': 'Completed', 'task_status_overdue': 'Overdue',
-        // Operation types
         'op_quotation': '📄 Quotation Request', 'op_followup': '👀 Quotation Follow-up',
-        'op_supply': '🚚 Supply', 'op_bank': '🏦 Bank Transfer', 'op_cash': '💵 Cash'
+        'op_supply': '🚚 Supply', 'op_bank': '🏦 Bank Transfer', 'op_cash': '💵 Cash',
+        'voice_listening': 'Listening...', 'voice_searching': 'Searching for:',
+        'voice_not_supported': 'Voice search not supported in this browser',
+        'voice_permission_denied': 'Please allow microphone access for voice search'
     },
     ar: {
-        // Sidebar
         'm_crm': '👥 العملاء', 'm_tasks': '📅 المهام', 'm_dash': '📊 التحليلات',
         'm_profile': '👤 الملف الشخصي', 'm_recycle': '♻️ سلة المحذوفات', 'm_admin': '👑 لوحة التحكم',
         'm_logout': '🚪 تسجيل خروج',
-        // Headers
         'h_crm': '👥 إدارة العملاء', 'h_dash': '📊 لوحة التحليلات',
         'h_tasks': '📋 العمليات والمهام', 'recycleTitle': '♻️ سلة المحذوفات',
         'adminTitle': '👑 لوحة تحكم الأدمن', 'usersTitle': '👥 إدارة المستخدمين',
         'logsTitle': '📜 سجلات النشاطات', 'profileTitle': '👤 الملف الشخصي',
-        // Form Labels
         'labelName': 'الاسم كاملاً *', 'labelPhone': 'رقم الهاتف', 'labelGov': 'المحافظة',
         'labelStatus': 'الحالة', 'labelAgent': 'المندوب المسؤول', 'labelDate': 'التاريخ',
         'labelNotes': 'ملاحظات', 'labelTaskClient': 'العميل', 'labelTaskType': 'نوع العملية',
         'labelTaskAmount': 'المبلغ', 'labelTaskDate': 'تاريخ التسليم', 'labelTaskDesc': 'الوصف',
         'labelTaskNotes': 'ملاحظات', 'labelTaskExtra': 'تفاصيل إضافية',
-        // Placeholders
         'namePlaceholder': 'أدخل اسم العميل', 'phonePlaceholder': 'مثال: 01234567890',
         'agentPlaceholder': 'اسم المندوب', 'notesPlaceholder': 'ملاحظات إضافية وتاريخ العميل...',
         'taskSearchPlaceholder': '🔍 بحث في المهام...', 'advancedSearchPlaceholder': '🔍 بحث متقدم...',
         'searchPlaceholder': '🔍 بحث بالاسم أو رقم الهاتف أو الحالة...', 'taskTextPlaceholder': 'وصف المهمة',
         'taskNotesPlaceholder': 'ملاحظات إضافية...', 'taskExtraPlaceholder': 'متطلبات أو تفاصيل إضافية...',
         'taskAmountPlaceholder': 'المبلغ (إن وجد)',
-        // Buttons
         'save_btn': '💾 حفظ العميل', 'update_btn': '🔄 تحديث العميل', 'add_task_btn': '➕ إضافة مهمة',
         'save_filter': '💾 حفظ الفلتر', 'load_filters': '📂 تحميل الفلاتر', 'export_btn': '📥 تصدير CSV',
-        'voice_search': 'بحث صوتي', 'ai_suggest': '🤖 اقتراح AI', 'manual_sync': '🔄 مزامنة يدوية',
+        'voice_search': '🎤 بحث صوتي', 'ai_suggest': '🤖 اقتراح AI', 'manual_sync': '🔄 مزامنة يدوية',
         'enable_notifications': '🔔 تفعيل الإشعارات', 'update_pass_btn': 'تحديث كلمة المرور',
         'register_btn': '➕ تسجيل مستخدم جديد', 'clear_filters': '🗑️ مسح الفلاتر',
-        // Filter options
         'all_governorates': 'كل المحافظات', 'all_agents': 'كل المندوبين', 'all_priorities': 'كل الأولويات',
         'high_priority': 'أولوية عالية (70%+)', 'medium_priority': 'متوسطة (40-69%)', 'low_priority': 'منخفضة (-40%)',
         'all_clients': 'كل العملاء', 'all_task_statuses': 'كل الحالات', 'specific_date': 'تاريخ محدد',
-        // KPI
         'kpi_conversion': 'معدل التحويل', 'kpi_followup': 'متوسط المتابعة',
         'kpi_forecast': 'توقعات الأسبوع', 'kpi_top_agent': 'أفضل مندوب',
         'stat_total': 'إجمالي العملاء', 'stat_vip': 'عملاء VIP', 'stat_completed': 'الصفقات المغلقة',
         'status_chart': '📈 توزيع الحالات', 'geo_chart': '📍 التوزيع الجغرافي',
         'ai_insight': 'رؤية الذكاء الاصطناعي:', 'forecast_deals': 'صفقة متوقعة',
-        // Table headers
         'th_name': 'الاسم ↕️', 'th_phone': 'الهاتف', 'th_gov': 'المحافظة ↕️',
         'th_priority': 'أولوية AI', 'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات',
         'task_client_header': 'العميل', 'task_type_header': 'النوع', 'task_amount_header': 'المبلغ',
@@ -1119,14 +1150,14 @@ const translations = {
         'recycle_restore': 'استعادة', 'recycle_delete': 'حذف',
         'users_table_user': 'المستخدم', 'users_table_pass': 'كلمة المرور', 'users_table_name': 'الاسم',
         'users_table_role': 'الصلاحية', 'users_table_action': 'إجراء',
-        // Login
         'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن',
         'login_btn': '🔐 دخول النظام', 'logged_in_as': 'مسجل الدخول باسم:', 'change_pass_label': 'تغيير كلمة المرور:',
-        // Task status
         'task_status_pending': 'قيد التنفيذ', 'task_status_completed': 'مكتملة', 'task_status_overdue': 'متأخرة',
-        // Operation types
         'op_quotation': '📄 طلب عرض سعر', 'op_followup': '👀 متابعة عرض سعر',
-        'op_supply': '🚚 توريد', 'op_bank': '🏦 تحويل بنكي', 'op_cash': '💵 كاش'
+        'op_supply': '🚚 توريد', 'op_bank': '🏦 تحويل بنكي', 'op_cash': '💵 كاش',
+        'voice_listening': 'جاري الاستماع...', 'voice_searching': 'جاري البحث عن:',
+        'voice_not_supported': 'البحث الصوتي غير مدعوم في هذا المتصفح',
+        'voice_permission_denied': 'الرجاء السماح بالوصول إلى الميكروفون'
     }
 };
 
@@ -1158,6 +1189,105 @@ localDB.version(3).stores({
     users: "++id, u"
 });
 
+// ==================== VOICE SEARCH FUNCTION (FIXED) ====================
+app.startVoiceSearch = function() {
+    const t = translations[currentLang];
+    
+    // Check if browser supports speech recognition
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        app.showToast(t.voice_not_supported || 'Voice search not supported', 'error');
+        return;
+    }
+    
+    // Check if already listening
+    if (isListening) {
+        if (recognition) {
+            recognition.stop();
+        }
+        return;
+    }
+    
+    // Request microphone permission
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+            stream.getTracks().forEach(track => track.stop());
+            startRecognition();
+        })
+        .catch(function(err) {
+            console.error("Microphone permission error:", err);
+            app.showToast(t.voice_permission_denied || 'Please allow microphone access', 'warning');
+        });
+};
+
+function startRecognition() {
+    const t = translations[currentLang];
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    
+    // Set recognition properties
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+    
+    // Show voice status indicator
+    const voiceStatus = document.getElementById('voiceStatus');
+    const voiceStatusText = document.getElementById('voiceStatusText');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const voiceBtnText = document.getElementById('voiceBtnText');
+    
+    recognition.onstart = function() {
+        isListening = true;
+        voiceStatus.style.display = 'flex';
+        voiceStatusText.innerHTML = '<i class="fas fa-microphone"></i> ' + (t.voice_listening || 'جاري الاستماع...');
+        voiceBtn.classList.add('listening');
+        if (voiceBtnText) voiceBtnText.innerHTML = '<i class="fas fa-microphone-slash"></i> ' + (currentLang === 'ar' ? 'جاري الاستماع...' : 'Listening...');
+        app.showToast('🎤 ' + (currentLang === 'ar' ? 'تحدث الآن...' : 'Speak now...'), 'info');
+    };
+    
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        console.log("Voice recognized:", transcript);
+        
+        // Update search box with the recognized text
+        const searchInput = document.getElementById('advancedSearch');
+        if (searchInput) {
+            searchInput.value = transcript;
+            app.renderCRM();
+            app.showToast(`🔍 ${t.voice_searching || 'Searching for'}: "${transcript}"`, 'success');
+            app.playSound('soundSuccess');
+        }
+    };
+    
+    recognition.onerror = function(event) {
+        console.error("Speech recognition error:", event.error);
+        let errorMsg = '';
+        switch(event.error) {
+            case 'no-speech':
+                errorMsg = currentLang === 'ar' ? 'لم يتم اكتشاف صوت' : 'No speech detected';
+                break;
+            case 'audio-capture':
+                errorMsg = currentLang === 'ar' ? 'لا يوجد ميكروفون' : 'No microphone found';
+                break;
+            case 'not-allowed':
+                errorMsg = currentLang === 'ar' ? 'تم رفض الوصول إلى الميكروفون' : 'Microphone access denied';
+                break;
+            default:
+                errorMsg = currentLang === 'ar' ? 'خطأ في التعرف على الصوت' : 'Speech recognition error';
+        }
+        app.showToast(`⚠️ ${errorMsg}`, 'warning');
+    };
+    
+    recognition.onend = function() {
+        isListening = false;
+        voiceStatus.style.display = 'none';
+        voiceBtn.classList.remove('listening');
+        if (voiceBtnText) voiceBtnText.innerHTML = '<i class="fas fa-microphone"></i> ' + (t.voice_search || 'بحث صوتي');
+    };
+    
+    recognition.start();
+}
+
 // ==================== HELPER FUNCTIONS ====================
 app.showToast = function(message, type) {
     const toast = document.createElement('div');
@@ -1177,7 +1307,7 @@ app.playSound = function(id) {
     } catch(e) {}
 };
 
-// ==================== FULL LANGUAGE UPDATE ====================
+// ==================== LANGUAGE UPDATE ====================
 app.toggleLanguage = function() {
     currentLang = currentLang === 'en' ? 'ar' : 'en';
     localStorage.setItem('appLang', currentLang);
@@ -1252,17 +1382,9 @@ app.updateUILanguage = function() {
     const taskAmount = document.getElementById('taskAmount');
     if(taskAmount && t.taskAmountPlaceholder) taskAmount.placeholder = t.taskAmountPlaceholder;
     
-    const newU = document.getElementById('newU');
-    if(newU && t.username_placeholder) newU.placeholder = t.username_placeholder;
-    
-    const newP = document.getElementById('newP');
-    if(newP && t.password_placeholder) newP.placeholder = t.password_placeholder;
-    
-    const newD = document.getElementById('newD');
-    if(newD && t.fullname_placeholder) newD.placeholder = t.fullname_placeholder;
-    
-    const changePass = document.getElementById('changePassInput');
-    if(changePass && t.change_pass_label) changePass.placeholder = t.change_pass_label;
+    // Update voice button text
+    const voiceBtnText = document.getElementById('voiceBtnText');
+    if(voiceBtnText && t.voice_search) voiceBtnText.innerText = t.voice_search;
     
     // Update filter selects
     const filterGov = document.getElementById('filterGov');
@@ -1298,9 +1420,6 @@ app.updateUILanguage = function() {
     
     const btnSaveTask = document.getElementById('btnSaveTask');
     if(btnSaveTask && t.add_task_btn) btnSaveTask.innerHTML = t.add_task_btn;
-    
-    const voiceBtn = document.getElementById('voiceBtn');
-    if(voiceBtn && t.voice_search) voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + t.voice_search;
     
     // Update RTL/LTR
     const htmlTag = document.getElementById('htmlTag');
@@ -2029,24 +2148,6 @@ app.exportCSV = function() {
     link.download = `CRM_Export_${new Date().toLocaleDateString()}.csv`;
     link.click();
     app.showToast('📁 تم تصدير البيانات', 'success');
-};
-
-app.startVoiceInput = function() {
-    if (!('webkitSpeechRecognition' in window)) { app.showToast('❌ البحث الصوتي غير مدعوم', 'error'); return; }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    speechRecognition = new SpeechRecognition();
-    speechRecognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
-    speechRecognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript;
-        document.getElementById('advancedSearch').value = transcript;
-        app.renderCRM();
-        app.showToast(`🔍 بحث عن: "${transcript}"`, 'success');
-    };
-    speechRecognition.start();
-    const btn = document.getElementById('voiceBtn');
-    btn.classList.add('listening');
-    btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...';
-    speechRecognition.onend = () => { btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> ' + (translations[currentLang].voice_search || 'بحث صوتي'); };
 };
 
 // ==================== INIT ====================
