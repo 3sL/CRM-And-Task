@@ -1,1 +1,2698 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlTag" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>Utopia Trading Pro CRM & Tasks | Ultimate Security</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <script src="https://unpkg.com/dexie@3.2.3/dist/dexie.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* أنماط محسنة ومقاومة للتلاعب */
+        :root {
+            --primary: #1e1e2f;
+            --accent: #ffcc00;
+            --success: #28a745;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --vip: #9b59b6;
+            --light-bg: #f5f6fa;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --sidebar-width: 260px;
+            --quotation: #3498db;
+            --followup: #e67e22;
+            --supply: #2ecc71;
+            --bank: #f39c12;
+            --cash: #1abc9c;
+        }
+        
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none; /* منع تحديد النص */
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        /* حماية ضد فتح أدوات المطور */
+        .devtools-detector {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: red;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        /* باقي الأنماط */
+        [dir="rtl"] body { flex-direction: row-reverse; }
+        [dir="rtl"] .sidebar button { text-align: right; flex-direction: row-reverse; }
+        [dir="rtl"] .action-btn { margin: 0 3px; }
+        
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20000;
+        }
+        
+        .login-card {
+            background: rgba(255,255,255,0.95);
+            padding: 45px;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border-top: 6px solid var(--accent);
+            position: relative;
+            animation: slideInUp 0.5s ease;
+        }
+        
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-card h2 { 
+            margin-bottom: 25px; 
+            font-size: 1.8em; 
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .login-card input {
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            color: #333;
+            margin-bottom: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        
+        .login-card input:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,204,0,0.2);
+        }
+        
+        .login-card button {
+            background: var(--primary);
+            color: var(--accent);
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        
+        .login-card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        #mainApp { display: none; width: 100%; height: 100vh; }
+        
+        /* باقي الأنماط المحسنة */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            flex-shrink: 0;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar h2 { 
+            font-size: 1.4em; 
+            margin-bottom: 10px; 
+            color: var(--accent); 
+            text-align: center; 
+        }
+        
+        .dev-info { 
+            font-size: 0.8em; 
+            color: #aaa; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            padding-bottom: 15px; 
+            border-bottom: 1px solid #333; 
+        }
+        
+        .sidebar button {
+            background: #2e2e4d;
+            color: #fff;
+            border: none;
+            padding: 14px 18px;
+            margin: 6px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar button:hover { 
+            background: #3a3a5a; 
+            transform: translateX(5px);
+        }
+        
+        [dir="rtl"] .sidebar button:hover { 
+            transform: translateX(-5px);
+        }
+        
+        .sidebar button.active { 
+            background: var(--accent); 
+            color: var(--primary); 
+        }
+        
+        .main { 
+            flex: 1; 
+            padding: 30px; 
+            overflow-y: auto; 
+            background-color: #f0f2f5; 
+        }
+        
+        .tab-content { 
+            display: none; 
+            animation: fadeIn 0.5s ease; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tab-content.active { display: block; }
+        
+        .form-group { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            margin-bottom: 25px; 
+        }
+        
+        .grid-3 { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 15px; 
+        }
+        
+        .grid-2 { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+        }
+        
+        input, select, textarea {
+            padding: 14px;
+            margin: 8px 0;
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            background: #fafafa;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--info);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(23, 162, 184, 0.1);
+        }
+        
+        .btn-save {
+            background: var(--success);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 1.1em;
+            transition: 0.3s;
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        .table-container { 
+            width: 100%; 
+            overflow-x: auto; 
+            background: #fff; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 1000px; 
+        }
+        
+        th {
+            background: var(--primary);
+            color: var(--accent);
+            padding: 18px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+        }
+        
+        td { 
+            padding: 15px; 
+            text-align: center; 
+            border-bottom: 1px solid #f0f0f0; 
+            color: #555; 
+            font-size: 14px; 
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .vip-row { 
+            background-color: #fffcf0 !important; 
+            border-left: 6px solid var(--vip); 
+        }
+        
+        .hold-row { 
+            background-color: #fff5f5 !important; 
+            border-left: 6px solid var(--danger); 
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            margin: 0 3px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .btn-call { background: var(--info); }
+        .btn-wa { background: #25D366; }
+        .btn-del { background: var(--danger); }
+        .btn-edit { background: var(--accent); color: var(--primary); }
+        
+        .btn-ai { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            width: auto; 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 11px; 
+            margin-left: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .btn-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        #notification {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            padding: 18px 35px;
+            border-radius: 15px;
+            display: none;
+            z-index: 30000;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight { 
+            from { opacity: 0; transform: translateX(50px); } 
+            to { opacity: 1; transform: translateX(0); } 
+        }
+        
+        .status-badge { 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            display: inline-block;
+        }
+        
+        .watermark { 
+            position: fixed; 
+            bottom: 5px; 
+            right: 5px; 
+            font-size: 9px; 
+            color: rgba(0,0,0,0.2); 
+            pointer-events: none; 
+            z-index: 99999; 
+        }
+        
+        .no-select { 
+            user-select: none; 
+            -webkit-user-select: none; 
+        }
+        
+        .ai-score { 
+            font-weight: bold; 
+            color: var(--info); 
+            background: #e3f2fd; 
+            padding: 2px 6px; 
+            border-radius: 12px; 
+            font-size: 11px; 
+            margin-left: 5px; 
+        }
+        
+        .suggestion-badge { 
+            background: #fff3cd; 
+            color: #856404; 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            font-size: 11px; 
+            margin-top: 8px; 
+            display: inline-block; 
+        }
+        
+        .ai-recommendation { 
+            border-left: 4px solid var(--vip); 
+            background: #f8f9fa; 
+            padding: 8px 12px; 
+            border-radius: 10px; 
+            margin: 10px 0; 
+            font-size: 13px; 
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 30001;
+            animation: slideUp 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(50px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .advanced-filter-bar, .task-filter-bar {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .advanced-filter-bar input, .advanced-filter-bar select,
+        .task-filter-bar input, .task-filter-bar select {
+            margin: 0;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .priority-high { 
+            background-color: #ffebee !important; 
+            border-left: 4px solid #f44336; 
+        }
+        
+        .priority-medium { 
+            background-color: #fff8e1 !important; 
+            border-left: 4px solid #ffc107; 
+        }
+        
+        .priority-low { 
+            background-color: #e8f5e9 !important; 
+            border-left: 4px solid #4caf50; 
+        }
+        
+        .voice-btn { 
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24); 
+            color: white; 
+            border: none; 
+            padding: 8px 15px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            transition: 0.3s; 
+        }
+        
+        .voice-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .voice-btn.listening { 
+            animation: pulse 1.5s infinite; 
+            background: linear-gradient(135deg, #f093fb, #f5576c); 
+        }
+        
+        @keyframes pulse { 
+            0% { transform: scale(1); opacity: 1; } 
+            50% { transform: scale(1.05); opacity: 0.8; } 
+            100% { transform: scale(1); opacity: 1; } 
+        }
+        
+        .kpi-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border-radius: 15px; 
+            padding: 20px; 
+            text-align: center;
+            transition: 0.3s;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .kpi-card h4 { 
+            margin: 0 0 10px 0; 
+            font-size: 14px; 
+            opacity: 0.9; 
+        }
+        
+        .kpi-card .value { 
+            font-size: 28px; 
+            font-weight: bold; 
+            margin: 0; 
+        }
+        
+        .kpi-card .trend { 
+            font-size: 12px; 
+            margin-top: 5px; 
+        }
+        
+        .trend-up { color: #a5d6a7; }
+        .trend-down { color: #ef9a9a; }
+        
+        .notification-bell { 
+            position: relative; 
+            cursor: pointer; 
+            margin-left: 10px; 
+        }
+        
+        .notification-bell .badge { 
+            position: absolute; 
+            top: -8px; 
+            right: -8px; 
+            background: #f44336; 
+            color: white; 
+            border-radius: 50%; 
+            padding: 2px 6px; 
+            font-size: 10px; 
+        }
+        
+        .sync-status { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            background: rgba(0,0,0,0.3); 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            font-size: 11px; 
+            margin-left: 8px; 
+        }
+        
+        .sync-status.online { background: #28a745; }
+        .sync-status.offline { background: #dc3545; }
+        .sync-status.syncing { background: #ffc107; color: #333; animation: pulse 1s infinite; }
+        
+        .task-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .task-status-pending { background: #ffc107; color: #333; }
+        .task-status-completed { background: #28a745; color: white; }
+        .task-status-overdue { background: #dc3545; color: white; }
+        
+        .operation-type-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .op-quotation { background: #3498db; color: white; }
+        .op-followup { background: #e67e22; color: white; }
+        .op-supply { background: #2ecc71; color: white; }
+        .op-bank { background: #f39c12; color: white; }
+        .op-cash { background: #1abc9c; color: white; }
+        
+        .amount-field {
+            font-weight: bold;
+            color: var(--success);
+        }
+        
+        .recycle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .loading-indicator {
+            text-align: center;
+            padding: 40px;
+            color: var(--info);
+            font-size: 16px;
+        }
+        
+        /* حماية الشاشة */
+        .anti-debug-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: red;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        /* تحسينات RTL */
+        [dir="rtl"] .advanced-filter-bar button,
+        [dir="rtl"] .action-btn,
+        [dir="rtl"] .btn-ai {
+            margin-left: 0;
+            margin-right: 8px;
+        }
+        
+        [dir="rtl"] .watermark {
+            right: auto;
+            left: 5px;
+        }
+        
+        [dir="rtl"] .toast-notification {
+            right: auto;
+            left: 30px;
+        }
+        
+        /* تحسينات الاستجابة */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .sidebar button {
+                width: auto;
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+            }
+            
+            .main {
+                padding: 15px;
+            }
+            
+            .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" onkeydown="return window._0x3d2a && window._0x3d2a.preventDevTools(event);">
 
+<!-- حماية ضد أدوات المطور -->
+<div class="devtools-detector" id="devtoolsDetector">
+    ⚠️ تم اكتشاف محاولة فتح أدوات المطور!<br>
+    النظام مؤمن بالكامل.
+</div>
+
+<audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+<div id="notification"></div>
+<div class="watermark" id="watermark">© Eng. Mahmoud Mohamed Marie | +201222153415 | نظام آمن بالكامل</div>
+
+<div id="loginOverlay">
+    <div class="login-card">
+        <h2 id="loginTitle">Utopia For Trading And Export</h2>
+        <p id="loginSubtitle" style="color: #666; font-size: 0.9em; margin-top: -15px;">نظام إدارة متكامل وآمن</p>
+        <input type="text" id="userInput" placeholder="اسم المستخدم" autocomplete="off">
+        <input type="password" id="passInput" placeholder="كلمة المرور" autocomplete="off">
+        <button onclick="window._0x3d2a.login()" id="loginBtn">الدخول إلى النظام</button>
+        <p id="loginError" style="color:var(--danger); display:none; margin-top:15px; font-weight:bold;">❌ بيانات الدخول غير صحيحة!</p>
+        <div style="margin-top:25px; font-size:0.75em; color:#888; border-top: 1px solid #e0e0e0; padding-top: 15px;">
+            تم التطوير والتأمين بواسطة:<br>
+            <b style="color: var(--accent);">مهندس/ محمود محمد مرعي</b><br>
+            <a href="tel:+201222153415" style="color: var(--primary); text-decoration: none;">📞 +201222153415</a>
+        </div>
+    </div>
+</div>
+
+<div id="mainApp">
+    <div class="sidebar">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+            <h2 id="side_title" style="margin:0; font-size: 1.1em;">يوتوبيا للتجارة والتصدير</h2>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button onclick="window._0x3d2a.toggleLanguage()" style="padding:5px 10px; font-size:11px; background:var(--accent); color:var(--primary); width: auto;" id="langBtn">🇸🇦 عربي</button>
+                <div class="notification-bell" onclick="window._0x3d2a.showNotifications()">
+                    <i class="fas fa-bell" style="color: white; font-size: 18px;"></i>
+                    <span id="notificationBadge" class="badge" style="display: none;">0</span>
+                </div>
+                <div id="syncStatusIndicator" class="sync-status offline">
+                    <i class="fas fa-plug"></i> <span id="syncStatusText">غير متصل</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dev-info">
+            <b>مهندس/ محمود محمد مرعي</b><br>
+            <a href="tel:+201222153415" style="color: #00ff88; text-decoration: none; font-size: 13px; font-weight: bold; display: block; margin-top: 5px;">
+                📞 +201222153415
+            </a>
+            <span id="userBadge" style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:10px; margin-top:5px; display:inline-block;"></span>
+        </div>
+        
+        <button class="tab-btn active" onclick="window._0x3d2a.showTab('crmTab', this)" id="m_crm">👥 إدارة العملاء</button>
+        <button class="tab-btn" onclick="window._0x3d2a.showTab('tasksTab', this)" id="m_tasks">📅 المهام والعمليات</button>
+        <button class="tab-btn" onclick="window._0x3d2a.showTab('dashboardTab', this)" id="m_dash">📊 التحليلات الذكية</button>
+        <button class="tab-btn" onclick="window._0x3d2a.showTab('profileTab', this)" id="m_profile">👤 ملفي الشخصي</button>
+        <button class="tab-btn" onclick="window._0x3d2a.showTab('recycleTab', this)" id="m_recycle" style="color:#ff9999">♻️ سلة المحذوفات</button>
+        
+        <button class="tab-btn admin-only" onclick="window._0x3d2a.showTab('adminControlTab', this)" id="m_admin" style="display:none; background: #3a3a5a; border: 1px solid var(--accent); margin-top: 15px;">👑 لوحة تحكم الأدمن</button>
+        
+        <button onclick="window._0x3d2a.logout()" style="margin-top:auto; background:var(--danger); color:white; justify-content: center;" id="m_logout">🚪 تسجيل خروج آمن</button>
+    </div>
+
+    <div class="main">
+        <!-- تبويب العملاء -->
+        <div id="crmTab" class="tab-content active">
+            <h2 id="h_crm">إدارة العملاء</h2>
+            
+            <div class="advanced-filter-bar">
+                <input type="text" id="advancedSearch" placeholder="🔍 بحث متقدم..." oninput="window._0x3d2a.filterClients()">
+                <select id="filterGov" onchange="window._0x3d2a.filterClients()">
+                    <option value="">كل المحافظات</option>
+                </select>
+                <select id="filterAgent" onchange="window._0x3d2a.filterClients()">
+                    <option value="">كل المندوبين</option>
+                </select>
+                <select id="filterPriority" onchange="window._0x3d2a.filterClients()">
+                    <option value="">كل الأولويات</option>
+                    <option value="high">عالية (70%+)</option>
+                    <option value="medium">متوسطة (40-69%)</option>
+                    <option value="low">منخفضة (-40%)</option>
+                </select>
+                <button onclick="window._0x3d2a.saveCurrentFilter()" class="btn-ai">💾 حفظ الفلتر</button>
+                <button onclick="window._0x3d2a.showSavedFilters()" class="btn-ai" style="background: #6c5ce7;">📂 الفلاتر المحفوظة</button>
+            </div>
+            
+            <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+                <input id="search" placeholder="🔍 بحث بالاسم أو رقم الهاتف أو الحالة..." oninput="window._0x3d2a.filterClients()" style="flex:3; margin:0;">
+                <select id="filterStatus" onchange="window._0x3d2a.filterClients()" style="flex:1; margin:0;">
+                    <option value="All">جميع الحالات</option>
+                    <option value="Interested">مهتم</option>
+                    <option value="In Progress">قيد التنفيذ</option>
+                    <option value="Hold">معلق</option>
+                    <option value="Completed">مكتمل</option>
+                    <option value="VIP">VIP</option>
+                </select>
+                <button onclick="window._0x3d2a.exportToCSV()" style="background:#2c3e50; color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer;">📥 تصدير البيانات</button>
+                <button onclick="window._0x3d2a.startVoiceSearch()" class="voice-btn" id="voiceBtn"><i class="fas fa-microphone"></i> بحث صوتي</button>
+            </div>
+            
+            <div class="form-group">
+                <div class="grid-3">
+                    <input id="name" placeholder="اسم العميل كاملاً">
+                    <input id="phone" placeholder="رقم الهاتف (مثال 012...)">
+                    <select id="gov">
+                        <option value="">اختر المحافظة</option>
+                    </select>
+                </div>
+                <div class="grid-3">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <select id="status" style="flex:2;">
+                            <option value="Interested">مهتم</option>
+                            <option value="In Progress">قيد التنفيذ</option>
+                            <option value="Hold">معلق ⚠️</option>
+                            <option value="Completed">مكتمل ✅</option>
+                            <option value="VIP">VIP 🌟</option>
+                        </select>
+                        <button type="button" class="btn-ai" onclick="window._0x3d2a.aiSuggestStatus()">🤖 اقتراح AI</button>
+                    </div>
+                    <input id="agent" placeholder="المندوب المسؤول">
+                    <input type="date" id="date">
+                </div>
+                <textarea id="notes" rows="3" placeholder="ملاحظات إضافية وتاريخ العميل..." oninput="window._0x3d2a.analyzeSentiment(this.value)"></textarea>
+                <div id="sentimentResult" class="suggestion-badge" style="display: none;"></div>
+                <button class="btn-save" onclick="window._0x3d2a.saveClient()" id="btnSave">💾 حفظ بيانات العميل</button>
+            </div>
+            
+            <div id="aiRecommendations" class="ai-recommendation" style="display: none;"></div>
+
+            <div class="table-container">
+                <table id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th onclick="window._0x3d2a.sortClients(0)" id="thName">الاسم ↕️</th>
+                            <th onclick="window._0x3d2a.sortClients(1)" id="thPhone">الهاتف</th>
+                            <th onclick="window._0x3d2a.sortClients(2)" id="thGov">المحافظة ↕️</th>
+                            <th onclick="window._0x3d2a.sortClients(3)" id="thPriority">أولوية AI</th>
+                            <th onclick="window._0x3d2a.sortClients(4)" id="thStatus">الحالة ↕️</th>
+                            <th id="thActions">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="6" class="loading-indicator">
+                                ⏳ جاري تحميل البيانات...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- تبويب لوحة المعلومات -->
+        <div id="dashboardTab" class="tab-content">
+            <h2 id="h_dash">📊 الأداء الفوري</h2>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom: 30px;">
+                <div class="kpi-card">
+                    <h4 id="kpiConversion">معدل التحويل</h4>
+                    <p class="value" id="conversionRate">0%</p>
+                    <p class="trend" id="conversionTrend">-</p>
+                </div>
+                <div class="kpi-card">
+                    <h4 id="kpiFollowUp">متوسط زمن المتابعة</h4>
+                    <p class="value" id="avgFollowUp">0 يوم</p>
+                    <p class="trend" id="avgTrend">-</p>
+                </div>
+                <div class="kpi-card">
+                    <h4 id="kpiForecast">توقعات الأسبوع القادم</h4>
+                    <p class="value" id="nextWeekForecast">0</p>
+                    <p class="trend" id="forecastTrend">صفقة متوقعة</p>
+                </div>
+                <div class="kpi-card">
+                    <h4 id="kpiTopAgent">أفضل مندوب</h4>
+                    <p class="value" id="topAgent">-</p>
+                    <p class="trend" id="topAgentScore">-</p>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom: 30px;">
+                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--info); text-align:center;">
+                    <h3 id="statTotalLabel">إجمالي العملاء</h3>
+                    <p id="countTotal" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--primary);">0</p>
+                </div>
+                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--vip); text-align:center;">
+                    <h3 id="statVipLabel">عملاء VIP</h3>
+                    <p id="countVip" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--vip);">0</p>
+                </div>
+                <div style="background:#fff; padding:25px; border-radius:20px; border-bottom:5px solid var(--success); text-align:center;">
+                    <h3 id="statCompLabel">الصفقات المغلقة</h3>
+                    <p id="countComp" style="font-size:2.5em; font-weight:bold; margin:10px 0; color:var(--success);">0</p>
+                </div>
+            </div>
+            <div class="ai-recommendation" id="aiInsightPanel" style="margin-bottom: 20px;">
+                🤖 <strong id="aiInsightLabel">رؤية الذكاء الاصطناعي:</strong> 
+                <span id="aiInsightText">تحليل البيانات قيد التشغيل...</span>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <h4 id="statusChartLabel">📈 توزيع الحالات</h4>
+                    <canvas id="statusChart"></canvas>
+                </div>
+                <div class="form-group">
+                    <h4 id="geoChartLabel">📍 التوزيع الجغرافي</h4>
+                    <div id="geoStats" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب المهام والعمليات -->
+        <div id="tasksTab" class="tab-content">
+            <h2 id="h_tasks">العمليات والمتابعات</h2>
+            
+            <div class="task-filter-bar">
+                <input type="text" id="taskSearch" placeholder="🔍 بحث في المهام..." oninput="window._0x3d2a.filterTasks()" style="flex:2;">
+                <select id="taskFilterClient" onchange="window._0x3d2a.filterTasks()">
+                    <option value="">كل العملاء</option>
+                </select>
+                <select id="taskFilterStatus" onchange="window._0x3d2a.filterTasks()">
+                    <option value="all">كل الحالات</option>
+                    <option value="pending">قيد التنفيذ</option>
+                    <option value="completed">مكتملة</option>
+                    <option value="overdue">متأخرة</option>
+                </select>
+                <select id="taskFilterOperationType" onchange="window._0x3d2a.filterTasks()">
+                    <option value="">كل أنواع العمليات</option>
+                    <option value="quotation">📄 طلب عرض سعر</option>
+                    <option value="followup">👀 متابعة عرض سعر</option>
+                    <option value="supply">🚚 توريد</option>
+                    <option value="bank">🏦 بنك</option>
+                    <option value="cash">💵 كاش</option>
+                </select>
+                <input type="date" id="taskFilterDate" onchange="window._0x3d2a.filterTasks()" placeholder="تاريخ محدد">
+                <button onclick="window._0x3d2a.clearTaskFilters()" class="btn-ai" style="background: #6c5ce7;">🗑️ مسح الفلاتر</button>
+            </div>
+            
+            <div class="form-group">
+                <div class="grid-3">
+                    <select id="taskClientSelect" onchange="window._0x3d2a.autoFillTaskInfo()">
+                        <option value="">ربط بعميل</option>
+                    </select>
+                    <select id="taskOperationType">
+                        <option value="quotation">📄 طلب عرض سعر</option>
+                        <option value="followup">👀 متابعة عرض سعر</option>
+                        <option value="supply">🚚 توريد</option>
+                        <option value="bank">🏦 بنك</option>
+                        <option value="cash">💵 كاش</option>
+                    </select>
+                    <input id="taskAmount" type="number" step="0.01" placeholder="المبلغ (إن وجد)">
+                </div>
+                <div class="grid-3">
+                    <input id="taskDate" type="date">
+                    <input id="taskText" placeholder="وصف العملية / المهمة">
+                </div>
+                <textarea id="taskNotes" rows="2" placeholder="ملاحظات إضافية عن العملية..."></textarea>
+                <textarea id="extraInfo" rows="2" placeholder="تفاصيل إضافية أو متطلبات..."></textarea>
+                <button onclick="window._0x3d2a.saveTask()" class="btn-save" style="background:var(--info)" id="btnSaveTask">➕ إضافة عملية</button>
+            </div>
+            
+            <div class="table-container">
+                <table id="tasksTable">
+                    <thead>
+                        <tr>
+                            <th id="taskClientHeader">العميل</th>
+                            <th id="taskTypeHeader">نوع العملية</th>
+                            <th id="taskAmountHeader">المبلغ</th>
+                            <th id="taskTextHeader">الوصف</th>
+                            <th id="taskNotesHeader">ملاحظات إضافية</th>
+                            <th id="taskDateHeader">تاريخ التسليم</th>
+                            <th id="taskStatusHeader">الحالة</th>
+                            <th id="taskActionHeader">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taskBody">
+                        <tr>
+                            <td colspan="8" class="loading-indicator">
+                                ⏳ جاري تحميل المهام...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- تبويب سلة المحذوفات -->
+        <div id="recycleTab" class="tab-content">
+            <h2 id="recycleTitle" style="color:var(--danger)">♻️ سلة المحذوفات (المؤرشفة)</h2>
+            <div class="recycle-header">
+                <button onclick="window._0x3d2a.refreshRecycleBin()" class="btn-ai" style="background: #17a2b8;">🔄 تحديث سلة المحذوفات</button>
+                <button onclick="window._0x3d2a.clearAllRecycle()" class="btn-ai" style="background: #dc3545;" id="clearAllRecycleBtn">🗑️ إفراغ السلة بالكامل</button>
+            </div>
+            <div class="table-container">
+                <table id="recycleTable">
+                    <thead>
+                        <tr>
+                            <th id="recycleNameHeader">الاسم</th>
+                            <th id="recyclePhoneHeader">الهاتف</th>
+                            <th id="recycleStatusHeader">الحالة السابقة</th>
+                            <th id="recycleRestoreHeader">استعادة</th>
+                            <th id="recycleDeleteHeader">حذف نهائي</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recycleBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- تبويب لوحة تحكم الأدمن -->
+        <div id="adminControlTab" class="tab-content">
+            <h2 id="adminTitle" style="color:var(--vip)">👑 لوحة تحكم الأدمن الرئيسي</h2>
+            <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <h3 id="usersTitle">👥 إدارة حسابات المستخدمين</h3>
+                    <div class="grid-3">
+                        <input id="newU" placeholder="اسم المستخدم">
+                        <input id="newP" placeholder="كلمة المرور">
+                        <input id="newD" placeholder="الاسم الكامل">
+                    </div>
+                    <select id="newR" style="margin-top:10px;">
+                        <option value="user">مندوب عادي</option>
+                        <option value="admin">مسؤول النظام</option>
+                    </select>
+                    <button onclick="window._0x3d2a.addUser()" class="btn-save" style="background:var(--primary)" id="registerBtn">تسجيل مستخدم جديد</button>
+                    <div class="table-container" style="margin-top:20px;">
+                        <table id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th id="usersTableUser">المستخدم</th>
+                                    <th id="usersTablePass">كلمة المرور</th>
+                                    <th id="usersTableName">الاسم</th>
+                                    <th id="usersTableRole">الصلاحية</th>
+                                    <th id="usersTableAction">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h3 id="logsTitle">📜 سجلات النشاطات الأمنية</h3>
+                    <div id="logsContainer" style="max-height: 500px; overflow-y: auto; background: #fafafa; border-radius: 10px; padding: 10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب الملف الشخصي -->
+        <div id="profileTab" class="tab-content">
+            <h2 id="profileTitle">👤 إعدادات المستخدم</h2>
+            <div class="form-group" style="max-width: 500px;">
+                <p id="loggedInAs">مسجل الدخول باسم: <b id="profName" style="color: var(--info);"></b></p>
+                <hr>
+                <label id="changePassLabel">تغيير كلمة المرور:</label>
+                <input type="password" id="changePassInput" placeholder="أدخل كلمة المرور الجديدة">
+                <button onclick="window._0x3d2a.updatePassword()" class="btn-save" style="background:var(--info)" id="updatePassBtn">تحديث كلمة المرور</button>
+                <hr>
+                <button onclick="window._0x3d2a.enableNotifications()" class="btn-save" style="background:var(--info); margin-top:10px;" id="enableNotifBtn">🔔 تفعيل الإشعارات</button>
+                <button onclick="window._0x3d2a.manualSync()" class="btn-save" style="background:var(--primary); margin-top:10px;" id="manualSyncBtn">🔄 مزامنة يدوية</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// نظام آمن بالكامل - تم التطوير بواسطة مهندس/ محمود محمد مرعي
+// حماية متقدمة للكود المصدر والحفظ والتحميل
+// ============================================================
+
+// كائن التطبيق الرئيسي
+window._0x3d2a = {};
+
+// إعدادات اللغة
+var currentLang = localStorage.getItem('appLang') || 'ar';
+var translations = {
+    ar: {
+        'm_crm': '👥 إدارة العملاء',
+        'm_tasks': '📅 المهام والعمليات',
+        'm_dash': '📊 التحليلات الذكية',
+        'm_profile': '👤 ملفي الشخصي',
+        'm_recycle': '♻️ سلة المحذوفات',
+        'm_admin': '👑 لوحة تحكم الأدمن',
+        'm_logout': '🚪 تسجيل خروج',
+        'h_crm': 'إدارة العملاء',
+        'h_dash': '📊 الأداء الفوري',
+        'h_tasks': 'العمليات والمتابعات',
+        'recycleTitle': '♻️ سلة المحذوفات (المؤرشفة)',
+        'adminTitle': '👑 لوحة تحكم الأدمن الرئيسي',
+        'usersTitle': '👥 إدارة حسابات المستخدمين',
+        'logsTitle': '📜 سجلات النشاطات الأمنية',
+        'profileTitle': '👤 إعدادات المستخدم',
+        'loginTitle': 'يوتوبيا للتجارة والتصدير',
+        'loginSubtitle': 'نظام إدارة متكامل وآمن',
+        'loginBtn': 'الدخول إلى النظام',
+        'statTotalLabel': 'إجمالي العملاء',
+        'statVipLabel': 'عملاء VIP',
+        'statCompLabel': 'الصفقات المغلقة',
+        'statusChartLabel': '📈 توزيع الحالات',
+        'geoChartLabel': '📍 التوزيع الجغرافي',
+        'taskClientHeader': 'العميل',
+        'taskTypeHeader': 'نوع العملية',
+        'taskAmountHeader': 'المبلغ',
+        'taskTextHeader': 'الوصف',
+        'taskNotesHeader': 'ملاحظات إضافية',
+        'taskDateHeader': 'تاريخ التسليم',
+        'taskActionHeader': 'إجراءات',
+        'taskStatusHeader': 'الحالة',
+        'recycleNameHeader': 'الاسم',
+        'recyclePhoneHeader': 'الهاتف',
+        'recycleStatusHeader': 'الحالة السابقة',
+        'recycleRestoreHeader': 'استعادة',
+        'recycleDeleteHeader': 'حذف نهائي',
+        'registerBtn': 'تسجيل مستخدم جديد',
+        'updatePassBtn': 'تحديث كلمة المرور',
+        'changePassLabel': 'تغيير كلمة المرور:',
+        'loggedInAs': 'مسجل الدخول باسم:',
+        'kpiConversion': 'معدل التحويل',
+        'kpiFollowUp': 'متوسط زمن المتابعة',
+        'kpiForecast': 'توقعات الأسبوع القادم',
+        'kpiTopAgent': 'أفضل مندوب',
+        'aiInsightLabel': 'رؤية الذكاء الاصطناعي:',
+        'enableNotifBtn': '🔔 تفعيل الإشعارات',
+        'manualSyncBtn': '🔄 مزامنة يدوية',
+        'usersTableUser': 'المستخدم',
+        'usersTablePass': 'كلمة المرور',
+        'usersTableName': 'الاسم',
+        'usersTableRole': 'الصلاحية',
+        'usersTableAction': 'إجراء',
+        'thName': 'الاسم ↕️',
+        'thPhone': 'الهاتف',
+        'thGov': 'المحافظة ↕️',
+        'thPriority': 'أولوية AI',
+        'thStatus': 'الحالة ↕️',
+        'thActions': 'إجراءات'
+    },
+    en: {
+        'm_crm': '👥 Clients Management',
+        'm_tasks': '📅 Tasks & Operations',
+        'm_dash': '📊 AI Analytics',
+        'm_profile': '👤 My Profile',
+        'm_recycle': '♻️ Recycle Bin',
+        'm_admin': '👑 Admin Panel',
+        'm_logout': '🚪 Logout',
+        'h_crm': 'Clients Management',
+        'h_dash': '📊 Real-time Performance',
+        'h_tasks': 'Operations & Follow-ups',
+        'recycleTitle': '♻️ Recycle Bin (Archived)',
+        'adminTitle': '👑 Admin Master Control Panel',
+        'usersTitle': '👥 User Accounts Management',
+        'logsTitle': '📜 Security Activity Logs',
+        'profileTitle': '👤 User Settings',
+        'loginTitle': 'Utopia For Trading And Export',
+        'loginSubtitle': 'Complete Secure Management System',
+        'loginBtn': 'Access System',
+        'statTotalLabel': 'Total Clients',
+        'statVipLabel': 'VIP Members',
+        'statCompLabel': 'Closed Deals',
+        'statusChartLabel': '📈 Status Distribution',
+        'geoChartLabel': '📍 Geographical Distribution',
+        'taskClientHeader': 'Client',
+        'taskTypeHeader': 'Operation Type',
+        'taskAmountHeader': 'Amount',
+        'taskTextHeader': 'Description',
+        'taskNotesHeader': 'Additional Notes',
+        'taskDateHeader': 'Deadline',
+        'taskActionHeader': 'Actions',
+        'taskStatusHeader': 'Status',
+        'recycleNameHeader': 'Name',
+        'recyclePhoneHeader': 'Phone',
+        'recycleStatusHeader': 'Previous Status',
+        'recycleRestoreHeader': 'Restore',
+        'recycleDeleteHeader': 'Delete',
+        'registerBtn': 'Register New User',
+        'updatePassBtn': 'Update Password',
+        'changePassLabel': 'Change Password:',
+        'loggedInAs': 'Logged in as:',
+        'kpiConversion': 'Conversion Rate',
+        'kpiFollowUp': 'Avg Follow-up Time',
+        'kpiForecast': 'Next Week Forecast',
+        'kpiTopAgent': 'Top Agent',
+        'aiInsightLabel': 'AI Insight:',
+        'enableNotifBtn': '🔔 Enable Notifications',
+        'manualSyncBtn': '🔄 Manual Sync',
+        'usersTableUser': 'User',
+        'usersTablePass': 'Password',
+        'usersTableName': 'Name',
+        'usersTableRole': 'Role',
+        'usersTableAction': 'Action',
+        'thName': 'Name ↕️',
+        'thPhone': 'Phone',
+        'thGov': 'Governorate ↕️',
+        'thPriority': 'AI Priority',
+        'thStatus': 'Status ↕️',
+        'thActions': 'Actions'
+    }
+};
+
+// بيانات التطبيق
+var appData = {
+    clients: [],
+    tasks: [],
+    deletedClients: [],
+    users: [],
+    logs: [],
+    editClientIndex: -1,
+    editTaskIndex: -1,
+    sortColumn: 0,
+    sortDirection: 'asc',
+    savedFilters: [],
+    notifications: [],
+    isOnline: navigator.onLine,
+    isSyncing: false
+};
+
+// قائمة المحافظات
+var governorates = ["القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "الشرقية", "المنوفية", "الغربية", "كفر الشيخ", "البحيرة", "دمياط", "بورسعيد", "الإسماعيلية", "السويس", "بني سويف", "الفيوم", "المنيا", "أسيوط", "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد", "مطروح", "شمال سيناء", "جنوب سيناء", "القليوبية"];
+
+// بيانات تجريبية
+var demoData = {
+    clients: [
+        { name: "شركة النور للتجارة", phone: "01234567890", gov: "القاهرة", status: "VIP", notes: "عميل مهم - تعاقدات كبيرة", agent: "محمد علي", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" },
+        { name: "مؤسسة السلام", phone: "01122334455", gov: "الإسكندرية", status: "In Progress", notes: "قيد التفاوض على الأسعار", agent: "أحمد حسن", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" },
+        { name: "شركة الفجر", phone: "01099887766", gov: "الجيزة", status: "Interested", notes: "طلب عرض سعر للمنتجات", agent: "سامي ربيع", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" }
+    ],
+    tasks: [
+        { client: "شركة النور للتجارة", operationType: "quotation", amount: 50000, text: "تقديم عرض سعر للمعدات", taskNotes: "تم الإرسال عبر الإيميل", extra: "", date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null },
+        { client: "مؤسسة السلام", operationType: "followup", amount: null, text: "متابعة عرض السعر", taskNotes: "اتصال يوم الأحد", extra: "", date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null }
+    ]
+};
+
+// مستخدمين افتراضيين
+var defaultUsers = [
+    { u: "admin", p: "admin123", displayName: "مدير النظام", role: "admin" },
+    { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
+    { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" }
+];
+
+// ============================================================
+// دوال الحماية والتشفير
+// ============================================================
+
+// تشفير بسيط للبيانات الحساسة
+function encryptData(data) {
+    try {
+        return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    } catch(e) {
+        return data;
+    }
+}
+
+function decryptData(encryptedData) {
+    try {
+        return JSON.parse(decodeURIComponent(escape(atob(encryptedData))));
+    } catch(e) {
+        return encryptedData;
+    }
+}
+
+// منع فتح أدوات المطور
+window._0x3d2a.preventDevTools = function(e) {
+    // منع F12
+    if(e.key === 'F12') {
+        e.preventDefault();
+        return false;
+    }
+    // منع Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+    if(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+        e.preventDefault();
+        return false;
+    }
+    // منع Ctrl+U
+    if(e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        return false;
+    }
+    return true;
+};
+
+// كشف أدوات المطور
+function detectDevTools() {
+    var threshold = 160;
+    var widthThreshold = window.outerWidth - window.innerWidth > threshold;
+    var heightThreshold = window.outerHeight - window.innerHeight > threshold;
+    
+    if (widthThreshold || heightThreshold) {
+        var detector = document.getElementById('devtoolsDetector');
+        if(detector) detector.style.display = 'flex';
+        setTimeout(function() {
+            if(detector) detector.style.display = 'none';
+        }, 3000);
+    }
+}
+
+// مراقبة أدوات المطور
+setInterval(detectDevTools, 1000);
+
+// منع النسخ واللصق
+document.addEventListener('copy', function(e) {
+    e.preventDefault();
+    window._0x3d2a.showNotification('⚠️ تم منع نسخ البيانات', 'warning');
+    return false;
+});
+
+document.addEventListener('cut', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// ============================================================
+// دوال إدارة التخزين المحلي
+// ============================================================
+
+// حفظ البيانات في localStorage بشكل مشفر
+function saveToLocalStorage() {
+    try {
+        var dataToSave = {
+            clients: appData.clients,
+            tasks: appData.tasks,
+            deletedClients: appData.deletedClients,
+            users: appData.users
+        };
+        localStorage.setItem('appData', encryptData(dataToSave));
+        localStorage.setItem('lastBackup', new Date().toISOString());
+        console.log('Data saved to localStorage');
+    } catch(e) {
+        console.error('Error saving to localStorage:', e);
+    }
+}
+
+// تحميل البيانات من localStorage
+function loadFromLocalStorage() {
+    try {
+        var savedData = localStorage.getItem('appData');
+        if(savedData) {
+            var decryptedData = decryptData(savedData);
+            appData.clients = decryptedData.clients || [];
+            appData.tasks = decryptedData.tasks || [];
+            appData.deletedClients = decryptedData.deletedClients || [];
+            appData.users = decryptedData.users || [];
+            
+            if(appData.clients.length === 0) {
+                appData.clients = demoData.clients;
+            }
+            if(appData.tasks.length === 0) {
+                appData.tasks = demoData.tasks;
+            }
+            if(appData.users.length === 0) {
+                appData.users = defaultUsers;
+            }
+            
+            console.log('Data loaded from localStorage');
+            return true;
+        }
+    } catch(e) {
+        console.error('Error loading from localStorage:', e);
+    }
+    return false;
+}
+
+// تصدير البيانات كملف JSON مشفر
+window._0x3d2a.exportBackup = function() {
+    var backup = {
+        clients: appData.clients,
+        tasks: appData.tasks,
+        deletedClients: appData.deletedClients,
+        users: appData.users,
+        exportDate: new Date().toISOString()
+    };
+    
+    var encryptedBackup = encryptData(backup);
+    var blob = new Blob([encryptedBackup], { type: 'application/json' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'utopia_backup_' + new Date().toISOString().split('T')[0] + '.enc';
+    link.click();
+    window._0x3d2a.showNotification('✅ تم تصدير النسخة الاحتياطية بنجاح', 'success');
+};
+
+// استيراد بيانات من ملف احتياطي
+window._0x3d2a.importBackup = function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var decryptedData = decryptData(e.target.result);
+            if(decryptedData.clients) appData.clients = decryptedData.clients;
+            if(decryptedData.tasks) appData.tasks = decryptedData.tasks;
+            if(decryptedData.deletedClients) appData.deletedClients = decryptedData.deletedClients;
+            
+            saveToLocalStorage();
+            window._0x3d2a.renderClients();
+            window._0x3d2a.renderTasks();
+            window._0x3d2a.renderRecycleBin();
+            window._0x3d2a.showNotification('✅ تم استيراد النسخة الاحتياطية بنجاح', 'success');
+        } catch(err) {
+            window._0x3d2a.showNotification('❌ فشل استيراد الملف', 'error');
+        }
+    };
+    reader.readAsText(file);
+};
+
+// ============================================================
+// دوال عرض البيانات
+// ============================================================
+
+window._0x3d2a.renderClients = function() {
+    var tbody = document.getElementById('tableBody');
+    if(!tbody) return;
+    
+    if(appData.clients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</td></tr>';
+        return;
+    }
+    
+    // تطبيق الفلاتر
+    var searchTerm = document.getElementById('search') ? document.getElementById('search').value.toLowerCase() : '';
+    var filterStatus = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : 'All';
+    var filterGov = document.getElementById('filterGov') ? document.getElementById('filterGov').value : '';
+    var filterAgent = document.getElementById('filterAgent') ? document.getElementById('filterAgent').value : '';
+    
+    var filteredClients = appData.clients.filter(function(client) {
+        var matchesSearch = !searchTerm || 
+            (client.name && client.name.toLowerCase().includes(searchTerm)) ||
+            (client.phone && client.phone.toLowerCase().includes(searchTerm));
+        var matchesStatus = filterStatus === 'All' || client.status === filterStatus;
+        var matchesGov = !filterGov || client.gov === filterGov;
+        var matchesAgent = !filterAgent || client.agent === filterAgent;
+        return matchesSearch && matchesStatus && matchesGov && matchesAgent;
+    });
+    
+    // الترتيب
+    filteredClients.sort(function(a, b) {
+        var valA, valB;
+        switch(appData.sortColumn) {
+            case 0: valA = a.name || ''; valB = b.name || ''; break;
+            case 1: valA = a.phone || ''; valB = b.phone || ''; break;
+            case 2: valA = a.gov || ''; valB = b.gov || ''; break;
+            case 3: valA = window._0x3d2a.calculateProbability(a); valB = window._0x3d2a.calculateProbability(b); break;
+            case 4: valA = a.status || ''; valB = b.status || ''; break;
+            default: valA = a.name || ''; valB = b.name || '';
+        }
+        
+        if(typeof valA === 'number') {
+            return appData.sortDirection === 'asc' ? valA - valB : valB - valA;
+        }
+        
+        valA = valA.toString().toLowerCase();
+        valB = valB.toString().toLowerCase();
+        if(valA < valB) return appData.sortDirection === 'asc' ? -1 : 1;
+        if(valA > valB) return appData.sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    // عرض البيانات
+    tbody.innerHTML = '';
+    for(var i = 0; i < filteredClients.length; i++) {
+        var client = filteredClients[i];
+        var probability = window._0x3d2a.calculateProbability(client);
+        var statusColor = window._0x3d2a.getStatusColor(client.status);
+        var rowClass = client.status === 'VIP' ? 'vip-row' : (client.status === 'Hold' ? 'hold-row' : '');
+        
+        tbody.innerHTML += '<tr class="' + rowClass + '">' +
+            '<td style="font-weight:bold">' + (client.name || '') + ' <span class="ai-score">🤖 ' + probability + '%</span></td>' +
+            '<td>' + (client.phone || '') + '</td>' +
+            '<td>' + (client.gov || '') + '</td>' +
+            '<td><div style="background:#eee; height:8px; border-radius:4px; width:60px; margin:auto"><div style="background:var(--success); height:100%; width:' + probability + '%; border-radius:4px;"></div></div><small>' + probability + '%</small></td>' +
+            '<td><span class="status-badge" style="background:' + statusColor + '; color:white">' + window._0x3d2a.getStatusText(client.status) + '</span></td>' +
+            '<td>' +
+                '<button class="action-btn btn-call" onclick="window.open(\'tel:' + (client.phone || '') + '\')">📞</button>' +
+                '<button class="action-btn btn-wa" onclick="window.open(\'https://wa.me/2' + (client.phone || '') + '\')">💬</button>' +
+                '<button class="action-btn btn-edit" onclick="window._0x3d2a.editClient(' + appData.clients.indexOf(client) + ')">✏️</button>' +
+                '<button class="action-btn btn-del" onclick="window._0x3d2a.deleteClient(' + appData.clients.indexOf(client) + ')">✕</button>' +
+            '</td>' +
+        '</tr>';
+    }
+};
+
+window._0x3d2a.renderTasks = function() {
+    var tbody = document.getElementById('taskBody');
+    if(!tbody) return;
+    
+    if(appData.tasks.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 لا توجد مهام حالياً</td></tr>';
+        return;
+    }
+    
+    var searchTerm = document.getElementById('taskSearch') ? document.getElementById('taskSearch').value.toLowerCase() : '';
+    var filterClient = document.getElementById('taskFilterClient') ? document.getElementById('taskFilterClient').value : '';
+    var filterStatus = document.getElementById('taskFilterStatus') ? document.getElementById('taskFilterStatus').value : 'all';
+    var filterOperationType = document.getElementById('taskFilterOperationType') ? document.getElementById('taskFilterOperationType').value : '';
+    
+    var filteredTasks = appData.tasks.filter(function(task) {
+        var matchesSearch = !searchTerm || 
+            (task.client && task.client.toLowerCase().includes(searchTerm)) ||
+            (task.text && task.text.toLowerCase().includes(searchTerm));
+        var matchesClient = !filterClient || task.client === filterClient;
+        var matchesOperationType = !filterOperationType || task.operationType === filterOperationType;
+        
+        var isCompleted = task.completed || false;
+        var isOverdue = task.date && new Date(task.date) < new Date() && !isCompleted;
+        
+        var matchesStatus = true;
+        if(filterStatus === 'pending') matchesStatus = !isCompleted;
+        else if(filterStatus === 'completed') matchesStatus = isCompleted;
+        else if(filterStatus === 'overdue') matchesStatus = isOverdue;
+        
+        return matchesSearch && matchesClient && matchesOperationType && matchesStatus;
+    });
+    
+    tbody.innerHTML = '';
+    for(var i = 0; i < filteredTasks.length; i++) {
+        var task = filteredTasks[i];
+        var originalIndex = appData.tasks.indexOf(task);
+        var isCompleted = task.completed || false;
+        var isOverdue = task.date && new Date(task.date) < new Date() && !isCompleted;
+        var statusText = isCompleted ? 'مكتملة' : (isOverdue ? 'متأخرة' : 'قيد التنفيذ');
+        var statusClass = isCompleted ? 'task-status-completed' : (isOverdue ? 'task-status-overdue' : 'task-status-pending');
+        var operationTypeText = window._0x3d2a.getOperationTypeText(task.operationType);
+        var operationTypeClass = window._0x3d2a.getOperationTypeClass(task.operationType);
+        
+        tbody.innerHTML += '<tr>' +
+            '<td><b>' + (task.client || '') + '</b></td>' +
+            '<td><span class="operation-type-badge ' + operationTypeClass + '">' + operationTypeText + '</span></td>' +
+            '<td class="amount-field">' + (task.amount ? (currentLang === 'ar' ? task.amount + ' ج.م' : task.amount + ' EGP') : '—') + '</td>' +
+            '<td>' + (task.text || '') + '</td>' +
+            '<td><textarea style="margin:0; font-size:12px; width:100%;" onchange="window._0x3d2a.updateTaskNotes(' + originalIndex + ', this.value)">' + (task.taskNotes || '') + '</textarea></td>' +
+            '<td>' + (task.date || '') + '</td>' +
+            '<td><span class="task-status-badge ' + statusClass + '">' + statusText + '</span><br>' +
+            (!isCompleted ? '<button class="btn-ai" style="margin-top:5px; font-size:10px;" onclick="window._0x3d2a.completeTask(' + originalIndex + ')">✓ إكمال</button>' : '') +
+            '</td>' +
+            '<td>' +
+                '<button class="action-btn btn-edit" onclick="window._0x3d2a.editTask(' + originalIndex + ')">✏️</button>' +
+                '<button class="action-btn btn-del" onclick="window._0x3d2a.deleteTask(' + originalIndex + ')">✕</button>' +
+            '</td>' +
+        '</tr>';
+    }
+};
+
+window._0x3d2a.renderRecycleBin = function() {
+    var tbody = document.getElementById('recycleBody');
+    if(!tbody) return;
+    
+    if(appData.deletedClients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    for(var i = 0; i < appData.deletedClients.length; i++) {
+        var client = appData.deletedClients[i];
+        tbody.innerHTML += '<tr>' +
+            '<td><b>' + (client.name || '') + '</b></td>' +
+            '<td>' + (client.phone || '') + '</td>' +
+            '<td>' + window._0x3d2a.getStatusText(client.status) + '</td>' +
+            '<td><button class="action-btn btn-edit" onclick="window._0x3d2a.restoreClient(' + i + ')">🔄</button></td>' +
+            '<td><button class="action-btn btn-del" onclick="window._0x3d2a.permanentDelete(' + i + ')">🗑️</button></td>' +
+        '</tr>';
+    }
+};
+
+window._0x3d2a.renderUsers = function() {
+    var tbody = document.getElementById('usersBody');
+    if(!tbody) return;
+    
+    var currentUserRole = sessionStorage.getItem('userRole');
+    if(currentUserRole !== 'admin') {
+        tbody.innerHTML = '<tr><td colspan="5" class="loading-indicator">🔒 غير مصرح لك بالوصول</b></tr>';
+        return;
+    }
+    
+    if(appData.users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 لا يوجد مستخدمين</b></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    for(var i = 0; i < appData.users.length; i++) {
+        var user = appData.users[i];
+        tbody.innerHTML += '<tr>' +
+            '<td>' + (user.u || '') + '</td>' +
+            '<td class="mask-pass">••••••</b></td>' +
+            '<td>' + (user.displayName || '') + '</td>' +
+            '<td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (user.role === 'admin' ? 'مدير' : 'مندوب') + '</span></td>' +
+            '<td><button class="action-btn btn-del" onclick="window._0x3d2a.deleteUser(' + i + ')">✕</button></td>' +
+        '</tr>';
+    }
+};
+
+window._0x3d2a.renderLogs = function() {
+    var container = document.getElementById('logsContainer');
+    if(!container) return;
+    
+    container.innerHTML = appData.logs.slice().reverse().map(function(log) {
+        return '<div style="padding:8px; border-bottom:1px solid #eee;">' +
+            '<span style="color:var(--info); font-weight:bold">[' + log.user + ']</span> ' +
+            '<span>' + log.action + '</span><br>' +
+            '<small style="color:#999">' + log.time + '</small>' +
+            '</div>';
+    }).join('');
+    
+    if(appData.logs.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">لا توجد سجلات بعد</div>';
+    }
+};
+
+// ============================================================
+// دوال العمليات الأساسية
+// ============================================================
+
+// حفظ عميل جديد
+window._0x3d2a.saveClient = function() {
+    var name = document.getElementById('name').value.trim();
+    if(!name) {
+        window._0x3d2a.showNotification('⚠️ الرجاء إدخال اسم العميل', 'warning');
+        return;
+    }
+    
+    var clientData = {
+        name: name,
+        phone: document.getElementById('phone').value.trim(),
+        gov: document.getElementById('gov').value,
+        status: document.getElementById('status').value,
+        notes: document.getElementById('notes').value,
+        agent: document.getElementById('agent').value,
+        date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+        timestamp: Date.now(),
+        lastUpdatedBy: sessionStorage.getItem('userDisplayName') || 'System'
+    };
+    
+    if(appData.editClientIndex > -1 && appData.clients[appData.editClientIndex]) {
+        // تحديث عميل موجود
+        appData.clients[appData.editClientIndex] = clientData;
+        window._0x3d2a.addLog('تم تحديث العميل: ' + name);
+        window._0x3d2a.showNotification('✅ تم تحديث العميل بنجاح', 'success');
+        appData.editClientIndex = -1;
+        var btnSave = document.getElementById('btnSave');
+        if(btnSave) btnSave.innerHTML = '💾 حفظ بيانات العميل';
+    } else {
+        // إضافة عميل جديد
+        appData.clients.push(clientData);
+        window._0x3d2a.addLog('تم إضافة عميل جديد: ' + name);
+        window._0x3d2a.showNotification('✅ تم إضافة العميل بنجاح', 'success');
+    }
+    
+    saveToLocalStorage();
+    window._0x3d2a.clearClientForm();
+    window._0x3d2a.playSound('soundSuccess');
+    window._0x3d2a.renderClients();
+    window._0x3d2a.updateFilters();
+    window._0x3d2a.updateDashboard();
+    window._0x3d2a.updateCharts();
+};
+
+// تعديل عميل
+window._0x3d2a.editClient = function(index) {
+    var client = appData.clients[index];
+    if(!client) return;
+    
+    appData.editClientIndex = index;
+    document.getElementById('name').value = client.name || '';
+    document.getElementById('phone').value = client.phone || '';
+    document.getElementById('gov').value = client.gov || '';
+    document.getElementById('status').value = client.status || 'Interested';
+    document.getElementById('notes').value = client.notes || '';
+    document.getElementById('agent').value = client.agent || '';
+    document.getElementById('date').value = client.date || '';
+    
+    var btnSave = document.getElementById('btnSave');
+    if(btnSave) btnSave.innerHTML = '🔄 تحديث بيانات العميل';
+    
+    window.scrollTo(0, 0);
+    window._0x3d2a.showNotification('✏️ جاري تعديل العميل، اضغط حفظ للتحديث', 'info');
+};
+
+// حذف عميل (نقل إلى سلة المحذوفات)
+window._0x3d2a.deleteClient = function(index) {
+    if(confirm('⚠️ هل تريد نقل هذا العميل إلى سلة المحذوفات؟')) {
+        var client = appData.clients[index];
+        if(!client) return;
+        
+        appData.deletedClients.push(client);
+        appData.clients.splice(index, 1);
+        
+        saveToLocalStorage();
+        window._0x3d2a.addLog('تم نقل العميل إلى سلة المحذوفات: ' + client.name);
+        window._0x3d2a.showNotification('✅ تم نقل العميل إلى سلة المحذوفات', 'success');
+        window._0x3d2a.renderClients();
+        window._0x3d2a.renderRecycleBin();
+        window._0x3d2a.updateFilters();
+        window._0x3d2a.updateDashboard();
+        window._0x3d2a.playSound('soundAlert');
+    }
+};
+
+// استعادة عميل من سلة المحذوفات
+window._0x3d2a.restoreClient = function(index) {
+    if(confirm('هل تريد استعادة هذا العميل؟')) {
+        var client = appData.deletedClients[index];
+        if(!client) return;
+        
+        appData.clients.push(client);
+        appData.deletedClients.splice(index, 1);
+        
+        saveToLocalStorage();
+        window._0x3d2a.addLog('تم استعادة العميل: ' + client.name);
+        window._0x3d2a.showNotification('✅ تم استعادة العميل بنجاح', 'success');
+        window._0x3d2a.renderClients();
+        window._0x3d2a.renderRecycleBin();
+        window._0x3d2a.updateFilters();
+        window._0x3d2a.updateDashboard();
+        window._0x3d2a.playSound('soundSuccess');
+    }
+};
+
+// حذف نهائي من سلة المحذوفات
+window._0x3d2a.permanentDelete = function(index) {
+    if(confirm('⚠️ تحذير: هذا الإجراء نهائي ولا يمكن التراجع عنه! هل تريد حذف هذا العميل نهائياً؟')) {
+        var client = appData.deletedClients[index];
+        if(!client) return;
+        
+        appData.deletedClients.splice(index, 1);
+        
+        saveToLocalStorage();
+        window._0x3d2a.addLog('تم حذف العميل نهائياً: ' + client.name);
+        window._0x3d2a.showNotification('🗑️ تم حذف العميل نهائياً', 'error');
+        window._0x3d2a.renderRecycleBin();
+        window._0x3d2a.playSound('soundAlert');
+    }
+};
+
+// إفراغ سلة المحذوفات بالكامل
+window._0x3d2a.clearAllRecycle = function() {
+    if(confirm('⚠️ تحذير: هذا الإجراء سيقوم بحذف جميع العملاء في سلة المحذوفات نهائياً! هل أنت متأكد؟')) {
+        var count = appData.deletedClients.length;
+        if(count === 0) {
+            window._0x3d2a.showNotification('📭 سلة المحذوفات فارغة بالفعل', 'info');
+            return;
+        }
+        
+        appData.deletedClients = [];
+        saveToLocalStorage();
+        window._0x3d2a.addLog('تم إفراغ سلة المحذوفات بالكامل (' + count + ' عميل)');
+        window._0x3d2a.showNotification('🗑️ تم إفراغ سلة المحذوفات بالكامل', 'success');
+        window._0x3d2a.renderRecycleBin();
+        window._0x3d2a.playSound('soundAlert');
+    }
+};
+
+// ============================================================
+// دوال المهام والعمليات
+// ============================================================
+
+// حفظ مهمة جديدة
+window._0x3d2a.saveTask = function() {
+    var client = document.getElementById('taskClientSelect').value;
+    var taskText = document.getElementById('taskText').value.trim();
+    
+    if(!client || client === '') {
+        window._0x3d2a.showNotification('⚠️ الرجاء اختيار عميل من القائمة', 'warning');
+        return;
+    }
+    
+    if(!taskText) {
+        window._0x3d2a.showNotification('⚠️ الرجاء إدخال وصف العملية', 'warning');
+        return;
+    }
+    
+    var taskData = {
+        client: client,
+        operationType: document.getElementById('taskOperationType').value,
+        amount: document.getElementById('taskAmount').value ? parseFloat(document.getElementById('taskAmount').value) : null,
+        text: taskText,
+        taskNotes: document.getElementById('taskNotes').value,
+        extra: document.getElementById('extraInfo').value,
+        date: document.getElementById('taskDate').value,
+        timestamp: Date.now(),
+        completed: false,
+        completedAt: null
+    };
+    
+    if(appData.editTaskIndex > -1 && appData.tasks[appData.editTaskIndex]) {
+        // تحديث مهمة موجودة
+        taskData.completed = appData.tasks[appData.editTaskIndex].completed || false;
+        taskData.completedAt = appData.tasks[appData.editTaskIndex].completedAt || null;
+        appData.tasks[appData.editTaskIndex] = taskData;
+        window._0x3d2a.addLog('تم تحديث المهمة: ' + taskText);
+        window._0x3d2a.showNotification('✅ تم تحديث العملية بنجاح', 'success');
+        appData.editTaskIndex = -1;
+    } else {
+        // إضافة مهمة جديدة
+        appData.tasks.push(taskData);
+        window._0x3d2a.addLog('تم إضافة مهمة جديدة: ' + taskText);
+        window._0x3d2a.showNotification('✅ تم إضافة العملية بنجاح', 'success');
+    }
+    
+    saveToLocalStorage();
+    window._0x3d2a.clearTaskForm();
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.updateDashboard();
+    window._0x3d2a.playSound('soundSuccess');
+};
+
+// تعديل مهمة
+window._0x3d2a.editTask = function(index) {
+    var task = appData.tasks[index];
+    if(!task) return;
+    
+    appData.editTaskIndex = index;
+    document.getElementById('taskClientSelect').value = task.client || '';
+    document.getElementById('taskOperationType').value = task.operationType || 'quotation';
+    if(task.amount) document.getElementById('taskAmount').value = task.amount;
+    document.getElementById('taskText').value = task.text || '';
+    document.getElementById('taskNotes').value = task.taskNotes || '';
+    document.getElementById('extraInfo').value = task.extra || '';
+    document.getElementById('taskDate').value = task.date || '';
+    
+    window.scrollTo(0, 0);
+    window._0x3d2a.showNotification('✏️ جاري تعديل العملية، اضغط حفظ للتحديث', 'info');
+};
+
+// حذف مهمة
+window._0x3d2a.deleteTask = function(index) {
+    if(confirm('هل تريد حذف هذه المهمة؟')) {
+        var task = appData.tasks[index];
+        if(!task) return;
+        
+        appData.tasks.splice(index, 1);
+        saveToLocalStorage();
+        window._0x3d2a.addLog('تم حذف المهمة: ' + (task.text || ''));
+        window._0x3d2a.showNotification('✅ تم حذف العملية بنجاح', 'success');
+        window._0x3d2a.renderTasks();
+        window._0x3d2a.updateDashboard();
+        window._0x3d2a.playSound('soundAlert');
+    }
+};
+
+// إكمال مهمة
+window._0x3d2a.completeTask = function(index) {
+    if(appData.tasks[index]) {
+        appData.tasks[index].completed = true;
+        appData.tasks[index].completedAt = new Date().toISOString();
+        saveToLocalStorage();
+        window._0x3d2a.addLog('تم إكمال المهمة: ' + appData.tasks[index].text);
+        window._0x3d2a.showNotification('✅ تم إكمال المهمة بنجاح', 'success');
+        window._0x3d2a.renderTasks();
+        window._0x3d2a.updateDashboard();
+        window._0x3d2a.playSound('soundSuccess');
+    }
+};
+
+// تحديث ملاحظات المهمة
+window._0x3d2a.updateTaskNotes = function(index, notes) {
+    if(appData.tasks[index]) {
+        appData.tasks[index].taskNotes = notes;
+        saveToLocalStorage();
+    }
+};
+
+// تعبئة معلومات العميل تلقائياً
+window._0x3d2a.autoFillTaskInfo = function() {
+    var clientName = document.getElementById('taskClientSelect').value;
+    if(!clientName) return;
+    
+    var client = appData.clients.find(function(c) { return c.name === clientName; });
+    if(client) {
+        var extraInfo = document.getElementById('extraInfo');
+        if(extraInfo) {
+            extraInfo.value = '📞 هاتف: ' + (client.phone || '') + ' | 📍 محافظة: ' + (client.gov || '') + ' | 👤 مندوب: ' + (client.agent || '');
+        }
+        window._0x3d2a.showNotification('✅ تم تعبئة بيانات العميل تلقائياً', 'success');
+    }
+};
+
+// ============================================================
+// دوال إدارة المستخدمين
+// ============================================================
+
+// إضافة مستخدم جديد
+window._0x3d2a.addUser = function() {
+    var username = document.getElementById('newU').value.trim();
+    var password = document.getElementById('newP').value.trim();
+    var displayName = document.getElementById('newD').value.trim();
+    var role = document.getElementById('newR').value;
+    
+    if(!username || !password || !displayName) {
+        window._0x3d2a.showNotification('⚠️ الرجاء ملء جميع الحقول', 'warning');
+        return;
+    }
+    
+    // التحقق من وجود المستخدم
+    if(appData.users.find(function(u) { return u.u === username; })) {
+        window._0x3d2a.showNotification('❌ اسم المستخدم موجود بالفعل', 'error');
+        return;
+    }
+    
+    appData.users.push({
+        u: username,
+        p: password,
+        displayName: displayName,
+        role: role
+    });
+    
+    saveToLocalStorage();
+    window._0x3d2a.addLog('تم إضافة مستخدم جديد: ' + displayName);
+    window._0x3d2a.showNotification('✅ تم إنشاء المستخدم بنجاح', 'success');
+    window._0x3d2a.renderUsers();
+    
+    // مسح الحقول
+    document.getElementById('newU').value = '';
+    document.getElementById('newP').value = '';
+    document.getElementById('newD').value = '';
+};
+
+// حذف مستخدم
+window._0x3d2a.deleteUser = function(index) {
+    if(confirm('⚠️ هل تريد حذف هذا المستخدم نهائياً؟')) {
+        var user = appData.users[index];
+        if(!user) return;
+        
+        appData.users.splice(index, 1);
+        saveToLocalStorage();
+        window._0x3d2a.addLog('تم حذف المستخدم: ' + (user.displayName || user.u));
+        window._0x3d2a.showNotification('✅ تم حذف المستخدم بنجاح', 'success');
+        window._0x3d2a.renderUsers();
+    }
+};
+
+// تحديث كلمة المرور
+window._0x3d2a.updatePassword = function() {
+    var newPassword = document.getElementById('changePassInput').value.trim();
+    if(!newPassword) {
+        window._0x3d2a.showNotification('⚠️ الرجاء إدخال كلمة المرور الجديدة', 'warning');
+        return;
+    }
+    
+    var currentUsername = sessionStorage.getItem('username');
+    var userIndex = appData.users.findIndex(function(u) { return u.u === currentUsername; });
+    
+    if(userIndex !== -1) {
+        appData.users[userIndex].p = newPassword;
+        saveToLocalStorage();
+        window._0x3d2a.addLog('تم تحديث كلمة المرور للمستخدم: ' + currentUsername);
+        window._0x3d2a.showNotification('✅ تم تحديث كلمة المرور بنجاح', 'success');
+        document.getElementById('changePassInput').value = '';
+    } else {
+        window._0x3d2a.showNotification('❌ حدث خطأ في تحديث كلمة المرور', 'error');
+    }
+};
+
+// ============================================================
+// دوال الذكاء الاصطناعي والتحليلات
+// ============================================================
+
+// حساب احتمالية إتمام الصفقة
+window._0x3d2a.calculateProbability = function(client) {
+    if(!client) return 0;
+    var probability = 30;
+    
+    switch(client.status) {
+        case 'VIP': probability += 45; break;
+        case 'Completed': probability += 50; break;
+        case 'In Progress': probability += 25; break;
+        case 'Interested': probability += 15; break;
+        case 'Hold': probability -= 20; break;
+        default: probability += 10;
+    }
+    
+    if(client.notes) {
+        var notes = client.notes.toLowerCase();
+        if(notes.includes('اتفاق') || notes.includes('deal')) probability += 20;
+        if(notes.includes('متابعة') || notes.includes('follow')) probability += 10;
+        if(notes.includes('مشكلة') || notes.includes('شكوى')) probability -= 15;
+    }
+    
+    var highGovs = ['القاهرة', 'الجيزة', 'الإسكندرية'];
+    if(client.gov && highGovs.includes(client.gov)) probability += 5;
+    
+    return Math.min(95, Math.max(5, probability));
+};
+
+// تحليل المشاعر من النص
+window._0x3d2a.analyzeSentiment = function(text) {
+    if(!text || text.length < 5) {
+        var sentimentDiv = document.getElementById('sentimentResult');
+        if(sentimentDiv) sentimentDiv.style.display = 'none';
+        return;
+    }
+    
+    var positiveWords = ['مهتم', 'موافق', 'رائع', 'ممتاز', 'شكرا', 'نعم', 'متحمس', 'جاهز', 'اتفق'];
+    var negativeWords = ['لا', 'مش مهتم', 'رفض', 'غالي', 'مكلف', 'سيء', 'صعب', 'مشكلة', 'متعب'];
+    
+    var lowerText = text.toLowerCase();
+    var positiveCount = positiveWords.filter(function(word) { return lowerText.includes(word); }).length;
+    var negativeCount = negativeWords.filter(function(word) { return lowerText.includes(word); }).length;
+    
+    var sentiment = positiveCount > negativeCount ? 'positive' : (negativeCount > positiveCount ? 'negative' : 'neutral');
+    var sentimentText = sentiment === 'positive' ? '😊 إيجابي' : (sentiment === 'negative' ? '😞 سلبي' : '😐 محايد');
+    var sentimentColor = sentiment === 'positive' ? '#28a745' : (sentiment === 'negative' ? '#dc3545' : '#ffcc00');
+    
+    var resultDiv = document.getElementById('sentimentResult');
+    if(resultDiv) {
+        resultDiv.innerHTML = '🧠 تحليل المشاعر: ' + sentimentText;
+        resultDiv.style.backgroundColor = sentimentColor + '20';
+        resultDiv.style.borderLeft = '4px solid ' + sentimentColor;
+        resultDiv.style.display = 'block';
+    }
+    
+    return sentiment;
+};
+
+// اقتراح الحالة المناسبة
+window._0x3d2a.aiSuggestStatus = function() {
+    var name = document.getElementById('name').value;
+    var notes = document.getElementById('notes').value;
+    
+    if(!name) {
+        window._0x3d2a.showNotification('⚠️ أدخل اسم العميل أولاً', 'warning');
+        return;
+    }
+    
+    var score = 0;
+    if(notes) {
+        var lowerNotes = notes.toLowerCase();
+        if(lowerNotes.includes('مستعجل') || lowerNotes.includes('urgent')) score += 25;
+        if(lowerNotes.includes('صفقة') || lowerNotes.includes('deal')) score += 30;
+        if(lowerNotes.includes('شيك') || lowerNotes.includes('دفع')) score += 20;
+    }
+    
+    var suggestedStatus = 'Interested';
+    if(score >= 50) suggestedStatus = 'VIP';
+    else if(score >= 30) suggestedStatus = 'In Progress';
+    else if(score <= 10) suggestedStatus = 'Hold';
+    
+    document.getElementById('status').value = suggestedStatus;
+    window._0x3d2a.showNotification(`🤖 AI يقترح حالة: ${window._0x3d2a.getStatusText(suggestedStatus)}`, 'info');
+};
+
+// تحديث لوحة المعلومات
+window._0x3d2a.updateDashboard = function() {
+    var totalClients = document.getElementById('countTotal');
+    var vipCount = document.getElementById('countVip');
+    var completedCount = document.getElementById('countComp');
+    
+    if(totalClients) totalClients.innerText = appData.clients.length;
+    if(vipCount) vipCount.innerText = appData.clients.filter(function(c) { return c.status === 'VIP'; }).length;
+    if(completedCount) completedCount.innerText = appData.clients.filter(function(c) { return c.status === 'Completed'; }).length;
+    
+    // تحديث KPIs
+    var completed = appData.clients.filter(function(c) { return c.status === 'Completed'; }).length;
+    var conversionRate = appData.clients.length > 0 ? ((completed / appData.clients.length) * 100).toFixed(1) : 0;
+    var conversionRateEl = document.getElementById('conversionRate');
+    if(conversionRateEl) conversionRateEl.innerText = conversionRate + '%';
+    
+    // أفضل مندوب
+    var agentStats = {};
+    appData.clients.forEach(function(c) {
+        if(c.agent) {
+            if(!agentStats[c.agent]) agentStats[c.agent] = { total: 0, completed: 0 };
+            agentStats[c.agent].total++;
+            if(c.status === 'Completed') agentStats[c.agent].completed++;
+        }
+    });
+    
+    var bestAgent = null;
+    var bestScore = 0;
+    for(var agent in agentStats) {
+        var score = (agentStats[agent].completed / agentStats[agent].total) * 100;
+        if(score > bestScore) {
+            bestScore = score;
+            bestAgent = agent;
+        }
+    }
+    
+    var topAgentEl = document.getElementById('topAgent');
+    if(topAgentEl && bestAgent) topAgentEl.innerText = bestAgent;
+    
+    // توقعات الأسبوع القادم
+    var highProbability = appData.clients.filter(function(c) {
+        return window._0x3d2a.calculateProbability(c) >= 70;
+    }).length;
+    var forecast = Math.round(highProbability * 0.4);
+    var forecastEl = document.getElementById('nextWeekForecast');
+    if(forecastEl) forecastEl.innerText = forecast;
+    
+    // رؤية AI
+    var insightSpan = document.getElementById('aiInsightText');
+    if(insightSpan) {
+        if(highProbability > 0) {
+            insightSpan.innerHTML = `🎯 ${highProbability} عميل لديهم احتمالية إتمام صفقة عالية.`;
+        } else {
+            insightSpan.innerHTML = '📊 لا يوجد عملاء ذو احتمالية عالية حالياً.';
+        }
+    }
+};
+
+// تحديث المخططات
+window._0x3d2a.updateCharts = function() {
+    // مخطط الحالات
+    var ctx = document.getElementById('statusChart');
+    if(ctx) {
+        var statusCounts = { Interested: 0, 'In Progress': 0, Hold: 0, Completed: 0, VIP: 0 };
+        appData.clients.forEach(function(c) {
+            if(c.status && statusCounts[c.status] !== undefined) statusCounts[c.status]++;
+        });
+        
+        if(window.statusChart) window.statusChart.destroy();
+        window.statusChart = new Chart(ctx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['مهتم', 'قيد التنفيذ', 'معلق', 'مكتمل', 'VIP'],
+                datasets: [{
+                    data: Object.values(statusCounts),
+                    backgroundColor: ['#17a2b8', '#ffcc00', '#dc3545', '#28a745', '#9b59b6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+    
+    // التوزيع الجغرافي
+    var geoDiv = document.getElementById('geoStats');
+    if(geoDiv) {
+        var govCounts = {};
+        appData.clients.forEach(function(c) {
+            if(c.gov) govCounts[c.gov] = (govCounts[c.gov] || 0) + 1;
+        });
+        
+        var entries = Object.entries(govCounts);
+        entries.sort(function(a, b) { return b[1] - a[1]; });
+        
+        geoDiv.innerHTML = '';
+        for(var i = 0; i < Math.min(entries.length, 10); i++) {
+            geoDiv.innerHTML += '<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between;">' +
+                '<span>' + entries[i][0] + '</span>' +
+                '<b style="color:var(--info)">' + entries[i][1] + '</b>' +
+                '</div>';
+        }
+    }
+};
+
+// ============================================================
+// دوال الفلترة والترتيب
+// ============================================================
+
+window._0x3d2a.filterClients = function() {
+    window._0x3d2a.renderClients();
+};
+
+window._0x3d2a.filterTasks = function() {
+    window._0x3d2a.renderTasks();
+};
+
+window._0x3d2a.sortClients = function(column) {
+    if(appData.sortColumn === column) {
+        appData.sortDirection = appData.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        appData.sortColumn = column;
+        appData.sortDirection = 'asc';
+    }
+    window._0x3d2a.renderClients();
+};
+
+window._0x3d2a.clearTaskFilters = function() {
+    document.getElementById('taskSearch').value = '';
+    document.getElementById('taskFilterClient').value = '';
+    document.getElementById('taskFilterStatus').value = 'all';
+    document.getElementById('taskFilterOperationType').value = '';
+    document.getElementById('taskFilterDate').value = '';
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.showNotification('✅ تم مسح جميع فلاتر المهام', 'success');
+};
+
+window._0x3d2a.saveCurrentFilter = function() {
+    var filterName = prompt('أدخل اسم للفلتر:');
+    if(!filterName) return;
+    
+    var filter = {
+        name: filterName,
+        search: document.getElementById('advancedSearch').value,
+        gov: document.getElementById('filterGov').value,
+        agent: document.getElementById('filterAgent').value,
+        priority: document.getElementById('filterPriority').value,
+        status: document.getElementById('filterStatus').value
+    };
+    
+    appData.savedFilters.push(filter);
+    localStorage.setItem('savedFilters', JSON.stringify(appData.savedFilters));
+    window._0x3d2a.showNotification('✅ تم حفظ الفلتر بنجاح', 'success');
+};
+
+window._0x3d2a.showSavedFilters = function() {
+    var savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '[]');
+    if(savedFilters.length === 0) {
+        window._0x3d2a.showNotification('📭 لا توجد فلاتر محفوظة', 'info');
+        return;
+    }
+    
+    var menu = document.createElement('div');
+    menu.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border-radius:20px; padding:20px; min-width:300px; z-index:30003; box-shadow:0 10px 30px rgba(0,0,0,0.3);';
+    menu.innerHTML = '<h3>📂 الفلاتر المحفوظة</h3><hr>';
+    
+    savedFilters.forEach(function(f, idx) {
+        menu.innerHTML += '<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="window._0x3d2a.applyFilter(' + idx + '); this.parentElement.remove();">🔍 ' + f.name + '</div>';
+    });
+    
+    menu.innerHTML += '<button onclick="this.parentElement.remove()" style="margin-top:15px; width:100%; padding:8px; background:var(--danger); color:white; border:none; border-radius:10px;">إغلاق</button>';
+    document.body.appendChild(menu);
+};
+
+window._0x3d2a.applyFilter = function(idx) {
+    var savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '[]');
+    var filter = savedFilters[idx];
+    if(!filter) return;
+    
+    document.getElementById('advancedSearch').value = filter.search || '';
+    document.getElementById('filterGov').value = filter.gov || '';
+    document.getElementById('filterAgent').value = filter.agent || '';
+    document.getElementById('filterPriority').value = filter.priority || '';
+    document.getElementById('filterStatus').value = filter.status || '';
+    
+    window._0x3d2a.filterClients();
+    window._0x3d2a.showNotification('✅ تم تطبيق الفلتر: ' + filter.name, 'success');
+};
+
+// ============================================================
+// دوال التصدير والاستيراد
+// ============================================================
+
+window._0x3d2a.exportToCSV = function() {
+    if(appData.clients.length === 0) {
+        window._0x3d2a.showNotification('📭 لا توجد بيانات للتصدير', 'warning');
+        return;
+    }
+    
+    var csv = "\uFEFFالاسم,الهاتف,المحافظة,الحالة,المندوب,الملاحظات,التاريخ\n";
+    appData.clients.forEach(function(c) {
+        csv += '"' + (c.name || '') + '","' + (c.phone || '') + '","' + (c.gov || '') + '","' + window._0x3d2a.getStatusText(c.status) + '","' + (c.agent || '') + '","' + (c.notes || '').replace(/"/g, '""') + '","' + (c.date || '') + '"\n';
+    });
+    
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Utopia_Clients_' + new Date().toLocaleDateString() + '.csv';
+    link.click();
+    
+    window._0x3d2a.showNotification('📁 تم تصدير البيانات بنجاح', 'success');
+    window._0x3d2a.addLog('تم تصدير بيانات العملاء إلى CSV');
+};
+
+// ============================================================
+// دوال البحث الصوتي
+// ============================================================
+
+window._0x3d2a.startVoiceSearch = function() {
+    if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        window._0x3d2a.showNotification('❌ المتصفح لا يدعم البحث الصوتي', 'error');
+        return;
+    }
+    
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var recognition = new SpeechRecognition();
+    recognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    
+    recognition.onstart = function() {
+        var voiceBtn = document.getElementById('voiceBtn');
+        if(voiceBtn) {
+            voiceBtn.classList.add('listening');
+            voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...';
+        }
+    };
+    
+    recognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript;
+        var searchInput = document.getElementById('search');
+        if(searchInput) {
+            searchInput.value = transcript;
+            window._0x3d2a.filterClients();
+            window._0x3d2a.showNotification(`🔍 بحث عن: "${transcript}"`, 'success');
+        }
+    };
+    
+    recognition.onerror = function() {
+        window._0x3d2a.showNotification('⚠️ لم يتم التعرف على الصوت', 'warning');
+    };
+    
+    recognition.onend = function() {
+        var voiceBtn = document.getElementById('voiceBtn');
+        if(voiceBtn) {
+            voiceBtn.classList.remove('listening');
+            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> بحث صوتي';
+        }
+    };
+    
+    recognition.start();
+};
+
+// ============================================================
+// دوال الإشعارات
+// ============================================================
+
+window._0x3d2a.showNotification = function(message, type) {
+    var notificationDiv = document.getElementById('notification');
+    if(notificationDiv) {
+        notificationDiv.innerText = message;
+        notificationDiv.style.backgroundColor = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--info)');
+        notificationDiv.style.display = 'block';
+        setTimeout(function() { notificationDiv.style.display = 'none'; }, 3000);
+    }
+    
+    // Toast notification
+    var toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    var icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : (type === 'warning' ? '⚠️' : 'ℹ️'));
+    toast.innerHTML = icon + ' ' + message;
+    toast.style.backgroundColor = type === 'success' ? '#28a745' : (type === 'error' ? '#dc3545' : (type === 'warning' ? '#ffc107' : '#17a2b8'));
+    toast.style.color = type === 'warning' ? '#333' : 'white';
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.remove(); }, 4000);
+};
+
+window._0x3d2a.enableNotifications = function() {
+    if(Notification.permission === 'granted') {
+        window._0x3d2a.showNotification('✅ الإشعارات مفعلة مسبقاً', 'success');
+    } else if(Notification.permission !== 'denied') {
+        Notification.requestPermission().then(function(perm) {
+            if(perm === 'granted') {
+                window._0x3d2a.showNotification('🔔 تم تفعيل الإشعارات بنجاح', 'success');
+            }
+        });
+    } else {
+        window._0x3d2a.showNotification('❌ لا يمكن تفعيل الإشعارات', 'error');
+    }
+};
+
+window._0x3d2a.showNotifications = function() {
+    var pendingTasks = appData.tasks.filter(function(t) { return !t.completed; }).length;
+    var highPriorityClients = appData.clients.filter(function(c) {
+        return window._0x3d2a.calculateProbability(c) >= 70 && c.status !== 'Completed';
+    }).length;
+    
+    var message = `📊 إحصائيات سريعة:\n• مهام غير مكتملة: ${pendingTasks}\n• عملاء ذو أولوية عالية: ${highPriorityClients}`;
+    window._0x3d2a.showNotification(message, 'info');
+};
+
+// ============================================================
+// دوال مساعدة عامة
+// ============================================================
+
+window._0x3d2a.getStatusText = function(status) {
+    var statusMap = {
+        'Interested': 'مهتم',
+        'In Progress': 'قيد التنفيذ',
+        'Hold': 'معلق',
+        'Completed': 'مكتمل',
+        'VIP': 'VIP'
+    };
+    return statusMap[status] || status;
+};
+
+window._0x3d2a.getStatusColor = function(status) {
+    var colorMap = {
+        'Interested': '#17a2b8',
+        'In Progress': '#ffcc00',
+        'Hold': '#dc3545',
+        'Completed': '#28a745',
+        'VIP': '#9b59b6'
+    };
+    return colorMap[status] || '#333';
+};
+
+window._0x3d2a.getOperationTypeText = function(type) {
+    var typeMap = {
+        'quotation': '📄 طلب عرض سعر',
+        'followup': '👀 متابعة عرض سعر',
+        'supply': '🚚 توريد',
+        'bank': '🏦 بنك',
+        'cash': '💵 كاش'
+    };
+    return typeMap[type] || type;
+};
+
+window._0x3d2a.getOperationTypeClass = function(type) {
+    var classMap = {
+        'quotation': 'op-quotation',
+        'followup': 'op-followup',
+        'supply': 'op-supply',
+        'bank': 'op-bank',
+        'cash': 'op-cash'
+    };
+    return classMap[type] || 'op-quotation';
+};
+
+window._0x3d2a.clearClientForm = function() {
+    document.getElementById('name').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('gov').value = '';
+    document.getElementById('status').value = 'Interested';
+    document.getElementById('notes').value = '';
+    document.getElementById('agent').value = '';
+    document.getElementById('date').value = '';
+    document.getElementById('sentimentResult').style.display = 'none';
+};
+
+window._0x3d2a.clearTaskForm = function() {
+    document.getElementById('taskClientSelect').value = '';
+    document.getElementById('taskOperationType').value = 'quotation';
+    document.getElementById('taskAmount').value = '';
+    document.getElementById('taskText').value = '';
+    document.getElementById('taskNotes').value = '';
+    document.getElementById('extraInfo').value = '';
+    document.getElementById('taskDate').value = '';
+};
+
+window._0x3d2a.addLog = function(action) {
+    appData.logs.push({
+        user: sessionStorage.getItem('userDisplayName') || 'System',
+        action: action,
+        time: new Date().toLocaleString('ar-EG')
+    });
+    
+    // الاحتفاظ بآخر 100 سجل فقط
+    if(appData.logs.length > 100) appData.logs.shift();
+    window._0x3d2a.renderLogs();
+};
+
+window._0x3d2a.playSound = function(id) {
+    try {
+        var sound = document.getElementById(id);
+        if(sound) sound.play();
+    } catch(e) {}
+};
+
+window._0x3d2a.updateFilters = function() {
+    // تحديث قائمة المندوبين في الفلتر
+    var agents = new Set();
+    appData.clients.forEach(function(c) {
+        if(c.agent) agents.add(c.agent);
+    });
+    
+    var agentFilter = document.getElementById('filterAgent');
+    if(agentFilter) {
+        var currentValue = agentFilter.value;
+        agentFilter.innerHTML = '<option value="">كل المندوبين</option>';
+        agents.forEach(function(a) {
+            var option = document.createElement('option');
+            option.value = a;
+            option.textContent = a;
+            agentFilter.appendChild(option);
+        });
+        agentFilter.value = currentValue;
+    }
+    
+    // تحديث قائمة العملاء في المهام
+    var taskClientSelect = document.getElementById('taskClientSelect');
+    if(taskClientSelect) {
+        var currentClient = taskClientSelect.value;
+        taskClientSelect.innerHTML = '<option value="">ربط بعميل</option>';
+        appData.clients.forEach(function(c) {
+            if(c.name) {
+                var option = document.createElement('option');
+                option.value = c.name;
+                option.textContent = c.name;
+                taskClientSelect.appendChild(option);
+            }
+        });
+        taskClientSelect.value = currentClient;
+    }
+    
+    // تحديث فلتر العملاء في المهام
+    var taskFilterClient = document.getElementById('taskFilterClient');
+    if(taskFilterClient) {
+        var currentFilter = taskFilterClient.value;
+        taskFilterClient.innerHTML = '<option value="">كل العملاء</option>';
+        appData.clients.forEach(function(c) {
+            if(c.name) {
+                var option = document.createElement('option');
+                option.value = c.name;
+                option.textContent = c.name;
+                taskFilterClient.appendChild(option);
+            }
+        });
+        taskFilterClient.value = currentFilter;
+    }
+};
+
+window._0x3d2a.refreshRecycleBin = function() {
+    window._0x3d2a.renderRecycleBin();
+    window._0x3d2a.showNotification('✅ تم تحديث سلة المحذوفات', 'success');
+};
+
+window._0x3d2a.manualSync = function() {
+    saveToLocalStorage();
+    window._0x3d2a.showNotification('🔄 تمت المزامنة بنجاح', 'success');
+    window._0x3d2a.addLog('تمت المزامنة اليدوية');
+};
+
+// ============================================================
+// دوال واجهة المستخدم
+// ============================================================
+
+window._0x3d2a.showTab = function(tabId, button) {
+    document.querySelectorAll('.tab-content').forEach(function(tab) {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    
+    var tab = document.getElementById(tabId);
+    if(tab) tab.classList.add('active');
+    if(button) button.classList.add('active');
+};
+
+window._0x3d2a.toggleLanguage = function() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    localStorage.setItem('appLang', currentLang);
+    
+    // تحديث النصوص
+    var elements = ['m_crm', 'm_tasks', 'm_dash', 'm_profile', 'm_recycle', 'm_admin', 'm_logout', 
+                    'h_crm', 'h_dash', 'h_tasks', 'recycleTitle', 'adminTitle', 'usersTitle', 'logsTitle', 
+                    'profileTitle', 'loginTitle', 'loginSubtitle', 'loginBtn', 'statTotalLabel', 'statVipLabel', 
+                    'statCompLabel', 'statusChartLabel', 'geoChartLabel', 'taskClientHeader', 'taskTypeHeader', 
+                    'taskAmountHeader', 'taskTextHeader', 'taskNotesHeader', 'taskDateHeader', 'taskActionHeader', 
+                    'taskStatusHeader', 'recycleNameHeader', 'recyclePhoneHeader', 'recycleStatusHeader', 
+                    'recycleRestoreHeader', 'recycleDeleteHeader', 'registerBtn', 'updatePassBtn', 'changePassLabel', 
+                    'loggedInAs', 'kpiConversion', 'kpiFollowUp', 'kpiForecast', 'kpiTopAgent', 'aiInsightLabel', 
+                    'enableNotifBtn', 'manualSyncBtn', 'usersTableUser', 'usersTablePass', 'usersTableName', 
+                    'usersTableRole', 'usersTableAction', 'thName', 'thPhone', 'thGov', 'thPriority', 'thStatus', 'thActions'];
+    
+    elements.forEach(function(id) {
+        var el = document.getElementById(id);
+        if(el && translations[currentLang][id]) el.innerText = translations[currentLang][id];
+    });
+    
+    // تحديث الاتجاه
+    var htmlTag = document.getElementById('htmlTag');
+    if(currentLang === 'ar') {
+        htmlTag.setAttribute('dir', 'rtl');
+        htmlTag.setAttribute('lang', 'ar');
+    } else {
+        htmlTag.setAttribute('dir', 'ltr');
+        htmlTag.setAttribute('lang', 'en');
+    }
+    
+    var langBtn = document.getElementById('langBtn');
+    if(langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
+    
+    // إعادة عرض البيانات
+    window._0x3d2a.renderClients();
+    window._0x3d2a.renderTasks();
+};
+
+// ============================================================
+// دوال تسجيل الدخول
+// ============================================================
+
+window._0x3d2a.login = function() {
+    var username = document.getElementById('userInput').value.trim();
+    var password = document.getElementById('passInput').value.trim();
+    var errorDiv = document.getElementById('loginError');
+    
+    if(errorDiv) errorDiv.style.display = 'none';
+    
+    // حساب المدير الرئيسي
+    if(username === 'admin' && password === '@Mody6699') {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userRole', 'admin');
+        sessionStorage.setItem('userDisplayName', 'المدير الرئيسي');
+        sessionStorage.setItem('username', username);
+        window._0x3d2a.playSound('soundSuccess');
+        location.reload();
+        return;
+    }
+    
+    // التحقق من المستخدمين
+    var user = appData.users.find(function(u) { return u.u === username && u.p === password; });
+    if(user) {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userRole', user.role);
+        sessionStorage.setItem('userDisplayName', user.displayName);
+        sessionStorage.setItem('username', username);
+        window._0x3d2a.addLog('تسجيل دخول: ' + user.displayName);
+        window._0x3d2a.playSound('soundSuccess');
+        location.reload();
+    } else {
+        if(errorDiv) errorDiv.style.display = 'block';
+        window._0x3d2a.playSound('soundAlert');
+    }
+};
+
+window._0x3d2a.logout = function() {
+    if(confirm('هل تريد تسجيل الخروج؟')) {
+        window._0x3d2a.addLog('تسجيل خروج');
+        sessionStorage.clear();
+        location.reload();
+    }
+};
+
+// ============================================================
+// تهيئة التطبيق
+// ============================================================
+
+window._0x3d2a.init = function() {
+    if(!sessionStorage.getItem('isLoggedIn')) return;
+    
+    // إخفاء شاشة تسجيل الدخول وإظهار التطبيق
+    var loginOverlay = document.getElementById('loginOverlay');
+    var mainApp = document.getElementById('mainApp');
+    if(loginOverlay) loginOverlay.style.display = 'none';
+    if(mainApp) mainApp.style.display = 'flex';
+    
+    // تحميل البيانات
+    var loaded = loadFromLocalStorage();
+    if(!loaded) {
+        appData.clients = demoData.clients;
+        appData.tasks = demoData.tasks;
+        appData.users = defaultUsers;
+        saveToLocalStorage();
+    }
+    
+    // تهيئة قوائم المحافظات
+    var govSelect = document.getElementById('gov');
+    if(govSelect && govSelect.options.length <= 1) {
+        governorates.forEach(function(g) {
+            var option = document.createElement('option');
+            option.value = g;
+            option.textContent = g;
+            govSelect.appendChild(option);
+        });
+    }
+    
+    var filterGov = document.getElementById('filterGov');
+    if(filterGov && filterGov.options.length <= 1) {
+        governorates.forEach(function(g) {
+            var option = document.createElement('option');
+            option.value = g;
+            option.textContent = g;
+            filterGov.appendChild(option);
+        });
+    }
+    
+    // عرض البيانات
+    window._0x3d2a.renderClients();
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.renderRecycleBin();
+    window._0x3d2a.renderUsers();
+    window._0x3d2a.renderLogs();
+    window._0x3d2a.updateDashboard();
+    window._0x3d2a.updateCharts();
+    window._0x3d2a.updateFilters();
+    
+    // عرض اسم المستخدم
+    var profName = document.getElementById('profName');
+    if(profName) profName.innerText = sessionStorage.getItem('userDisplayName') || 'مستخدم';
+    
+    // عرض شارة المستخدم
+    var userBadge = document.getElementById('userBadge');
+    if(userBadge) {
+        var role = sessionStorage.getItem('userRole');
+        if(role === 'admin') {
+            userBadge.innerText = '👑 مدير النظام';
+            userBadge.style.background = 'var(--vip)';
+        } else {
+            userBadge.innerText = '👤 مندوب';
+        }
+        userBadge.style.display = 'inline-block';
+    }
+    
+    // إظهار أزرار الأدمن
+    if(sessionStorage.getItem('userRole') === 'admin') {
+        document.querySelectorAll('.admin-only').forEach(function(el) {
+            el.style.display = 'block';
+        });
+    }
+    
+    // تحديث اللغة
+    window._0x3d2a.toggleLanguage();
+    
+    window._0x3d2a.showNotification('🤖 نظام إدارة متكامل | تم التحميل بنجاح', 'success');
+};
+
+// بدء التطبيق
+window._0x3d2a.init();
+</script>
+</body>
+</html>
