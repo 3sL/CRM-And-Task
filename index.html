@@ -14,12 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
             --primary: #1a1a2e;
             --primary-light: #16213e;
@@ -74,14 +70,8 @@
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .login-card h2 {
@@ -551,26 +541,6 @@
             z-index: 99999;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 80px;
-                padding: 15px 10px;
-            }
-            .sidebar button span:not(.fa) {
-                display: none;
-            }
-            .sidebar button {
-                justify-content: center;
-            }
-            .main {
-                padding: 15px;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* RTL Support */
         [dir="rtl"] .sidebar button {
             text-align: right;
@@ -585,9 +555,48 @@
             right: auto;
             left: 10px;
         }
+
+        /* Loading Indicator */
+        .loading-indicator {
+            text-align: center;
+            padding: 40px;
+            color: var(--info);
+            font-size: 16px;
+        }
+
+        .ai-score {
+            font-weight: bold;
+            color: var(--info);
+            background: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
+        .ai-recommendation {
+            border-left: 4px solid var(--vip);
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .suggestion-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
+
+<audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
 <div id="loginOverlay">
     <div class="login-card">
@@ -656,7 +665,6 @@
         <div id="crmTab" class="tab-content active">
             <h2 style="margin-bottom: 20px; color: var(--primary);" id="h_crm">👥 Clients Management</h2>
             
-            <!-- Filter Section -->
             <div class="filter-bar">
                 <div class="filter-grid">
                     <input type="text" id="advancedSearch" placeholder="🔍 Advanced Search..." oninput="app.renderCRM()">
@@ -677,7 +685,6 @@
                 </div>
             </div>
             
-            <!-- Search Bar -->
             <div class="card">
                 <div class="form-grid" style="grid-template-columns: 2fr 1fr auto; gap: 15px;">
                     <input id="search" placeholder="🔍 Search by Name, Phone or Status..." oninput="app.renderCRM()">
@@ -692,7 +699,6 @@
                 </div>
             </div>
             
-            <!-- Add Client Form -->
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-user-plus"></i> <span id="formTitle">Add New Client</span></h3>
@@ -742,7 +748,6 @@
             
             <div id="aiRecommendations" class="ai-recommendation" style="display: none;"></div>
             
-            <!-- Clients Table -->
             <div class="table-wrapper">
                 <table id="clientsTable">
                     <thead>
@@ -756,7 +761,7 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr><td colspan="6" style="text-align: center; padding: 40px;">⏳ Loading clients...</td></tr>
+                        <tr><td colspan="6" class="loading-indicator">⏳ Loading clients...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -876,7 +881,7 @@
                         </tr>
                     </thead>
                     <tbody id="taskBody">
-                        <tr><td colspan="8" style="text-align: center; padding: 40px;">⏳ Loading tasks...</td></tr>
+                        <tr><td colspan="8" class="loading-indicator">⏳ Loading tasks...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -962,7 +967,7 @@
 
 <script>
 // ============================================================
-// ULTRA SECURE CRM SYSTEM - Enhanced Version
+// COMPLETE CRM SYSTEM - All Features Working
 // Developed by Eng. Mahmoud Mohamed Marie
 // ============================================================
 
@@ -975,7 +980,7 @@ let tasks = [];
 let deletedClients = [];
 let authSystem = { users: [] };
 let logs = [];
-let appEditIdx = -1;
+let editIdx = -1;
 let editTaskIdx = -1;
 let statusChart = null;
 let sortColumn = 0;
@@ -1039,7 +1044,7 @@ const translations = {
         'taskFormTitle': 'إضافة مهمة جديدة', 'save_btn': '💾 حفظ العميل', 'update_btn': '🔄 تحديث العميل',
         'add_task_btn': '➕ إضافة مهمة', 'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن',
         'login_btn': '🔐 دخول النظام', 'voice_search': 'بحث صوتي', 'ai_suggest': '🤖 اقتراح AI',
-        'save_filter': '💾 حفظ الفلتر', 'load_filters': '📂 تحميل الفلاتر', 'advanced_search': '🔍 بحث متقدم...',
+        'save_filter': '💾 حفظ الفلتر', 'load_filters': '📂 تحميل الفلاتر', 'advanced_search': 'بحث متقدم...',
         'all_governorates': 'كل المحافظات', 'all_agents': 'كل المندوبين', 'all_priorities': 'كل الأولويات',
         'high_priority': 'أولوية عالية (70%+)', 'medium_priority': 'متوسطة (40-69%)', 'low_priority': 'منخفضة (-40%)',
         'kpi_conversion': 'معدل التحويل', 'kpi_followup': 'متوسط المتابعة', 'kpi_forecast': 'توقعات الأسبوع',
@@ -1122,12 +1127,9 @@ app.updateUILanguage = function() {
         if (el && t[id]) el.innerText = t[id];
     });
     
-    const formTitle = document.querySelector('#formTitle');
-    if(formTitle && t.formTitle) formTitle.innerText = t.formTitle;
-    const taskFormTitle = document.querySelector('#taskFormTitle');
-    if(taskFormTitle && t.taskFormTitle) taskFormTitle.innerText = t.taskFormTitle;
     const btnSave = document.getElementById('btnSave');
-    if(btnSave) btnSave.innerHTML = t.save_btn;
+    if(btnSave && editIdx === -1) btnSave.innerHTML = t.save_btn;
+    else if(btnSave && editIdx > -1) btnSave.innerHTML = t.update_btn;
     
     const htmlTag = document.getElementById('htmlTag');
     if (currentLang === 'ar') {
@@ -1192,17 +1194,57 @@ app.saveToLocalDB = async function(type, data) {
         } else if (type === 'tasks') {
             await localDB.tasks.clear();
             if (data.length) await localDB.tasks.bulkAdd(data);
+        } else if (type === 'deletedClients') {
+            await localDB.deletedClients.clear();
+            if (data.length) await localDB.deletedClients.bulkAdd(data);
+        } else if (type === 'users') {
+            await localDB.users.clear();
+            if (data.length) await localDB.users.bulkAdd(data);
+            authSystem.users = data;
         }
-        if (database && isOnline) setTimeout(() => database.ref(type).set(data), 1000);
+        if (database && isOnline) setTimeout(() => syncToFirebase(), 1000);
     } catch(e) {}
 };
 
+async function syncToFirebase() {
+    if (!database || isSyncing) return;
+    isSyncing = true;
+    updateSyncStatusUI();
+    try {
+        await database.ref('clients').set(clients.map(({id,...rest}) => rest));
+        await database.ref('tasks').set(tasks.map(({id,...rest}) => rest));
+        await database.ref('deletedClients').set(deletedClients.map(({id,...rest}) => rest));
+        await database.ref('authSystem/users').set(authSystem.users);
+    } catch(e) {}
+    finally { isSyncing = false; updateSyncStatusUI(); }
+}
+
 app.manualSync = async function() {
     await syncFromFirebase();
+    await syncToFirebase();
     app.renderCRM();
     app.renderTasks();
     app.showToast('✅ Sync completed', 'success');
 };
+
+function updateSyncStatusUI() {
+    const indicator = document.getElementById('syncStatusIndicator');
+    const textSpan = document.getElementById('syncStatusText');
+    if (!indicator) return;
+    if (isSyncing) {
+        indicator.className = 'sync-status syncing';
+        if(textSpan) textSpan.innerText = 'Syncing...';
+    } else if (isOnline) {
+        indicator.className = 'sync-status online';
+        if(textSpan) textSpan.innerText = 'Online';
+    } else {
+        indicator.className = 'sync-status offline';
+        if(textSpan) textSpan.innerText = 'Offline';
+    }
+}
+
+window.addEventListener('online', async () => { isOnline = true; updateSyncStatusUI(); await syncFromFirebase(); app.renderCRM(); app.renderTasks(); });
+window.addEventListener('offline', () => { isOnline = false; updateSyncStatusUI(); app.showToast('📡 Offline mode', 'warning'); });
 
 // ==================== AI FUNCTIONS ====================
 app.calculateWinProbability = function(client) {
@@ -1256,11 +1298,88 @@ app.updateAIInsights = function() {
     insightSpan.innerHTML = `🎯 ${highPotential.length} high-potential clients | ⚠️ ${pending.length} pending tasks`;
 };
 
+app.updateAdvancedKPIs = function() {
+    if (!clients.length) return;
+    const completed = clients.filter(c => c.status === 'Completed').length;
+    const conversionRate = ((completed / clients.length) * 100).toFixed(1);
+    document.getElementById('conversionRate').innerText = conversionRate + '%';
+    
+    const agentPerformance = {};
+    clients.forEach(c => {
+        if (c.agent) {
+            if (!agentPerformance[c.agent]) agentPerformance[c.agent] = { total: 0, completed: 0 };
+            agentPerformance[c.agent].total++;
+            if (c.status === 'Completed') agentPerformance[c.agent].completed++;
+        }
+    });
+    let bestAgent = null, bestScore = 0;
+    for (const agent in agentPerformance) {
+        const score = (agentPerformance[agent].completed / agentPerformance[agent].total) * 100;
+        if (score > bestScore) { bestScore = score; bestAgent = agent; }
+    }
+    if (bestAgent) document.getElementById('topAgent').innerText = bestAgent;
+    
+    const nextWeekForecast = Math.round(clients.filter(c => app.calculateWinProbability(c) >= 60).length * 0.4);
+    document.getElementById('nextWeekForecast').innerText = nextWeekForecast;
+};
+
+app.checkSmartNotifications = function() {
+    const newNotifications = [];
+    clients.forEach(client => {
+        const prediction = app.predictClientBehavior(client);
+        if (prediction.priority === 'high' && client.status !== 'Completed') {
+            newNotifications.push(`🎯 High priority client: ${client.name}`);
+        }
+    });
+    tasks.forEach(task => {
+        if (task.date && new Date(task.date) < new Date() && !task.completed) {
+            newNotifications.push(`⏰ Overdue task: ${task.text} - ${task.client}`);
+        }
+    });
+    if (newNotifications.length > 0 && notifications.length !== newNotifications.length) {
+        notifications = newNotifications;
+        const badge = document.getElementById('notificationBadge');
+        if(badge) {
+            badge.innerText = notifications.length;
+            badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
+        }
+        if (Notification.permission === 'granted') {
+            new Notification(`📢 ${newNotifications.length} new notification(s)`, { body: newNotifications[0] });
+        }
+    }
+};
+
+app.predictClientBehavior = function(client) {
+    const prob = app.calculateWinProbability(client);
+    if (prob >= 70) return { priority: 'high', text: 'High - Follow up immediately', daysToFollow: 1 };
+    if (prob >= 40) return { priority: 'medium', text: 'Medium - Weekly follow-up', daysToFollow: 7 };
+    return { priority: 'low', text: 'Low - Monthly follow-up', daysToFollow: 30 };
+};
+
+app.showNotificationsPanel = function() {
+    if (notifications.length === 0) {
+        app.showToast('📭 No new notifications', 'info');
+        return;
+    }
+    const panel = document.createElement('div');
+    panel.style.cssText = 'position:fixed; top:80px; right:20px; width:350px; background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:30002; padding:15px; max-height:400px; overflow-y:auto;';
+    panel.innerHTML = '<h4 style="margin:0 0 10px 0; color:var(--primary)">🔔 Notifications</h4><hr>';
+    notifications.forEach(n => { panel.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">${n}</div>`; });
+    panel.innerHTML += '<button onclick="this.remove()" style="margin-top:10px; width:100%; padding:8px; background:var(--info); color:white; border:none; border-radius:10px;">Close</button>';
+    document.body.appendChild(panel);
+};
+
+app.enableDesktopNotifications = function() {
+    if (Notification.permission === 'granted') app.showToast('✅ Notifications enabled', 'success');
+    else if (Notification.permission !== 'denied') Notification.requestPermission().then(perm => { if (perm === 'granted') app.showToast('🔔 Notifications enabled', 'success'); });
+    else app.showToast('❌ Cannot enable notifications', 'error');
+};
+
 // ==================== CRM FUNCTIONS ====================
 app.renderCRM = function() {
     const body = document.getElementById('tableBody');
     if (!body) return;
-    if (!clients.length) { body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">📭 No clients found</td></tr>'; return; }
+    if (!clients.length) { body.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 No clients found</td></tr>'; return; }
     
     const search = document.getElementById('search')?.value.toLowerCase() || '';
     const advanced = document.getElementById('advancedSearch')?.value.toLowerCase() || '';
@@ -1284,11 +1403,11 @@ app.renderCRM = function() {
     });
     
     body.innerHTML = '';
-    filtered.forEach((c, idx) => {
+    filtered.forEach(c => {
         const prob = app.calculateWinProbability(c);
         const statusClass = `status-${c.status?.replace(/ /g, '') || 'Interested'}`;
         body.innerHTML += `<tr>
-            <td><strong>${c.name || ''}</strong> <span class="ai-score" style="background:#e3f2fd;padding:2px 6px;border-radius:12px;font-size:11px;">🤖 ${prob}%</span></td>
+            <td><strong>${c.name || ''}</strong> <span class="ai-score">🤖 ${prob}%</span></td>
             <td>${c.phone || ''}</td>
             <td>${c.gov || ''}</td>
             <td><div style="background:#eee;height:6px;border-radius:3px;width:80px;margin:auto"><div style="background:#00b894;height:100%;width:${prob}%;border-radius:3px"></div></div></td>
@@ -1313,9 +1432,9 @@ app.saveClient = function() {
         agent: document.getElementById('agent').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
         timestamp: Date.now()
     };
-    if (appEditIdx > -1 && clients[appEditIdx]) {
-        clients[appEditIdx] = data;
-        appEditIdx = -1;
+    if (editIdx > -1 && clients[editIdx]) {
+        clients[editIdx] = data;
+        editIdx = -1;
         app.showToast('✅ Client updated', 'success');
     } else {
         clients.push(data);
@@ -1332,7 +1451,7 @@ app.saveClient = function() {
 
 app.editClient = function(i) {
     const c = clients[i];
-    appEditIdx = i;
+    editIdx = i;
     document.getElementById('name').value = c.name || '';
     document.getElementById('phone').value = c.phone || '';
     document.getElementById('gov').value = c.gov || '';
@@ -1362,7 +1481,7 @@ app.clearForm = function() {
     document.getElementById('status').value = 'Interested';
     document.getElementById('gov').value = '';
     document.getElementById('btnSave').innerHTML = translations[currentLang].save_btn;
-    appEditIdx = -1;
+    editIdx = -1;
 };
 
 app.sort = function(col) {
@@ -1391,7 +1510,7 @@ app.sort = function(col) {
 app.renderTasks = function() {
     const body = document.getElementById('taskBody');
     if (!body) return;
-    if (!tasks.length) { body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;">📭 No tasks found</td></tr>'; return; }
+    if (!tasks.length) { body.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 No tasks found</b></td>'; return; }
     
     const search = document.getElementById('taskSearch')?.value.toLowerCase() || '';
     const filterClient = document.getElementById('taskFilterClient')?.value || '';
@@ -1413,7 +1532,7 @@ app.renderTasks = function() {
     });
     
     body.innerHTML = '';
-    filtered.forEach((t, idx) => {
+    filtered.forEach(t => {
         const originalIdx = tasks.indexOf(t);
         const isOverdue = t.date && new Date(t.date) < new Date() && !t.completed;
         const statusText = t.completed ? '✅ Completed' : (isOverdue ? '⚠️ Overdue' : '🔄 Pending');
@@ -1426,7 +1545,7 @@ app.renderTasks = function() {
             <td>${t.text || ''}</td>
             <td><textarea style="width:100%;font-size:11px;padding:5px;" onchange="app.updateTaskNotes(${originalIdx}, this.value)">${t.taskNotes || ''}</textarea></td>
             <td>${t.date || ''}</td>
-            <td><span class="task-status-badge ${statusClass}">${statusText}</span>${!t.completed ? '<br><button class="btn-ai" style="margin-top:5px;font-size:10px;" onclick="app.completeTask('+originalIdx+')">✓ Complete</button>' : ''}</td>
+            <td><span class="task-status-badge ${statusClass}">${statusText}</span>${!t.completed ? '<br><button class="btn-info" style="margin-top:5px;font-size:10px;padding:4px 8px;" onclick="app.completeTask('+originalIdx+')">✓ Complete</button>' : ''}</td>
             <td><div class="action-btns"><button class="action-btn btn-edit" onclick="app.editTask(${originalIdx})">✏️</button><button class="action-btn btn-delete" onclick="app.deleteTask(${originalIdx})">✕</button></div></td>
         </tr>`;
     });
@@ -1517,7 +1636,7 @@ app.clearTaskFilters = function() {
 app.renderRecycle = function() {
     const body = document.getElementById('recycleBody');
     if (!body) return;
-    if (!deletedClients.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">📭 Recycle bin empty</b></tr>'; return; }
+    if (!deletedClients.length) { body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 Recycle bin empty</b></td>'; return; }
     body.innerHTML = '';
     deletedClients.forEach((c, i) => {
         body.innerHTML += `<tr>
@@ -1584,6 +1703,8 @@ app.updateDashboard = function() {
         clients.forEach(c => { if(c.gov) geo[c.gov] = (geo[c.gov] || 0) + 1; });
         geoDiv.innerHTML = Object.entries(geo).sort((a,b) => b[1]-a[1]).map(g => `<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee;"><span>${g[0]}</span><b style="color:#0984e3">${g[1]}</b></div>`).join('');
     }
+    app.updateAdvancedKPIs();
+    app.checkSmartNotifications();
 };
 
 // ==================== USER & AUTH ====================
@@ -1603,6 +1724,7 @@ app.loginSuccess = function(role, name, idx) {
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
+    app.addLog("Logged in");
     app.playSound('soundSuccess');
     setTimeout(() => location.reload(), 300);
 };
@@ -1623,7 +1745,7 @@ app.delUser = function(i) { if (confirm('Delete user?')) { authSystem.users.spli
 app.renderUsers = function() {
     const body = document.getElementById('usersBody');
     if (!body) return;
-    if (sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin") { body.innerHTML = '<tr><td colspan="5">Restricted</td></tr>'; return; }
+    if (sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin") { body.innerHTML = '<tr><td colspan="5">Restricted</b></td>'; return; }
     body.innerHTML = '';
     authSystem.users.forEach((u, i) => {
         body.innerHTML += `<tr>
@@ -1644,13 +1766,16 @@ app.updatePassword = function() {
     if (authSystem.users[idx]) { authSystem.users[idx].p = np; app.saveToLocalDB('users', authSystem.users); app.showToast('✅ Password updated', 'success'); document.getElementById('changePassInput').value = ''; }
 };
 
-app.enableDesktopNotifications = function() {
-    if (Notification.permission === 'granted') app.showToast('✅ Notifications enabled', 'success');
-    else if (Notification.permission !== 'denied') Notification.requestPermission().then(perm => { if (perm === 'granted') app.showToast('🔔 Notifications enabled', 'success'); });
-    else app.showToast('❌ Cannot enable notifications', 'error');
+app.addLog = function(msg) {
+    logs.push({ user: sessionStorage.getItem('userDisplayName') || "System", action: msg, time: new Date().toLocaleString() });
+    app.renderLogs();
 };
 
-app.showNotificationsPanel = function() { app.showToast('📭 No new notifications', 'info'); };
+app.renderLogs = function() {
+    const cont = document.getElementById('logsContainer');
+    if (!cont) return;
+    cont.innerHTML = logs.slice().reverse().map(l => `<div style="padding:8px;border-bottom:1px solid #eee;"><b style="color:#0984e3">[${l.user}]</b> ${l.action}<br><small style="color:#999">${l.time}</small></div>`).join('');
+};
 
 // ==================== UI HELPERS ====================
 app.show = function(id, btn) {
@@ -1749,7 +1874,6 @@ app.init = async function() {
     await syncFromFirebase();
     app.updateUILanguage();
     
-    // Populate governorates
     const govSel = document.getElementById('gov');
     if (govSel && govSel.options.length <= 1) govs.forEach(g => { const opt = document.createElement('option'); opt.value = g; opt.innerText = g; govSel.appendChild(opt); });
     const filterGov = document.getElementById('filterGov');
@@ -1769,6 +1893,8 @@ app.init = async function() {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
     app.showToast('🚀 System Ready | AI Enhanced', 'success');
+    
+    syncInterval = setInterval(() => { if (isOnline && !isSyncing && database) syncToFirebase(); }, 60000);
     
     if (Notification.permission === 'default') setTimeout(() => { if (confirm('Enable notifications for reminders?')) app.enableDesktopNotifications(); }, 2000);
 };
