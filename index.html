@@ -325,6 +325,18 @@
             z-index: 9999;
         }
         
+        .admin-section {
+            border: 2px solid #f9ca24;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-section h3 {
+            color: #f9ca24;
+            margin-bottom: 15px;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 width: 70px;
@@ -561,36 +573,61 @@
             </div>
         </div>
         
-        <!-- Admin Tab -->
+        <!-- Admin Tab - FULL ADMIN PANEL -->
         <div id="adminTab" class="tab-content">
             <h2 style="margin-bottom: 20px;">👑 لوحة تحكم الأدمن</h2>
-            <div class="card">
-                <h3>➕ إضافة مستخدم جديد</h3>
+            
+            <!-- إضافة مستخدم جديد -->
+            <div class="admin-section">
+                <h3><i class="fas fa-user-plus"></i> إضافة مستخدم جديد</h3>
                 <div class="form-grid">
                     <input type="text" id="newUsername" placeholder="اسم المستخدم">
-                    <input type="password" id="newUserPass" placeholder="كلمة المرور">
-                    <input type="text" id="newUserFullname" placeholder="الاسم الكامل">
-                    <select id="newUserRole">
-                        <option value="user">مندوب</option>
-                        <option value="admin">أدمن</option>
+                    <input type="password" id="newPasswordAdmin" placeholder="كلمة المرور">
+                    <input type="text" id="newFullname" placeholder="الاسم الكامل">
+                    <select id="newRole">
+                        <option value="user">مندوب عادي</option>
+                        <option value="admin">مسؤول النظام (أدمن)</option>
                     </select>
                 </div>
-                <button class="btn-primary" onclick="addUser()">إضافة مستخدم</button>
+                <button class="btn-primary" onclick="addUser()" style="margin-top: 10px;">➕ إضافة مستخدم</button>
             </div>
             
-            <div class="card">
-                <h3>👥 قائمة المستخدمين</h3>
+            <!-- قائمة المستخدمين -->
+            <div class="admin-section">
+                <h3><i class="fas fa-users"></i> قائمة المستخدمين</h3>
                 <div class="table-container">
-                    <table>
-                        <thead><tr><th>المستخدم</th><th>الاسم</th><th>الصلاحية</th><th>حذف</th></tr></thead>
-                        <tbody id="usersTableBody"></tbody>
+                    <table style="min-width: 500px;">
+                        <thead>
+                            <tr>
+                                <th>اسم المستخدم</th>
+                                <th>الاسم الكامل</th>
+                                <th>الصلاحية</th>
+                                <th>تاريخ الإضافة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersListTable">
+                            <tr><td colspan="5" style="text-align: center;">جاري تحميل المستخدمين...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
             
-            <div class="card">
-                <h3>📜 سجل النشاطات</h3>
-                <div id="logsList" style="max-height: 300px; overflow-y: auto;"></div>
+            <!-- سجل النشاطات -->
+            <div class="admin-section">
+                <h3><i class="fas fa-history"></i> سجل النشاطات</h3>
+                <div id="logsContainer" style="max-height: 400px; overflow-y: auto; background: #f8f9fa; border-radius: 10px; padding: 10px;"></div>
+                <button onclick="clearLogs()" style="margin-top: 10px; background: #eb4d4b; color: white; border: none; padding: 8px 15px; border-radius: 8px;">🗑️ مسح السجل</button>
+            </div>
+            
+            <!-- إحصائيات النظام -->
+            <div class="admin-section">
+                <h3><i class="fas fa-chart-bar"></i> إحصائيات النظام</h3>
+                <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #22a6b3, #1a1a2e);"><h3>إجمالي المستخدمين</h3><div class="value" id="totalUsers">0</div></div>
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #6ab04c, #1a1a2e);"><h3>إجمالي العملاء</h3><div class="value" id="totalClientsAdmin">0</div></div>
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #f9ca24, #1a1a2e);"><h3>إجمالي المهام</h3><div class="value" id="totalTasksAdmin">0</div></div>
+                </div>
             </div>
         </div>
     </div>
@@ -626,20 +663,20 @@ const governorates = [
 
 // المستخدمين الافتراضيين
 const defaultUsers = [
-    { username: "admin", password: "@Mody6699", fullname: "Master Admin", role: "master" },
-    { username: "user1", password: "123456", fullname: "موظف عادي", role: "user" },
-    { username: "agent1", password: "agent123", fullname: "مندوب مبيعات", role: "user" }
+    { username: "admin", password: "@Mody6699", fullname: "Master Admin", role: "master", createdAt: new Date().toISOString() },
+    { username: "user1", password: "123456", fullname: "موظف عادي", role: "user", createdAt: new Date().toISOString() },
+    { username: "agent1", password: "agent123", fullname: "مندوب مبيعات", role: "user", createdAt: new Date().toISOString() }
 ];
 
 // بيانات تجريبية
 const demoData = {
     clients: [
-        { name: "شركة النور للتجارة", phone: "01234567890", gov: "القاهرة", status: "VIP", notes: "عميل مهم", agent: "محمد علي", date: new Date().toISOString().split('T')[0] },
-        { name: "مؤسسة السلام", phone: "01122334455", gov: "الإسكندرية", status: "In Progress", notes: "قيد التفاوض", agent: "أحمد حسن", date: new Date().toISOString().split('T')[0] },
-        { name: "شركة الفجر", phone: "01099887766", gov: "الجيزة", status: "Interested", notes: "طلب عرض سعر", agent: "سامي ربيع", date: new Date().toISOString().split('T')[0] }
+        { name: "شركة النور للتجارة", phone: "01234567890", gov: "القاهرة", status: "VIP", notes: "عميل مهم - تعاقدات كبيرة", agent: "محمد علي", date: new Date().toISOString().split('T')[0] },
+        { name: "مؤسسة السلام", phone: "01122334455", gov: "الإسكندرية", status: "In Progress", notes: "قيد التفاوض على الأسعار", agent: "أحمد حسن", date: new Date().toISOString().split('T')[0] },
+        { name: "شركة الفجر", phone: "01099887766", gov: "الجيزة", status: "Interested", notes: "طلب عرض سعر للمنتجات", agent: "سامي ربيع", date: new Date().toISOString().split('T')[0] }
     ],
     tasks: [
-        { client: "شركة النور للتجارة", type: "quotation", amount: 50000, text: "تقديم عرض سعر", notes: "", date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0], completed: false }
+        { client: "شركة النور للتجارة", type: "quotation", amount: 50000, text: "تقديم عرض سعر للمعدات", notes: "تم الإرسال عبر الإيميل", date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0], completed: false }
     ]
 };
 
@@ -653,8 +690,9 @@ function init() {
     
     if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-        renderUsers();
-        renderLogs();
+        renderUsersList();
+        renderLogsAdmin();
+        updateAdminStats();
     }
     
     document.getElementById('profileName').innerText = currentUser ? currentUser.fullname : '';
@@ -673,7 +711,7 @@ function loadDataFromStorage() {
     if (savedClients) {
         clients = JSON.parse(savedClients);
     } else {
-        clients = demoData.clients;
+        clients = [...demoData.clients];
         saveClients();
     }
     
@@ -682,7 +720,7 @@ function loadDataFromStorage() {
     if (savedTasks) {
         tasks = JSON.parse(savedTasks);
     } else {
-        tasks = demoData.tasks;
+        tasks = [...demoData.tasks];
         saveTasks();
     }
     
@@ -707,6 +745,8 @@ function loadDataFromStorage() {
     const savedLogs = localStorage.getItem('utopia_logs');
     if (savedLogs) {
         logs = JSON.parse(savedLogs);
+    } else {
+        logs = [];
     }
 }
 
@@ -737,9 +777,11 @@ function addLog(action) {
         time: new Date().toLocaleString('ar-EG')
     };
     logs.unshift(log);
-    if (logs.length > 100) logs.pop();
+    if (logs.length > 200) logs.pop();
     saveLogs();
-    renderLogs();
+    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
+        renderLogsAdmin();
+    }
 }
 
 // ==================== دوال تسجيل الدخول ====================
@@ -754,7 +796,7 @@ function login() {
         sessionStorage.setItem('currentUser', JSON.stringify(user));
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('appContainer').style.display = 'flex';
-        addLog('تسجيل الدخول');
+        addLog('تسجيل الدخول إلى النظام');
         init();
     } else {
         document.getElementById('loginError').style.display = 'block';
@@ -880,15 +922,15 @@ function renderClients() {
                         <div style="background: ${prob >= 70 ? '#6ab04c' : (prob >= 40 ? '#f9ca24' : '#eb4d4b')}; width: ${prob}%; height: 100%; border-radius: 3px;"></div>
                     </div>
                     <small>${prob}%</small>
-                 </td>
+                  </td>
                 <td><span class="status-badge" style="background: ${statusColor}20; color: ${statusColor};">${client.status || 'Interested'}</span></td>
                 <td>
                     <button class="action-btn btn-call" onclick="window.open('tel:${client.phone || ''}')">📞</button>
                     <button class="action-btn btn-wa" onclick="window.open('https://wa.me/${client.phone || ''}')">💬</button>
                     <button class="action-btn btn-edit" onclick="editClient(${originalIndex})">✏️</button>
                     <button class="action-btn btn-delete" onclick="deleteClient(${originalIndex})">✕</button>
-                 </td>
-            </table>
+                  </td>
+            </tr>
         `;
     });
     
@@ -938,6 +980,9 @@ function saveClient() {
     clearClientForm();
     renderClients();
     updateClientSelect();
+    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
+        updateAdminStats();
+    }
 }
 
 function editClient(index) {
@@ -969,6 +1014,9 @@ function deleteClient(index) {
         renderRecycleBin();
         updateClientSelect();
         showToast('تم نقل العميل إلى سلة المحذوفات', 'success');
+        if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
+            updateAdminStats();
+        }
     }
 }
 
@@ -1049,7 +1097,7 @@ function renderTasks() {
         const originalIndex = tasks.findIndex(t => t === task);
         const isOverdue = task.date && new Date(task.date) < new Date() && !task.completed;
         const statusText = task.completed ? 'مكتملة' : (isOverdue ? 'متأخرة' : 'قيد التنفيذ');
-        const statusClass = task.completed ? 'task-status-completed' : (isOverdue ? 'task-status-overdue' : 'task-status-pending');
+        const statusClass = task.completed ? 'completed' : (isOverdue ? 'overdue' : 'pending');
         
         tbody.innerHTML += `
             <tr>
@@ -1059,13 +1107,13 @@ function renderTasks() {
                 <td>${task.text || ''}</td>
                 <td>${task.date || ''}</td>
                 <td>
-                    <span class="status-badge" style="background: ${statusClass === 'task-status-completed' ? '#6ab04c' : (statusClass === 'task-status-overdue' ? '#eb4d4b' : '#f9ca24')}20; color: ${statusClass === 'task-status-completed' ? '#6ab04c' : (statusClass === 'task-status-overdue' ? '#eb4d4b' : '#f9ca24')};">${statusText}</span>
-                    ${!task.completed ? `<button class="btn-ai" style="margin-top: 5px; font-size: 11px; background: #6ab04c;" onclick="completeTask(${originalIndex})">✓ إكمال</button>` : ''}
-                 </td>
+                    <span class="status-badge" style="background: ${statusClass === 'completed' ? '#6ab04c' : (statusClass === 'overdue' ? '#eb4d4b' : '#f9ca24')}20; color: ${statusClass === 'completed' ? '#6ab04c' : (statusClass === 'overdue' ? '#eb4d4b' : '#f9ca24')};">${statusText}</span>
+                    ${!task.completed ? `<button class="btn-info" style="margin-top: 5px; font-size: 11px; background: #6ab04c; border: none; padding: 4px 10px; border-radius: 5px; color: white; cursor: pointer;" onclick="completeTask(${originalIndex})">✓ إكمال</button>` : ''}
+                  </td>
                 <td>
                     <button class="action-btn btn-edit" onclick="editTask(${originalIndex})">✏️</button>
                     <button class="action-btn btn-delete" onclick="deleteTask(${originalIndex})">✕</button>
-                 </td>
+                  </td>
             </tr>
         `;
     });
@@ -1110,6 +1158,9 @@ function saveTask() {
     saveTasks();
     clearTaskForm();
     renderTasks();
+    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
+        updateAdminStats();
+    }
 }
 
 function editTask(index) {
@@ -1135,6 +1186,9 @@ function deleteTask(index) {
         addLog(`حذف مهمة: ${task.text}`);
         renderTasks();
         showToast('تم حذف المهمة', 'success');
+        if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
+            updateAdminStats();
+        }
     }
 }
 
@@ -1194,6 +1248,9 @@ function restoreClient(index) {
         renderRecycleBin();
         updateClientSelect();
         showToast('تم استعادة العميل', 'success');
+        if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
+            updateAdminStats();
+        }
     }
 }
 
@@ -1262,34 +1319,43 @@ function updateDashboard() {
                 <b style="color: #22a6b3;">${count}</b>
             </div>
         `).join('');
+        if (sorted.length === 0) geoDiv.innerHTML = '<p style="text-align: center;">لا توجد بيانات</p>';
     }
 }
 
-// ==================== دوال الأدمن ====================
-function renderUsers() {
-    const tbody = document.getElementById('usersTableBody');
+// ==================== دوال الأدمن الكاملة ====================
+function renderUsersList() {
+    const tbody = document.getElementById('usersListTable');
     if (!tbody) return;
+    
+    if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">لا يوجد مستخدمين</td></tr>';
+        return;
+    }
     
     tbody.innerHTML = '';
     users.forEach((user, idx) => {
-        if (user.username !== currentUser?.username || currentUser?.role !== 'master') {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${user.username}</td>
-                    <td>${user.fullname}</td>
-                    <td>${user.role === 'master' ? 'مدير' : (user.role === 'admin' ? 'أدمن' : 'مندوب')}</td>
-                    <td>${user.role !== 'master' ? `<button class="action-btn btn-delete" onclick="deleteUser(${idx})">✕</button>` : '—'}</td>
-                </tr>
-            `;
-        }
+        const roleName = user.role === 'master' ? 'مدير النظام' : (user.role === 'admin' ? 'أدمن' : 'مندوب');
+        const roleColor = user.role === 'master' ? '#f9ca24' : (user.role === 'admin' ? '#22a6b3' : '#6ab04c');
+        tbody.innerHTML += `
+            <tr>
+                <td>${user.username}</td>
+                <td>${user.fullname}</td>
+                <td><span style="background: ${roleColor}20; color: ${roleColor}; padding: 4px 10px; border-radius: 20px; font-size: 12px;">${roleName}</span></td>
+                <td>${user.createdAt ? new Date(user.createdAt).toLocaleDateString('ar-EG') : '—'}</td>
+                <td>
+                    ${user.role !== 'master' || currentUser?.role === 'master' ? `<button class="action-btn btn-delete" onclick="deleteUserFromAdmin(${idx})">✕</button>` : '—'}
+                </td>
+            </tr>
+        `;
     });
 }
 
 function addUser() {
     const username = document.getElementById('newUsername').value;
-    const password = document.getElementById('newUserPass').value;
-    const fullname = document.getElementById('newUserFullname').value;
-    const role = document.getElementById('newUserRole').value;
+    const password = document.getElementById('newPasswordAdmin').value;
+    const fullname = document.getElementById('newFullname').value;
+    const role = document.getElementById('newRole').value;
     
     if (!username || !password || !fullname) {
         showToast('جميع الحقول مطلوبة', 'error');
@@ -1301,43 +1367,80 @@ function addUser() {
         return;
     }
     
-    users.push({ username, password, fullname, role });
+    const newUser = {
+        username: username,
+        password: password,
+        fullname: fullname,
+        role: role,
+        createdAt: new Date().toISOString()
+    };
+    
+    users.push(newUser);
     saveUsers();
-    addLog(`إضافة مستخدم جديد: ${fullname}`);
-    renderUsers();
-    clearUserForm();
-    showToast('تم إضافة المستخدم', 'success');
+    addLog(`إضافة مستخدم جديد: ${fullname} (${username})`);
+    renderUsersList();
+    updateAdminStats();
+    
+    // تفريغ الحقول
+    document.getElementById('newUsername').value = '';
+    document.getElementById('newPasswordAdmin').value = '';
+    document.getElementById('newFullname').value = '';
+    document.getElementById('newRole').value = 'user';
+    
+    showToast('تم إضافة المستخدم بنجاح', 'success');
 }
 
-function deleteUser(index) {
-    if (confirm('حذف المستخدم؟')) {
-        const user = users[index];
+function deleteUserFromAdmin(index) {
+    const user = users[index];
+    if (user.username === currentUser?.username) {
+        showToast('لا يمكن حذف حسابك الحالي', 'error');
+        return;
+    }
+    
+    if (confirm(`هل تريد حذف المستخدم "${user.fullname}"؟`)) {
         users.splice(index, 1);
         saveUsers();
-        addLog(`حذف مستخدم: ${user.fullname}`);
-        renderUsers();
+        addLog(`حذف مستخدم: ${user.fullname} (${user.username})`);
+        renderUsersList();
+        updateAdminStats();
         showToast('تم حذف المستخدم', 'success');
     }
 }
 
-function clearUserForm() {
-    document.getElementById('newUsername').value = '';
-    document.getElementById('newUserPass').value = '';
-    document.getElementById('newUserFullname').value = '';
-    document.getElementById('newUserRole').value = 'user';
-}
-
-function renderLogs() {
-    const container = document.getElementById('logsList');
+function renderLogsAdmin() {
+    const container = document.getElementById('logsContainer');
     if (!container) return;
     
-    container.innerHTML = logs.slice(0, 50).map(log => `
-        <div style="padding: 8px; border-bottom: 1px solid #eee; font-size: 12px;">
-            <b style="color: #22a6b3;">[${log.user}]</b><br>
-            ${log.action}<br>
-            <small style="color: #999;">${log.time}</small>
+    if (logs.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">لا توجد سجلات</p>';
+        return;
+    }
+    
+    container.innerHTML = logs.slice(0, 100).map(log => `
+        <div style="padding: 10px; border-bottom: 1px solid #ddd; font-size: 13px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <b style="color: #22a6b3;">${log.user}</b>
+                <small style="color: #999;">${log.time}</small>
+            </div>
+            <div>${log.action}</div>
         </div>
     `).join('');
+}
+
+function clearLogs() {
+    if (confirm('مسح جميع سجلات النشاطات؟')) {
+        logs = [];
+        saveLogs();
+        renderLogsAdmin();
+        addLog('مسح سجل النشاطات');
+        showToast('تم مسح السجل', 'success');
+    }
+}
+
+function updateAdminStats() {
+    document.getElementById('totalUsers').innerText = users.length;
+    document.getElementById('totalClientsAdmin').innerText = clients.length;
+    document.getElementById('totalTasksAdmin').innerText = tasks.length;
 }
 
 // ==================== دوال الملف الشخصي ====================
@@ -1371,6 +1474,11 @@ function manualSync() {
     setTimeout(() => {
         showToast('✅ تمت المزامنة بنجاح', 'success');
         updateSyncStatus();
+        if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
+            renderUsersList();
+            renderLogsAdmin();
+            updateAdminStats();
+        }
     }, 500);
 }
 
@@ -1486,6 +1594,16 @@ function showTab(tabId, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     if (btn) btn.classList.add('active');
+    
+    // تحديث البيانات عند فتح التبويبات
+    if (tabId === 'adminTab' && currentUser && (currentUser.role === 'admin' || currentUser.role === 'master')) {
+        renderUsersList();
+        renderLogsAdmin();
+        updateAdminStats();
+    }
+    if (tabId === 'recycleTab') {
+        renderRecycleBin();
+    }
 }
 
 function toggleLanguage() {
