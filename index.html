@@ -1259,14 +1259,34 @@ window._0x3d2a.notify = function(msg, type) {
     window._0x3d2a.showToast(msg, type);
 };
 
+// ==================== FIXED LOGIN FUNCTION ====================
 window._0x3d2a.check = async function(){
     var u = document.getElementById('userInput').value.trim();
     var p = document.getElementById('passInput').value.trim();
     document.getElementById('loginError').style.display = 'none';
     
+    // Check for master admin first (instant access)
     if(u === "admin" && p === "@Mody6699"){
         window._0x3d2a.loginSuccess("admin", "Master Admin", -1);
         return;
+    }
+    
+    // Ensure users are loaded from IndexedDB before checking
+    if (authSystem.users.length === 0) {
+        // Load users from IndexedDB
+        try {
+            var loadedUsers = await localDB.users.toArray();
+            if (loadedUsers && loadedUsers.length > 0) {
+                authSystem.users = loadedUsers;
+            } else {
+                // Add default users if none exist
+                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+                authSystem.users = await localDB.users.toArray();
+            }
+        } catch(e) {
+            console.error("Error loading users during login:", e);
+            authSystem.users = defaultUsers;
+        }
     }
     
     var found = authSystem.users.find(function(acc){ 
@@ -1509,7 +1529,7 @@ window._0x3d2a.renderCRM = function(){
     if(!body) return;
     
     if (clients.length === 0) {
-        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</td></tr>';
+        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</b></td>';
         return;
     }
     
@@ -1536,7 +1556,7 @@ window._0x3d2a.renderCRM = function(){
     });
     
     if (filteredClients.length === 0) {
-        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">⚠️ لا توجد نتائج تطابق معايير البحث</td></tr>';
+        body.innerHTML = '<tr><td colspan="6" class="loading-indicator">⚠️ لا توجد نتائج تطابق معايير البحث</b></td>';
         return;
     }
     
@@ -1680,7 +1700,7 @@ window._0x3d2a.sort = function(col){
             case 0: va = a.name || ''; vb = b.name || ''; break;
             case 1: va = a.phone || ''; vb = b.phone || ''; break;
             case 2: va = a.gov || ''; vb = b.gov || ''; break;
-            case 3: va = window._0x3d2a.calcScore(a); vb = window._0x3d2a.calcScore(b); break;
+            case 3: va = window._0x3d2a.calculateWinProbability(a); vb = window._0x3d2a.calculateWinProbability(b); break;
             case 4: va = a.status || ''; vb = b.status || ''; break;
             default: va = a.name || ''; vb = b.name || '';
         }
@@ -1765,7 +1785,7 @@ window._0x3d2a.renderTasks = function(){
     if(!body) return;
     
     if (tasks.length === 0) {
-        body.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 لا توجد مهام حالياً. قم بإضافة مهمة جديدة</b></td>';
         return;
     }
     
@@ -1981,7 +2001,7 @@ window._0x3d2a.renderRecycle = function(){
     if(!body) return;
     
     if(deletedClients.length === 0){
-        body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></tr>';
+        body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></td>';
         return;
     }
     
@@ -2078,7 +2098,7 @@ window._0x3d2a.hardDelete = function(i){
 window._0x3d2a.renderUsers = function(){
     var body = document.getElementById('usersBody');
     if(!body) return;
-    if(sessionStorage.getItem('userDisplayName') !== "Master Admin"){
+    if(sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin"){
         body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></tr>";
         return;
     }
@@ -2124,16 +2144,6 @@ window._0x3d2a.edit = function(i){
     }
     window._0x3d2a.show('crmTab', null);
     window.scrollTo(0,0);
-};
-
-window._0x3d2a.calcScore = function(c){
-    var s = 40;
-    if(c.status === 'VIP') s += 50;
-    if(c.status === 'Completed') s += 60;
-    if(c.status === 'Interested') s += 20;
-    if(c.status === 'Hold') s -= 30;
-    if(c.notes && c.notes.length > 20) s += 10;
-    return Math.min(100, Math.max(0, s));
 };
 
 window._0x3d2a.statusColor = function(s){
@@ -2234,7 +2244,7 @@ window._0x3d2a.init = async function(){
         }
     }
     
-    if(sessionStorage.getItem('userRole') === 'admin'){
+    if(sessionStorage.getItem('userRole') === 'admin' || sessionStorage.getItem('userDisplayName') === "Master Admin"){
         var adminBtns = document.querySelectorAll('.admin-only');
         for (var i = 0; i < adminBtns.length; i++) {
             adminBtns[i].style.display = 'block';
