@@ -705,19 +705,19 @@
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Full Name *</label>
+                        <label id="labelName">Full Name *</label>
                         <input id="name" placeholder="Enter client name">
                     </div>
                     <div class="form-group">
-                        <label>Phone Number</label>
+                        <label id="labelPhone">Phone Number</label>
                         <input id="phone" placeholder="e.g., 01234567890">
                     </div>
                     <div class="form-group">
-                        <label>Governorate</label>
+                        <label id="labelGov">Governorate</label>
                         <select id="gov"><option value="">Select Governorate</option></select>
                     </div>
                     <div class="form-group">
-                        <label>Status</label>
+                        <label id="labelStatus">Status</label>
                         <div style="display: flex; gap: 10px;">
                             <select id="status" style="flex: 1;">
                                 <option value="Interested">Interested</option>
@@ -730,16 +730,16 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Assigned Agent</label>
+                        <label id="labelAgent">Assigned Agent</label>
                         <input id="agent" placeholder="Agent name">
                     </div>
                     <div class="form-group">
-                        <label>Date</label>
+                        <label id="labelDate">Date</label>
                         <input type="date" id="date">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Notes</label>
+                    <label id="labelNotes">Notes</label>
                     <textarea id="notes" rows="3" placeholder="Additional notes & client history..." oninput="app.analyzeSentiment(this.value)"></textarea>
                     <div id="sentimentResult" style="margin-top: 8px; display: none;"></div>
                 </div>
@@ -761,7 +761,7 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr><td colspan="6" class="loading-indicator">⏳ Loading clients...</td></tr>
+                        <tr><td colspan="6" class="loading-indicator">⏳ Loading clients...</b></td>
                     </tbody>
                 </table>
             </div>
@@ -829,11 +829,11 @@
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Client</label>
+                        <label id="labelTaskClient">Client</label>
                         <select id="taskClientSelect" onchange="app.autoFillTask()"><option value="">Select Client</option></select>
                     </div>
                     <div class="form-group">
-                        <label>Operation Type</label>
+                        <label id="labelTaskType">Operation Type</label>
                         <select id="taskOperationType">
                             <option value="quotation">📄 Quotation Request</option>
                             <option value="followup">👀 Quotation Follow-up</option>
@@ -843,24 +843,24 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Amount</label>
+                        <label id="labelTaskAmount">Amount</label>
                         <input id="taskAmount" type="number" step="0.01" placeholder="Amount (if any)">
                     </div>
                     <div class="form-group">
-                        <label>Due Date</label>
+                        <label id="labelTaskDate">Due Date</label>
                         <input id="taskDate" type="date">
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
+                        <label id="labelTaskDesc">Description</label>
                         <input id="taskText" placeholder="Task description">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Notes</label>
+                    <label id="labelTaskNotes">Notes</label>
                     <textarea id="taskNotes" rows="2" placeholder="Additional notes..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Extra Details</label>
+                    <label id="labelTaskExtra">Extra Details</label>
                     <textarea id="extraInfo" rows="2" placeholder="Requirements or extra info..."></textarea>
                 </div>
                 <button onclick="app.saveTask()" class="btn btn-primary" id="btnSaveTask" style="width: 100%;">➕ Add Task</button>
@@ -881,7 +881,7 @@
                         </tr>
                     </thead>
                     <tbody id="taskBody">
-                        <tr><td colspan="8" class="loading-indicator">⏳ Loading tasks...</td></tr>
+                        <tr><td colspan="8" class="loading-indicator">⏳ Loading tasks...</b></td>
                     </tbody>
                 </table>
             </div>
@@ -967,7 +967,7 @@
 
 <script>
 // ============================================================
-// COMPLETE CRM SYSTEM - All Features Working
+// COMPLETE CRM SYSTEM - All Features Working - FULL ARABIC SUPPORT
 // Developed by Eng. Mahmoud Mohamed Marie
 // ============================================================
 
@@ -1010,54 +1010,123 @@ const demoData = {
     ]
 };
 
-// ==================== TRANSLATIONS ====================
+// ==================== FULL TRANSLATIONS ====================
 const translations = {
     en: {
-        'm_crm': '👥 Clients', 'm_tasks': '📅 Tasks', 'm_dash': '📊 Analytics', 'm_profile': '👤 Profile', 'm_recycle': '♻️ Recycle', 'm_admin': '👑 Admin', 'm_logout': '🚪 Logout',
-        'h_crm': '👥 Clients Management', 'h_dash': '📊 Analytics Dashboard', 'h_tasks': '📋 Operations & Tasks',
-        'recycleTitle': '♻️ Recycle Bin', 'adminTitle': '👑 Admin Control Panel', 'usersTitle': '👥 User Management',
-        'logsTitle': '📜 Activity Logs', 'profileTitle': '👤 User Profile', 'formTitle': 'Add New Client',
-        'taskFormTitle': 'Add New Task', 'save_btn': '💾 Save Client', 'update_btn': '🔄 Update Client',
-        'add_task_btn': '➕ Add Task', 'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
-        'login_btn': '🔐 Access System', 'voice_search': 'Voice Search', 'ai_suggest': '🤖 AI Suggest',
-        'save_filter': '💾 Save Filter', 'load_filters': '📂 Load Filters', 'advanced_search': '🔍 Advanced Search...',
+        // Sidebar
+        'm_crm': '👥 Clients', 'm_tasks': '📅 Tasks', 'm_dash': '📊 Analytics', 
+        'm_profile': '👤 Profile', 'm_recycle': '♻️ Recycle', 'm_admin': '👑 Admin', 
+        'm_logout': '🚪 Logout',
+        // Headers
+        'h_crm': '👥 Clients Management', 'h_dash': '📊 Analytics Dashboard', 
+        'h_tasks': '📋 Operations & Tasks', 'recycleTitle': '♻️ Recycle Bin',
+        'adminTitle': '👑 Admin Control Panel', 'usersTitle': '👥 User Management',
+        'logsTitle': '📜 Activity Logs', 'profileTitle': '👤 User Profile',
+        // Form Labels
+        'labelName': 'Full Name *', 'labelPhone': 'Phone Number', 'labelGov': 'Governorate',
+        'labelStatus': 'Status', 'labelAgent': 'Assigned Agent', 'labelDate': 'Date',
+        'labelNotes': 'Notes', 'labelTaskClient': 'Client', 'labelTaskType': 'Operation Type',
+        'labelTaskAmount': 'Amount', 'labelTaskDate': 'Due Date', 'labelTaskDesc': 'Description',
+        'labelTaskNotes': 'Notes', 'labelTaskExtra': 'Extra Details',
+        // Placeholders
+        'namePlaceholder': 'Enter client name', 'phonePlaceholder': 'e.g., 01234567890',
+        'agentPlaceholder': 'Agent name', 'notesPlaceholder': 'Additional notes & client history...',
+        'taskSearchPlaceholder': '🔍 Search tasks...', 'advancedSearchPlaceholder': '🔍 Advanced Search...',
+        'searchPlaceholder': '🔍 Search by Name, Phone or Status...', 'taskTextPlaceholder': 'Task description',
+        'taskNotesPlaceholder': 'Additional notes...', 'taskExtraPlaceholder': 'Requirements or extra info...',
+        'taskAmountPlaceholder': 'Amount (if any)',
+        // Buttons
+        'save_btn': '💾 Save Client', 'update_btn': '🔄 Update Client', 'add_task_btn': '➕ Add Task',
+        'save_filter': '💾 Save Filter', 'load_filters': '📂 Load Filters', 'export_btn': '📥 Export CSV',
+        'voice_search': 'Voice Search', 'ai_suggest': '🤖 AI Suggest', 'manual_sync': '🔄 Manual Sync',
+        'enable_notifications': '🔔 Enable Notifications', 'update_pass_btn': 'Update Password',
+        'register_btn': '➕ Register New User', 'clear_filters': '🗑️ Clear Filters',
+        // Filter options
         'all_governorates': 'All Governorates', 'all_agents': 'All Agents', 'all_priorities': 'All Priorities',
         'high_priority': 'High Priority (70%+)', 'medium_priority': 'Medium (40-69%)', 'low_priority': 'Low (-40%)',
-        'kpi_conversion': 'Conversion Rate', 'kpi_followup': 'Avg Follow-up', 'kpi_forecast': 'Next Week Forecast',
-        'kpi_top_agent': 'Top Agent', 'stat_total': 'Total Clients', 'stat_vip': 'VIP Members', 'stat_completed': 'Closed Deals',
-        'status_chart': '📈 Status Distribution', 'geo_chart': '📍 Geographical Distribution', 'ai_insight': 'AI Insight:',
-        'enable_notifications': '🔔 Enable Notifications', 'manual_sync': '🔄 Manual Sync', 'change_pass_label': 'Change Password:',
-        'update_pass_btn': 'Update Password', 'logged_in_as': 'Logged in as:', 'forecast_deals': 'Expected Deals',
-        'task_client_header': 'Client', 'task_type_header': 'Type', 'task_amount_header': 'Amount', 'task_text_header': 'Description',
-        'task_notes_header': 'Notes', 'task_date_header': 'Due Date', 'task_status_header': 'Status', 'task_action_header': 'Actions',
-        'recycle_name': 'Name', 'recycle_phone': 'Phone', 'recycle_status': 'Previous Status', 'recycle_restore': 'Restore',
-        'recycle_delete': 'Delete', 'users_table_user': 'User', 'users_table_pass': 'Pass', 'users_table_name': 'Name',
-        'users_table_role': 'Role', 'users_table_action': 'Action', 'th_name': 'Name ↕️', 'th_phone': 'Phone',
-        'th_gov': 'Governorate ↕️', 'th_priority': 'AI Priority', 'th_status': 'Status ↕️', 'th_actions': 'Actions'
+        'all_clients': 'All Clients', 'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date',
+        // KPI
+        'kpi_conversion': 'Conversion Rate', 'kpi_followup': 'Avg Follow-up', 
+        'kpi_forecast': 'Next Week Forecast', 'kpi_top_agent': 'Top Agent',
+        'stat_total': 'Total Clients', 'stat_vip': 'VIP Members', 'stat_completed': 'Closed Deals',
+        'status_chart': '📈 Status Distribution', 'geo_chart': '📍 Geographical Distribution',
+        'ai_insight': 'AI Insight:', 'forecast_deals': 'Expected Deals',
+        // Table headers
+        'th_name': 'Name ↕️', 'th_phone': 'Phone', 'th_gov': 'Governorate ↕️',
+        'th_priority': 'AI Priority', 'th_status': 'Status ↕️', 'th_actions': 'Actions',
+        'task_client_header': 'Client', 'task_type_header': 'Type', 'task_amount_header': 'Amount',
+        'task_text_header': 'Description', 'task_notes_header': 'Notes', 'task_date_header': 'Due Date',
+        'task_status_header': 'Status', 'task_action_header': 'Actions',
+        'recycle_name': 'Name', 'recycle_phone': 'Phone', 'recycle_status': 'Previous Status',
+        'recycle_restore': 'Restore', 'recycle_delete': 'Delete',
+        'users_table_user': 'User', 'users_table_pass': 'Pass', 'users_table_name': 'Name',
+        'users_table_role': 'Role', 'users_table_action': 'Action',
+        // Login
+        'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
+        'login_btn': '🔐 Access System', 'logged_in_as': 'Logged in as:', 'change_pass_label': 'Change Password:',
+        // Task status
+        'task_status_pending': 'Pending', 'task_status_completed': 'Completed', 'task_status_overdue': 'Overdue',
+        // Operation types
+        'op_quotation': '📄 Quotation Request', 'op_followup': '👀 Quotation Follow-up',
+        'op_supply': '🚚 Supply', 'op_bank': '🏦 Bank Transfer', 'op_cash': '💵 Cash'
     },
     ar: {
-        'm_crm': '👥 العملاء', 'm_tasks': '📅 المهام', 'm_dash': '📊 التحليلات', 'm_profile': '👤 الملف الشخصي',
-        'm_recycle': '♻️ سلة المحذوفات', 'm_admin': '👑 الأدمن', 'm_logout': '🚪 تسجيل خروج',
-        'h_crm': '👥 إدارة العملاء', 'h_dash': '📊 لوحة التحليلات', 'h_tasks': '📋 العمليات والمهام',
-        'recycleTitle': '♻️ سلة المحذوفات', 'adminTitle': '👑 لوحة تحكم الأدمن', 'usersTitle': '👥 إدارة المستخدمين',
-        'logsTitle': '📜 سجلات النشاطات', 'profileTitle': '👤 الملف الشخصي', 'formTitle': 'إضافة عميل جديد',
-        'taskFormTitle': 'إضافة مهمة جديدة', 'save_btn': '💾 حفظ العميل', 'update_btn': '🔄 تحديث العميل',
-        'add_task_btn': '➕ إضافة مهمة', 'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن',
-        'login_btn': '🔐 دخول النظام', 'voice_search': 'بحث صوتي', 'ai_suggest': '🤖 اقتراح AI',
-        'save_filter': '💾 حفظ الفلتر', 'load_filters': '📂 تحميل الفلاتر', 'advanced_search': 'بحث متقدم...',
+        // Sidebar
+        'm_crm': '👥 العملاء', 'm_tasks': '📅 المهام', 'm_dash': '📊 التحليلات',
+        'm_profile': '👤 الملف الشخصي', 'm_recycle': '♻️ سلة المحذوفات', 'm_admin': '👑 لوحة التحكم',
+        'm_logout': '🚪 تسجيل خروج',
+        // Headers
+        'h_crm': '👥 إدارة العملاء', 'h_dash': '📊 لوحة التحليلات',
+        'h_tasks': '📋 العمليات والمهام', 'recycleTitle': '♻️ سلة المحذوفات',
+        'adminTitle': '👑 لوحة تحكم الأدمن', 'usersTitle': '👥 إدارة المستخدمين',
+        'logsTitle': '📜 سجلات النشاطات', 'profileTitle': '👤 الملف الشخصي',
+        // Form Labels
+        'labelName': 'الاسم كاملاً *', 'labelPhone': 'رقم الهاتف', 'labelGov': 'المحافظة',
+        'labelStatus': 'الحالة', 'labelAgent': 'المندوب المسؤول', 'labelDate': 'التاريخ',
+        'labelNotes': 'ملاحظات', 'labelTaskClient': 'العميل', 'labelTaskType': 'نوع العملية',
+        'labelTaskAmount': 'المبلغ', 'labelTaskDate': 'تاريخ التسليم', 'labelTaskDesc': 'الوصف',
+        'labelTaskNotes': 'ملاحظات', 'labelTaskExtra': 'تفاصيل إضافية',
+        // Placeholders
+        'namePlaceholder': 'أدخل اسم العميل', 'phonePlaceholder': 'مثال: 01234567890',
+        'agentPlaceholder': 'اسم المندوب', 'notesPlaceholder': 'ملاحظات إضافية وتاريخ العميل...',
+        'taskSearchPlaceholder': '🔍 بحث في المهام...', 'advancedSearchPlaceholder': '🔍 بحث متقدم...',
+        'searchPlaceholder': '🔍 بحث بالاسم أو رقم الهاتف أو الحالة...', 'taskTextPlaceholder': 'وصف المهمة',
+        'taskNotesPlaceholder': 'ملاحظات إضافية...', 'taskExtraPlaceholder': 'متطلبات أو تفاصيل إضافية...',
+        'taskAmountPlaceholder': 'المبلغ (إن وجد)',
+        // Buttons
+        'save_btn': '💾 حفظ العميل', 'update_btn': '🔄 تحديث العميل', 'add_task_btn': '➕ إضافة مهمة',
+        'save_filter': '💾 حفظ الفلتر', 'load_filters': '📂 تحميل الفلاتر', 'export_btn': '📥 تصدير CSV',
+        'voice_search': 'بحث صوتي', 'ai_suggest': '🤖 اقتراح AI', 'manual_sync': '🔄 مزامنة يدوية',
+        'enable_notifications': '🔔 تفعيل الإشعارات', 'update_pass_btn': 'تحديث كلمة المرور',
+        'register_btn': '➕ تسجيل مستخدم جديد', 'clear_filters': '🗑️ مسح الفلاتر',
+        // Filter options
         'all_governorates': 'كل المحافظات', 'all_agents': 'كل المندوبين', 'all_priorities': 'كل الأولويات',
         'high_priority': 'أولوية عالية (70%+)', 'medium_priority': 'متوسطة (40-69%)', 'low_priority': 'منخفضة (-40%)',
-        'kpi_conversion': 'معدل التحويل', 'kpi_followup': 'متوسط المتابعة', 'kpi_forecast': 'توقعات الأسبوع',
-        'kpi_top_agent': 'أفضل مندوب', 'stat_total': 'إجمالي العملاء', 'stat_vip': 'عملاء VIP', 'stat_completed': 'الصفقات المغلقة',
-        'status_chart': '📈 توزيع الحالات', 'geo_chart': '📍 التوزيع الجغرافي', 'ai_insight': 'رؤية الذكاء الاصطناعي:',
-        'enable_notifications': '🔔 تفعيل الإشعارات', 'manual_sync': '🔄 مزامنة يدوية', 'change_pass_label': 'تغيير كلمة المرور:',
-        'update_pass_btn': 'تحديث كلمة المرور', 'logged_in_as': 'مسجل الدخول باسم:', 'forecast_deals': 'صفقة متوقعة',
-        'task_client_header': 'العميل', 'task_type_header': 'النوع', 'task_amount_header': 'المبلغ', 'task_text_header': 'الوصف',
-        'task_notes_header': 'ملاحظات', 'task_date_header': 'تاريخ التسليم', 'task_status_header': 'الحالة', 'task_action_header': 'إجراءات',
-        'recycle_name': 'الاسم', 'recycle_phone': 'الهاتف', 'recycle_status': 'الحالة السابقة', 'recycle_restore': 'استعادة',
-        'recycle_delete': 'حذف', 'users_table_user': 'المستخدم', 'users_table_pass': 'كلمة المرور', 'users_table_name': 'الاسم',
-        'users_table_role': 'الصلاحية', 'users_table_action': 'إجراء', 'th_name': 'الاسم ↕️', 'th_phone': 'الهاتف',
-        'th_gov': 'المحافظة ↕️', 'th_priority': 'أولوية AI', 'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات'
+        'all_clients': 'كل العملاء', 'all_task_statuses': 'كل الحالات', 'specific_date': 'تاريخ محدد',
+        // KPI
+        'kpi_conversion': 'معدل التحويل', 'kpi_followup': 'متوسط المتابعة',
+        'kpi_forecast': 'توقعات الأسبوع', 'kpi_top_agent': 'أفضل مندوب',
+        'stat_total': 'إجمالي العملاء', 'stat_vip': 'عملاء VIP', 'stat_completed': 'الصفقات المغلقة',
+        'status_chart': '📈 توزيع الحالات', 'geo_chart': '📍 التوزيع الجغرافي',
+        'ai_insight': 'رؤية الذكاء الاصطناعي:', 'forecast_deals': 'صفقة متوقعة',
+        // Table headers
+        'th_name': 'الاسم ↕️', 'th_phone': 'الهاتف', 'th_gov': 'المحافظة ↕️',
+        'th_priority': 'أولوية AI', 'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات',
+        'task_client_header': 'العميل', 'task_type_header': 'النوع', 'task_amount_header': 'المبلغ',
+        'task_text_header': 'الوصف', 'task_notes_header': 'ملاحظات', 'task_date_header': 'تاريخ التسليم',
+        'task_status_header': 'الحالة', 'task_action_header': 'إجراءات',
+        'recycle_name': 'الاسم', 'recycle_phone': 'الهاتف', 'recycle_status': 'الحالة السابقة',
+        'recycle_restore': 'استعادة', 'recycle_delete': 'حذف',
+        'users_table_user': 'المستخدم', 'users_table_pass': 'كلمة المرور', 'users_table_name': 'الاسم',
+        'users_table_role': 'الصلاحية', 'users_table_action': 'إجراء',
+        // Login
+        'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن',
+        'login_btn': '🔐 دخول النظام', 'logged_in_as': 'مسجل الدخول باسم:', 'change_pass_label': 'تغيير كلمة المرور:',
+        // Task status
+        'task_status_pending': 'قيد التنفيذ', 'task_status_completed': 'مكتملة', 'task_status_overdue': 'متأخرة',
+        // Operation types
+        'op_quotation': '📄 طلب عرض سعر', 'op_followup': '👀 متابعة عرض سعر',
+        'op_supply': '🚚 توريد', 'op_bank': '🏦 تحويل بنكي', 'op_cash': '💵 كاش'
     }
 };
 
@@ -1108,7 +1177,7 @@ app.playSound = function(id) {
     } catch(e) {}
 };
 
-// ==================== LANGUAGE ====================
+// ==================== FULL LANGUAGE UPDATE ====================
 app.toggleLanguage = function() {
     currentLang = currentLang === 'en' ? 'ar' : 'en';
     localStorage.setItem('appLang', currentLang);
@@ -1120,17 +1189,120 @@ app.toggleLanguage = function() {
 
 app.updateUILanguage = function() {
     const t = translations[currentLang];
-    const elements = ['m_crm', 'm_tasks', 'm_dash', 'm_profile', 'm_recycle', 'm_admin', 'm_logout', 'h_crm', 'h_dash', 'h_tasks', 'recycleTitle', 'adminTitle', 'usersTitle', 'logsTitle', 'profileTitle', 'loginTitle', 'loginSubtitle', 'loginBtn', 'statTotalLabel', 'statVipLabel', 'statCompLabel', 'statusChartLabel', 'geoChartLabel', 'taskClientHeader', 'taskTypeHeader', 'taskAmountHeader', 'taskTextHeader', 'taskNotesHeader', 'taskDateHeader', 'taskStatusHeader', 'taskActionHeader', 'recycleNameHeader', 'recyclePhoneHeader', 'recycleStatusHeader', 'recycleRestoreHeader', 'recycleDeleteHeader', 'registerBtn', 'updatePassBtn', 'changePassLabel', 'loggedInAs', 'kpiConversion', 'kpiFollowUp', 'kpiForecast', 'kpiTopAgent', 'aiInsightLabel', 'enableNotifBtn', 'manualSyncBtn', 'usersTableUser', 'usersTablePass', 'usersTableName', 'usersTableRole', 'usersTableAction', 'thName', 'thPhone', 'thGov', 'thPriority', 'thStatus', 'thActions'];
+    
+    // Update all elements with IDs
+    const elements = [
+        'm_crm', 'm_tasks', 'm_dash', 'm_profile', 'm_recycle', 'm_admin', 'm_logout',
+        'h_crm', 'h_dash', 'h_tasks', 'recycleTitle', 'adminTitle', 'usersTitle', 'logsTitle', 'profileTitle',
+        'loginTitle', 'loginSubtitle', 'loginBtn', 'statTotalLabel', 'statVipLabel', 'statCompLabel',
+        'statusChartLabel', 'geoChartLabel', 'taskClientHeader', 'taskTypeHeader', 'taskAmountHeader',
+        'taskTextHeader', 'taskNotesHeader', 'taskDateHeader', 'taskStatusHeader', 'taskActionHeader',
+        'recycleNameHeader', 'recyclePhoneHeader', 'recycleStatusHeader', 'recycleRestoreHeader', 'recycleDeleteHeader',
+        'registerBtn', 'updatePassBtn', 'changePassLabel', 'loggedInAs', 'kpiConversion', 'kpiFollowUp',
+        'kpiForecast', 'kpiTopAgent', 'aiInsightLabel', 'enableNotifBtn', 'manualSyncBtn', 'usersTableUser',
+        'usersTablePass', 'usersTableName', 'usersTableRole', 'usersTableAction', 'thName', 'thPhone',
+        'thGov', 'thPriority', 'thStatus', 'thActions', 'formTitle', 'taskFormTitle'
+    ];
     
     elements.forEach(id => {
         const el = document.getElementById(id);
         if (el && t[id]) el.innerText = t[id];
     });
     
-    const btnSave = document.getElementById('btnSave');
-    if(btnSave && editIdx === -1) btnSave.innerHTML = t.save_btn;
-    else if(btnSave && editIdx > -1) btnSave.innerHTML = t.update_btn;
+    // Update labels
+    const labels = ['labelName', 'labelPhone', 'labelGov', 'labelStatus', 'labelAgent', 'labelDate', 'labelNotes',
+                    'labelTaskClient', 'labelTaskType', 'labelTaskAmount', 'labelTaskDate', 'labelTaskDesc',
+                    'labelTaskNotes', 'labelTaskExtra'];
+    labels.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && t[id]) el.innerText = t[id];
+    });
     
+    // Update placeholders
+    const nameInput = document.getElementById('name');
+    if(nameInput && t.namePlaceholder) nameInput.placeholder = t.namePlaceholder;
+    
+    const phoneInput = document.getElementById('phone');
+    if(phoneInput && t.phonePlaceholder) phoneInput.placeholder = t.phonePlaceholder;
+    
+    const agentInput = document.getElementById('agent');
+    if(agentInput && t.agentPlaceholder) agentInput.placeholder = t.agentPlaceholder;
+    
+    const notesArea = document.getElementById('notes');
+    if(notesArea && t.notesPlaceholder) notesArea.placeholder = t.notesPlaceholder;
+    
+    const searchInput = document.getElementById('search');
+    if(searchInput && t.searchPlaceholder) searchInput.placeholder = t.searchPlaceholder;
+    
+    const advancedSearch = document.getElementById('advancedSearch');
+    if(advancedSearch && t.advancedSearchPlaceholder) advancedSearch.placeholder = t.advancedSearchPlaceholder;
+    
+    const taskSearch = document.getElementById('taskSearch');
+    if(taskSearch && t.taskSearchPlaceholder) taskSearch.placeholder = t.taskSearchPlaceholder;
+    
+    const taskText = document.getElementById('taskText');
+    if(taskText && t.taskTextPlaceholder) taskText.placeholder = t.taskTextPlaceholder;
+    
+    const taskNotes = document.getElementById('taskNotes');
+    if(taskNotes && t.taskNotesPlaceholder) taskNotes.placeholder = t.taskNotesPlaceholder;
+    
+    const extraInfo = document.getElementById('extraInfo');
+    if(extraInfo && t.taskExtraPlaceholder) extraInfo.placeholder = t.taskExtraPlaceholder;
+    
+    const taskAmount = document.getElementById('taskAmount');
+    if(taskAmount && t.taskAmountPlaceholder) taskAmount.placeholder = t.taskAmountPlaceholder;
+    
+    const newU = document.getElementById('newU');
+    if(newU && t.username_placeholder) newU.placeholder = t.username_placeholder;
+    
+    const newP = document.getElementById('newP');
+    if(newP && t.password_placeholder) newP.placeholder = t.password_placeholder;
+    
+    const newD = document.getElementById('newD');
+    if(newD && t.fullname_placeholder) newD.placeholder = t.fullname_placeholder;
+    
+    const changePass = document.getElementById('changePassInput');
+    if(changePass && t.change_pass_label) changePass.placeholder = t.change_pass_label;
+    
+    // Update filter selects
+    const filterGov = document.getElementById('filterGov');
+    if(filterGov && filterGov.options.length > 0 && t.all_governorates) filterGov.options[0].text = t.all_governorates;
+    
+    const filterAgent = document.getElementById('filterAgent');
+    if(filterAgent && filterAgent.options.length > 0 && t.all_agents) filterAgent.options[0].text = t.all_agents;
+    
+    const filterPriority = document.getElementById('filterPriority');
+    if(filterPriority && filterPriority.options.length > 0) {
+        if(t.all_priorities) filterPriority.options[0].text = t.all_priorities;
+        if(t.high_priority) filterPriority.options[1].text = t.high_priority;
+        if(t.medium_priority) filterPriority.options[2].text = t.medium_priority;
+        if(t.low_priority) filterPriority.options[3].text = t.low_priority;
+    }
+    
+    const filterStatus = document.getElementById('filterStatus');
+    if(filterStatus && filterStatus.options.length > 0 && t.filter_all) filterStatus.options[0].text = t.filter_all;
+    
+    const taskFilterClient = document.getElementById('taskFilterClient');
+    if(taskFilterClient && taskFilterClient.options.length > 0 && t.all_clients) taskFilterClient.options[0].text = t.all_clients;
+    
+    const taskFilterStatus = document.getElementById('taskFilterStatus');
+    if(taskFilterStatus && taskFilterStatus.options.length > 0 && t.all_task_statuses) taskFilterStatus.options[0].text = t.all_task_statuses;
+    
+    const taskFilterDate = document.getElementById('taskFilterDate');
+    if(taskFilterDate && t.specific_date) taskFilterDate.placeholder = t.specific_date;
+    
+    // Update button texts
+    const btnSave = document.getElementById('btnSave');
+    if(btnSave && editIdx === -1 && t.save_btn) btnSave.innerHTML = t.save_btn;
+    else if(btnSave && editIdx > -1 && t.update_btn) btnSave.innerHTML = t.update_btn;
+    
+    const btnSaveTask = document.getElementById('btnSaveTask');
+    if(btnSaveTask && t.add_task_btn) btnSaveTask.innerHTML = t.add_task_btn;
+    
+    const voiceBtn = document.getElementById('voiceBtn');
+    if(voiceBtn && t.voice_search) voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + t.voice_search;
+    
+    // Update RTL/LTR
     const htmlTag = document.getElementById('htmlTag');
     if (currentLang === 'ar') {
         htmlTag.setAttribute('dir', 'rtl');
@@ -1166,6 +1338,12 @@ async function syncFromFirebase() {
             tasks = local.length ? local : demoData.tasks;
         }
         
+        const deletedSnap = await database.ref('deletedClients').once('value');
+        const fbDeleted = [];
+        deletedSnap.forEach(child => fbDeleted.push({ id: child.key, ...child.val() }));
+        if (fbDeleted.length > 0) deletedClients = fbDeleted;
+        else deletedClients = await localDB.deletedClients.toArray() || [];
+        
         const usersSnap = await database.ref('authSystem/users').once('value');
         const fbUsers = [];
         usersSnap.forEach(child => fbUsers.push(child.val()));
@@ -1179,10 +1357,13 @@ async function syncFromFirebase() {
         await localDB.clients.bulkAdd(clients);
         await localDB.tasks.clear();
         await localDB.tasks.bulkAdd(tasks);
+        await localDB.deletedClients.clear();
+        if(deletedClients.length) await localDB.deletedClients.bulkAdd(deletedClients);
     } catch(e) {
         console.error("Sync error:", e);
         clients = await localDB.clients.toArray() || demoData.clients;
         tasks = await localDB.tasks.toArray() || demoData.tasks;
+        deletedClients = await localDB.deletedClients.toArray() || [];
     }
 }
 
@@ -1233,18 +1414,18 @@ function updateSyncStatusUI() {
     if (!indicator) return;
     if (isSyncing) {
         indicator.className = 'sync-status syncing';
-        if(textSpan) textSpan.innerText = 'Syncing...';
+        if(textSpan) textSpan.innerText = 'جاري المزامنة...';
     } else if (isOnline) {
         indicator.className = 'sync-status online';
-        if(textSpan) textSpan.innerText = 'Online';
+        if(textSpan) textSpan.innerText = 'متصل';
     } else {
         indicator.className = 'sync-status offline';
-        if(textSpan) textSpan.innerText = 'Offline';
+        if(textSpan) textSpan.innerText = 'غير متصل';
     }
 }
 
 window.addEventListener('online', async () => { isOnline = true; updateSyncStatusUI(); await syncFromFirebase(); app.renderCRM(); app.renderTasks(); });
-window.addEventListener('offline', () => { isOnline = false; updateSyncStatusUI(); app.showToast('📡 Offline mode', 'warning'); });
+window.addEventListener('offline', () => { isOnline = false; updateSyncStatusUI(); app.showToast('📡 وضع عدم الاتصال', 'warning'); });
 
 // ==================== AI FUNCTIONS ====================
 app.calculateWinProbability = function(client) {
@@ -1266,7 +1447,7 @@ app.calculateWinProbability = function(client) {
 
 app.aiSuggestStatus = function() {
     const name = document.getElementById('name').value;
-    if (!name) { app.showToast('⚠️ Enter client name first', 'warning'); return; }
+    if (!name) { app.showToast('⚠️ أدخل اسم العميل أولاً', 'warning'); return; }
     const notes = document.getElementById('notes').value;
     let score = 30;
     if (notes) {
@@ -1275,7 +1456,7 @@ app.aiSuggestStatus = function() {
     }
     const suggested = score >= 60 ? 'VIP' : (score >= 40 ? 'In Progress' : 'Interested');
     document.getElementById('status').value = suggested;
-    app.showToast(`🤖 AI suggests: ${suggested}`, 'info');
+    app.showToast(`🤖 AI يقترح: ${suggested}`, 'info');
 };
 
 app.analyzeSentiment = function(text) {
@@ -1285,8 +1466,8 @@ app.analyzeSentiment = function(text) {
     const negative = ['bad', 'no', 'not interested', 'refuse', 'لا', 'رفض', 'سيء'];
     const pos = positive.filter(w => text.toLowerCase().includes(w)).length;
     const neg = negative.filter(w => text.toLowerCase().includes(w)).length;
-    const sentiment = pos > neg ? '😊 Positive' : (neg > pos ? '😞 Negative' : '😐 Neutral');
-    resultDiv.innerHTML = `🧠 Sentiment: ${sentiment}`;
+    const sentiment = pos > neg ? '😊 إيجابي' : (neg > pos ? '😞 سلبي' : '😐 محايد');
+    resultDiv.innerHTML = `🧠 تحليل المشاعر: ${sentiment}`;
     resultDiv.style.display = 'block';
 };
 
@@ -1295,7 +1476,7 @@ app.updateAIInsights = function() {
     if (!insightSpan) return;
     const highPotential = clients.filter(c => app.calculateWinProbability(c) >= 70);
     const pending = tasks.filter(t => !t.completed);
-    insightSpan.innerHTML = `🎯 ${highPotential.length} high-potential clients | ⚠️ ${pending.length} pending tasks`;
+    insightSpan.innerHTML = `🎯 ${highPotential.length} عميل عالي الاحتمالية | ⚠️ ${pending.length} مهمة غير مكتملة`;
 };
 
 app.updateAdvancedKPIs = function() {
@@ -1328,12 +1509,12 @@ app.checkSmartNotifications = function() {
     clients.forEach(client => {
         const prediction = app.predictClientBehavior(client);
         if (prediction.priority === 'high' && client.status !== 'Completed') {
-            newNotifications.push(`🎯 High priority client: ${client.name}`);
+            newNotifications.push(`🎯 عميل ذو أولوية عالية: ${client.name}`);
         }
     });
     tasks.forEach(task => {
         if (task.date && new Date(task.date) < new Date() && !task.completed) {
-            newNotifications.push(`⏰ Overdue task: ${task.text} - ${task.client}`);
+            newNotifications.push(`⏰ مهمة متأخرة: ${task.text} - ${task.client}`);
         }
     });
     if (newNotifications.length > 0 && notifications.length !== newNotifications.length) {
@@ -1344,42 +1525,42 @@ app.checkSmartNotifications = function() {
             badge.style.display = notifications.length > 0 ? 'inline-block' : 'none';
         }
         if (Notification.permission === 'granted') {
-            new Notification(`📢 ${newNotifications.length} new notification(s)`, { body: newNotifications[0] });
+            new Notification(`📢 ${newNotifications.length} إشعار جديد`, { body: newNotifications[0] });
         }
     }
 };
 
 app.predictClientBehavior = function(client) {
     const prob = app.calculateWinProbability(client);
-    if (prob >= 70) return { priority: 'high', text: 'High - Follow up immediately', daysToFollow: 1 };
-    if (prob >= 40) return { priority: 'medium', text: 'Medium - Weekly follow-up', daysToFollow: 7 };
-    return { priority: 'low', text: 'Low - Monthly follow-up', daysToFollow: 30 };
+    if (prob >= 70) return { priority: 'high', text: 'عالية - متابعة فورية', daysToFollow: 1 };
+    if (prob >= 40) return { priority: 'medium', text: 'متوسطة - متابعة أسبوعية', daysToFollow: 7 };
+    return { priority: 'low', text: 'منخفضة - متابعة شهرية', daysToFollow: 30 };
 };
 
 app.showNotificationsPanel = function() {
     if (notifications.length === 0) {
-        app.showToast('📭 No new notifications', 'info');
+        app.showToast('📭 لا توجد إشعارات جديدة', 'info');
         return;
     }
     const panel = document.createElement('div');
     panel.style.cssText = 'position:fixed; top:80px; right:20px; width:350px; background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:30002; padding:15px; max-height:400px; overflow-y:auto;';
-    panel.innerHTML = '<h4 style="margin:0 0 10px 0; color:var(--primary)">🔔 Notifications</h4><hr>';
+    panel.innerHTML = '<h4 style="margin:0 0 10px 0; color:var(--primary)">🔔 الإشعارات</h4><hr>';
     notifications.forEach(n => { panel.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">${n}</div>`; });
-    panel.innerHTML += '<button onclick="this.remove()" style="margin-top:10px; width:100%; padding:8px; background:var(--info); color:white; border:none; border-radius:10px;">Close</button>';
+    panel.innerHTML += '<button onclick="this.remove()" style="margin-top:10px; width:100%; padding:8px; background:var(--info); color:white; border:none; border-radius:10px;">إغلاق</button>';
     document.body.appendChild(panel);
 };
 
 app.enableDesktopNotifications = function() {
-    if (Notification.permission === 'granted') app.showToast('✅ Notifications enabled', 'success');
-    else if (Notification.permission !== 'denied') Notification.requestPermission().then(perm => { if (perm === 'granted') app.showToast('🔔 Notifications enabled', 'success'); });
-    else app.showToast('❌ Cannot enable notifications', 'error');
+    if (Notification.permission === 'granted') app.showToast('✅ الإشعارات مفعلة', 'success');
+    else if (Notification.permission !== 'denied') Notification.requestPermission().then(perm => { if (perm === 'granted') app.showToast('🔔 تم تفعيل الإشعارات', 'success'); });
+    else app.showToast('❌ لا يمكن تفعيل الإشعارات', 'error');
 };
 
 // ==================== CRM FUNCTIONS ====================
 app.renderCRM = function() {
     const body = document.getElementById('tableBody');
     if (!body) return;
-    if (!clients.length) { body.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 No clients found</td></tr>'; return; }
+    if (!clients.length) { body.innerHTML = '<tr><td colspan="6" class="loading-indicator">📭 لا يوجد عملاء</b></td>'; return; }
     
     const search = document.getElementById('search')?.value.toLowerCase() || '';
     const advanced = document.getElementById('advancedSearch')?.value.toLowerCase() || '';
@@ -1425,7 +1606,7 @@ app.renderCRM = function() {
 
 app.saveClient = function() {
     const name = document.getElementById('name').value;
-    if (!name) { app.showToast('⚠️ Name is required', 'warning'); return; }
+    if (!name) { app.showToast('⚠️ الاسم مطلوب', 'warning'); return; }
     const data = {
         name, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value,
         status: document.getElementById('status').value, notes: document.getElementById('notes').value,
@@ -1435,10 +1616,10 @@ app.saveClient = function() {
     if (editIdx > -1 && clients[editIdx]) {
         clients[editIdx] = data;
         editIdx = -1;
-        app.showToast('✅ Client updated', 'success');
+        app.showToast('✅ تم تحديث العميل', 'success');
     } else {
         clients.push(data);
-        app.showToast('✅ Client added', 'success');
+        app.showToast('✅ تم إضافة العميل', 'success');
     }
     app.saveToLocalDB('clients', clients);
     app.clearForm();
@@ -1460,19 +1641,19 @@ app.editClient = function(i) {
     document.getElementById('agent').value = c.agent || '';
     document.getElementById('date').value = c.date || '';
     document.getElementById('btnSave').innerHTML = translations[currentLang].update_btn;
-    app.showToast('✏️ Editing client, click Save to update', 'info');
+    app.showToast('✏️ جاري التعديل، اضغط حفظ للتحديث', 'info');
     window.scrollTo(0, 0);
 };
 
 app.deleteClient = function(i) {
-    if (confirm('Move to recycle bin?')) {
+    if (confirm('نقل إلى سلة المحذوفات؟')) {
         deletedClients.push(clients[i]);
         clients.splice(i, 1);
         app.saveToLocalDB('clients', clients);
         app.saveToLocalDB('deletedClients', deletedClients);
         app.renderCRM();
         app.renderRecycle();
-        app.showToast('✅ Moved to recycle bin', 'success');
+        app.showToast('✅ تم النقل إلى سلة المحذوفات', 'success');
     }
 };
 
@@ -1510,42 +1691,44 @@ app.sort = function(col) {
 app.renderTasks = function() {
     const body = document.getElementById('taskBody');
     if (!body) return;
-    if (!tasks.length) { body.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 No tasks found</b></td>'; return; }
+    if (!tasks.length) { body.innerHTML = '<tr><td colspan="8" class="loading-indicator">📭 لا توجد مهام</b></td>'; return; }
     
     const search = document.getElementById('taskSearch')?.value.toLowerCase() || '';
     const filterClient = document.getElementById('taskFilterClient')?.value || '';
     const filterStatus = document.getElementById('taskFilterStatus')?.value || 'all';
     const filterType = document.getElementById('taskFilterOperationType')?.value || '';
     const filterDate = document.getElementById('taskFilterDate')?.value || '';
+    const t = translations[currentLang];
     
-    const filtered = tasks.filter(t => {
-        const matchSearch = !search || (t.client?.toLowerCase().includes(search) || t.text?.toLowerCase().includes(search));
-        const matchClient = !filterClient || t.client === filterClient;
-        const matchType = !filterType || t.operationType === filterType;
-        const matchDate = !filterDate || t.date === filterDate;
-        const isOverdue = t.date && new Date(t.date) < new Date() && !t.completed;
+    const filtered = tasks.filter(task => {
+        const matchSearch = !search || (task.client?.toLowerCase().includes(search) || task.text?.toLowerCase().includes(search));
+        const matchClient = !filterClient || task.client === filterClient;
+        const matchType = !filterType || task.operationType === filterType;
+        const matchDate = !filterDate || task.date === filterDate;
+        const isOverdue = task.date && new Date(task.date) < new Date() && !task.completed;
         let matchStatus = true;
-        if (filterStatus === 'pending') matchStatus = !t.completed;
-        else if (filterStatus === 'completed') matchStatus = t.completed === true;
+        if (filterStatus === 'pending') matchStatus = !task.completed;
+        else if (filterStatus === 'completed') matchStatus = task.completed === true;
         else if (filterStatus === 'overdue') matchStatus = isOverdue;
         return matchSearch && matchClient && matchType && matchDate && matchStatus;
     });
     
     body.innerHTML = '';
-    filtered.forEach(t => {
-        const originalIdx = tasks.indexOf(t);
-        const isOverdue = t.date && new Date(t.date) < new Date() && !t.completed;
-        const statusText = t.completed ? '✅ Completed' : (isOverdue ? '⚠️ Overdue' : '🔄 Pending');
-        const statusClass = t.completed ? 'task-status-completed' : (isOverdue ? 'task-status-overdue' : 'task-status-pending');
+    filtered.forEach(task => {
+        const originalIdx = tasks.indexOf(task);
+        const isOverdue = task.date && new Date(task.date) < new Date() && !task.completed;
+        const statusText = task.completed ? (t.task_status_completed || 'مكتملة') : (isOverdue ? (t.task_status_overdue || 'متأخرة') : (t.task_status_pending || 'قيد التنفيذ'));
+        const statusClass = task.completed ? 'task-status-completed' : (isOverdue ? 'task-status-overdue' : 'task-status-pending');
         const typeIcons = { quotation: '📄', followup: '👀', supply: '🚚', bank: '🏦', cash: '💵' };
+        const typeText = { quotation: t.op_quotation || 'طلب عرض سعر', followup: t.op_followup || 'متابعة عرض سعر', supply: t.op_supply || 'توريد', bank: t.op_bank || 'بنك', cash: t.op_cash || 'كاش' };
         body.innerHTML += `<tr>
-            <td><strong>${t.client || ''}</strong></td>
-            <td>${typeIcons[t.operationType] || '📄'} ${t.operationType || 'quotation'}</td>
-            <td>${t.amount ? t.amount + ' EGP' : '—'}</td>
-            <td>${t.text || ''}</td>
-            <td><textarea style="width:100%;font-size:11px;padding:5px;" onchange="app.updateTaskNotes(${originalIdx}, this.value)">${t.taskNotes || ''}</textarea></td>
-            <td>${t.date || ''}</td>
-            <td><span class="task-status-badge ${statusClass}">${statusText}</span>${!t.completed ? '<br><button class="btn-info" style="margin-top:5px;font-size:10px;padding:4px 8px;" onclick="app.completeTask('+originalIdx+')">✓ Complete</button>' : ''}</td>
+            <td><strong>${task.client || ''}</strong></td>
+            <td>${typeIcons[task.operationType] || '📄'} ${typeText[task.operationType] || task.operationType}</td>
+            <td>${task.amount ? task.amount + (currentLang === 'ar' ? ' ج.م' : ' EGP') : '—'}</td>
+            <td>${task.text || ''}</td>
+            <td><textarea style="width:100%;font-size:11px;padding:5px;" onchange="app.updateTaskNotes(${originalIdx}, this.value)">${task.taskNotes || ''}</textarea></td>
+            <td>${task.date || ''}</td>
+            <td><span class="task-status-badge ${statusClass}">${statusText}</span>${!task.completed ? '<br><button class="btn-info" style="margin-top:5px;font-size:10px;padding:4px 8px;" onclick="app.completeTask('+originalIdx+')">✓ إكمال</button>' : ''}</td>
             <td><div class="action-btns"><button class="action-btn btn-edit" onclick="app.editTask(${originalIdx})">✏️</button><button class="action-btn btn-delete" onclick="app.deleteTask(${originalIdx})">✕</button></div></td>
         </tr>`;
     });
@@ -1554,8 +1737,8 @@ app.renderTasks = function() {
 app.saveTask = function() {
     const client = document.getElementById('taskClientSelect').value;
     const text = document.getElementById('taskText').value;
-    if (!client) { app.showToast('⚠️ Select a client', 'warning'); return; }
-    if (!text) { app.showToast('⚠️ Enter task description', 'warning'); return; }
+    if (!client) { app.showToast('⚠️ اختر عميلاً', 'warning'); return; }
+    if (!text) { app.showToast('⚠️ أدخل وصف المهمة', 'warning'); return; }
     
     const task = {
         client, text, operationType: document.getElementById('taskOperationType').value,
@@ -1568,10 +1751,10 @@ app.saveTask = function() {
         task.completed = tasks[editTaskIdx].completed;
         tasks[editTaskIdx] = task;
         editTaskIdx = -1;
-        app.showToast('✅ Task updated', 'success');
+        app.showToast('✅ تم تحديث المهمة', 'success');
     } else {
         tasks.push(task);
-        app.showToast('✅ Task added', 'success');
+        app.showToast('✅ تم إضافة المهمة', 'success');
     }
     app.saveToLocalDB('tasks', tasks);
     document.getElementById('taskText').value = '';
@@ -1594,16 +1777,16 @@ app.editTask = function(i) {
     document.getElementById('taskNotes').value = t.taskNotes || '';
     document.getElementById('extraInfo').value = t.extra || '';
     document.getElementById('taskDate').value = t.date || '';
-    app.showToast('✏️ Editing task, click Save to update', 'info');
+    app.showToast('✏️ جاري التعديل، اضغط حفظ للتحديث', 'info');
     window.scrollTo(0, 0);
 };
 
 app.deleteTask = function(i) {
-    if (confirm('Delete this task?')) {
+    if (confirm('حذف هذه المهمة؟')) {
         tasks.splice(i, 1);
         app.saveToLocalDB('tasks', tasks);
         app.renderTasks();
-        app.showToast('✅ Task deleted', 'success');
+        app.showToast('✅ تم حذف المهمة', 'success');
     }
 };
 
@@ -1613,7 +1796,7 @@ app.completeTask = function(i) {
         tasks[i].completedAt = new Date().toISOString();
         app.saveToLocalDB('tasks', tasks);
         app.renderTasks();
-        app.showToast('✅ Task completed!', 'success');
+        app.showToast('✅ تم إكمال المهمة!', 'success');
     }
 };
 
@@ -1629,14 +1812,14 @@ app.clearTaskFilters = function() {
     const status = document.getElementById('taskFilterStatus');
     if (status) status.value = 'all';
     app.renderTasks();
-    app.showToast('✅ Filters cleared', 'success');
+    app.showToast('✅ تم مسح الفلاتر', 'success');
 };
 
 // ==================== RECYCLE FUNCTIONS ====================
 app.renderRecycle = function() {
     const body = document.getElementById('recycleBody');
     if (!body) return;
-    if (!deletedClients.length) { body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 Recycle bin empty</b></td>'; return; }
+    if (!deletedClients.length) { body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></td>'; return; }
     body.innerHTML = '';
     deletedClients.forEach((c, i) => {
         body.innerHTML += `<tr>
@@ -1650,33 +1833,33 @@ app.renderRecycle = function() {
 };
 
 app.restoreClient = function(i) {
-    if (confirm('Restore this client?')) {
+    if (confirm('استعادة هذا العميل؟')) {
         clients.push(deletedClients[i]);
         deletedClients.splice(i, 1);
         app.saveToLocalDB('clients', clients);
         app.saveToLocalDB('deletedClients', deletedClients);
         app.renderCRM();
         app.renderRecycle();
-        app.showToast('✅ Client restored', 'success');
+        app.showToast('✅ تم استعادة العميل', 'success');
     }
 };
 
 app.permanentDelete = function(i) {
-    if (confirm('⚠️ Permanently delete? This cannot be undone!')) {
+    if (confirm('⚠️ حذف نهائي؟ لا يمكن التراجع!')) {
         deletedClients.splice(i, 1);
         app.saveToLocalDB('deletedClients', deletedClients);
         app.renderRecycle();
-        app.showToast('🗑️ Client permanently deleted', 'error');
+        app.showToast('🗑️ تم الحذف النهائي', 'error');
     }
 };
 
 app.refreshRecycle = function() { app.renderRecycle(); };
 app.clearAllRecycle = function() {
-    if (confirm('⚠️ Empty entire recycle bin?')) {
+    if (confirm('⚠️ إفراغ سلة المحذوفات بالكامل؟')) {
         deletedClients = [];
         app.saveToLocalDB('deletedClients', deletedClients);
         app.renderRecycle();
-        app.showToast('✅ Recycle bin emptied', 'success');
+        app.showToast('✅ تم إفراغ السلة', 'success');
     }
 };
 
@@ -1724,28 +1907,28 @@ app.loginSuccess = function(role, name, idx) {
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
-    app.addLog("Logged in");
+    app.addLog("تسجيل دخول");
     app.playSound('soundSuccess');
     setTimeout(() => location.reload(), 300);
 };
 
-app.logout = function() { if (confirm('Logout?')) { sessionStorage.clear(); location.reload(); } };
+app.logout = function() { if (confirm('تسجيل الخروج؟')) { sessionStorage.clear(); location.reload(); } };
 
 app.addUser = function() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
-    if (!u || !p || !d) { app.showToast('⚠️ All fields required', 'warning'); return; }
+    if (!u || !p || !d) { app.showToast('⚠️ جميع الحقول مطلوبة', 'warning'); return; }
     authSystem.users.push({ u, p, displayName: d, role: r });
     app.saveToLocalDB('users', authSystem.users);
     app.renderUsers();
-    app.showToast('✅ User created', 'success');
+    app.showToast('✅ تم إنشاء المستخدم', 'success');
 };
 
-app.delUser = function(i) { if (confirm('Delete user?')) { authSystem.users.splice(i,1); app.saveToLocalDB('users', authSystem.users); app.renderUsers(); } };
+app.delUser = function(i) { if (confirm('حذف المستخدم؟')) { authSystem.users.splice(i,1); app.saveToLocalDB('users', authSystem.users); app.renderUsers(); } };
 
 app.renderUsers = function() {
     const body = document.getElementById('usersBody');
     if (!body) return;
-    if (sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin") { body.innerHTML = '<tr><td colspan="5">Restricted</b></td>'; return; }
+    if (sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin") { body.innerHTML = '<tr><td colspan="5">غير مصرح</b></td>'; return; }
     body.innerHTML = '';
     authSystem.users.forEach((u, i) => {
         body.innerHTML += `<tr>
@@ -1761,9 +1944,9 @@ app.renderUsers = function() {
 app.updatePassword = function() {
     const np = document.getElementById('changePassInput').value;
     const idx = sessionStorage.getItem('userIdx');
-    if (!np) { app.showToast('⚠️ Enter new password', 'warning'); return; }
-    if (idx == -1) { app.showToast('⚠️ Master password cannot be changed here', 'warning'); return; }
-    if (authSystem.users[idx]) { authSystem.users[idx].p = np; app.saveToLocalDB('users', authSystem.users); app.showToast('✅ Password updated', 'success'); document.getElementById('changePassInput').value = ''; }
+    if (!np) { app.showToast('⚠️ أدخل كلمة المرور الجديدة', 'warning'); return; }
+    if (idx == -1) { app.showToast('⚠️ لا يمكن تغيير كلمة مرور الماستر هنا', 'warning'); return; }
+    if (authSystem.users[idx]) { authSystem.users[idx].p = np; app.saveToLocalDB('users', authSystem.users); app.showToast('✅ تم تحديث كلمة المرور', 'success'); document.getElementById('changePassInput').value = ''; }
 };
 
 app.addLog = function(msg) {
@@ -1788,7 +1971,7 @@ app.show = function(id, btn) {
 app.fillClients = function() {
     const sel = document.getElementById('taskClientSelect');
     if (!sel) return;
-    sel.innerHTML = '<option value="">Select Client</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    sel.innerHTML = '<option value="">اختر عميلاً</option>' + clients.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
 };
 
 app.autoFillTask = function() {
@@ -1800,30 +1983,30 @@ app.autoFillTask = function() {
 app.updateAgentList = function() {
     const agents = [...new Set(clients.map(c => c.agent).filter(a => a))];
     const sel = document.getElementById('filterAgent');
-    if (sel) sel.innerHTML = '<option value="">All Agents</option>' + agents.map(a => `<option value="${a}">${a}</option>`).join('');
+    if (sel) sel.innerHTML = '<option value="">كل المندوبين</option>' + agents.map(a => `<option value="${a}">${a}</option>`).join('');
 };
 
 app.updateTaskClientFilter = function() {
     const clientsList = [...new Set(clients.map(c => c.name).filter(n => n))];
     const sel = document.getElementById('taskFilterClient');
-    if (sel) sel.innerHTML = '<option value="">All Clients</option>' + clientsList.map(c => `<option value="${c}">${c}</option>`).join('');
+    if (sel) sel.innerHTML = '<option value="">كل العملاء</option>' + clientsList.map(c => `<option value="${c}">${c}</option>`).join('');
 };
 
 app.saveCurrentFilter = function() {
-    const name = prompt('Filter name:');
+    const name = prompt('اسم الفلتر:');
     if (!name) return;
     savedFilters.push({ name, search: document.getElementById('advancedSearch').value, gov: document.getElementById('filterGov').value, agent: document.getElementById('filterAgent').value, priority: document.getElementById('filterPriority').value, status: document.getElementById('filterStatus').value });
     localStorage.setItem('savedFilters', JSON.stringify(savedFilters));
-    app.showToast('✅ Filter saved', 'success');
+    app.showToast('✅ تم حفظ الفلتر', 'success');
 };
 
 app.loadSavedFilters = function() {
-    if (!savedFilters.length) { app.showToast('📭 No saved filters', 'info'); return; }
+    if (!savedFilters.length) { app.showToast('📭 لا توجد فلاتر محفوظة', 'info'); return; }
     const menu = document.createElement('div');
     menu.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border-radius:16px;padding:20px;min-width:300px;z-index:30003;box-shadow:0 10px 30px rgba(0,0,0,0.3);';
-    menu.innerHTML = '<h3>📂 Saved Filters</h3><hr>';
+    menu.innerHTML = '<h3>📂 الفلاتر المحفوظة</h3><hr>';
     savedFilters.forEach((f, idx) => { menu.innerHTML += `<div style="padding:8px;cursor:pointer;border-bottom:1px solid #eee;" onclick="app.applyFilter(${idx}); this.parentElement.remove();">🔍 ${f.name}</div>`; });
-    menu.innerHTML += '<button onclick="this.parentElement.remove()" style="margin-top:15px;width:100%;padding:10px;background:#d63031;color:white;border:none;border-radius:10px;">Close</button>';
+    menu.innerHTML += '<button onclick="this.parentElement.remove()" style="margin-top:15px;width:100%;padding:10px;background:#d63031;color:white;border:none;border-radius:10px;">إغلاق</button>';
     document.body.appendChild(menu);
 };
 
@@ -1835,7 +2018,7 @@ app.applyFilter = function(idx) {
     document.getElementById('filterPriority').value = f.priority;
     document.getElementById('filterStatus').value = f.status;
     app.renderCRM();
-    app.showToast(`✅ Applied: ${f.name}`, 'success');
+    app.showToast(`✅ تم تطبيق: ${f.name}`, 'success');
 };
 
 app.exportCSV = function() {
@@ -1845,11 +2028,11 @@ app.exportCSV = function() {
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
     link.download = `CRM_Export_${new Date().toLocaleDateString()}.csv`;
     link.click();
-    app.showToast('📁 Data exported', 'success');
+    app.showToast('📁 تم تصدير البيانات', 'success');
 };
 
 app.startVoiceInput = function() {
-    if (!('webkitSpeechRecognition' in window)) { app.showToast('❌ Voice not supported', 'error'); return; }
+    if (!('webkitSpeechRecognition' in window)) { app.showToast('❌ البحث الصوتي غير مدعوم', 'error'); return; }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     speechRecognition = new SpeechRecognition();
     speechRecognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
@@ -1857,13 +2040,13 @@ app.startVoiceInput = function() {
         const transcript = e.results[0][0].transcript;
         document.getElementById('advancedSearch').value = transcript;
         app.renderCRM();
-        app.showToast(`🔍 Searched: "${transcript}"`, 'success');
+        app.showToast(`🔍 بحث عن: "${transcript}"`, 'success');
     };
     speechRecognition.start();
     const btn = document.getElementById('voiceBtn');
     btn.classList.add('listening');
-    btn.innerHTML = '<i class="fas fa-microphone-slash"></i> Listening...';
-    speechRecognition.onend = () => { btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> ' + (translations[currentLang].voice_search || 'Voice Search'); };
+    btn.innerHTML = '<i class="fas fa-microphone-slash"></i> جاري الاستماع...';
+    speechRecognition.onend = () => { btn.classList.remove('listening'); btn.innerHTML = '<i class="fas fa-microphone"></i> ' + (translations[currentLang].voice_search || 'بحث صوتي'); };
 };
 
 // ==================== INIT ====================
@@ -1892,11 +2075,11 @@ app.init = async function() {
     if (sessionStorage.getItem('userRole') === 'admin' || sessionStorage.getItem('userDisplayName') === "Master Admin") {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
-    app.showToast('🚀 System Ready | AI Enhanced', 'success');
+    app.showToast('🚀 النظام جاهز | الذكاء الاصطناعي مفعل', 'success');
     
     syncInterval = setInterval(() => { if (isOnline && !isSyncing && database) syncToFirebase(); }, 60000);
     
-    if (Notification.permission === 'default') setTimeout(() => { if (confirm('Enable notifications for reminders?')) app.enableDesktopNotifications(); }, 2000);
+    if (Notification.permission === 'default') setTimeout(() => { if (confirm('تفعيل الإشعارات للتذكيرات؟')) app.enableDesktopNotifications(); }, 2000);
 };
 
 if (sessionStorage.getItem('isLoggedIn') === 'true') app.init();
