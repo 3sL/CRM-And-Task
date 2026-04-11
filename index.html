@@ -2,7 +2,7 @@
 <html lang="en" id="htmlTag" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Utopia For Trading And Export -Pro CRM & Tasks DEV BY - Eng.Mahmoud Mohamed Marie | Ultra Secure</title>
+    <title>Utopia For Trading And Export -Pro CRM & Tasks | Eng.Mahmoud Mohamed Marie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     
@@ -495,7 +495,7 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Voice Button - Improved */
+        /* Voice Button */
         .voice-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -567,7 +567,6 @@
             left: 10px;
         }
 
-        /* Loading Indicator */
         .loading-indicator {
             text-align: center;
             padding: 40px;
@@ -603,7 +602,6 @@
             margin-top: 8px;
         }
         
-        /* Voice Status Indicator */
         .voice-status {
             position: fixed;
             bottom: 100px;
@@ -1011,7 +1009,8 @@
 
 <script>
 // ============================================================
-// COMPLETE CRM SYSTEM - WITH WORKING VOICE SEARCH
+// ULTRA SECURE CRM SYSTEM - FIXED DATA PERSISTENCE
+// Data saves to BOTH IndexedDB AND Firebase simultaneously
 // Developed by Eng. Mahmoud Mohamed Marie
 // ============================================================
 
@@ -1034,8 +1033,6 @@ let notifications = [];
 let isOnline = navigator.onLine;
 let isSyncing = false;
 let syncInterval = null;
-
-// Voice recognition variables
 let recognition = null;
 let isListening = false;
 
@@ -1057,111 +1054,7 @@ const demoData = {
     ]
 };
 
-// ==================== TRANSLATIONS ====================
-const translations = {
-    en: {
-        'm_crm': '👥 Clients', 'm_tasks': '📅 Tasks', 'm_dash': '📊 Analytics', 
-        'm_profile': '👤 Profile', 'm_recycle': '♻️ Recycle', 'm_admin': '👑 Admin', 
-        'm_logout': '🚪 Logout',
-        'h_crm': '👥 Clients Management', 'h_dash': '📊 Analytics Dashboard', 
-        'h_tasks': '📋 Operations & Tasks', 'recycleTitle': '♻️ Recycle Bin',
-        'adminTitle': '👑 Admin Control Panel', 'usersTitle': '👥 User Management',
-        'logsTitle': '📜 Activity Logs', 'profileTitle': '👤 User Profile',
-        'labelName': 'Full Name *', 'labelPhone': 'Phone Number', 'labelGov': 'Governorate',
-        'labelStatus': 'Status', 'labelAgent': 'Assigned Agent', 'labelDate': 'Date',
-        'labelNotes': 'Notes', 'labelTaskClient': 'Client', 'labelTaskType': 'Operation Type',
-        'labelTaskAmount': 'Amount', 'labelTaskDate': 'Due Date', 'labelTaskDesc': 'Description',
-        'labelTaskNotes': 'Notes', 'labelTaskExtra': 'Extra Details',
-        'namePlaceholder': 'Enter client name', 'phonePlaceholder': 'e.g., 01234567890',
-        'agentPlaceholder': 'Agent name', 'notesPlaceholder': 'Additional notes & client history...',
-        'taskSearchPlaceholder': '🔍 Search tasks...', 'advancedSearchPlaceholder': '🔍 Advanced Search...',
-        'searchPlaceholder': '🔍 Search by Name, Phone or Status...', 'taskTextPlaceholder': 'Task description',
-        'taskNotesPlaceholder': 'Additional notes...', 'taskExtraPlaceholder': 'Requirements or extra info...',
-        'taskAmountPlaceholder': 'Amount (if any)',
-        'save_btn': '💾 Save Client', 'update_btn': '🔄 Update Client', 'add_task_btn': '➕ Add Task',
-        'save_filter': '💾 Save Filter', 'load_filters': '📂 Load Filters', 'export_btn': '📥 Export CSV',
-        'voice_search': '🎤 Voice Search', 'ai_suggest': '🤖 AI Suggest', 'manual_sync': '🔄 Manual Sync',
-        'enable_notifications': '🔔 Enable Notifications', 'update_pass_btn': 'Update Password',
-        'register_btn': '➕ Register New User', 'clear_filters': '🗑️ Clear Filters',
-        'all_governorates': 'All Governorates', 'all_agents': 'All Agents', 'all_priorities': 'All Priorities',
-        'high_priority': 'High Priority (70%+)', 'medium_priority': 'Medium (40-69%)', 'low_priority': 'Low (-40%)',
-        'all_clients': 'All Clients', 'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date',
-        'kpi_conversion': 'Conversion Rate', 'kpi_followup': 'Avg Follow-up', 
-        'kpi_forecast': 'Next Week Forecast', 'kpi_top_agent': 'Top Agent',
-        'stat_total': 'Total Clients', 'stat_vip': 'VIP Members', 'stat_completed': 'Closed Deals',
-        'status_chart': '📈 Status Distribution', 'geo_chart': '📍 Geographical Distribution',
-        'ai_insight': 'AI Insight:', 'forecast_deals': 'Expected Deals',
-        'th_name': 'Name ↕️', 'th_phone': 'Phone', 'th_gov': 'Governorate ↕️',
-        'th_priority': 'AI Priority', 'th_status': 'Status ↕️', 'th_actions': 'Actions',
-        'task_client_header': 'Client', 'task_type_header': 'Type', 'task_amount_header': 'Amount',
-        'task_text_header': 'Description', 'task_notes_header': 'Notes', 'task_date_header': 'Due Date',
-        'task_status_header': 'Status', 'task_action_header': 'Actions',
-        'recycle_name': 'Name', 'recycle_phone': 'Phone', 'recycle_status': 'Previous Status',
-        'recycle_restore': 'Restore', 'recycle_delete': 'Delete',
-        'users_table_user': 'User', 'users_table_pass': 'Pass', 'users_table_name': 'Name',
-        'users_table_role': 'Role', 'users_table_action': 'Action',
-        'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
-        'login_btn': '🔐 Access System', 'logged_in_as': 'Logged in as:', 'change_pass_label': 'Change Password:',
-        'task_status_pending': 'Pending', 'task_status_completed': 'Completed', 'task_status_overdue': 'Overdue',
-        'op_quotation': '📄 Quotation Request', 'op_followup': '👀 Quotation Follow-up',
-        'op_supply': '🚚 Supply', 'op_bank': '🏦 Bank Transfer', 'op_cash': '💵 Cash',
-        'voice_listening': 'Listening...', 'voice_searching': 'Searching for:',
-        'voice_not_supported': 'Voice search not supported in this browser',
-        'voice_permission_denied': 'Please allow microphone access for voice search'
-    },
-    ar: {
-        'm_crm': '👥 العملاء', 'm_tasks': '📅 المهام', 'm_dash': '📊 التحليلات',
-        'm_profile': '👤 الملف الشخصي', 'm_recycle': '♻️ سلة المحذوفات', 'm_admin': '👑 لوحة التحكم',
-        'm_logout': '🚪 تسجيل خروج',
-        'h_crm': '👥 إدارة العملاء', 'h_dash': '📊 لوحة التحليلات',
-        'h_tasks': '📋 العمليات والمهام', 'recycleTitle': '♻️ سلة المحذوفات',
-        'adminTitle': '👑 لوحة تحكم الأدمن', 'usersTitle': '👥 إدارة المستخدمين',
-        'logsTitle': '📜 سجلات النشاطات', 'profileTitle': '👤 الملف الشخصي',
-        'labelName': 'الاسم كاملاً *', 'labelPhone': 'رقم الهاتف', 'labelGov': 'المحافظة',
-        'labelStatus': 'الحالة', 'labelAgent': 'المندوب المسؤول', 'labelDate': 'التاريخ',
-        'labelNotes': 'ملاحظات', 'labelTaskClient': 'العميل', 'labelTaskType': 'نوع العملية',
-        'labelTaskAmount': 'المبلغ', 'labelTaskDate': 'تاريخ التسليم', 'labelTaskDesc': 'الوصف',
-        'labelTaskNotes': 'ملاحظات', 'labelTaskExtra': 'تفاصيل إضافية',
-        'namePlaceholder': 'أدخل اسم العميل', 'phonePlaceholder': 'مثال: 01234567890',
-        'agentPlaceholder': 'اسم المندوب', 'notesPlaceholder': 'ملاحظات إضافية وتاريخ العميل...',
-        'taskSearchPlaceholder': '🔍 بحث في المهام...', 'advancedSearchPlaceholder': '🔍 بحث متقدم...',
-        'searchPlaceholder': '🔍 بحث بالاسم أو رقم الهاتف أو الحالة...', 'taskTextPlaceholder': 'وصف المهمة',
-        'taskNotesPlaceholder': 'ملاحظات إضافية...', 'taskExtraPlaceholder': 'متطلبات أو تفاصيل إضافية...',
-        'taskAmountPlaceholder': 'المبلغ (إن وجد)',
-        'save_btn': '💾 حفظ العميل', 'update_btn': '🔄 تحديث العميل', 'add_task_btn': '➕ إضافة مهمة',
-        'save_filter': '💾 حفظ الفلتر', 'load_filters': '📂 تحميل الفلاتر', 'export_btn': '📥 تصدير CSV',
-        'voice_search': '🎤 بحث صوتي', 'ai_suggest': '🤖 اقتراح AI', 'manual_sync': '🔄 مزامنة يدوية',
-        'enable_notifications': '🔔 تفعيل الإشعارات', 'update_pass_btn': 'تحديث كلمة المرور',
-        'register_btn': '➕ تسجيل مستخدم جديد', 'clear_filters': '🗑️ مسح الفلاتر',
-        'all_governorates': 'كل المحافظات', 'all_agents': 'كل المندوبين', 'all_priorities': 'كل الأولويات',
-        'high_priority': 'أولوية عالية (70%+)', 'medium_priority': 'متوسطة (40-69%)', 'low_priority': 'منخفضة (-40%)',
-        'all_clients': 'كل العملاء', 'all_task_statuses': 'كل الحالات', 'specific_date': 'تاريخ محدد',
-        'kpi_conversion': 'معدل التحويل', 'kpi_followup': 'متوسط المتابعة',
-        'kpi_forecast': 'توقعات الأسبوع', 'kpi_top_agent': 'أفضل مندوب',
-        'stat_total': 'إجمالي العملاء', 'stat_vip': 'عملاء VIP', 'stat_completed': 'الصفقات المغلقة',
-        'status_chart': '📈 توزيع الحالات', 'geo_chart': '📍 التوزيع الجغرافي',
-        'ai_insight': 'رؤية الذكاء الاصطناعي:', 'forecast_deals': 'صفقة متوقعة',
-        'th_name': 'الاسم ↕️', 'th_phone': 'الهاتف', 'th_gov': 'المحافظة ↕️',
-        'th_priority': 'أولوية AI', 'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات',
-        'task_client_header': 'العميل', 'task_type_header': 'النوع', 'task_amount_header': 'المبلغ',
-        'task_text_header': 'الوصف', 'task_notes_header': 'ملاحظات', 'task_date_header': 'تاريخ التسليم',
-        'task_status_header': 'الحالة', 'task_action_header': 'إجراءات',
-        'recycle_name': 'الاسم', 'recycle_phone': 'الهاتف', 'recycle_status': 'الحالة السابقة',
-        'recycle_restore': 'استعادة', 'recycle_delete': 'حذف',
-        'users_table_user': 'المستخدم', 'users_table_pass': 'كلمة المرور', 'users_table_name': 'الاسم',
-        'users_table_role': 'الصلاحية', 'users_table_action': 'إجراء',
-        'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن',
-        'login_btn': '🔐 دخول النظام', 'logged_in_as': 'مسجل الدخول باسم:', 'change_pass_label': 'تغيير كلمة المرور:',
-        'task_status_pending': 'قيد التنفيذ', 'task_status_completed': 'مكتملة', 'task_status_overdue': 'متأخرة',
-        'op_quotation': '📄 طلب عرض سعر', 'op_followup': '👀 متابعة عرض سعر',
-        'op_supply': '🚚 توريد', 'op_bank': '🏦 تحويل بنكي', 'op_cash': '💵 كاش',
-        'voice_listening': 'جاري الاستماع...', 'voice_searching': 'جاري البحث عن:',
-        'voice_not_supported': 'البحث الصوتي غير مدعوم في هذا المتصفح',
-        'voice_permission_denied': 'الرجاء السماح بالوصول إلى الميكروفون'
-    }
-};
-
-// ==================== FIREBASE CONFIG ====================
+// ==================== FIREBASE & INDEXEDDB SETUP ====================
 const firebaseConfig = {
     apiKey: "AIzaSyCh3wFPo7mVeB_ccufW5LyKgPFoeSO0J00",
     authDomain: "crm-and-tasks-9f7c3.firebaseapp.com",
@@ -1176,11 +1069,11 @@ let database = null;
 try {
     const firebaseApp = firebase.initializeApp(firebaseConfig);
     database = firebase.database();
+    console.log("Firebase initialized");
 } catch(e) {
     if(firebase.apps.length > 0) database = firebase.apps[0].database();
 }
 
-// IndexedDB
 const localDB = new Dexie("UtopiaCRMOffline");
 localDB.version(3).stores({
     clients: "++id, name, phone, status, timestamp",
@@ -1189,104 +1082,93 @@ localDB.version(3).stores({
     users: "++id, u"
 });
 
-// ==================== VOICE SEARCH FUNCTION (FIXED) ====================
-app.startVoiceSearch = function() {
-    const t = translations[currentLang];
-    
-    // Check if browser supports speech recognition
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        app.showToast(t.voice_not_supported || 'Voice search not supported', 'error');
-        return;
+// ==================== TRANSLATIONS ====================
+const translations = {
+    en: {
+        'm_crm': '👥 Clients', 'm_tasks': '📅 Tasks', 'm_dash': '📊 Analytics', 
+        'm_profile': '👤 Profile', 'm_recycle': '♻️ Recycle', 'm_admin': '👑 Admin', 
+        'm_logout': '🚪 Logout', 'h_crm': '👥 Clients Management', 
+        'h_dash': '📊 Analytics Dashboard', 'h_tasks': '📋 Operations & Tasks',
+        'recycleTitle': '♻️ Recycle Bin', 'adminTitle': '👑 Admin Control Panel',
+        'usersTitle': '👥 User Management', 'logsTitle': '📜 Activity Logs',
+        'profileTitle': '👤 User Profile', 'formTitle': 'Add New Client',
+        'taskFormTitle': 'Add New Task', 'save_btn': '💾 Save Client',
+        'update_btn': '🔄 Update Client', 'add_task_btn': '➕ Add Task',
+        'voice_search': '🎤 Voice Search', 'ai_suggest': '🤖 AI Suggest',
+        'save_filter': '💾 Save Filter', 'load_filters': '📂 Load Filters',
+        'export_btn': '📥 Export CSV', 'manual_sync': '🔄 Manual Sync',
+        'enable_notifications': '🔔 Enable Notifications', 'update_pass_btn': 'Update Password',
+        'register_btn': '➕ Register New User', 'clear_filters': '🗑️ Clear Filters',
+        'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
+        'login_btn': '🔐 Access System', 'logged_in_as': 'Logged in as:',
+        'change_pass_label': 'Change Password:', 'kpi_conversion': 'Conversion Rate',
+        'kpi_followup': 'Avg Follow-up', 'kpi_forecast': 'Next Week Forecast',
+        'kpi_top_agent': 'Top Agent', 'stat_total': 'Total Clients',
+        'stat_vip': 'VIP Members', 'stat_completed': 'Closed Deals',
+        'status_chart': '📈 Status Distribution', 'geo_chart': '📍 Geographical Distribution',
+        'ai_insight': 'AI Insight:', 'th_name': 'Name ↕️', 'th_phone': 'Phone',
+        'th_gov': 'Governorate ↕️', 'th_priority': 'AI Priority', 'th_status': 'Status ↕️',
+        'th_actions': 'Actions', 'task_client_header': 'Client', 'task_type_header': 'Type',
+        'task_amount_header': 'Amount', 'task_text_header': 'Description',
+        'task_notes_header': 'Notes', 'task_date_header': 'Due Date',
+        'task_status_header': 'Status', 'task_action_header': 'Actions',
+        'recycle_name': 'Name', 'recycle_phone': 'Phone', 'recycle_status': 'Previous Status',
+        'recycle_restore': 'Restore', 'recycle_delete': 'Delete',
+        'users_table_user': 'User', 'users_table_pass': 'Pass', 'users_table_name': 'Name',
+        'users_table_role': 'Role', 'users_table_action': 'Action',
+        'task_status_pending': 'Pending', 'task_status_completed': 'Completed',
+        'task_status_overdue': 'Overdue', 'all_governorates': 'All Governorates',
+        'all_agents': 'All Agents', 'all_priorities': 'All Priorities',
+        'high_priority': 'High Priority (70%+)', 'medium_priority': 'Medium (40-69%)',
+        'low_priority': 'Low (-40%)', 'all_clients': 'All Clients',
+        'all_task_statuses': 'All Statuses', 'specific_date': 'Specific Date',
+        'op_quotation': '📄 Quotation Request', 'op_followup': '👀 Quotation Follow-up',
+        'op_supply': '🚚 Supply', 'op_bank': '🏦 Bank Transfer', 'op_cash': '💵 Cash'
+    },
+    ar: {
+        'm_crm': '👥 العملاء', 'm_tasks': '📅 المهام', 'm_dash': '📊 التحليلات',
+        'm_profile': '👤 الملف الشخصي', 'm_recycle': '♻️ سلة المحذوفات',
+        'm_admin': '👑 لوحة التحكم', 'm_logout': '🚪 تسجيل خروج',
+        'h_crm': '👥 إدارة العملاء', 'h_dash': '📊 لوحة التحليلات',
+        'h_tasks': '📋 العمليات والمهام', 'recycleTitle': '♻️ سلة المحذوفات',
+        'adminTitle': '👑 لوحة تحكم الأدمن', 'usersTitle': '👥 إدارة المستخدمين',
+        'logsTitle': '📜 سجلات النشاطات', 'profileTitle': '👤 الملف الشخصي',
+        'formTitle': 'إضافة عميل جديد', 'taskFormTitle': 'إضافة مهمة جديدة',
+        'save_btn': '💾 حفظ العميل', 'update_btn': '🔄 تحديث العميل',
+        'add_task_btn': '➕ إضافة مهمة', 'voice_search': '🎤 بحث صوتي',
+        'ai_suggest': '🤖 اقتراح AI', 'save_filter': '💾 حفظ الفلتر',
+        'load_filters': '📂 تحميل الفلاتر', 'export_btn': '📥 تصدير CSV',
+        'manual_sync': '🔄 مزامنة يدوية', 'enable_notifications': '🔔 تفعيل الإشعارات',
+        'update_pass_btn': 'تحديث كلمة المرور', 'register_btn': '➕ تسجيل مستخدم جديد',
+        'clear_filters': '🗑️ مسح الفلاتر', 'login_title': 'يوتوبيا للتجارة والتصدير',
+        'login_subtitle': 'نظام إدارة آمن', 'login_btn': '🔐 دخول النظام',
+        'logged_in_as': 'مسجل الدخول باسم:', 'change_pass_label': 'تغيير كلمة المرور:',
+        'kpi_conversion': 'معدل التحويل', 'kpi_followup': 'متوسط المتابعة',
+        'kpi_forecast': 'توقعات الأسبوع', 'kpi_top_agent': 'أفضل مندوب',
+        'stat_total': 'إجمالي العملاء', 'stat_vip': 'عملاء VIP',
+        'stat_completed': 'الصفقات المغلقة', 'status_chart': '📈 توزيع الحالات',
+        'geo_chart': '📍 التوزيع الجغرافي', 'ai_insight': 'رؤية الذكاء الاصطناعي:',
+        'th_name': 'الاسم ↕️', 'th_phone': 'الهاتف', 'th_gov': 'المحافظة ↕️',
+        'th_priority': 'أولوية AI', 'th_status': 'الحالة ↕️', 'th_actions': 'إجراءات',
+        'task_client_header': 'العميل', 'task_type_header': 'النوع',
+        'task_amount_header': 'المبلغ', 'task_text_header': 'الوصف',
+        'task_notes_header': 'ملاحظات', 'task_date_header': 'تاريخ التسليم',
+        'task_status_header': 'الحالة', 'task_action_header': 'إجراءات',
+        'recycle_name': 'الاسم', 'recycle_phone': 'الهاتف', 'recycle_status': 'الحالة السابقة',
+        'recycle_restore': 'استعادة', 'recycle_delete': 'حذف',
+        'users_table_user': 'المستخدم', 'users_table_pass': 'كلمة المرور',
+        'users_table_name': 'الاسم', 'users_table_role': 'الصلاحية',
+        'users_table_action': 'إجراء', 'task_status_pending': 'قيد التنفيذ',
+        'task_status_completed': 'مكتملة', 'task_status_overdue': 'متأخرة',
+        'all_governorates': 'كل المحافظات', 'all_agents': 'كل المندوبين',
+        'all_priorities': 'كل الأولويات', 'high_priority': 'أولوية عالية (70%+)',
+        'medium_priority': 'متوسطة (40-69%)', 'low_priority': 'منخفضة (-40%)',
+        'all_clients': 'كل العملاء', 'all_task_statuses': 'كل الحالات',
+        'specific_date': 'تاريخ محدد', 'op_quotation': '📄 طلب عرض سعر',
+        'op_followup': '👀 متابعة عرض سعر', 'op_supply': '🚚 توريد',
+        'op_bank': '🏦 تحويل بنكي', 'op_cash': '💵 كاش'
     }
-    
-    // Check if already listening
-    if (isListening) {
-        if (recognition) {
-            recognition.stop();
-        }
-        return;
-    }
-    
-    // Request microphone permission
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(function(stream) {
-            stream.getTracks().forEach(track => track.stop());
-            startRecognition();
-        })
-        .catch(function(err) {
-            console.error("Microphone permission error:", err);
-            app.showToast(t.voice_permission_denied || 'Please allow microphone access', 'warning');
-        });
 };
-
-function startRecognition() {
-    const t = translations[currentLang];
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    
-    // Set recognition properties
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
-    
-    // Show voice status indicator
-    const voiceStatus = document.getElementById('voiceStatus');
-    const voiceStatusText = document.getElementById('voiceStatusText');
-    const voiceBtn = document.getElementById('voiceBtn');
-    const voiceBtnText = document.getElementById('voiceBtnText');
-    
-    recognition.onstart = function() {
-        isListening = true;
-        voiceStatus.style.display = 'flex';
-        voiceStatusText.innerHTML = '<i class="fas fa-microphone"></i> ' + (t.voice_listening || 'جاري الاستماع...');
-        voiceBtn.classList.add('listening');
-        if (voiceBtnText) voiceBtnText.innerHTML = '<i class="fas fa-microphone-slash"></i> ' + (currentLang === 'ar' ? 'جاري الاستماع...' : 'Listening...');
-        app.showToast('🎤 ' + (currentLang === 'ar' ? 'تحدث الآن...' : 'Speak now...'), 'info');
-    };
-    
-    recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        console.log("Voice recognized:", transcript);
-        
-        // Update search box with the recognized text
-        const searchInput = document.getElementById('advancedSearch');
-        if (searchInput) {
-            searchInput.value = transcript;
-            app.renderCRM();
-            app.showToast(`🔍 ${t.voice_searching || 'Searching for'}: "${transcript}"`, 'success');
-            app.playSound('soundSuccess');
-        }
-    };
-    
-    recognition.onerror = function(event) {
-        console.error("Speech recognition error:", event.error);
-        let errorMsg = '';
-        switch(event.error) {
-            case 'no-speech':
-                errorMsg = currentLang === 'ar' ? 'لم يتم اكتشاف صوت' : 'No speech detected';
-                break;
-            case 'audio-capture':
-                errorMsg = currentLang === 'ar' ? 'لا يوجد ميكروفون' : 'No microphone found';
-                break;
-            case 'not-allowed':
-                errorMsg = currentLang === 'ar' ? 'تم رفض الوصول إلى الميكروفون' : 'Microphone access denied';
-                break;
-            default:
-                errorMsg = currentLang === 'ar' ? 'خطأ في التعرف على الصوت' : 'Speech recognition error';
-        }
-        app.showToast(`⚠️ ${errorMsg}`, 'warning');
-    };
-    
-    recognition.onend = function() {
-        isListening = false;
-        voiceStatus.style.display = 'none';
-        voiceBtn.classList.remove('listening');
-        if (voiceBtnText) voiceBtnText.innerHTML = '<i class="fas fa-microphone"></i> ' + (t.voice_search || 'بحث صوتي');
-    };
-    
-    recognition.start();
-}
 
 // ==================== HELPER FUNCTIONS ====================
 app.showToast = function(message, type) {
@@ -1301,13 +1183,10 @@ app.showToast = function(message, type) {
 };
 
 app.playSound = function(id) {
-    try {
-        const snd = document.getElementById(id);
-        if(snd) snd.play();
-    } catch(e) {}
+    try { document.getElementById(id)?.play(); } catch(e) {}
 };
 
-// ==================== LANGUAGE UPDATE ====================
+// ==================== LANGUAGE ====================
 app.toggleLanguage = function() {
     currentLang = currentLang === 'en' ? 'ar' : 'en';
     localStorage.setItem('appLang', currentLang);
@@ -1319,10 +1198,7 @@ app.toggleLanguage = function() {
 
 app.updateUILanguage = function() {
     const t = translations[currentLang];
-    
-    // Update all elements with IDs
-    const elements = [
-        'm_crm', 'm_tasks', 'm_dash', 'm_profile', 'm_recycle', 'm_admin', 'm_logout',
+    const elements = ['m_crm', 'm_tasks', 'm_dash', 'm_profile', 'm_recycle', 'm_admin', 'm_logout',
         'h_crm', 'h_dash', 'h_tasks', 'recycleTitle', 'adminTitle', 'usersTitle', 'logsTitle', 'profileTitle',
         'loginTitle', 'loginSubtitle', 'loginBtn', 'statTotalLabel', 'statVipLabel', 'statCompLabel',
         'statusChartLabel', 'geoChartLabel', 'taskClientHeader', 'taskTypeHeader', 'taskAmountHeader',
@@ -1331,89 +1207,36 @@ app.updateUILanguage = function() {
         'registerBtn', 'updatePassBtn', 'changePassLabel', 'loggedInAs', 'kpiConversion', 'kpiFollowUp',
         'kpiForecast', 'kpiTopAgent', 'aiInsightLabel', 'enableNotifBtn', 'manualSyncBtn', 'usersTableUser',
         'usersTablePass', 'usersTableName', 'usersTableRole', 'usersTableAction', 'thName', 'thPhone',
-        'thGov', 'thPriority', 'thStatus', 'thActions', 'formTitle', 'taskFormTitle'
-    ];
+        'thGov', 'thPriority', 'thStatus', 'thActions', 'formTitle', 'taskFormTitle'];
     
     elements.forEach(id => {
         const el = document.getElementById(id);
         if (el && t[id]) el.innerText = t[id];
     });
     
-    // Update labels
     const labels = ['labelName', 'labelPhone', 'labelGov', 'labelStatus', 'labelAgent', 'labelDate', 'labelNotes',
-                    'labelTaskClient', 'labelTaskType', 'labelTaskAmount', 'labelTaskDate', 'labelTaskDesc',
-                    'labelTaskNotes', 'labelTaskExtra'];
+        'labelTaskClient', 'labelTaskType', 'labelTaskAmount', 'labelTaskDate', 'labelTaskDesc',
+        'labelTaskNotes', 'labelTaskExtra'];
     labels.forEach(id => {
         const el = document.getElementById(id);
         if (el && t[id]) el.innerText = t[id];
     });
     
     // Update placeholders
-    const nameInput = document.getElementById('name');
-    if(nameInput && t.namePlaceholder) nameInput.placeholder = t.namePlaceholder;
+    const placeholders = {
+        'name': 'namePlaceholder', 'phone': 'phonePlaceholder', 'agent': 'agentPlaceholder',
+        'notes': 'notesPlaceholder', 'search': 'searchPlaceholder', 'advancedSearch': 'advancedSearchPlaceholder',
+        'taskSearch': 'taskSearchPlaceholder', 'taskText': 'taskTextPlaceholder', 'taskNotes': 'taskNotesPlaceholder',
+        'extraInfo': 'taskExtraPlaceholder', 'taskAmount': 'taskAmountPlaceholder'
+    };
+    for (const [id, transKey] of Object.entries(placeholders)) {
+        const el = document.getElementById(id);
+        if (el && t[transKey]) el.placeholder = t[transKey];
+    }
     
-    const phoneInput = document.getElementById('phone');
-    if(phoneInput && t.phonePlaceholder) phoneInput.placeholder = t.phonePlaceholder;
-    
-    const agentInput = document.getElementById('agent');
-    if(agentInput && t.agentPlaceholder) agentInput.placeholder = t.agentPlaceholder;
-    
-    const notesArea = document.getElementById('notes');
-    if(notesArea && t.notesPlaceholder) notesArea.placeholder = t.notesPlaceholder;
-    
-    const searchInput = document.getElementById('search');
-    if(searchInput && t.searchPlaceholder) searchInput.placeholder = t.searchPlaceholder;
-    
-    const advancedSearch = document.getElementById('advancedSearch');
-    if(advancedSearch && t.advancedSearchPlaceholder) advancedSearch.placeholder = t.advancedSearchPlaceholder;
-    
-    const taskSearch = document.getElementById('taskSearch');
-    if(taskSearch && t.taskSearchPlaceholder) taskSearch.placeholder = t.taskSearchPlaceholder;
-    
-    const taskText = document.getElementById('taskText');
-    if(taskText && t.taskTextPlaceholder) taskText.placeholder = t.taskTextPlaceholder;
-    
-    const taskNotes = document.getElementById('taskNotes');
-    if(taskNotes && t.taskNotesPlaceholder) taskNotes.placeholder = t.taskNotesPlaceholder;
-    
-    const extraInfo = document.getElementById('extraInfo');
-    if(extraInfo && t.taskExtraPlaceholder) extraInfo.placeholder = t.taskExtraPlaceholder;
-    
-    const taskAmount = document.getElementById('taskAmount');
-    if(taskAmount && t.taskAmountPlaceholder) taskAmount.placeholder = t.taskAmountPlaceholder;
-    
-    // Update voice button text
     const voiceBtnText = document.getElementById('voiceBtnText');
     if(voiceBtnText && t.voice_search) voiceBtnText.innerText = t.voice_search;
     
-    // Update filter selects
-    const filterGov = document.getElementById('filterGov');
-    if(filterGov && filterGov.options.length > 0 && t.all_governorates) filterGov.options[0].text = t.all_governorates;
-    
-    const filterAgent = document.getElementById('filterAgent');
-    if(filterAgent && filterAgent.options.length > 0 && t.all_agents) filterAgent.options[0].text = t.all_agents;
-    
-    const filterPriority = document.getElementById('filterPriority');
-    if(filterPriority && filterPriority.options.length > 0) {
-        if(t.all_priorities) filterPriority.options[0].text = t.all_priorities;
-        if(t.high_priority) filterPriority.options[1].text = t.high_priority;
-        if(t.medium_priority) filterPriority.options[2].text = t.medium_priority;
-        if(t.low_priority) filterPriority.options[3].text = t.low_priority;
-    }
-    
-    const filterStatus = document.getElementById('filterStatus');
-    if(filterStatus && filterStatus.options.length > 0 && t.filter_all) filterStatus.options[0].text = t.filter_all;
-    
-    const taskFilterClient = document.getElementById('taskFilterClient');
-    if(taskFilterClient && taskFilterClient.options.length > 0 && t.all_clients) taskFilterClient.options[0].text = t.all_clients;
-    
-    const taskFilterStatus = document.getElementById('taskFilterStatus');
-    if(taskFilterStatus && taskFilterStatus.options.length > 0 && t.all_task_statuses) taskFilterStatus.options[0].text = t.all_task_statuses;
-    
-    const taskFilterDate = document.getElementById('taskFilterDate');
-    if(taskFilterDate && t.specific_date) taskFilterDate.placeholder = t.specific_date;
-    
-    // Update button texts
     const btnSave = document.getElementById('btnSave');
     if(btnSave && editIdx === -1 && t.save_btn) btnSave.innerHTML = t.save_btn;
     else if(btnSave && editIdx > -1 && t.update_btn) btnSave.innerHTML = t.update_btn;
@@ -1421,7 +1244,6 @@ app.updateUILanguage = function() {
     const btnSaveTask = document.getElementById('btnSaveTask');
     if(btnSaveTask && t.add_task_btn) btnSaveTask.innerHTML = t.add_task_btn;
     
-    // Update RTL/LTR
     const htmlTag = document.getElementById('htmlTag');
     if (currentLang === 'ar') {
         htmlTag.setAttribute('dir', 'rtl');
@@ -1435,57 +1257,7 @@ app.updateUILanguage = function() {
     if(langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
 };
 
-// ==================== DATA SYNC ====================
-async function syncFromFirebase() {
-    if (!database) return;
-    try {
-        const clientsSnap = await database.ref('clients').once('value');
-        const fbClients = [];
-        clientsSnap.forEach(child => fbClients.push({ id: child.key, ...child.val() }));
-        if (fbClients.length > 0) clients = fbClients;
-        else {
-            const local = await localDB.clients.toArray();
-            clients = local.length ? local : demoData.clients;
-        }
-        
-        const tasksSnap = await database.ref('tasks').once('value');
-        const fbTasks = [];
-        tasksSnap.forEach(child => fbTasks.push({ id: child.key, ...child.val() }));
-        if (fbTasks.length > 0) tasks = fbTasks;
-        else {
-            const local = await localDB.tasks.toArray();
-            tasks = local.length ? local : demoData.tasks;
-        }
-        
-        const deletedSnap = await database.ref('deletedClients').once('value');
-        const fbDeleted = [];
-        deletedSnap.forEach(child => fbDeleted.push({ id: child.key, ...child.val() }));
-        if (fbDeleted.length > 0) deletedClients = fbDeleted;
-        else deletedClients = await localDB.deletedClients.toArray() || [];
-        
-        const usersSnap = await database.ref('authSystem/users').once('value');
-        const fbUsers = [];
-        usersSnap.forEach(child => fbUsers.push(child.val()));
-        if (fbUsers.length > 0) authSystem.users = fbUsers;
-        else {
-            const local = await localDB.users.toArray();
-            authSystem.users = local.length ? local : defaultUsers;
-        }
-        
-        await localDB.clients.clear();
-        await localDB.clients.bulkAdd(clients);
-        await localDB.tasks.clear();
-        await localDB.tasks.bulkAdd(tasks);
-        await localDB.deletedClients.clear();
-        if(deletedClients.length) await localDB.deletedClients.bulkAdd(deletedClients);
-    } catch(e) {
-        console.error("Sync error:", e);
-        clients = await localDB.clients.toArray() || demoData.clients;
-        tasks = await localDB.tasks.toArray() || demoData.tasks;
-        deletedClients = await localDB.deletedClients.toArray() || [];
-    }
-}
-
+// ==================== DATA PERSISTENCE - SAVES TO BOTH STORAGES ====================
 app.saveToLocalDB = async function(type, data) {
     try {
         if (type === 'clients') {
@@ -1502,29 +1274,111 @@ app.saveToLocalDB = async function(type, data) {
             if (data.length) await localDB.users.bulkAdd(data);
             authSystem.users = data;
         }
-        if (database && isOnline) setTimeout(() => syncToFirebase(), 1000);
-    } catch(e) {}
+        console.log(`Saved ${data.length} items to IndexedDB (${type})`);
+        return true;
+    } catch(e) {
+        console.error("Error saving to IndexedDB:", e);
+        return false;
+    }
 };
 
-async function syncToFirebase() {
-    if (!database || isSyncing) return;
-    isSyncing = true;
-    updateSyncStatusUI();
+app.saveToFirebase = async function() {
+    if (!database || !isOnline) return false;
     try {
-        await database.ref('clients').set(clients.map(({id,...rest}) => rest));
-        await database.ref('tasks').set(tasks.map(({id,...rest}) => rest));
-        await database.ref('deletedClients').set(deletedClients.map(({id,...rest}) => rest));
+        isSyncing = true;
+        updateSyncStatusUI();
+        
+        const clientsToSync = clients.map(({id, ...rest}) => rest);
+        await database.ref('clients').set(clientsToSync);
+        
+        const tasksToSync = tasks.map(({id, ...rest}) => rest);
+        await database.ref('tasks').set(tasksToSync);
+        
+        const deletedToSync = deletedClients.map(({id, ...rest}) => rest);
+        await database.ref('deletedClients').set(deletedToSync);
+        
         await database.ref('authSystem/users').set(authSystem.users);
-    } catch(e) {}
-    finally { isSyncing = false; updateSyncStatusUI(); }
+        
+        console.log("Data saved to Firebase successfully");
+        return true;
+    } catch(err) {
+        console.error("Error saving to Firebase:", err);
+        return false;
+    } finally {
+        isSyncing = false;
+        updateSyncStatusUI();
+    }
+};
+
+app.saveToBothStorages = async function() {
+    // Save to IndexedDB first
+    await app.saveToLocalDB('clients', clients);
+    await app.saveToLocalDB('tasks', tasks);
+    await app.saveToLocalDB('deletedClients', deletedClients);
+    await app.saveToLocalDB('users', authSystem.users);
+    
+    // Then save to Firebase if online
+    if (database && isOnline) {
+        const result = await app.saveToFirebase();
+        if (result) {
+            app.showToast('✅ تم حفظ البيانات محلياً وفي السحابة', 'success');
+        } else {
+            app.showToast('⚠️ تم الحفظ محلياً فقط (فشل الرفع للسحابة)', 'warning');
+        }
+    } else {
+        app.showToast('✅ تم الحفظ محلياً (غير متصل)', 'info');
+    }
+};
+
+async function syncFromFirebase() {
+    if (!database) return;
+    try {
+        console.log("Syncing from Firebase...");
+        
+        const clientsSnap = await database.ref('clients').once('value');
+        const fbClients = [];
+        clientsSnap.forEach(child => fbClients.push({ id: child.key, ...child.val() }));
+        
+        const tasksSnap = await database.ref('tasks').once('value');
+        const fbTasks = [];
+        tasksSnap.forEach(child => fbTasks.push({ id: child.key, ...child.val() }));
+        
+        const deletedSnap = await database.ref('deletedClients').once('value');
+        const fbDeleted = [];
+        deletedSnap.forEach(child => fbDeleted.push({ id: child.key, ...child.val() }));
+        
+        const usersSnap = await database.ref('authSystem/users').once('value');
+        const fbUsers = [];
+        usersSnap.forEach(child => fbUsers.push(child.val()));
+        
+        if (fbClients.length > 0) clients = fbClients;
+        if (fbTasks.length > 0) tasks = fbTasks;
+        if (fbDeleted.length > 0) deletedClients = fbDeleted;
+        if (fbUsers.length > 0) authSystem.users = fbUsers;
+        
+        // Save to IndexedDB
+        await app.saveToLocalDB('clients', clients);
+        await app.saveToLocalDB('tasks', tasks);
+        await app.saveToLocalDB('deletedClients', deletedClients);
+        await app.saveToLocalDB('users', authSystem.users);
+        
+        console.log("Sync complete - Clients:", clients.length);
+    } catch(err) {
+        console.error("Sync error:", err);
+        clients = await localDB.clients.toArray() || demoData.clients;
+        tasks = await localDB.tasks.toArray() || demoData.tasks;
+        deletedClients = await localDB.deletedClients.toArray() || [];
+        const usersArray = await localDB.users.toArray() || [];
+        authSystem.users = usersArray.length ? usersArray : defaultUsers;
+    }
 }
 
 app.manualSync = async function() {
     await syncFromFirebase();
-    await syncToFirebase();
+    await app.saveToFirebase();
     app.renderCRM();
     app.renderTasks();
-    app.showToast('✅ Sync completed', 'success');
+    app.showToast('✅ تمت المزامنة بنجاح', 'success');
 };
 
 function updateSyncStatusUI() {
@@ -1543,8 +1397,20 @@ function updateSyncStatusUI() {
     }
 }
 
-window.addEventListener('online', async () => { isOnline = true; updateSyncStatusUI(); await syncFromFirebase(); app.renderCRM(); app.renderTasks(); });
-window.addEventListener('offline', () => { isOnline = false; updateSyncStatusUI(); app.showToast('📡 وضع عدم الاتصال', 'warning'); });
+window.addEventListener('online', async () => { 
+    isOnline = true; 
+    updateSyncStatusUI(); 
+    await syncFromFirebase(); 
+    app.renderCRM(); 
+    app.renderTasks();
+    app.showToast('🌐 تم استعادة الاتصال، جاري المزامنة', 'success');
+});
+
+window.addEventListener('offline', () => { 
+    isOnline = false; 
+    updateSyncStatusUI(); 
+    app.showToast('📡 وضع عدم الاتصال - سيتم الحفظ محلياً', 'warning');
+});
 
 // ==================== AI FUNCTIONS ====================
 app.calculateWinProbability = function(client) {
@@ -1723,30 +1589,46 @@ app.renderCRM = function() {
     app.updateAIInsights();
 };
 
+// FIXED SAVE FUNCTION - Saves to both storages
 app.saveClient = function() {
     const name = document.getElementById('name').value;
     if (!name) { app.showToast('⚠️ الاسم مطلوب', 'warning'); return; }
+    
     const data = {
-        name, phone: document.getElementById('phone').value, gov: document.getElementById('gov').value,
-        status: document.getElementById('status').value, notes: document.getElementById('notes').value,
-        agent: document.getElementById('agent').value, date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-        timestamp: Date.now()
+        name: name,
+        phone: document.getElementById('phone').value,
+        gov: document.getElementById('gov').value,
+        status: document.getElementById('status').value,
+        notes: document.getElementById('notes').value,
+        agent: document.getElementById('agent').value,
+        date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+        timestamp: Date.now(),
+        lastUpdatedBy: sessionStorage.getItem('userDisplayName') || 'System'
     };
+    
     if (editIdx > -1 && clients[editIdx]) {
+        // Keep the id if exists
+        if (clients[editIdx].id) data.id = clients[editIdx].id;
         clients[editIdx] = data;
-        editIdx = -1;
         app.showToast('✅ تم تحديث العميل', 'success');
+        editIdx = -1;
+        document.getElementById('btnSave').innerHTML = translations[currentLang].save_btn;
     } else {
         clients.push(data);
         app.showToast('✅ تم إضافة العميل', 'success');
     }
-    app.saveToLocalDB('clients', clients);
+    
+    // CRITICAL: Save to both IndexedDB and Firebase
+    app.saveToBothStorages();
+    
     app.clearForm();
     app.playSound('soundSuccess');
     app.renderCRM();
     app.updateAgentList();
     app.fillClients();
     app.updateTaskClientFilter();
+    app.updateDashboard();
+    app.updateGeo();
 };
 
 app.editClient = function(i) {
@@ -1768,8 +1650,7 @@ app.deleteClient = function(i) {
     if (confirm('نقل إلى سلة المحذوفات؟')) {
         deletedClients.push(clients[i]);
         clients.splice(i, 1);
-        app.saveToLocalDB('clients', clients);
-        app.saveToLocalDB('deletedClients', deletedClients);
+        app.saveToBothStorages();
         app.renderCRM();
         app.renderRecycle();
         app.showToast('✅ تم النقل إلى سلة المحذوفات', 'success');
@@ -1875,7 +1756,9 @@ app.saveTask = function() {
         tasks.push(task);
         app.showToast('✅ تم إضافة المهمة', 'success');
     }
-    app.saveToLocalDB('tasks', tasks);
+    
+    app.saveToBothStorages();
+    
     document.getElementById('taskText').value = '';
     document.getElementById('taskNotes').value = '';
     document.getElementById('extraInfo').value = '';
@@ -1903,7 +1786,7 @@ app.editTask = function(i) {
 app.deleteTask = function(i) {
     if (confirm('حذف هذه المهمة؟')) {
         tasks.splice(i, 1);
-        app.saveToLocalDB('tasks', tasks);
+        app.saveToBothStorages();
         app.renderTasks();
         app.showToast('✅ تم حذف المهمة', 'success');
     }
@@ -1913,14 +1796,14 @@ app.completeTask = function(i) {
     if (tasks[i]) {
         tasks[i].completed = true;
         tasks[i].completedAt = new Date().toISOString();
-        app.saveToLocalDB('tasks', tasks);
+        app.saveToBothStorages();
         app.renderTasks();
         app.showToast('✅ تم إكمال المهمة!', 'success');
     }
 };
 
 app.updateTaskNotes = function(i, val) {
-    if (tasks[i]) { tasks[i].taskNotes = val; app.saveToLocalDB('tasks', tasks); }
+    if (tasks[i]) { tasks[i].taskNotes = val; app.saveToBothStorages(); }
 };
 
 app.clearTaskFilters = function() {
@@ -1941,7 +1824,7 @@ app.renderRecycle = function() {
     if (!deletedClients.length) { body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></td>'; return; }
     body.innerHTML = '';
     deletedClients.forEach((c, i) => {
-        body.innerHTML += `<tr>
+        body.innerHTML += `<td>
             <td><strong>${c.name || ''}</strong></td>
             <td>${c.phone || ''}</td>
             <td>${c.status || ''}</td>
@@ -1955,8 +1838,7 @@ app.restoreClient = function(i) {
     if (confirm('استعادة هذا العميل؟')) {
         clients.push(deletedClients[i]);
         deletedClients.splice(i, 1);
-        app.saveToLocalDB('clients', clients);
-        app.saveToLocalDB('deletedClients', deletedClients);
+        app.saveToBothStorages();
         app.renderCRM();
         app.renderRecycle();
         app.showToast('✅ تم استعادة العميل', 'success');
@@ -1966,7 +1848,7 @@ app.restoreClient = function(i) {
 app.permanentDelete = function(i) {
     if (confirm('⚠️ حذف نهائي؟ لا يمكن التراجع!')) {
         deletedClients.splice(i, 1);
-        app.saveToLocalDB('deletedClients', deletedClients);
+        app.saveToBothStorages();
         app.renderRecycle();
         app.showToast('🗑️ تم الحذف النهائي', 'error');
     }
@@ -1976,7 +1858,7 @@ app.refreshRecycle = function() { app.renderRecycle(); };
 app.clearAllRecycle = function() {
     if (confirm('⚠️ إفراغ سلة المحذوفات بالكامل؟')) {
         deletedClients = [];
-        app.saveToLocalDB('deletedClients', deletedClients);
+        app.saveToBothStorages();
         app.renderRecycle();
         app.showToast('✅ تم إفراغ السلة', 'success');
     }
@@ -2037,12 +1919,12 @@ app.addUser = function() {
     const u = document.getElementById('newU').value, p = document.getElementById('newP').value, d = document.getElementById('newD').value, r = document.getElementById('newR').value;
     if (!u || !p || !d) { app.showToast('⚠️ جميع الحقول مطلوبة', 'warning'); return; }
     authSystem.users.push({ u, p, displayName: d, role: r });
-    app.saveToLocalDB('users', authSystem.users);
+    app.saveToBothStorages();
     app.renderUsers();
     app.showToast('✅ تم إنشاء المستخدم', 'success');
 };
 
-app.delUser = function(i) { if (confirm('حذف المستخدم؟')) { authSystem.users.splice(i,1); app.saveToLocalDB('users', authSystem.users); app.renderUsers(); } };
+app.delUser = function(i) { if (confirm('حذف المستخدم؟')) { authSystem.users.splice(i,1); app.saveToBothStorages(); app.renderUsers(); } };
 
 app.renderUsers = function() {
     const body = document.getElementById('usersBody');
@@ -2065,7 +1947,7 @@ app.updatePassword = function() {
     const idx = sessionStorage.getItem('userIdx');
     if (!np) { app.showToast('⚠️ أدخل كلمة المرور الجديدة', 'warning'); return; }
     if (idx == -1) { app.showToast('⚠️ لا يمكن تغيير كلمة مرور الماستر هنا', 'warning'); return; }
-    if (authSystem.users[idx]) { authSystem.users[idx].p = np; app.saveToLocalDB('users', authSystem.users); app.showToast('✅ تم تحديث كلمة المرور', 'success'); document.getElementById('changePassInput').value = ''; }
+    if (authSystem.users[idx]) { authSystem.users[idx].p = np; app.saveToBothStorages(); app.showToast('✅ تم تحديث كلمة المرور', 'success'); document.getElementById('changePassInput').value = ''; }
 };
 
 app.addLog = function(msg) {
@@ -2150,6 +2032,94 @@ app.exportCSV = function() {
     app.showToast('📁 تم تصدير البيانات', 'success');
 };
 
+// ==================== VOICE SEARCH ====================
+app.startVoiceSearch = function() {
+    const t = translations[currentLang];
+    
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        app.showToast(t.voice_not_supported || 'Voice search not supported', 'error');
+        return;
+    }
+    
+    if (isListening) {
+        if (recognition) recognition.stop();
+        return;
+    }
+    
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+            stream.getTracks().forEach(track => track.stop());
+            startRecognition();
+        })
+        .catch(function(err) {
+            app.showToast(t.voice_permission_denied || 'Please allow microphone access', 'warning');
+        });
+};
+
+function startRecognition() {
+    const t = translations[currentLang];
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+    
+    const voiceStatus = document.getElementById('voiceStatus');
+    const voiceStatusText = document.getElementById('voiceStatusText');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const voiceBtnText = document.getElementById('voiceBtnText');
+    
+    recognition.onstart = function() {
+        isListening = true;
+        voiceStatus.style.display = 'flex';
+        voiceStatusText.innerHTML = '<i class="fas fa-microphone"></i> ' + (t.voice_listening || 'جاري الاستماع...');
+        voiceBtn.classList.add('listening');
+        if (voiceBtnText) voiceBtnText.innerHTML = '<i class="fas fa-microphone-slash"></i> ' + (currentLang === 'ar' ? 'جاري الاستماع...' : 'Listening...');
+        app.showToast('🎤 ' + (currentLang === 'ar' ? 'تحدث الآن...' : 'Speak now...'), 'info');
+    };
+    
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        const searchInput = document.getElementById('advancedSearch');
+        if (searchInput) {
+            searchInput.value = transcript;
+            app.renderCRM();
+            app.showToast(`🔍 ${t.voice_searching || 'Searching for'}: "${transcript}"`, 'success');
+            app.playSound('soundSuccess');
+        }
+    };
+    
+    recognition.onerror = function(event) {
+        let errorMsg = '';
+        switch(event.error) {
+            case 'no-speech': errorMsg = currentLang === 'ar' ? 'لم يتم اكتشاف صوت' : 'No speech detected'; break;
+            case 'audio-capture': errorMsg = currentLang === 'ar' ? 'لا يوجد ميكروفون' : 'No microphone found'; break;
+            case 'not-allowed': errorMsg = currentLang === 'ar' ? 'تم رفض الوصول إلى الميكروفون' : 'Microphone access denied'; break;
+            default: errorMsg = currentLang === 'ar' ? 'خطأ في التعرف على الصوت' : 'Speech recognition error';
+        }
+        app.showToast(`⚠️ ${errorMsg}`, 'warning');
+    };
+    
+    recognition.onend = function() {
+        isListening = false;
+        voiceStatus.style.display = 'none';
+        voiceBtn.classList.remove('listening');
+        if (voiceBtnText) voiceBtnText.innerHTML = '<i class="fas fa-microphone"></i> ' + (t.voice_search || 'بحث صوتي');
+    };
+    
+    recognition.start();
+}
+
+// ==================== UPDATE GEO ====================
+app.updateGeo = function() {
+    const geoDiv = document.getElementById('geoStats');
+    if (!geoDiv) return;
+    const geo = {};
+    clients.forEach(c => { if(c.gov) geo[c.gov] = (geo[c.gov] || 0) + 1; });
+    geoDiv.innerHTML = Object.entries(geo).sort((a,b) => b[1]-a[1]).map(g => `<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee;"><span>${g[0]}</span><b style="color:#0984e3">${g[1]}</b></div>`).join('');
+};
+
 // ==================== INIT ====================
 app.init = async function() {
     if (!sessionStorage.getItem('isLoggedIn')) return;
@@ -2171,14 +2141,15 @@ app.init = async function() {
     app.fillClients();
     app.updateAgentList();
     app.updateTaskClientFilter();
+    app.updateGeo();
     
     document.getElementById('profName').innerText = sessionStorage.getItem('userDisplayName') || "User";
     if (sessionStorage.getItem('userRole') === 'admin' || sessionStorage.getItem('userDisplayName') === "Master Admin") {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
-    app.showToast('🚀 النظام جاهز | الذكاء الاصطناعي مفعل', 'success');
+    app.showToast('🚀 النظام جاهز | الحفظ التلقائي مفعل', 'success');
     
-    syncInterval = setInterval(() => { if (isOnline && !isSyncing && database) syncToFirebase(); }, 60000);
+    syncInterval = setInterval(() => { if (isOnline && !isSyncing && database) app.saveToFirebase(); }, 30000);
     
     if (Notification.permission === 'default') setTimeout(() => { if (confirm('تفعيل الإشعارات للتذكيرات؟')) app.enableDesktopNotifications(); }, 2000);
 };
