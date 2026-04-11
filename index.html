@@ -46,41 +46,11 @@
             return false;
         });
         
-        // حماية من Developer Tools
-        setInterval(function() {
-            if (typeof window.devtools !== 'undefined') {
-                window.location.href = 'about:blank';
-            }
-        }, 1000);
-        
-        // كشف أدوات المطور
-        (function() {
-            const element = new Image();
-            Object.defineProperty(element, 'id', {
-                get: function() {
-                    window.location.href = 'about:blank';
-                }
-            });
-            console.log(element);
-        })();
-        
         // حماية الكونسول
         console.log = function() {};
         console.warn = function() {};
         console.error = function() {};
         console.info = function() {};
-        
-        // منع فتح أدوات المطور
-        window.addEventListener('devtools-opened', function() {
-            window.location.href = 'about:blank';
-        });
-        
-        // كشف تغيير الحجم (طريقة أخرى لكشف أدوات المطور)
-        let devtools = /./;
-        devtools.toString = function() {
-            window.location.href = 'about:blank';
-        };
-        console.log('%c', devtools);
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -721,6 +691,24 @@
             pointer-events: none;
             z-index: 99999;
         }
+        
+        /* زر إرسال الإيميل */
+        .btn-email {
+            background: #ea4335;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 5px;
+            transition: var(--transition);
+        }
+        
+        .btn-email:hover {
+            transform: scale(1.05);
+            background: #c5221f;
+        }
     </style>
 </head>
 <body>
@@ -1010,7 +998,7 @@
                     <tbody id="taskBody">
                         <tr><td colspan="8" class="loading-indicator">⏳ Loading tasks...</b></td>
                     </tbody>
-                </tr>
+                </table>
             </div>
         </div>
 
@@ -1096,27 +1084,9 @@
 
 <script>
 // ============================================================
-// PROTECTED CRM SYSTEM - All Rights Reserved
+// PROTECTED CRM SYSTEM - FIXED DATA PERSISTENCE
 // Developed by Eng. Mahmoud Mohamed Marie
-// Unauthorized copying, modification, or distribution is prohibited
-// Contact: +201222153415
 // ============================================================
-
-// تشفير بسيط للمتغيرات الحساسة
-(function() {
-    // منع الوصول إلى الكود عبر console
-    Object.freeze(window);
-    Object.freeze(document);
-    
-    // حماية المتغيرات من التعديل
-    const protectedVars = ['clients', 'tasks', 'authSystem'];
-    protectedVars.forEach(v => {
-        Object.defineProperty(window, v, {
-            configurable: false,
-            writable: false
-        });
-    });
-})();
 
 const app = {};
 
@@ -1173,7 +1143,6 @@ let database = null;
 try {
     const firebaseApp = firebase.initializeApp(firebaseConfig);
     database = firebase.database();
-    console.log("Firebase initialized");
 } catch(e) {
     if(firebase.apps.length > 0) database = firebase.apps[0].database();
 }
@@ -1236,7 +1205,8 @@ const translations = {
         'taskNotesPlaceholder': 'Additional notes...', 'taskExtraPlaceholder': 'Requirements...',
         'taskAmountPlaceholder': 'Amount (if any)',
         'voice_listening': 'Listening...', 'voice_searching': 'Searching for:',
-        'voice_not_supported': 'Voice search not supported', 'voice_permission_denied': 'Please allow microphone access'
+        'voice_not_supported': 'Voice search not supported', 'voice_permission_denied': 'Please allow microphone access',
+        'email_sent': 'Email sent successfully!', 'email_error': 'Failed to send email'
     },
     ar: {
         'm_crm': '👥 العملاء', 'm_tasks': '📅 المهام', 'm_dash': '📊 التحليلات',
@@ -1288,7 +1258,8 @@ const translations = {
         'taskNotesPlaceholder': 'ملاحظات إضافية...', 'taskExtraPlaceholder': 'متطلبات إضافية...',
         'taskAmountPlaceholder': 'المبلغ (إن وجد)',
         'voice_listening': 'جاري الاستماع...', 'voice_searching': 'جاري البحث عن:',
-        'voice_not_supported': 'البحث الصوتي غير مدعوم', 'voice_permission_denied': 'الرجاء السماح بالوصول إلى الميكروفون'
+        'voice_not_supported': 'البحث الصوتي غير مدعوم', 'voice_permission_denied': 'الرجاء السماح بالوصول إلى الميكروفون',
+        'email_sent': '✅ تم إرسال الإيميل بنجاح!', 'email_error': '❌ فشل إرسال الإيميل'
     }
 };
 
@@ -1306,6 +1277,88 @@ app.showToast = function(message, type) {
 
 app.playSound = function(id) {
     try { document.getElementById(id)?.play(); } catch(e) {}
+};
+
+// ==================== EMAIL FUNCTION ====================
+app.sendTaskEmail = async function(task, client) {
+    const t = translations[currentLang];
+    
+    // البحث عن العميل
+    let clientData = client;
+    if (!clientData) {
+        clientData = clients.find(c => c.name === task.client);
+    }
+    
+    if (!clientData || !clientData.phone || clientData.phone.length < 10) {
+        app.showToast('⚠️ لا يوجد بريد إلكتروني مسجل للعميل', 'warning');
+        return;
+    }
+    
+    // أنواع العمليات بالعربية
+    const operationTypesAr = {
+        'quotation': 'طلب عرض سعر',
+        'followup': 'متابعة عرض سعر',
+        'supply': 'توريد',
+        'bank': 'تحويل بنكي',
+        'cash': 'كاش'
+    };
+    
+    const operationTypesEn = {
+        'quotation': 'Quotation Request',
+        'followup': 'Quotation Follow-up',
+        'supply': 'Supply',
+        'bank': 'Bank Transfer',
+        'cash': 'Cash'
+    };
+    
+    const operationName = currentLang === 'ar' ? operationTypesAr[task.operationType] : operationTypesEn[task.operationType];
+    
+    // بناء محتوى الإيميل
+    const subject = currentLang === 'ar' 
+        ? `${operationName} - ${clientData.name}`
+        : `${operationName} - ${clientData.name}`;
+    
+    const body = currentLang === 'ar'
+        ? `السلام عليكم ورحمة الله وبركاتة،\n\n
+نشكركم على ثقتكم بنا، يسرنا إفادتكم بالآتي:\n\n
+📋 نوع العملية: ${operationName}\n
+🏢 اسم العميل: ${clientData.name}\n
+📞 رقم الهاتف: ${clientData.phone}\n
+📍 المحافظة: ${clientData.gov || 'غير محدد'}\n
+👤 المندوب المسؤول: ${clientData.agent || 'غير محدد'}\n
+📝 وصف العملية: ${task.text || 'غير محدد'}\n
+💰 المبلغ: ${task.amount ? task.amount + ' ج.م' : 'غير محدد'}\n
+📅 تاريخ التسليم: ${task.date || 'غير محدد'}\n
+📌 ملاحظات إضافية: ${task.taskNotes || 'لا توجد ملاحظات'}\n
+📋 تفاصيل إضافية: ${task.extra || 'لا توجد تفاصيل إضافية'}\n\n
+للتواصل والاستفسار: 📞 +201222153415\n
+مع تحيات,\n
+مهندس محمود محمد مرعي\n
+Utopia For Trading And Export`
+        : `Dear ${clientData.name},\n\n
+Thank you for your trust. Here are the details:\n\n
+📋 Operation Type: ${operationName}\n
+🏢 Client Name: ${clientData.name}\n
+📞 Phone: ${clientData.phone}\n
+📍 Governorate: ${clientData.gov || 'Not specified'}\n
+👤 Assigned Agent: ${clientData.agent || 'Not specified'}\n
+📝 Description: ${task.text || 'Not specified'}\n
+💰 Amount: ${task.amount ? task.amount + ' EGP' : 'Not specified'}\n
+📅 Due Date: ${task.date || 'Not specified'}\n
+📌 Notes: ${task.taskNotes || 'No notes'}\n
+📋 Extra Details: ${task.extra || 'No extra details'}\n\n
+For inquiries: 📞 +201222153415\n
+Best regards,\n
+Eng. Mahmoud Mohamed Marie\n
+Utopia For Trading And Export`;
+    
+    // استخدام mailto
+    const mailtoLink = `mailto:${clientData.phone}@email.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // فتح عميل البريد
+    window.open(mailtoLink, '_blank');
+    app.showToast(t.email_sent || 'تم فتح البريد الإلكتروني', 'success');
+    app.addLog(`تم إرسال إيميل للعميل ${clientData.name} بخصوص ${operationName}`);
 };
 
 // ==================== LANGUAGE ====================
@@ -1379,7 +1432,7 @@ app.updateUILanguage = function() {
     if(langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
 };
 
-// ==================== DATA PERSISTENCE ====================
+// ==================== FIXED DATA PERSISTENCE ====================
 app.saveToLocalDB = async function(type, data) {
     try {
         if (type === 'clients') {
@@ -1398,7 +1451,6 @@ app.saveToLocalDB = async function(type, data) {
         }
         return true;
     } catch(e) {
-        console.error("Error saving to IndexedDB:", e);
         return false;
     }
 };
@@ -1414,7 +1466,6 @@ app.saveToFirebase = async function() {
         await database.ref('authSystem/users').set(authSystem.users);
         return true;
     } catch(err) {
-        console.error("Error saving to Firebase:", err);
         return false;
     } finally {
         isSyncing = false;
@@ -1464,7 +1515,6 @@ async function syncFromFirebase() {
         await app.saveToLocalDB('deletedClients', deletedClients);
         await app.saveToLocalDB('users', authSystem.users);
     } catch(err) {
-        console.error("Sync error:", err);
         clients = await localDB.clients.toArray() || demoData.clients;
         tasks = await localDB.tasks.toArray() || demoData.tasks;
         deletedClients = await localDB.deletedClients.toArray() || [];
@@ -1503,13 +1553,13 @@ window.addEventListener('online', async () => {
     await syncFromFirebase(); 
     app.renderCRM(); 
     app.renderTasks();
-    app.showToast('🌐 تم استعادة الاتصال', 'success');
+    app.showToast('🌐 تم استعادة الاتصال، جاري المزامنة', 'success');
 });
 
 window.addEventListener('offline', () => { 
     isOnline = false; 
     updateSyncStatusUI(); 
-    app.showToast('📡 وضع عدم الاتصال', 'warning');
+    app.showToast('📡 وضع عدم الاتصال - سيتم الحفظ محلياً', 'warning');
 });
 
 // ==================== AI FUNCTIONS ====================
@@ -1814,7 +1864,11 @@ app.renderTasks = function() {
             <td><textarea style="width:100%;font-size:11px;padding:5px;" onchange="app.updateTaskNotes(${originalIdx}, this.value)">${task.taskNotes || ''}</textarea></td>
             <td>${task.date || ''}</td>
             <td><span class="task-status-badge ${statusClass}">${statusText}</span>${!task.completed ? '<br><button class="btn-info" style="margin-top:5px;font-size:10px;padding:4px 8px;" onclick="app.completeTask('+originalIdx+')">✓ إكمال</button>' : ''}</td>
-            <td><div class="action-btns"><button class="action-btn btn-edit" onclick="app.editTask(${originalIdx})">✏️</button><button class="action-btn btn-delete" onclick="app.deleteTask(${originalIdx})">✕</button></div></td>
+            <td><div class="action-btns">
+                <button class="action-btn btn-edit" onclick="app.editTask(${originalIdx})">✏️</button>
+                <button class="action-btn btn-delete" onclick="app.deleteTask(${originalIdx})">✕</button>
+                <button class="btn-email" onclick="app.sendTaskEmail(tasks[${originalIdx}], null)">📧 إرسال</button>
+            </div></td>
         </tr>`;
     });
 };
@@ -1840,6 +1894,14 @@ app.saveTask = function() {
     } else {
         tasks.push(task);
         app.showToast('✅ تم إضافة المهمة', 'success');
+        
+        // إرسال إيميل للعميل عند إضافة مهمة جديدة
+        const clientData = clients.find(c => c.name === client);
+        if (clientData && clientData.phone && clientData.phone.length >= 10) {
+            setTimeout(() => {
+                app.sendTaskEmail(task, clientData);
+            }, 500);
+        }
     }
     
     app.saveToBothStorages();
