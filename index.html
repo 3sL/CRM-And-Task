@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* --- نفس الـ CSS الموجود في الكود الأصلي --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -978,7 +979,7 @@
 
 <script>
 // ============================================================
-// COMPLETE CRM SYSTEM - FULLY WORKING
+// COMPLETE CRM SYSTEM - FULLY WORKING - CORRECTED VERSION
 // All features: Language, Voice Search, Data Persistence
 // Developed by Eng. Mahmoud Mohamed Marie
 // ============================================================
@@ -1244,8 +1245,74 @@ app.updateUILanguage = function() {
     if(langBtn) langBtn.innerText = currentLang === 'ar' ? '🇬🇧 English' : '🇸🇦 عربي';
 };
 
-// ==================== DATA PERSISTENCE ====================
-app.saveToLocalDB = async function(type, data) {
+// ==================== DATA PERSISTENCE (CORRECTED) ====================
+async function loadInitialData() {
+    console.log("Loading initial data...");
+    try {
+        // 1. Load from IndexedDB first
+        const localClients = await localDB.clients.toArray();
+        const localTasks = await localDB.tasks.toArray();
+        const localDeleted = await localDB.deletedClients.toArray();
+        const localUsers = await localDB.users.toArray();
+
+        if (localClients.length > 0) clients = localClients;
+        if (localTasks.length > 0) tasks = localTasks;
+        if (localDeleted.length > 0) deletedClients = localDeleted;
+        if (localUsers.length > 0) authSystem.users = localUsers;
+        else authSystem.users = [...defaultUsers];
+
+        console.log(`Loaded from IndexedDB: ${clients.length} clients, ${tasks.length} tasks`);
+
+        // 2. If online, load from Firebase and merge (Firebase data overwrites local if newer)
+        if (isOnline && database) {
+            console.log("Online, syncing with Firebase...");
+            const clientsSnap = await database.ref('clients').once('value');
+            const fbClients = [];
+            clientsSnap.forEach(child => fbClients.push({ id: child.key, ...child.val() }));
+            if (fbClients.length > 0) {
+                // Merge: Firebase clients replace local ones with same ID (simple approach for demo)
+                // For a more robust solution, compare timestamps. We'll just use Firebase as source of truth.
+                clients = fbClients;
+            }
+
+            const tasksSnap = await database.ref('tasks').once('value');
+            const fbTasks = [];
+            tasksSnap.forEach(child => fbTasks.push({ id: child.key, ...child.val() }));
+            if (fbTasks.length > 0) tasks = fbTasks;
+
+            const deletedSnap = await database.ref('deletedClients').once('value');
+            const fbDeleted = [];
+            deletedSnap.forEach(child => fbDeleted.push({ id: child.key, ...child.val() }));
+            if (fbDeleted.length > 0) deletedClients = fbDeleted;
+
+            const usersSnap = await database.ref('authSystem/users').once('value');
+            const fbUsers = [];
+            usersSnap.forEach(child => fbUsers.push(child.val()));
+            if (fbUsers.length > 0) authSystem.users = fbUsers;
+
+            console.log(`Synced from Firebase: ${clients.length} clients, ${tasks.length} tasks`);
+            // Save the merged data back to IndexedDB
+            await saveToLocalDB('clients', clients);
+            await saveToLocalDB('tasks', tasks);
+            await saveToLocalDB('deletedClients', deletedClients);
+            await saveToLocalDB('users', authSystem.users);
+        }
+        
+        // If still no data, load demo data
+        if (clients.length === 0) clients = demoData.clients;
+        if (tasks.length === 0) tasks = demoData.tasks;
+        
+    } catch (error) {
+        console.error("Error loading initial data:", error);
+        // Fallback to demo data on error
+        clients = demoData.clients;
+        tasks = demoData.tasks;
+        deletedClients = [];
+        if (authSystem.users.length === 0) authSystem.users = [...defaultUsers];
+    }
+}
+
+async function saveToLocalDB(type, data) {
     try {
         if (type === 'clients') {
             await localDB.clients.clear();
@@ -1259,23 +1326,27 @@ app.saveToLocalDB = async function(type, data) {
         } else if (type === 'users') {
             await localDB.users.clear();
             if (data.length) await localDB.users.bulkAdd(data);
-            authSystem.users = data;
         }
         return true;
     } catch(e) {
         console.error("Error saving to IndexedDB:", e);
         return false;
     }
-};
+}
 
-app.saveToFirebase = async function() {
+async function saveToFirebase() {
     if (!database || !isOnline) return false;
     try {
         isSyncing = true;
         updateSyncStatusUI();
-        await database.ref('clients').set(clients.map(({id,...rest}) => rest));
-        await database.ref('tasks').set(tasks.map(({id,...rest}) => rest));
-        await database.ref('deletedClients').set(deletedClients.map(({id,...rest}) => rest));
+        // Remove internal 'id' field before sending to Firebase
+        const clientsForFB = clients.map(({id, ...rest}) => rest);
+        const tasksForFB = tasks.map(({id, ...rest}) => rest);
+        const deletedForFB = deletedClients.map(({id, ...rest}) => rest);
+        
+        await database.ref('clients').set(clientsForFB);
+        await database.ref('tasks').set(tasksForFB);
+        await database.ref('deletedClients').set(deletedForFB);
         await database.ref('authSystem/users').set(authSystem.users);
         return true;
     } catch(err) {
@@ -1285,64 +1356,36 @@ app.saveToFirebase = async function() {
         isSyncing = false;
         updateSyncStatusUI();
     }
-};
+}
 
 app.saveToBothStorages = async function() {
-    await app.saveToLocalDB('clients', clients);
-    await app.saveToLocalDB('tasks', tasks);
-    await app.saveToLocalDB('deletedClients', deletedClients);
-    await app.saveToLocalDB('users', authSystem.users);
+    await saveToLocalDB('clients', clients);
+    await saveToLocalDB('tasks', tasks);
+    await saveToLocalDB('deletedClients', deletedClients);
+    await saveToLocalDB('users', authSystem.users);
     
     if (database && isOnline) {
-        await app.saveToFirebase();
+        await saveToFirebase();
         app.showToast('✅ تم الحفظ محلياً وفي السحابة', 'success');
+    } else if (!isOnline) {
+        app.showToast('✅ تم الحفظ محلياً (غير متصل)', 'success');
     } else {
         app.showToast('✅ تم الحفظ محلياً', 'success');
     }
 };
 
-async function syncFromFirebase() {
-    if (!database) return;
-    try {
-        const clientsSnap = await database.ref('clients').once('value');
-        const fbClients = [];
-        clientsSnap.forEach(child => fbClients.push({ id: child.key, ...child.val() }));
-        if (fbClients.length > 0) clients = fbClients;
-        
-        const tasksSnap = await database.ref('tasks').once('value');
-        const fbTasks = [];
-        tasksSnap.forEach(child => fbTasks.push({ id: child.key, ...child.val() }));
-        if (fbTasks.length > 0) tasks = fbTasks;
-        
-        const deletedSnap = await database.ref('deletedClients').once('value');
-        const fbDeleted = [];
-        deletedSnap.forEach(child => fbDeleted.push({ id: child.key, ...child.val() }));
-        if (fbDeleted.length > 0) deletedClients = fbDeleted;
-        
-        const usersSnap = await database.ref('authSystem/users').once('value');
-        const fbUsers = [];
-        usersSnap.forEach(child => fbUsers.push(child.val()));
-        if (fbUsers.length > 0) authSystem.users = fbUsers;
-        
-        await app.saveToLocalDB('clients', clients);
-        await app.saveToLocalDB('tasks', tasks);
-        await app.saveToLocalDB('deletedClients', deletedClients);
-        await app.saveToLocalDB('users', authSystem.users);
-    } catch(err) {
-        console.error("Sync error:", err);
-        clients = await localDB.clients.toArray() || demoData.clients;
-        tasks = await localDB.tasks.toArray() || demoData.tasks;
-        deletedClients = await localDB.deletedClients.toArray() || [];
-        const usersArray = await localDB.users.toArray() || [];
-        authSystem.users = usersArray.length ? usersArray : defaultUsers;
-    }
-}
-
 app.manualSync = async function() {
-    await syncFromFirebase();
-    await app.saveToFirebase();
+    app.showToast('🔄 جاري المزامنة...', 'info');
+    await loadInitialData(); // This will re-fetch from Firebase and merge
     app.renderCRM();
     app.renderTasks();
+    app.renderRecycle();
+    app.renderUsers();
+    app.updateDashboard();
+    app.fillClients();
+    app.updateAgentList();
+    app.updateTaskClientFilter();
+    app.updateGeo();
     app.showToast('✅ تمت المزامنة بنجاح', 'success');
 };
 
@@ -1365,10 +1408,17 @@ function updateSyncStatusUI() {
 window.addEventListener('online', async () => { 
     isOnline = true; 
     updateSyncStatusUI(); 
-    await syncFromFirebase(); 
+    await loadInitialData(); 
     app.renderCRM(); 
     app.renderTasks();
-    app.showToast('🌐 تم استعادة الاتصال', 'success');
+    app.renderRecycle();
+    app.renderUsers();
+    app.updateDashboard();
+    app.fillClients();
+    app.updateAgentList();
+    app.updateTaskClientFilter();
+    app.updateGeo();
+    app.showToast('🌐 تم استعادة الاتصال وتمت المزامنة', 'success');
 });
 
 window.addEventListener('offline', () => { 
@@ -1529,16 +1579,16 @@ app.renderCRM = function() {
         const statusClass = `status-${c.status?.replace(/ /g, '') || 'Interested'}`;
         body.innerHTML += `<tr>
             <td><strong>${c.name || ''}</strong> <span class="ai-score">🤖 ${prob}%</span></td>
-            <td>${c.phone || ''}</td>
-            <td>${c.gov || ''}</td>
-            <td><div style="background:#eee;height:6px;border-radius:3px;width:80px;margin:auto"><div style="background:#00b894;height:100%;width:${prob}%;border-radius:3px"></div></div></td>
-            <td><span class="status-badge ${statusClass}">${c.status || 'Interested'}</span></td>
+            <td>${c.phone || ''}</b></td>
+            <td>${c.gov || ''}</b></td>
+            <td><div style="background:#eee;height:6px;border-radius:3px;width:80px;margin:auto"><div style="background:#00b894;height:100%;width:${prob}%;border-radius:3px"></div></div></b></td>
+            <td><span class="status-badge ${statusClass}">${c.status || 'Interested'}</span></b></td>
             <td><div class="action-btns">
                 <button class="action-btn btn-call" onclick="window.open('tel:${c.phone || ''}')">📞</button>
                 <button class="action-btn btn-wa" onclick="window.open('https://wa.me/2${c.phone || ''}')">💬</button>
                 <button class="action-btn btn-edit" onclick="app.editClient(${clients.indexOf(c)})">✏️</button>
                 <button class="action-btn btn-delete" onclick="app.deleteClient(${clients.indexOf(c)})">✕</button>
-            </div></td>
+            </div></b>
         </tr>`;
     });
     app.updateAIInsights();
@@ -1672,14 +1722,14 @@ app.renderTasks = function() {
         const typeIcons = { quotation: '📄', followup: '👀', supply: '🚚', bank: '🏦', cash: '💵' };
         const typeText = { quotation: t.op_quotation || 'طلب عرض سعر', followup: t.op_followup || 'متابعة عرض سعر', supply: t.op_supply || 'توريد', bank: t.op_bank || 'بنك', cash: t.op_cash || 'كاش' };
         body.innerHTML += `<tr>
-            <td><strong>${task.client || ''}</strong></td>
-            <td>${typeIcons[task.operationType] || '📄'} ${typeText[task.operationType] || task.operationType}</td>
-            <td>${task.amount ? task.amount + (currentLang === 'ar' ? ' ج.م' : ' EGP') : '—'}</td>
-            <td>${task.text || ''}</td>
-            <td><textarea style="width:100%;font-size:11px;padding:5px;" onchange="app.updateTaskNotes(${originalIdx}, this.value)">${task.taskNotes || ''}</textarea></td>
-            <td>${task.date || ''}</td>
-            <td><span class="task-status-badge ${statusClass}">${statusText}</span>${!task.completed ? '<br><button class="btn-info" style="margin-top:5px;font-size:10px;padding:4px 8px;" onclick="app.completeTask('+originalIdx+')">✓ إكمال</button>' : ''}</td>
-            <td><div class="action-btns"><button class="action-btn btn-edit" onclick="app.editTask(${originalIdx})">✏️</button><button class="action-btn btn-delete" onclick="app.deleteTask(${originalIdx})">✕</button></div></td>
+            <td><strong>${task.client || ''}</strong></b><td>
+            <td>${typeIcons[task.operationType] || '📄'} ${typeText[task.operationType] || task.operationType}</b><td>
+            <td>${task.amount ? task.amount + (currentLang === 'ar' ? ' ج.م' : ' EGP') : '—'}</b><td>
+            <td>${task.text || ''}</b><td>
+            <td><textarea style="width:100%;font-size:11px;padding:5px;" onchange="app.updateTaskNotes(${originalIdx}, this.value)">${task.taskNotes || ''}</textarea></b></td>
+            <td>${task.date || ''}</b><td>
+            <td><span class="task-status-badge ${statusClass}">${statusText}</span>${!task.completed ? '<br><button class="btn-info" style="margin-top:5px;font-size:10px;padding:4px 8px;" onclick="app.completeTask('+originalIdx+')">✓ إكمال</button>' : ''}</b></td>
+            <td><div class="action-btns"><button class="action-btn btn-edit" onclick="app.editTask(${originalIdx})">✏️</button><button class="action-btn btn-delete" onclick="app.deleteTask(${originalIdx})">✕</button></div></b>
         </tr>`;
     });
 };
@@ -1774,11 +1824,11 @@ app.renderRecycle = function() {
     body.innerHTML = '';
     deletedClients.forEach((c, i) => {
         body.innerHTML += `<tr>
-            <td><strong>${c.name || ''}</strong></td>
-            <td>${c.phone || ''}</td>
-            <td>${c.status || ''}</td>
-            <td><button class="action-btn btn-edit" onclick="app.restoreClient(${i})">🔄</button></td>
-            <td><button class="action-btn btn-delete" onclick="app.permanentDelete(${i})">🗑️</button></td>
+            <td><strong>${c.name || ''}</strong></b><td>
+            <td>${c.phone || ''}</b><td>
+            <td>${c.status || ''}</b></td>
+            <td><button class="action-btn btn-edit" onclick="app.restoreClient(${i})">🔄</button></b></td>
+            <td><button class="action-btn btn-delete" onclick="app.permanentDelete(${i})">🗑️</button></b>
         </tr>`;
     });
 };
@@ -1878,15 +1928,15 @@ app.delUser = function(i) { if (confirm('حذف المستخدم؟')) { authSyst
 app.renderUsers = function() {
     const body = document.getElementById('usersBody');
     if (!body) return;
-    if (sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin") { body.innerHTML = '<td><td colspan="5">غير مصرح</b></td>'; return; }
+    if (sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin") { body.innerHTML = '<tr><td colspan="5">غير مصرح</b></td>'; return; }
     body.innerHTML = '';
     authSystem.users.forEach((u, i) => {
         body.innerHTML += `<tr>
-            <td>${u.u || ''}</td>
+            <td>${u.u || ''}</b></td>
             <td>••••••</b></td>
-            <td>${u.displayName || ''}</td>
-            <td>${u.role || 'user'}</td>
-            <td><button class="action-btn btn-delete" onclick="app.delUser(${i})">✕</button></td>
+            <td>${u.displayName || ''}</b></td>
+            <td>${u.role || 'user'}</b></td>
+            <td><button class="action-btn btn-delete" onclick="app.delUser(${i})">✕</button></b>
         </tr>`;
     });
 };
@@ -2069,19 +2119,25 @@ app.updateGeo = function() {
     geoDiv.innerHTML = Object.entries(geo).sort((a,b) => b[1]-a[1]).map(g => `<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee;"><span>${g[0]}</span><b style="color:#0984e3">${g[1]}</b></div>`).join('');
 };
 
-// ==================== INIT ====================
+// ==================== INIT (CORRECTED) ====================
 app.init = async function() {
     if (!sessionStorage.getItem('isLoggedIn')) return;
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
-    await syncFromFirebase();
+    
+    // Load all data first
+    await loadInitialData();
+    
+    // Update UI with loaded data
     app.updateUILanguage();
     
+    // Populate governorate dropdowns
     const govSel = document.getElementById('gov');
     if (govSel && govSel.options.length <= 1) govs.forEach(g => { const opt = document.createElement('option'); opt.value = g; opt.innerText = g; govSel.appendChild(opt); });
     const filterGov = document.getElementById('filterGov');
     if (filterGov && filterGov.options.length <= 1) govs.forEach(g => { const opt = document.createElement('option'); opt.value = g; opt.innerText = g; filterGov.appendChild(opt); });
     
+    // Render all sections
     app.renderCRM();
     app.renderTasks();
     app.renderRecycle();
@@ -2098,7 +2154,12 @@ app.init = async function() {
     }
     app.showToast('🚀 النظام جاهز', 'success');
     
-    syncInterval = setInterval(() => { if (isOnline && !isSyncing && database) app.saveToFirebase(); }, 30000);
+    // Set up auto-sync every 30 seconds only if online
+    syncInterval = setInterval(() => { 
+        if (isOnline && !isSyncing && database) {
+            saveToFirebase(); 
+        }
+    }, 30000);
     
     if (Notification.permission === 'default') setTimeout(() => { if (confirm('تفعيل الإشعارات للتذكيرات؟')) app.enableDesktopNotifications(); }, 2000);
 };
