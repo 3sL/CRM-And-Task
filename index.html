@@ -5,6 +5,83 @@
     <title>Utopia For Trading And Export - CRM System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="copyright" content="Eng. Mahmoud Mohamed Marie - All Rights Reserved">
+    <meta name="author" content="Eng. Mahmoud Mohamed Marie">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Anti-theft protection -->
+    <script>
+        // حماية من حفظ الصفحة
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey && (e.key === 's' || e.key === 'S')) ||
+                (e.ctrlKey && (e.key === 'u' || e.key === 'U')) ||
+                (e.ctrlKey && (e.shiftKey && (e.key === 'I' || e.key === 'i'))) ||
+                (e.key === 'F12')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // حماية من النقر بزر الماوس الأيمن
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // حماية من تحديد النص
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // حماية من نسخ النص
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // حماية من قص النص
+        document.addEventListener('cut', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // حماية من Developer Tools
+        setInterval(function() {
+            if (typeof window.devtools !== 'undefined') {
+                window.location.href = 'about:blank';
+            }
+        }, 1000);
+        
+        // كشف أدوات المطور
+        (function() {
+            const element = new Image();
+            Object.defineProperty(element, 'id', {
+                get: function() {
+                    window.location.href = 'about:blank';
+                }
+            });
+            console.log(element);
+        })();
+        
+        // حماية الكونسول
+        console.log = function() {};
+        console.warn = function() {};
+        console.error = function() {};
+        console.info = function() {};
+        
+        // منع فتح أدوات المطور
+        window.addEventListener('devtools-opened', function() {
+            window.location.href = 'about:blank';
+        });
+        
+        // كشف تغيير الحجم (طريقة أخرى لكشف أدوات المطور)
+        let devtools = /./;
+        devtools.toString = function() {
+            window.location.href = 'about:blank';
+        };
+        console.log('%c', devtools);
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -14,6 +91,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* منع تحديد النص عبر CSS */
+        * {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* منع السحب */
+        img, a, button {
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+        
+        /* علامة مائية مرئية */
+        body::before {
+            content: "© Eng. Mahmoud Mohamed Marie | +201222153415 | All Rights Reserved";
+            position: fixed;
+            bottom: 5px;
+            left: 5px;
+            font-size: 8px;
+            color: rgba(0,0,0,0.15);
+            pointer-events: none;
+            z-index: 99999;
+            white-space: nowrap;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -605,6 +710,17 @@
             color: #ff6b6b;
             animation: voicePulse 1s infinite;
         }
+        
+        /* إشعار حقوق الملكية */
+        .copyright-notice {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 8px;
+            color: rgba(0,0,0,0.2);
+            pointer-events: none;
+            z-index: 99999;
+        }
     </style>
 </head>
 <body>
@@ -894,7 +1010,7 @@
                     <tbody id="taskBody">
                         <tr><td colspan="8" class="loading-indicator">⏳ Loading tasks...</b></td>
                     </tbody>
-                </table>
+                </tr>
             </div>
         </div>
 
@@ -976,12 +1092,31 @@
     <span id="voiceStatusText">جاري الاستماع...</span>
 </div>
 
+<div class="copyright-notice">© Eng. Mahmoud Mohamed Marie | +201222153415 | Protected Software</div>
+
 <script>
 // ============================================================
-// COMPLETE CRM SYSTEM - FULLY WORKING
-// All features: Language, Voice Search, Data Persistence
+// PROTECTED CRM SYSTEM - All Rights Reserved
 // Developed by Eng. Mahmoud Mohamed Marie
+// Unauthorized copying, modification, or distribution is prohibited
+// Contact: +201222153415
 // ============================================================
+
+// تشفير بسيط للمتغيرات الحساسة
+(function() {
+    // منع الوصول إلى الكود عبر console
+    Object.freeze(window);
+    Object.freeze(document);
+    
+    // حماية المتغيرات من التعديل
+    const protectedVars = ['clients', 'tasks', 'authSystem'];
+    protectedVars.forEach(v => {
+        Object.defineProperty(window, v, {
+            configurable: false,
+            writable: false
+        });
+    });
+})();
 
 const app = {};
 
@@ -1770,7 +1905,7 @@ app.clearTaskFilters = function() {
 app.renderRecycle = function() {
     const body = document.getElementById('recycleBody');
     if (!body) return;
-    if (!deletedClients.length) { body.innerHTML = '<tr><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></td>'; return; }
+    if (!deletedClients.length) { body.innerHTML = '<td><td colspan="5" class="loading-indicator">📭 سلة المحذوفات فارغة</b></td>'; return; }
     body.innerHTML = '';
     deletedClients.forEach((c, i) => {
         body.innerHTML += `<tr>
@@ -1878,7 +2013,7 @@ app.delUser = function(i) { if (confirm('حذف المستخدم؟')) { authSyst
 app.renderUsers = function() {
     const body = document.getElementById('usersBody');
     if (!body) return;
-    if (sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin") { body.innerHTML = '<td><td colspan="5">غير مصرح</b></td>'; return; }
+    if (sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin") { body.innerHTML = '<tr><td colspan="5">غير مصرح</b></td>'; return; }
     body.innerHTML = '';
     authSystem.users.forEach((u, i) => {
         body.innerHTML += `<tr>
@@ -2096,7 +2231,7 @@ app.init = async function() {
     if (sessionStorage.getItem('userRole') === 'admin' || sessionStorage.getItem('userDisplayName') === "Master Admin") {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
-    app.showToast('🚀 النظام جاهز', 'success');
+    app.showToast('🚀 النظام جاهز | محمي بحقوق الملكية', 'success');
     
     syncInterval = setInterval(() => { if (isOnline && !isSyncing && database) app.saveToFirebase(); }, 30000);
     
