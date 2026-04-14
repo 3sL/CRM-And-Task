@@ -5,8 +5,6 @@
     <title>Utopia Trading Pro CRM & Tasks | Ultra Secure</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    
-    <!-- حماية إضافية -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval';">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     
@@ -14,13 +12,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
     <script src="https://unpkg.com/dexie@3.2.3/dist/dexie.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* نفس الـ CSS السابق مع إضافات للإيميل */
         :root {
             --primary: #1e1e2f;
             --accent: #ffcc00;
@@ -49,14 +45,12 @@
             overflow: hidden;
             transition: all 0.3s ease;
         }
-        /* منع تحديد النصوص بالكامل */
         body, .sidebar, .main, .form-group, table {
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
         }
-        /* السماح بتحديد النص في حقول الإدخال فقط */
         input, textarea, select {
             user-select: text;
             -webkit-user-select: text;
@@ -67,7 +61,6 @@
         [dir="rtl"] .sidebar button { text-align: right; flex-direction: row-reverse; }
         [dir="rtl"] .action-btn { margin: 0 3px; }
         
-        /* باقي الـ CSS كما هو مع إضافة تأثيرات أمان */
         #loginOverlay {
             position: fixed;
             top: 0;
@@ -303,22 +296,6 @@
         .sync-status.offline { background: #dc3545; }
         .sync-status.syncing { background: #ffc107; color: #333; animation: pulse 1s infinite; }
         
-        .anti-debug-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            color: red;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100000;
-            font-size: 24px;
-            text-align: center;
-        }
-        
         [dir="rtl"] .advanced-filter-bar button,
         [dir="rtl"] .action-btn,
         [dir="rtl"] .btn-ai,
@@ -394,7 +371,6 @@
             font-size: 16px;
         }
         
-        /* علامة مائية ديناميكية */
         .dynamic-watermark {
             position: fixed;
             bottom: 10px;
@@ -406,7 +382,6 @@
             font-family: monospace;
         }
         
-        /* نافذة الإيميل المنبثقة */
         .email-modal {
             position: fixed;
             top: 0;
@@ -465,9 +440,26 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        
+        /* رسالة حماية عند محاولة فتح أدوات المطور */
+        .devtools-detected {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.98);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200000;
+            color: white;
+            text-align: center;
+            flex-direction: column;
+        }
     </style>
 </head>
-<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;"> 
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;" onkeydown="return false;"> 
 <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
@@ -790,32 +782,134 @@
 
 <script>
 // ============================================================
-// ULTRA SECURE SYSTEM - Enhanced Protection Layer v2.0
-// System secured by Eng. Mahmoud Mohamed Marie
+// UTOPIA TRADING PRO CRM - نظام إدارة متكامل وآمن
+// تم التطوير بواسطة: مهندس محمود محمد مرعي
+// الإصدار: 4.0 - أقصى حماية ممكنة للواجهة الأمامية
 // ============================================================
-
-// تهيئة EmailJS
-(function initEmailJS() {
-    emailjs.init("YOUR_PUBLIC_KEY"); // سيتم تحديثها من الإعدادات
-})();
 
 // ========== طبقات الحماية المتقدمة ==========
 
-// 1. منع أدوات المطور المتقدمة
-(function antiDebugger() {
+(function() {
+    "use strict";
+    
+    // 1. منع حفظ الصفحة (Ctrl+S)
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
+            e.preventDefault();
+            e.stopPropagation();
+            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ حفظ الصفحة غير مسموح', 'error');
+            return false;
+        }
+        // منع عرض المصدر (Ctrl+U)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
+            e.preventDefault();
+            e.stopPropagation();
+            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ عرض المصدر غير مسموح', 'error');
+            return false;
+        }
+        // منع فتح أدوات المطور (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C)
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            e.stopPropagation();
+            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ أدوات المطور معطلة', 'error');
+            return false;
+        }
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+            e.preventDefault();
+            e.stopPropagation();
+            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ أدوات المطور معطلة', 'error');
+            return false;
+        }
+        // منع الطباعة (Ctrl+P)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
+            e.preventDefault();
+            e.stopPropagation();
+            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ الطباعة غير مسموحة', 'error');
+            return false;
+        }
+    });
+    
+    // 2. كشف ومنع فتح أدوات المطور بشكل متقدم
     function detectDevTools() {
-        var start = performance.now();
-        debugger;
-        var end = performance.now();
-        if (end - start > 100) {
-            document.body.innerHTML = '<div class="anti-debug-overlay"><div><h1>🔒 Access Denied</h1><p>Developer tools are not allowed</p><p>System secured by Eng. Mahmoud Marie</p></div></div>';
-            throw new Error("Debugger detected");
+        var threshold = 160;
+        var widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        var heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        
+        if (widthThreshold || heightThreshold) {
+            document.body.innerHTML = '<div class="devtools-detected"><h1>🔒 تم اكتشاف أدوات المطور</h1><p>تم إغلاق النظام حفاظاً على الأمان</p><button onclick="location.reload()">إعادة التشغيل</button></div>';
+            if (window._0x3d2a && window._0x3d2a.out) window._0x3d2a.out();
+            throw new Error("DevTools detected");
         }
     }
+    
     setInterval(detectDevTools, 1000);
     
-    var noop = function() {};
-    if (window.console) {
+    // 3. منع النقر بزر الماوس الأيمن بشكل كامل
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
+    
+    // 4. منع السحب والإفلات
+    document.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    // 5. منع تحديد النص بشكل كامل
+    document.addEventListener('selectstart', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
+    // 6. منع النسخ والقص واللصق
+    document.addEventListener('copy', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ النسخ غير مسموح', 'error');
+            return false;
+        }
+    });
+    
+    document.addEventListener('cut', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ القص غير مسموح', 'error');
+            return false;
+        }
+    });
+    
+    document.addEventListener('paste', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ اللصق غير مسموح', 'error');
+            return false;
+        }
+    });
+    
+    // 7. منع حفظ الصفحة عبر قائمة المتصفح
+    window.addEventListener('beforeprint', function(e) {
+        e.preventDefault();
+        window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ الطباعة غير مسموحة', 'error');
+        return false;
+    });
+    
+    // 8. منع التقاط الشاشة (تنبيه فقط - لا يمكن منعه تقنياً)
+    // إضافة علامة مائية ديناميكية مع بيانات الجلسة
+    setInterval(function() {
+        var watermarkDiv = document.getElementById('dynamicWatermark');
+        if (watermarkDiv && sessionStorage.getItem('isLoggedIn') === 'true') {
+            var now = new Date();
+            watermarkDiv.innerHTML = sessionStorage.getItem('userDisplayName') + ' | ' + now.toLocaleString() + ' | ' + navigator.userAgent.substring(0, 30);
+        }
+    }, 3000);
+    
+    // 9. تعطيل console.log في الإنتاج
+    if (typeof console !== "undefined") {
+        var noop = function() {};
         console.log = noop;
         console.warn = noop;
         console.error = noop;
@@ -824,11 +918,27 @@
         console.table = noop;
         console.clear = noop;
     }
+    
+    // 10. إخفاء الكود عن طريق منع الوصول إلى innerHTML
+    var originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    if (originalInnerHTML && originalInnerHTML.get) {
+        Object.defineProperty(Element.prototype, 'innerHTML', {
+            get: function() {
+                if (this.tagName === 'SCRIPT' || this.tagName === 'HTML' || this.tagName === 'BODY') {
+                    return '';
+                }
+                return originalInnerHTML.get.call(this);
+            },
+            set: function(value) {
+                originalInnerHTML.set.call(this, value);
+            }
+        });
+    }
 })();
 
-// باقي دوال الحماية (مختصرة للمساحة، نفس السابق)
 window._0x3d2a = window._0x3d2a || {};
 
+// ========== إدارة المتغيرات العامة ==========
 var currentLang = localStorage.getItem('appLang') || 'en';
 var translations = {
     en: {
@@ -944,9 +1054,9 @@ var govs = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Sharkia", "Monufia", "Gh
 
 // إعدادات الإيميل
 var emailSettings = {
-    serviceId: localStorage.getItem('emailServiceId') || 'service_utopia',
-    templateId: localStorage.getItem('emailTemplateId') || 'template_utopia',
-    publicKey: localStorage.getItem('emailPublicKey') || 'YOUR_PUBLIC_KEY'
+    serviceId: (function() { try { return localStorage.getItem('emailServiceId') || 'service_utopia'; } catch(e) { return 'service_utopia'; } })(),
+    templateId: (function() { try { return localStorage.getItem('emailTemplateId') || 'template_utopia'; } catch(e) { return 'template_utopia'; } })(),
+    publicKey: (function() { try { return localStorage.getItem('emailPublicKey') || 'YOUR_PUBLIC_KEY'; } catch(e) { return 'YOUR_PUBLIC_KEY'; } })()
 };
 
 // مستخدمين تجريبيين
@@ -968,131 +1078,27 @@ var demoData = {
     ]
 };
 
-// قوالب الإيميلات لكل نوع عملية
+// قوالب الإيميلات
 var emailTemplates = {
     quotation: {
         subject: "📄 عرض سعر - {client_name}",
-        body: `尊敬的 {client_name}،
-
-تحية طيبة،
-
-يسر شركة يوتوبيا للتجارة والتصدير أن تقدم لكم عرض سعر للمنتجات/الخدمات المطلوبة:
-
-📋 تفاصيل العرض:
-- المنتج/الخدمة: {task_text}
-- المبلغ: {amount} جنيه مصري
-- تاريخ العرض: {date}
-
-📌 ملاحظات إضافية:
-{task_notes}
-
-نأمل أن ينال العرض إعجابكم، ونحن على استعداد تام للإجابة على أي استفسارات.
-
-مع خالص التحية،
-فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
-
----
-هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
+        body: `尊敬的 {client_name}،\n\nتحية طيبة،\n\nيسر شركة يوتوبيا للتجارة والتصدير أن تقدم لكم عرض سعر للمنتجات/الخدمات المطلوبة:\n\n📋 تفاصيل العرض:\n- المنتج/الخدمة: {task_text}\n- المبلغ: {amount} جنيه مصري\n- تاريخ العرض: {date}\n\n📌 ملاحظات إضافية:\n{task_notes}\n\nنأمل أن ينال العرض إعجابكم، ونحن على استعداد تام للإجابة على أي استفسارات.\n\nمع خالص التحية،\nفريق يوتوبيا للتجارة والتصدير\n📞 +201222153415\n📧 info@utopia.com\n\n---\nهذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
     },
     followup: {
         subject: "👀 متابعة عرض السعر - {client_name}",
-        body: `尊敬的 {client_name}،
-
-تحية طيبة،
-
-نود أن نتابع معكم بخصوص عرض السعر الذي تم تقديمه لكم بتاريخ {date} بخصوص {task_text}.
-
-نأمل أن تكونوا قد اطلعتم على العرض، ونحن في انتظار ردكم الكريم. لأي استفسارات، لا تترددوا في التواصل معنا.
-
-نتطلع إلى تعاون مثمر معكم.
-
-مع خالص التحية،
-فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
-
----
-هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
+        body: `尊敬的 {client_name}،\n\nتحية طيبة،\n\nنود أن نتابع معكم بخصوص عرض السعر الذي تم تقديمه لكم بتاريخ {date} بخصوص {task_text}.\n\nنأمل أن تكونوا قد اطلعتم على العرض، ونحن في انتظار ردكم الكريم. لأي استفسارات، لا تترددوا في التواصل معنا.\n\nنتطلع إلى تعاون مثمر معكم.\n\nمع خالص التحية،\nفريق يوتوبيا للتجارة والتصدير\n📞 +201222153415\n📧 info@utopia.com\n\n---\nهذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
     },
     supply: {
         subject: "🚚 تأكيد توريد - {client_name}",
-        body: `尊敬的 {client_name}،
-
-تحية طيبة،
-
-نود إعلامكم بأن عملية التوريد الخاصة بطلبكم قد تمت وفقاً للتفاصيل التالية:
-
-🚚 تفاصيل التوريد:
-- المنتج/الخدمة: {task_text}
-- كمية/قيمة التوريد: {amount} جنيه مصري
-- تاريخ التوريد: {date}
-
-📌 ملاحظات:
-{task_notes}
-
-يمكنكم التواصل معنا لأي استفسارات إضافية.
-
-مع خالص التحية،
-فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
-
----
-هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
+        body: `尊敬的 {client_name}،\n\nتحية طيبة،\n\nنود إعلامكم بأن عملية التوريد الخاصة بطلبكم قد تمت وفقاً للتفاصيل التالية:\n\n🚚 تفاصيل التوريد:\n- المنتج/الخدمة: {task_text}\n- كمية/قيمة التوريد: {amount} جنيه مصري\n- تاريخ التوريد: {date}\n\n📌 ملاحظات:\n{task_notes}\n\nيمكنكم التواصل معنا لأي استفسارات إضافية.\n\nمع خالص التحية،\nفريق يوتوبيا للتجارة والتصدير\n📞 +201222153415\n📧 info@utopia.com\n\n---\nهذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
     },
     bank: {
         subject: "🏦 إجراءات بنكية - {client_name}",
-        body: `尊敬的 {client_name}،
-
-تحية طيبة،
-
-بخصوص الإجراءات البنكية لعملية {task_text}:
-
-🏦 تفاصيل الحساب البنكي:
-- المبلغ: {amount} جنيه مصري
-- البنك: البنك الأهلي المصري
-- رقم الحساب: 123456789
-- IBAN: EG1234567890123456789
-
-📌 ملاحظات:
-{task_notes}
-
-يرجى إرسال إيصال التحويل بعد إتمام العملية.
-
-مع خالص التحية،
-فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
-
----
-هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
+        body: `尊敬的 {client_name}،\n\nتحية طيبة،\n\nبخصوص الإجراءات البنكية لعملية {task_text}:\n\n🏦 تفاصيل الحساب البنكي:\n- المبلغ: {amount} جنيه مصري\n- البنك: البنك الأهلي المصري\n- رقم الحساب: 123456789\n- IBAN: EG1234567890123456789\n\n📌 ملاحظات:\n{task_notes}\n\nيرجى إرسال إيصال التحويل بعد إتمام العملية.\n\nمع خالص التحية،\nفريق يوتوبيا للتجارة والتصدير\n📞 +201222153415\n📧 info@utopia.com\n\n---\nهذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
     },
     cash: {
         subject: "💵 تحصيل نقدي - {client_name}",
-        body: `尊敬的 {client_name}،
-
-تحية طيبة،
-
-بخصوص عملية التحصيل النقدي بقيمة {amount} جنيه مصري عن {task_text}:
-
-📌 تعليمات التحصيل:
-- المبلغ المطلوب: {amount} جنيه مصري
-- تاريخ الاستحقاق: {date}
-
-📌 ملاحظات:
-{task_notes}
-
-يرجى تجهيز المبلغ للتسليم في الموعد المحدد.
-
-مع خالص التحية،
-فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
-
----
-هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
+        body: `尊敬的 {client_name}،\n\nتحية طيبة،\n\nبخصوص عملية التحصيل النقدي بقيمة {amount} جنيه مصري عن {task_text}:\n\n📌 تعليمات التحصيل:\n- المبلغ المطلوب: {amount} جنيه مصري\n- تاريخ الاستحقاق: {date}\n\n📌 ملاحظات:\n{task_notes}\n\nيرجى تجهيز المبلغ للتسليم في الموعد المحدد.\n\nمع خالص التحية،\nفريق يوتوبيا للتجارة والتصدير\n📞 +201222153415\n📧 info@utopia.com\n\n---\nهذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
     }
 };
 
@@ -1145,7 +1151,6 @@ window._0x3d2a.saveEmailSettings = function() {
         localStorage.setItem('emailTemplateId', templateId);
         localStorage.setItem('emailPublicKey', publicKey);
         
-        // إعادة تهيئة EmailJS
         emailjs.init(publicKey);
         
         window._0x3d2a.showToast('✅ تم حفظ إعدادات البريد الإلكتروني', 'success');
@@ -1160,11 +1165,9 @@ window._0x3d2a.sendEmail = function(taskId, clientEmail, clientName, taskData) {
         return;
     }
     
-    // الحصول على القالب المناسب
     var operationType = taskData.operationType || 'quotation';
     var template = emailTemplates[operationType] || emailTemplates.quotation;
     
-    // تنسيق الموضوع والنص
     var subject = template.subject
         .replace('{client_name}', clientName)
         .replace('{task_text}', taskData.text || '')
@@ -1178,7 +1181,6 @@ window._0x3d2a.sendEmail = function(taskId, clientEmail, clientName, taskData) {
         .replace('{date}', taskData.date || new Date().toLocaleDateString())
         .replace('{task_notes}', taskData.taskNotes || 'لا توجد ملاحظات إضافية');
     
-    // عرض نافذة تأكيد مع معاينة
     var modal = document.createElement('div');
     modal.className = 'email-modal';
     modal.innerHTML = `
@@ -1239,14 +1241,12 @@ window._0x3d2a.confirmSendEmail = async function(taskId, toEmail, modalElement) 
         .replace('{date}', task.date || new Date().toLocaleDateString())
         .replace('{task_notes}', task.taskNotes || 'لا توجد ملاحظات إضافية');
     
-    // إظهار حالة الإرسال
     var statusDiv = document.createElement('div');
     statusDiv.className = 'email-status';
     statusDiv.innerHTML = '📧 جاري إرسال البريد الإلكتروني...';
     document.body.appendChild(statusDiv);
     
     try {
-        // إرسال الإيميل عبر EmailJS
         var templateParams = {
             to_email: client.email,
             to_name: client.name,
@@ -1263,7 +1263,6 @@ window._0x3d2a.confirmSendEmail = async function(taskId, toEmail, modalElement) 
             emailSettings.publicKey
         );
         
-        // تحديث حالة الإيميل في المهمة
         task.emailSent = true;
         task.emailDate = new Date().toISOString();
         window._0x3d2a.saveToLocalDB('tasks', tasks);
@@ -1281,7 +1280,6 @@ window._0x3d2a.confirmSendEmail = async function(taskId, toEmail, modalElement) 
         window._0x3d2a.renderTasks();
         
     } catch (error) {
-        console.error("Email error:", error);
         statusDiv.innerHTML = '❌ فشل إرسال البريد. تحقق من إعدادات EmailJS';
         statusDiv.style.background = '#dc3545';
         setTimeout(function() { statusDiv.remove(); }, 4000);
@@ -1289,7 +1287,7 @@ window._0x3d2a.confirmSendEmail = async function(taskId, toEmail, modalElement) 
     }
 };
 
-// ========== دوال المزامنة والتخزين (مختصرة) ==========
+// ========== دوال المزامنة والتخزين ==========
 
 async function syncFromFirebase() {
     if (!database || isLoadingData) return;
@@ -1559,7 +1557,7 @@ window._0x3d2a.renderCRM = function(){
     if(!body) return;
     
     if (clients.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</b></td>';
+        body.innerHTML = '<tr><td colspan="7" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</b></tr>';
         return;
     }
     
@@ -1902,7 +1900,6 @@ window._0x3d2a.renderTasks = function(){
         var emailIcon = task.emailSent ? '✅' : '📧';
         var emailTitle = task.emailSent ? `تم الإرسال: ${new Date(task.emailDate).toLocaleString()}` : 'إرسال إيميل';
         
-        // الحصول على إيميل العميل
         var client = clients.find(c => c.name === task.client);
         var clientEmail = client ? client.email : '';
         
@@ -2405,6 +2402,15 @@ window._0x3d2a.showNotificationsPanel = function() {
     document.body.appendChild(panel);
 };
 
+function startPeriodicSync() {
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(function() {
+        if (isOnline && !isSyncing && sessionStorage.getItem('isLoggedIn') === 'true') {
+            syncToFirebase();
+        }
+    }, 5 * 60 * 1000);
+}
+
 // ========== تهيئة التطبيق ==========
 
 window._0x3d2a.init = async function(){
@@ -2466,7 +2472,6 @@ window._0x3d2a.init = async function(){
         }
     }
     
-    // تحميل إعدادات الإيميل
     document.getElementById('emailServiceId').value = emailSettings.serviceId;
     document.getElementById('emailTemplateId').value = emailSettings.templateId;
     document.getElementById('emailPublicKey').value = emailSettings.publicKey;
@@ -2488,6 +2493,13 @@ window._0x3d2a.init = async function(){
 if(sessionStorage.getItem('isLoggedIn') === 'true'){
     window._0x3d2a.init();
 }
+
+// تهيئة EmailJS
+(function initEmailJS() {
+    try {
+        emailjs.init(emailSettings.publicKey || "YOUR_PUBLIC_KEY");
+    } catch(e) {}
+})();
 </script>
 </body>
 </html>
