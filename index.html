@@ -787,44 +787,48 @@ DOCTYPE html>
 // الإصدار: 4.0 - أقصى حماية ممكنة للواجهة الأمامية
 // ============================================================
 
-// ========== طبقات الحماية المتقدمة ==========
+// ========== طبقات الحماية المتقدمة (نسخة إصلاح خانات الإدخال) ==========
 
 (function() {
     "use strict";
 
-    // دالة مساعدة للتأكد إذا كان المستخدم يكتب في خانة إدخال
+    // 1. دالة مساعدة ذكية للتأكد إذا كان المستخدم يحاول الكتابة
     const isInput = (el) => {
-        return el.tagName === 'INPUT' || 
-               el.tagName === 'TEXTAREA' || 
+        if (!el) return false;
+        const tagName = el.tagName.toUpperCase();
+        return tagName === 'INPUT' || 
+               tagName === 'TEXTAREA' || 
                el.isContentEditable || 
                el.closest('input, textarea');
     };
 
-    // 1. منع الاختصارات مع استثناء الكتابة العادية
+    // 2. منع الاختصارات مع السماح الكامل للكتابة داخل الخانات
     document.addEventListener('keydown', function(e) {
         const targetIsInput = isInput(e.target);
 
-        // إذا كان المستخدم يكتب في خانة إدخال، اسمح له بكل شيء إلا أدوات المطور
+        // إذا كان المستخدم داخل خانة إدخال
         if (targetIsInput) {
-            // منع F12 و اختصارات الـ Inspect حتى داخل الـ Input
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
+            // نمنع فقط الاختصارات التي تفتح أدوات المطور
+            if (e.key === 'F12' || 
+               (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
                 e.preventDefault();
                 return false;
             }
-            return true; // اسمح ببقية الكتابة (حروف، أرقام، مسح)
+            // نسمح بكل شيء آخر (حروف، أرقام، مسح، Ctrl+V، إلخ)
+            return true; 
         }
 
         // منع حفظ الصفحة (Ctrl+S)
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
             e.preventDefault();
-            window._0x3d2a?.showToast?.('⛔ حفظ الصفحة غير مسموح', 'error');
+            if (window._0x3d2a?.showToast) window._0x3d2a.showToast('⛔ حفظ الصفحة غير مسموح', 'error');
             return false;
         }
 
         // منع عرض المصدر (Ctrl+U)
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') {
             e.preventDefault();
-            window._0x3d2a?.showToast?.('⛔ عرض المصدر غير مسموح', 'error');
+            if (window._0x3d2a?.showToast) window._0x3d2a.showToast('⛔ عرض المصدر غير مسموح', 'error');
             return false;
         }
 
@@ -833,39 +837,39 @@ DOCTYPE html>
             e.preventDefault();
             return false;
         }
-    }, true); // استخدام true لضمان التقاط الحدث أولاً
+    }, true); 
 
-    // 2. منع النقر يمين (مع استثناء خانات الإدخال)
+    // 3. منع النقر يمين (مع استثناء الخانات عشان الـ Copy/Paste يشتغل لو حبيت)
     document.addEventListener('contextmenu', function(e) {
         if (isInput(e.target)) return; 
         e.preventDefault();
         return false;
     });
 
-    // 3. منع التحديد والنسخ واللصق (استثناء الخانات تماماً)
+    // 4. منع التحديد والنسخ (استثناء الخانات تماماً)
     document.addEventListener('selectstart', (e) => { if (!isInput(e.target)) e.preventDefault(); });
     document.addEventListener('copy', (e) => { if (!isInput(e.target)) e.preventDefault(); });
     document.addEventListener('paste', (e) => { if (!isInput(e.target)) e.preventDefault(); });
 
-    // 4. كاشف أدوات المطور (بدون مسح محتوى الصفحة فوراً لتجنب الأخطاء)
+    // 5. كاشف أدوات المطور المحسن
     function detectDevTools() {
         const threshold = 160;
-        const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-        const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-        
-        if (widthThreshold || heightThreshold) {
-            console.warn("DevTools Detected");
-            // يمكنك هنا إضافة كود توجيه لصفحة فارغة لو حبيت
+        if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+            // هنا يتم رصد فتح أدوات المطور (يمكنك إضافة إجراء هنا)
         }
     }
     setInterval(detectDevTools, 2000);
 
-    // 5. حماية الـ innerHTML (تم استثناء الـ BODY لتجنب تعطل الـ UI)
+    // 6. حماية الـ innerHTML (معدلة: تمنع قراءة السكريبتات وتسمح بعمل الواجهة)
     const originalDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
     if (originalDescriptor && originalDescriptor.get) {
         Object.defineProperty(Element.prototype, 'innerHTML', {
             get: function() {
-                if (['SCRIPT', 'HTML', 'HEAD'].includes(this.tagName)) return '';
+                // منع قراءة محتوى السكريبتات والهيد فقط لحماية الكود
+                const protectedTags = ['SCRIPT', 'HTML', 'HEAD'];
+                if (protectedTags.includes(this.tagName.toUpperCase())) {
+                    return '';
+                }
                 return originalDescriptor.get.call(this);
             },
             set: function(value) {
