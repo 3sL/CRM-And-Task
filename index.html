@@ -441,7 +441,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
-        /* رسالة حماية عند محاولة فتح أدوات المطور */
         .devtools-detected {
             position: fixed;
             top: 0;
@@ -459,7 +458,8 @@
         }
     </style>
 </head>
-<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;" onkeydown="return false;"> 
+<!-- تم إزالة onkeydown="return false;" لمنع تعطيل الكتابة في الحقول -->
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;"> 
 <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="soundAlert" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
@@ -784,48 +784,65 @@
 // ============================================================
 // UTOPIA TRADING PRO CRM - نظام إدارة متكامل وآمن
 // تم التطوير بواسطة: مهندس محمود محمد مرعي
-// الإصدار: 4.0 - أقصى حماية ممكنة للواجهة الأمامية
+// الإصدار: 4.1 - إصلاح مشكلة الكتابة في الحقول
 // ============================================================
 
-// ========== طبقات الحماية المتقدمة ==========
+// ========== طبقات الحماية المتقدمة (مع السماح بالكتابة) ==========
 
 (function() {
     "use strict";
     
-    // 1. منع حفظ الصفحة (Ctrl+S)
+    // 1. منع اختصارات لوحة المفاتيح الضارة فقط (مع السماح بالكتابة العادية)
     document.addEventListener('keydown', function(e) {
+        var target = e.target;
+        var isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT';
+        
+        // منع حفظ الصفحة (Ctrl+S) - يمنع في كل الأحوال
         if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
             e.preventDefault();
             e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ حفظ الصفحة غير مسموح', 'error');
+            if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ حفظ الصفحة غير مسموح', 'error');
             return false;
         }
-        // منع عرض المصدر (Ctrl+U)
+        
+        // منع عرض المصدر (Ctrl+U) - يمنع في كل الأحوال
         if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
             e.preventDefault();
             e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ عرض المصدر غير مسموح', 'error');
+            if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ عرض المصدر غير مسموح', 'error');
             return false;
         }
-        // منع فتح أدوات المطور (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C)
+        
+        // منع فتح أدوات المطور (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C) - يمنع في كل الأحوال
         if (e.key === 'F12' || e.keyCode === 123) {
             e.preventDefault();
             e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ أدوات المطور معطلة', 'error');
+            if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ أدوات المطور معطلة', 'error');
             return false;
         }
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
             e.preventDefault();
             e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ أدوات المطور معطلة', 'error');
+            if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ أدوات المطور معطلة', 'error');
             return false;
         }
-        // منع الطباعة (Ctrl+P)
+        
+        // منع الطباعة (Ctrl+P) - يمنع في كل الأحوال
         if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
             e.preventDefault();
             e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ الطباعة غير مسموحة', 'error');
+            if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ الطباعة غير مسموحة', 'error');
             return false;
+        }
+        
+        // منع Ctrl+C و Ctrl+X و Ctrl+V فقط خارج حقول الإدخال
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C' || e.key === 'x' || e.key === 'X' || e.key === 'v' || e.key === 'V')) {
+            if (!isInputField) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ النسخ واللصق غير مسموح خارج الحقول', 'error');
+                return false;
+            }
         }
     });
     
@@ -857,7 +874,7 @@
         return false;
     });
     
-    // 5. منع تحديد النص بشكل كامل
+    // 5. منع تحديد النص بشكل كامل (مع السماح في حقول الإدخال)
     document.addEventListener('selectstart', function(e) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
             e.preventDefault();
@@ -865,11 +882,11 @@
         }
     });
     
-    // 6. منع النسخ والقص واللصق
+    // 6. منع النسخ والقص واللصق خارج حقول الإدخال
     document.addEventListener('copy', function(e) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ النسخ غير مسموح', 'error');
+            if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ النسخ غير مسموح', 'error');
             return false;
         }
     });
@@ -877,7 +894,7 @@
     document.addEventListener('cut', function(e) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ القص غير مسموح', 'error');
+            if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ القص غير مسموح', 'error');
             return false;
         }
     });
@@ -885,7 +902,7 @@
     document.addEventListener('paste', function(e) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ اللصق غير مسموح', 'error');
+            if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ اللصق غير مسموح', 'error');
             return false;
         }
     });
@@ -893,12 +910,11 @@
     // 7. منع حفظ الصفحة عبر قائمة المتصفح
     window.addEventListener('beforeprint', function(e) {
         e.preventDefault();
-        window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ الطباعة غير مسموحة', 'error');
+        if (window._0x3d2a && window._0x3d2a.showToast) window._0x3d2a.showToast('⛔ الطباعة غير مسموحة', 'error');
         return false;
     });
     
-    // 8. منع التقاط الشاشة (تنبيه فقط - لا يمكن منعه تقنياً)
-    // إضافة علامة مائية ديناميكية مع بيانات الجلسة
+    // 8. علامة مائية ديناميكية
     setInterval(function() {
         var watermarkDiv = document.getElementById('dynamicWatermark');
         if (watermarkDiv && sessionStorage.getItem('isLoggedIn') === 'true') {
@@ -917,22 +933,6 @@
         console.info = noop;
         console.table = noop;
         console.clear = noop;
-    }
-    
-    // 10. إخفاء الكود عن طريق منع الوصول إلى innerHTML
-    var originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
-    if (originalInnerHTML && originalInnerHTML.get) {
-        Object.defineProperty(Element.prototype, 'innerHTML', {
-            get: function() {
-                if (this.tagName === 'SCRIPT' || this.tagName === 'HTML' || this.tagName === 'BODY') {
-                    return '';
-                }
-                return originalInnerHTML.get.call(this);
-            },
-            set: function(value) {
-                originalInnerHTML.set.call(this, value);
-            }
-        });
     }
 })();
 
@@ -1557,7 +1557,7 @@ window._0x3d2a.renderCRM = function(){
     if(!body) return;
     
     if (clients.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</b></tr>';
+        body.innerHTML = '<tr><td colspan="7" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</b></td>';
         return;
     }
     
@@ -2029,7 +2029,7 @@ window._0x3d2a.renderRecycle = function(){
             '<td>' + (c.status || '') + '</td>' +
             '<td><button class="action-btn btn-edit" onclick="window._0x3d2a.restore(' + i + ')">🔄</button></td>' +
             '<td><button class="action-btn btn-del" onclick="window._0x3d2a.hardDelete(' + i + ')">🗑️</button></td>' +
-        '</tr>';
+        '<tr>';
     }
 };
 
@@ -2476,7 +2476,7 @@ window._0x3d2a.init = async function(){
     document.getElementById('emailTemplateId').value = emailSettings.templateId;
     document.getElementById('emailPublicKey').value = emailSettings.publicKey;
     
-    window._0x3d2a.showToast('🔒 نظام إدارة متكامل | جميع الحقوق محفوظة للمبرمج مهندس محمود محمد مرعي', 'info');
+    window._0x3d2a.showToast('🔒'info' Integrated management system | All rights reserved to programmer ENG.Mahmoud Mohamed Marei', );
     
     startPeriodicSync();
     setInterval(function() { window._0x3d2a.checkSmartNotifications(); }, 60000);
