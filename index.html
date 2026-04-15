@@ -791,149 +791,90 @@ DOCTYPE html>
 
 (function() {
     "use strict";
-    
-    // 1. منع حفظ الصفحة (Ctrl+S)
+
+    // دالة مساعدة للتأكد إذا كان المستخدم يكتب في خانة إدخال
+    const isInput = (el) => {
+        return el.tagName === 'INPUT' || 
+               el.tagName === 'TEXTAREA' || 
+               el.isContentEditable || 
+               el.closest('input, textarea');
+    };
+
+    // 1. منع الاختصارات مع استثناء الكتابة العادية
     document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
+        const targetIsInput = isInput(e.target);
+
+        // إذا كان المستخدم يكتب في خانة إدخال، اسمح له بكل شيء إلا أدوات المطور
+        if (targetIsInput) {
+            // منع F12 و اختصارات الـ Inspect حتى داخل الـ Input
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
+                e.preventDefault();
+                return false;
+            }
+            return true; // اسمح ببقية الكتابة (حروف، أرقام، مسح)
+        }
+
+        // منع حفظ الصفحة (Ctrl+S)
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
             e.preventDefault();
-            e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ حفظ الصفحة غير مسموح', 'error');
+            window._0x3d2a?.showToast?.('⛔ حفظ الصفحة غير مسموح', 'error');
             return false;
         }
+
         // منع عرض المصدر (Ctrl+U)
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') {
             e.preventDefault();
-            e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ عرض المصدر غير مسموح', 'error');
+            window._0x3d2a?.showToast?.('⛔ عرض المصدر غير مسموح', 'error');
             return false;
         }
-        // منع فتح أدوات المطور (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C)
-        if (e.key === 'F12' || e.keyCode === 123) {
+
+        // منع F12 بشكل عام
+        if (e.key === 'F12') {
             e.preventDefault();
-            e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ أدوات المطور معطلة', 'error');
             return false;
         }
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
-            e.preventDefault();
-            e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ أدوات المطور معطلة', 'error');
-            return false;
-        }
-        // منع الطباعة (Ctrl+P)
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
-            e.preventDefault();
-            e.stopPropagation();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ الطباعة غير مسموحة', 'error');
-            return false;
-        }
+    }, true); // استخدام true لضمان التقاط الحدث أولاً
+
+    // 2. منع النقر يمين (مع استثناء خانات الإدخال)
+    document.addEventListener('contextmenu', function(e) {
+        if (isInput(e.target)) return; 
+        e.preventDefault();
+        return false;
     });
-    
-    // 2. كشف ومنع فتح أدوات المطور بشكل متقدم
+
+    // 3. منع التحديد والنسخ واللصق (استثناء الخانات تماماً)
+    document.addEventListener('selectstart', (e) => { if (!isInput(e.target)) e.preventDefault(); });
+    document.addEventListener('copy', (e) => { if (!isInput(e.target)) e.preventDefault(); });
+    document.addEventListener('paste', (e) => { if (!isInput(e.target)) e.preventDefault(); });
+
+    // 4. كاشف أدوات المطور (بدون مسح محتوى الصفحة فوراً لتجنب الأخطاء)
     function detectDevTools() {
-        var threshold = 160;
-        var widthThreshold = window.outerWidth - window.innerWidth > threshold;
-        var heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        const threshold = 160;
+        const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        const heightThreshold = window.outerHeight - window.innerHeight > threshold;
         
         if (widthThreshold || heightThreshold) {
-            document.body.innerHTML = '<div class="devtools-detected"><h1>🔒 تم اكتشاف أدوات المطور</h1><p>تم إغلاق النظام حفاظاً على الأمان</p><button onclick="location.reload()">إعادة التشغيل</button></div>';
-            if (window._0x3d2a && window._0x3d2a.out) window._0x3d2a.out();
-            throw new Error("DevTools detected");
+            console.warn("DevTools Detected");
+            // يمكنك هنا إضافة كود توجيه لصفحة فارغة لو حبيت
         }
     }
-    
-    setInterval(detectDevTools, 1000);
-    
-    // 3. منع النقر بزر الماوس الأيمن بشكل كامل
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    });
-    
-    // 4. منع السحب والإفلات
-    document.addEventListener('dragstart', function(e) {
-        e.preventDefault();
-        return false;
-    });
-    
-    // 5. منع تحديد النص بشكل كامل
-    document.addEventListener('selectstart', function(e) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
-            e.preventDefault();
-            return false;
-        }
-    });
-    
-    // 6. منع النسخ والقص واللصق
-    document.addEventListener('copy', function(e) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ النسخ غير مسموح', 'error');
-            return false;
-        }
-    });
-    
-    document.addEventListener('cut', function(e) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ القص غير مسموح', 'error');
-            return false;
-        }
-    });
-    
-    document.addEventListener('paste', function(e) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-            window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ اللصق غير مسموح', 'error');
-            return false;
-        }
-    });
-    
-    // 7. منع حفظ الصفحة عبر قائمة المتصفح
-    window.addEventListener('beforeprint', function(e) {
-        e.preventDefault();
-        window._0x3d2a && window._0x3d2a.showToast && window._0x3d2a.showToast('⛔ الطباعة غير مسموحة', 'error');
-        return false;
-    });
-    
-    // 8. منع التقاط الشاشة (تنبيه فقط - لا يمكن منعه تقنياً)
-    // إضافة علامة مائية ديناميكية مع بيانات الجلسة
-    setInterval(function() {
-        var watermarkDiv = document.getElementById('dynamicWatermark');
-        if (watermarkDiv && sessionStorage.getItem('isLoggedIn') === 'true') {
-            var now = new Date();
-            watermarkDiv.innerHTML = sessionStorage.getItem('userDisplayName') + ' | ' + now.toLocaleString() + ' | ' + navigator.userAgent.substring(0, 30);
-        }
-    }, 3000);
-    
-    // 9. تعطيل console.log في الإنتاج
-    if (typeof console !== "undefined") {
-        var noop = function() {};
-        console.log = noop;
-        console.warn = noop;
-        console.error = noop;
-        console.debug = noop;
-        console.info = noop;
-        console.table = noop;
-        console.clear = noop;
-    }
-    
-    // 10. إخفاء الكود عن طريق منع الوصول إلى innerHTML
-    var originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
-    if (originalInnerHTML && originalInnerHTML.get) {
+    setInterval(detectDevTools, 2000);
+
+    // 5. حماية الـ innerHTML (تم استثناء الـ BODY لتجنب تعطل الـ UI)
+    const originalDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    if (originalDescriptor && originalDescriptor.get) {
         Object.defineProperty(Element.prototype, 'innerHTML', {
             get: function() {
-                if (this.tagName === 'SCRIPT' || this.tagName === 'HTML' || this.tagName === 'BODY') {
-                    return '';
-                }
-                return originalInnerHTML.get.call(this);
+                if (['SCRIPT', 'HTML', 'HEAD'].includes(this.tagName)) return '';
+                return originalDescriptor.get.call(this);
             },
             set: function(value) {
-                originalInnerHTML.set.call(this, value);
-            }
+                originalDescriptor.set.call(this, value);
+            },
+            configurable: true 
         });
     }
+
 })();
 
 window._0x3d2a = window._0x3d2a || {};
