@@ -787,102 +787,24 @@ DOCTYPE html>
 // الإصدار: 4.0 - أقصى حماية ممكنة للواجهة الأمامية
 // ============================================================
 
-// ========== طبقات الحماية المتقدمة (نسخة إصلاح خانات الإدخال) ==========
-
 (function() {
     "use strict";
 
-    // 1. دالة مساعدة ذكية للتأكد إذا كان المستخدم يحاول الكتابة
-    const isInput = (el) => {
-        if (!el) return false;
-        const tagName = el.tagName.toUpperCase();
-        return tagName === 'INPUT' || 
-               tagName === 'TEXTAREA' || 
-               el.isContentEditable || 
-               el.closest('input, textarea');
-    };
-
-    // 2. منع الاختصارات مع السماح الكامل للكتابة داخل الخانات
+    // 1. منع الزراير اللي بتفتح السورس كود (F12, Ctrl+U, Ctrl+S)
     document.addEventListener('keydown', function(e) {
-        const targetIsInput = isInput(e.target);
-
-        // إذا كان المستخدم داخل خانة إدخال
-        if (targetIsInput) {
-            // نمنع فقط الاختصارات التي تفتح أدوات المطور
-            if (e.key === 'F12' || 
-               (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
-                e.preventDefault();
-                return false;
-            }
-            // نسمح بكل شيء آخر (حروف، أرقام، مسح، Ctrl+V، إلخ)
-            return true; 
-        }
-
-        // منع حفظ الصفحة (Ctrl+S)
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-            e.preventDefault();
-            if (window._0x3d2a?.showToast) window._0x3d2a.showToast('⛔ حفظ الصفحة غير مسموح', 'error');
-            return false;
-        }
-
-        // منع عرض المصدر (Ctrl+U)
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') {
-            e.preventDefault();
-            if (window._0x3d2a?.showToast) window._0x3d2a.showToast('⛔ عرض المصدر غير مسموح', 'error');
-            return false;
-        }
-
-        // منع F12 بشكل عام
-        if (e.key === 'F12') {
+        const forbiddenKeys = ['u', 's', 'p', 'i', 'j', 'c'];
+        if (e.key === 'F12' || (e.ctrlKey && forbiddenKeys.includes(e.key.toLowerCase()))) {
             e.preventDefault();
             return false;
         }
-    }, true); 
-
-    // 3. منع النقر يمين (مع استثناء الخانات عشان الـ Copy/Paste يشتغل لو حبيت)
-    document.addEventListener('contextmenu', function(e) {
-        if (isInput(e.target)) return; 
-        e.preventDefault();
-        return false;
     });
 
-    // 4. منع التحديد والنسخ (استثناء الخانات تماماً)
-    document.addEventListener('selectstart', (e) => { if (!isInput(e.target)) e.preventDefault(); });
-    document.addEventListener('copy', (e) => { if (!isInput(e.target)) e.preventDefault(); });
-    document.addEventListener('paste', (e) => { if (!isInput(e.target)) e.preventDefault(); });
-
-    // 5. كاشف أدوات المطور المحسن
-    function detectDevTools() {
-        const threshold = 160;
-        if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-            // هنا يتم رصد فتح أدوات المطور (يمكنك إضافة إجراء هنا)
-        }
-    }
-    setInterval(detectDevTools, 2000);
-
-    // 6. حماية الـ innerHTML (معدلة: تمنع قراءة السكريبتات وتسمح بعمل الواجهة)
-    const originalDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
-    if (originalDescriptor && originalDescriptor.get) {
-        Object.defineProperty(Element.prototype, 'innerHTML', {
-            get: function() {
-                // منع قراءة محتوى السكريبتات والهيد فقط لحماية الكود
-                const protectedTags = ['SCRIPT', 'HTML', 'HEAD'];
-                if (protectedTags.includes(this.tagName.toUpperCase())) {
-                    return '';
-                }
-                return originalDescriptor.get.call(this);
-            },
-            set: function(value) {
-                originalDescriptor.set.call(this, value);
-            },
-            configurable: true 
-        });
-    }
-
+    // 2. منع كليك يمين في أي مكان "إلا" صناديق الكتابة
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        e.preventDefault();
+    });
 })();
-
-window._0x3d2a = window._0x3d2a || {};
-
 // ========== إدارة المتغيرات العامة ==========
 var currentLang = localStorage.getItem('appLang') || 'en';
 var translations = {
