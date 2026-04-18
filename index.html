@@ -1006,7 +1006,7 @@ var translations = {
         'recycle_status': 'Status', 'recycle_restore': 'Restore', 'recycle_delete': 'Delete',
         'admin_title': '👑 Admin Master Control Panel', 'users_title': '👥 User Accounts Management',
         'username_placeholder': 'Username', 'password_placeholder': 'Password', 'fullname_placeholder': 'Full Name',
-        'role_user': 'Standard Agent', 'role_admin': 'System Administrator', 'register_btn': 'Register New User',
+        'role_user': 'Standard User', 'role_admin': 'System Administrator', 'register_btn': 'Register New User',
         'logs_title': '📜 Security Activity Logs', 'profile_title': '👤 User Settings', 'logged_in_as': 'Logged in as:',
         'change_pass_label': 'Change Access Password:', 'update_pass_btn': 'Update My Password',
         'login_title': 'Utopia For Trading And Export', 'login_subtitle': 'Secure Management System',
@@ -1049,7 +1049,7 @@ var translations = {
         'recycle_phone': 'الهاتف', 'recycle_status': 'الحالة السابقة', 'recycle_restore': 'استعادة',
         'recycle_delete': 'حذف نهائي', 'admin_title': '👑 لوحة تحكم الأدمن الرئيسي', 'users_title': '👥 إدارة حسابات المستخدمين',
         'username_placeholder': 'اسم المستخدم', 'password_placeholder': 'كلمة المرور', 'fullname_placeholder': 'الاسم الكامل',
-        'role_user': 'مندوب عادي', 'role_admin': 'مسؤول النظام', 'register_btn': 'تسجيل مستخدم جديد',
+        'role_user': 'مستخدم عادي', 'role_admin': 'مسؤول النظام', 'register_btn': 'تسجيل مستخدم جديد',
         'logs_title': '📜 سجلات النشاطات الأمنية', 'profile_title': '👤 إعدادات المستخدم', 'logged_in_as': 'مسجل الدخول باسم:',
         'change_pass_label': 'تغيير كلمة المرور:', 'update_pass_btn': 'تحديث كلمة المرور',
         'login_title': 'يوتوبيا للتجارة والتصدير', 'login_subtitle': 'نظام إدارة آمن', 'login_btn': 'الدخول للنظام',
@@ -1104,7 +1104,7 @@ var emailSettings = {
     publicKey: (function() { try { return localStorage.getItem('emailPublicKey') || 'YOUR_PUBLIC_KEY'; } catch(e) { return 'YOUR_PUBLIC_KEY'; } })()
 };
 
-// مستخدمين تجريبيين (مشفرة)
+// المستخدمين الأساسيين
 var defaultUsers = [
     { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
     { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" },
@@ -1251,7 +1251,7 @@ var emailTemplates = {
     }
 };
 
-// Firebase Configuration (يجب تحديثها بقواعد أمان مناسبة)
+// Firebase Configuration
 var firebaseConfig = {
     apiKey: "AIzaSyCh3wFPo7mVeB_ccufW5LyKgPFoeSO0J00",
     authDomain: "crm-and-tasks-9f7c3.firebaseapp.com",
@@ -1718,7 +1718,7 @@ window._0x3d2a.renderCRM = function(){
     if(!body) return;
     
     if (clients.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</td></tr>';
+        body.innerHTML = '<tr><td colspan="7" class="loading-indicator">📭 لا يوجد عملاء. قم بإضافة عميل جديد</b></td>';
         return;
     }
     
@@ -1736,7 +1736,7 @@ window._0x3d2a.renderCRM = function(){
     });
     
     if (filteredClients.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" class="loading-indicator">⚠️ لا توجد نتائج تطابق معايير البحث</td></tr>';
+        body.innerHTML = '<tr><td colspan="7" class="loading-indicator">⚠️ لا توجد نتائج تطابق معايير البحث</b></td>';
         return;
     }
     
@@ -2044,7 +2044,7 @@ window._0x3d2a.renderTasks = function(){
     });
     
     if (filteredTasks.length === 0) {
-        body.innerHTML = '<td><td colspan="9" class="loading-indicator">⚠️ لا توجد مهام تطابق معايير البحث</b></td>';
+        body.innerHTML = '<tr><td colspan="9" class="loading-indicator">⚠️ لا توجد مهام تطابق معايير البحث</b></td>';
         return;
     }
     
@@ -2244,7 +2244,7 @@ window._0x3d2a.hardDelete = function(i){
     }
 };
 
-// ========== دوال المستخدمين ==========
+// ========== دوال المستخدمين (المُصلحة) ==========
 
 window._0x3d2a.renderUsers = function(){
     var body = document.getElementById('usersBody');
@@ -2258,7 +2258,8 @@ window._0x3d2a.renderUsers = function(){
         for (var i = 0; i < authSystem.users.length; i++) {
             var u = authSystem.users[i];
             var roleClass = u.role === 'admin' ? 'role-admin' : 'role-user';
-            var roleText = u.role === 'admin' ? '👑 مسؤول النظام' : '👤 مندوب عادي';
+            // تصحيح النص المعروض للصلاحية
+            var roleText = u.role === 'admin' ? '👑 مسؤول النظام' : '👤 مستخدم عادي';
             body.innerHTML += '<tr>' +
                 '<td><b>' + (u.u || '') + '</b></td>' +
                 '<td>••••••</b></td>' +
@@ -2280,7 +2281,7 @@ window._0x3d2a.addUser = function() {
     var newUser = { u: u, p: p, displayName: d, role: r };
     authSystem.users.push(newUser);
     window._0x3d2a.saveToLocalDB('users', authSystem.users);
-    window._0x3d2a.addLog("تم إنشاء مستخدم جديد: " + d + " (صلاحية: " + (r === 'admin' ? 'مسؤول' : 'مندوب') + ")");
+    window._0x3d2a.addLog("تم إنشاء مستخدم جديد: " + d + " (صلاحية: " + (r === 'admin' ? 'مسؤول' : 'مستخدم') + ")");
     document.getElementById('newU').value = '';
     document.getElementById('newP').value = '';
     document.getElementById('newD').value = '';
