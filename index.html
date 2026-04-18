@@ -292,26 +292,41 @@
         .notification-bell { position: relative; cursor: pointer; margin-left: 10px; }
         .notification-bell .badge { position: absolute; top: -8px; right: -8px; background: #f44336; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; }
         
-        /* تحسينات أزرار اللغة والمزامنة */
+        /* تحسينات أزرار رأس الصفحة - ترتيب عمودي */
+        .sidebar-header {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.2em;
+            text-align: center;
+            color: var(--accent);
+        }
         .header-actions {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
         }
         .lang-switch-btn {
             background: linear-gradient(135deg, var(--accent), #e6b800);
             color: var(--primary);
             border: none;
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-radius: 25px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             box-shadow: 0 2px 8px rgba(255, 204, 0, 0.3);
+            width: 100%;
         }
         .lang-switch-btn:hover {
             transform: translateY(-2px);
@@ -321,26 +336,27 @@
             position: relative;
             cursor: pointer;
             background: rgba(255,255,255,0.1);
-            width: 38px;
-            height: 38px;
+            padding: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
+            border-radius: 25px;
             transition: all 0.3s ease;
+            width: 100%;
+            gap: 8px;
         }
         .notification-bell:hover {
             background: rgba(255,255,255,0.2);
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
         .notification-bell i {
-            font-size: 20px;
+            font-size: 18px;
             color: white;
         }
         .notification-bell .badge {
             position: absolute;
             top: -5px;
-            right: -5px;
+            right: 15px;
             background: var(--danger);
             color: white;
             border-radius: 50%;
@@ -354,16 +370,18 @@
         .sync-status {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             background: rgba(0,0,0,0.3);
-            padding: 6px 14px;
+            padding: 10px 14px;
             border-radius: 25px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 500;
             transition: all 0.3s ease;
+            width: 100%;
         }
         .sync-status i {
-            font-size: 12px;
+            font-size: 14px;
         }
         .sync-status.online {
             background: linear-gradient(135deg, #28a745, #20c997);
@@ -379,6 +397,27 @@
             background: linear-gradient(135deg, #ffc107, #ff9800);
             color: #333;
             animation: pulse 1.5s infinite;
+        }
+        
+        /* تحسين عرض المستخدمين في لوحة الأدمن */
+        .users-table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .role-admin {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+        .role-user {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
         }
         
         [dir="rtl"] .advanced-filter-bar button,
@@ -558,21 +597,6 @@
             cursor: pointer;
             font-weight: bold;
         }
-        
-        /* تحسين رأس الشريط الجانبي */
-        .sidebar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .sidebar-header h2 {
-            margin: 0;
-            font-size: 1.1em;
-            flex: 1;
-        }
     </style>
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;"> 
@@ -610,6 +634,7 @@
                 </button>
                 <div class="notification-bell" onclick="window._0x3d2a.showNotificationsPanel()">
                     <i class="fas fa-bell"></i>
+                    <span>الإشعارات</span>
                     <span id="notificationBadge" class="badge" style="display: none;">0</span>
                 </div>
                 <div id="syncStatusIndicator" class="sync-status offline">
@@ -850,10 +875,10 @@
                         <input id="newD" placeholder="الاسم الكامل">
                     </div>
                     <select id="newR" style="margin-top:10px;">
-                        <option value="user">مندوب عادي</option>
-                        <option value="admin">مسؤول النظام</option>
+                        <option value="user">👤 مندوب عادي</option>
+                        <option value="admin">👑 مسؤول النظام</option>
                     </select>
-                    <button onclick="window._0x3d2a.addUser()" class="btn-save" style="background:var(--primary)" id="registerBtn">تسجيل مستخدم جديد</button>
+                    <button onclick="window._0x3d2a.addUser()" class="btn-save" style="background:var(--primary)" id="registerBtn">➕ تسجيل مستخدم جديد</button>
                     <div class="table-container" style="margin-top:20px;">
                         <table id="usersTable">
                             <thead>
@@ -2019,7 +2044,7 @@ window._0x3d2a.renderTasks = function(){
     });
     
     if (filteredTasks.length === 0) {
-        body.innerHTML = '<tr><td colspan="9" class="loading-indicator">⚠️ لا توجد مهام تطابق معايير البحث</b></td>';
+        body.innerHTML = '<td><td colspan="9" class="loading-indicator">⚠️ لا توجد مهام تطابق معايير البحث</b></td>';
         return;
     }
     
@@ -2225,18 +2250,20 @@ window._0x3d2a.renderUsers = function(){
     var body = document.getElementById('usersBody');
     if(!body) return;
     if(sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin"){
-        body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></td>";
+        body.innerHTML = "<tr><td colspan='5'>🔒 صلاحية مقيدة - لا يمكن الوصول</b></td>";
         return;
     }
     if (authSystem.users && authSystem.users.length > 0) {
         body.innerHTML = '';
         for (var i = 0; i < authSystem.users.length; i++) {
             var u = authSystem.users[i];
+            var roleClass = u.role === 'admin' ? 'role-admin' : 'role-user';
+            var roleText = u.role === 'admin' ? '👑 مسؤول النظام' : '👤 مندوب عادي';
             body.innerHTML += '<tr>' +
-                '<td>' + (u.u || '') + '</td>' +
-                '<td class="mask-pass">**</b></td>' +
+                '<td><b>' + (u.u || '') + '</b></td>' +
+                '<td>••••••</b></td>' +
                 '<td>' + (u.displayName || '') + '</td>' +
-                '<td><span style="font-size:10px; background:#ddd; padding:2px 5px; border-radius:3px">' + (u.role || 'user') + '</span></b></td>' +
+                '<td><span class="role-badge ' + roleClass + '">' + roleText + '</span></b></td>' +
                 '<td><button class="action-btn btn-del" onclick="window._0x3d2a.delUser(' + i + ')">✕</button></b></td>' +
             '</tr>';
         }
@@ -2248,12 +2275,12 @@ window._0x3d2a.addUser = function() {
     var p = document.getElementById('newP').value;
     var d = document.getElementById('newD').value;
     var r = document.getElementById('newR').value;
-    if(!u || !p || !d){ alert("All fields required"); return; }
+    if(!u || !p || !d){ alert("جميع الحقول مطلوبة!"); return; }
     
     var newUser = { u: u, p: p, displayName: d, role: r };
     authSystem.users.push(newUser);
     window._0x3d2a.saveToLocalDB('users', authSystem.users);
-    window._0x3d2a.addLog("User created: " + d);
+    window._0x3d2a.addLog("تم إنشاء مستخدم جديد: " + d + " (صلاحية: " + (r === 'admin' ? 'مسؤول' : 'مندوب') + ")");
     document.getElementById('newU').value = '';
     document.getElementById('newP').value = '';
     document.getElementById('newD').value = '';
@@ -2262,10 +2289,12 @@ window._0x3d2a.addUser = function() {
 };
 
 window._0x3d2a.delUser = function(i) {
-    if(confirm("Delete user?")){
+    if(confirm("هل تريد حذف هذا المستخدم نهائياً؟")){
+        var deletedUser = authSystem.users[i];
         authSystem.users.splice(i,1);
         window._0x3d2a.saveToLocalDB('users', authSystem.users);
         window._0x3d2a.renderUsers();
+        window._0x3d2a.addLog("تم حذف المستخدم: " + (deletedUser ? deletedUser.displayName : 'مستخدم'));
         window._0x3d2a.showToast('✅ تم حذف المستخدم بنجاح', 'success');
     }
 };
@@ -2277,18 +2306,20 @@ window._0x3d2a.check = async function(){
     var p = document.getElementById('passInput').value.trim();
     document.getElementById('loginError').style.display = 'none';
     
+    // حساب المدير الرئيسي
     if(u === "admin" && p === "@Mody6699"){
         window._0x3d2a.loginSuccess("admin", "Master Admin", -1);
         return;
     }
     
+    // تحميل المستخدمين من قاعدة البيانات المحلية إذا كانت فارغة
     if (authSystem.users.length === 0) {
         try {
             var loadedUsers = await localDB.users.toArray();
             if (loadedUsers && loadedUsers.length > 0) {
                 authSystem.users = loadedUsers;
             } else {
-                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+                await localDB.users.bulkAdd(defaultUsers.map(function(u) { return { ...u, id: u.u }; }));
                 authSystem.users = await localDB.users.toArray();
             }
         } catch(e) {
@@ -2296,15 +2327,22 @@ window._0x3d2a.check = async function(){
         }
     }
     
-    var found = authSystem.users.find(function(acc){ 
-        return acc && acc.u && acc.u.toString().trim() === u && acc.p.toString().trim() === p; 
-    });
+    // البحث عن المستخدم
+    var found = null;
+    for (var i = 0; i < authSystem.users.length; i++) {
+        var acc = authSystem.users[i];
+        if (acc && acc.u && acc.u.toString().trim() === u && acc.p.toString().trim() === p) {
+            found = acc;
+            break;
+        }
+    }
     
     if(found){
         window._0x3d2a.loginSuccess(found.role, found.displayName, authSystem.users.indexOf(found));
     } else {
         document.getElementById('loginError').style.display = 'block';
         window._0x3d2a.play('soundAlert');
+        window._0x3d2a.showToast('❌ اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
     }
 };
 
@@ -2316,7 +2354,7 @@ window._0x3d2a.loginSuccess = function(role, name, idx){
     
     // إضافة سجل تسجيل الدخول
     if(!logs) logs = [];
-    logs.push({ user: name, action: "Logged in", time: new Date().toLocaleString() });
+    logs.push({ user: name, action: "تسجيل دخول", time: new Date().toLocaleString() });
     
     window._0x3d2a.play('soundSuccess');
     resetSessionTimeout();
@@ -2404,7 +2442,7 @@ window._0x3d2a.initApp = async function(){
 };
 
 window._0x3d2a.out = function(){
-    if(confirm("Confirm logout?")){
+    if(confirm("تأكيد تسجيل الخروج؟")){
         sessionStorage.clear();
         location.reload();
     }
@@ -2413,14 +2451,14 @@ window._0x3d2a.out = function(){
 window._0x3d2a.updatePass = function(){ 
     var np = document.getElementById('changePassInput').value; 
     var idx = sessionStorage.getItem('userIdx'); 
-    if(!np){ alert("Enter password"); return; } 
-    if(idx == -1){ alert("Master password cannot be changed here"); return; } 
+    if(!np){ alert("الرجاء إدخال كلمة المرور الجديدة"); return; } 
+    if(idx == -1){ alert("لا يمكن تغيير كلمة مرور المدير الرئيسي من هنا"); return; } 
     if(authSystem.users[idx]){ 
         authSystem.users[idx].p = np; 
         window._0x3d2a.saveToLocalDB('users', authSystem.users); 
-        window._0x3d2a.notify("Password updated", "success"); 
+        window._0x3d2a.notify("تم تحديث كلمة المرور بنجاح", "success"); 
         document.getElementById('changePassInput').value = ''; 
-    } else { alert("User not found"); } 
+    } else { alert("المستخدم غير موجود"); } 
 };
 
 // ========== دوال التحليلات ==========
