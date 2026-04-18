@@ -799,8 +799,8 @@
 <script>
 // ============================================================
 // UTOPIA TRADING PRO CRM - نظام إدارة متكامل وآمن
-// تم التطوير بواسطة: مهندس محمود محمد مرعي
-// الإصدار: 3.0 مع تحسينات أمنية متقدمة
+// DEV By Eng.Mahmoud Mohamed Marie
+// Version: 3.0 with advanced security enhancements
 // ============================================================
 
 window._0x3d2a = window._0x3d2a || {};
@@ -1016,8 +1016,8 @@ var emailTemplates = {
 
 مع خالص التحية،
 فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
+📞 +201061007100
+📧 info@utopia-trading.com
 
 ---
 هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
@@ -1036,8 +1036,8 @@ var emailTemplates = {
 
 مع خالص التحية،
 فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
+📞 +201061007100
+📧 info@utopia-trading.com
 
 ---
 هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
@@ -1062,8 +1062,8 @@ var emailTemplates = {
 
 مع خالص التحية،
 فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
+📞 +201061007100
+📧 info@utopia-trading.com
 
 ---
 هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
@@ -1089,8 +1089,8 @@ var emailTemplates = {
 
 مع خالص التحية،
 فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
+📞 +201061007100
+📧 info@utopia-trading.com
 
 ---
 هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
@@ -1114,8 +1114,8 @@ var emailTemplates = {
 
 مع خالص التحية،
 فريق يوتوبيا للتجارة والتصدير
-📞 +201222153415
-📧 info@utopia.com
+📞 +201061007100
+📧 info@utopia-trading.com
 
 ---
 هذا بريد إلكتروني آمن - Utopia Trading Pro CRM`
@@ -1389,6 +1389,7 @@ async function syncFromFirebase() {
             }
         }
     } catch (err) {
+        console.warn("Sync error:", err);
         clients = await localDB.clients.toArray() || [];
         tasks = await localDB.tasks.toArray() || [];
         deletedClients = await localDB.deletedClients.toArray() || [];
@@ -1423,8 +1424,9 @@ async function syncToFirebase() {
         await database.ref('deletedClients').set(deletedToSync);
         
         await database.ref('authSystem/users').set(authSystem.users);
-    } catch (err) {}
-    finally {
+    } catch (err) {
+        console.warn("Sync to Firebase error:", err);
+    } finally {
         isSyncing = false;
         updateSyncStatusUI();
     }
@@ -1450,7 +1452,9 @@ window._0x3d2a.saveToLocalDB = async function(type, data) {
         if (database && isOnline && !isSyncing) {
             setTimeout(() => { syncToFirebase(); }, 1000);
         }
-    } catch (err) {}
+    } catch (err) {
+        console.warn("Save to localDB error:", err);
+    }
 };
 
 // ========== دوال عرض البيانات ==========
@@ -2110,7 +2114,7 @@ window._0x3d2a.renderUsers = function(){
     var body = document.getElementById('usersBody');
     if(!body) return;
     if(sessionStorage.getItem('userDisplayName') !== "Master Admin" && sessionStorage.getItem('userRole') !== "admin"){
-        body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></tr>";
+        body.innerHTML = "<tr><td colspan='5'>Restricted Access</b></td>";
         return;
     }
     if (authSystem.users && authSystem.users.length > 0) {
@@ -2198,10 +2202,94 @@ window._0x3d2a.loginSuccess = function(role, name, idx){
     sessionStorage.setItem('userRole', role);
     sessionStorage.setItem('userDisplayName', name);
     sessionStorage.setItem('userIdx', idx);
+    
+    // إضافة سجل تسجيل الدخول
+    if(!logs) logs = [];
     logs.push({ user: name, action: "Logged in", time: new Date().toLocaleString() });
+    
     window._0x3d2a.play('soundSuccess');
     resetSessionTimeout();
-    setTimeout(function(){ location.reload(); }, 300);
+    
+    // إخفاء شاشة تسجيل الدخول وإظهار التطبيق الرئيسي
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    
+    // تهيئة التطبيق بعد تسجيل الدخول
+    window._0x3d2a.initApp();
+};
+
+// فصل منطق تهيئة التطبيق عن تسجيل الدخول
+window._0x3d2a.initApp = async function(){
+    await syncFromFirebase();
+    
+    updateUILanguage();
+    
+    var govSel = document.getElementById('gov');
+    if(govSel && govSel.options.length <= 1){
+        for (var i = 0; i < govs.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = govs[i];
+            opt.innerText = govs[i];
+            govSel.appendChild(opt);
+        }
+    }
+    
+    var filterGovSel = document.getElementById('filterGov');
+    if(filterGovSel && filterGovSel.options.length <= 1){
+        for (var i = 0; i < govs.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = govs[i];
+            opt.innerText = govs[i];
+            filterGovSel.appendChild(opt);
+        }
+    }
+    
+    window._0x3d2a.renderCRM();
+    window._0x3d2a.renderTasks();
+    window._0x3d2a.renderRecycle();
+    window._0x3d2a.renderUsers();
+    window._0x3d2a.updateDash();
+    window._0x3d2a.updateGeo();
+    window._0x3d2a.fillClients();
+    window._0x3d2a.updateAgentList();
+    window._0x3d2a.updateTaskClientFilter();
+    
+    var profName = document.getElementById('profName');
+    if(profName) profName.innerText = sessionStorage.getItem('userDisplayName') || "User";
+    
+    var badge = document.getElementById('userBadge');
+    if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
+        if(badge) {
+            badge.innerText = "👑 MASTER ACCESS";
+            badge.style.background = "var(--vip)";
+            badge.style.display = "inline-block";
+        }
+    }
+    
+    if(sessionStorage.getItem('userRole') === 'admin' || sessionStorage.getItem('userDisplayName') === "Master Admin"){
+        var adminBtns = document.querySelectorAll('.admin-only');
+        for (var i = 0; i < adminBtns.length; i++) {
+            adminBtns[i].style.display = 'block';
+        }
+    }
+    
+    document.getElementById('emailServiceId').value = emailSettings.serviceId;
+    document.getElementById('emailTemplateId').value = emailSettings.templateId;
+    document.getElementById('emailPublicKey').value = emailSettings.publicKey;
+    
+    window._0x3d2a.showToast('🔒 نظام إدارة متكامل | Utopia Trading Pro CRM', 'success');
+    
+    startPeriodicSync();
+    setInterval(function() { window._0x3d2a.checkSmartNotifications(); }, 60000);
+    resetSessionTimeout();
+    
+    if (Notification.permission === 'default') {
+        setTimeout(function() {
+            if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { 
+                window._0x3d2a.enableDesktopNotifications(); 
+            }
+        }, 2000);
+    }
 };
 
 window._0x3d2a.out = function(){
@@ -2434,88 +2522,12 @@ function startPeriodicSync() {
     }, 5 * 60 * 1000);
 }
 
-// ========== تهيئة التطبيق ==========
-
-window._0x3d2a.init = async function(){
-    if(!sessionStorage.getItem('isLoggedIn')) return;
-    
+// ========== تهيئة التطبيق عند تحميل الصفحة ==========
+// التحقق من حالة تسجيل الدخول عند بدء التشغيل
+if(sessionStorage.getItem('isLoggedIn') === 'true'){
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
-    
-    await syncFromFirebase();
-    
-    updateUILanguage();
-    
-    var govSel = document.getElementById('gov');
-    if(govSel && govSel.options.length <= 1){
-        for (var i = 0; i < govs.length; i++) {
-            var opt = document.createElement('option');
-            opt.value = govs[i];
-            opt.innerText = govs[i];
-            govSel.appendChild(opt);
-        }
-    }
-    
-    var filterGovSel = document.getElementById('filterGov');
-    if(filterGovSel && filterGovSel.options.length <= 1){
-        for (var i = 0; i < govs.length; i++) {
-            var opt = document.createElement('option');
-            opt.value = govs[i];
-            opt.innerText = govs[i];
-            filterGovSel.appendChild(opt);
-        }
-    }
-    
-    window._0x3d2a.renderCRM();
-    window._0x3d2a.renderTasks();
-    window._0x3d2a.renderRecycle();
-    window._0x3d2a.renderUsers();
-    window._0x3d2a.updateDash();
-    window._0x3d2a.updateGeo();
-    window._0x3d2a.fillClients();
-    window._0x3d2a.updateAgentList();
-    window._0x3d2a.updateTaskClientFilter();
-    
-    var profName = document.getElementById('profName');
-    if(profName) profName.innerText = sessionStorage.getItem('userDisplayName') || "User";
-    
-    var badge = document.getElementById('userBadge');
-    if(sessionStorage.getItem('userDisplayName') === "Master Admin"){
-        if(badge) {
-            badge.innerText = "👑 MASTER ACCESS";
-            badge.style.background = "var(--vip)";
-            badge.style.display = "inline-block";
-        }
-    }
-    
-    if(sessionStorage.getItem('userRole') === 'admin' || sessionStorage.getItem('userDisplayName') === "Master Admin"){
-        var adminBtns = document.querySelectorAll('.admin-only');
-        for (var i = 0; i < adminBtns.length; i++) {
-            adminBtns[i].style.display = 'block';
-        }
-    }
-    
-    document.getElementById('emailServiceId').value = emailSettings.serviceId;
-    document.getElementById('emailTemplateId').value = emailSettings.templateId;
-    document.getElementById('emailPublicKey').value = emailSettings.publicKey;
-    
-    window._0x3d2a.showToast('🔒 نظام إدارة متكامل | ', 'info' Management System | All rights reserved to programmer Eng.Mahmoud Mohamed Marei);
-    
-    startPeriodicSync();
-    setInterval(function() { window._0x3d2a.checkSmartNotifications(); }, 60000);
-    resetSessionTimeout();
-    
-    if (Notification.permission === 'default') {
-        setTimeout(function() {
-            if (confirm('هل تريد تفعيل الإشعارات لتنبيهات المهام والعملاء؟')) { 
-                window._0x3d2a.enableDesktopNotifications(); 
-            }
-        }, 2000);
-    }
-};
-
-if(sessionStorage.getItem('isLoggedIn') === 'true'){
-    window._0x3d2a.init();
+    window._0x3d2a.initApp();
 }
 
 // تهيئة EmailJS
