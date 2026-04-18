@@ -2141,36 +2141,56 @@ window._0x3d2a.delUser = function(i) {
 window._0x3d2a.check = async function(){
     var u = document.getElementById('userInput').value.trim();
     var p = document.getElementById('passInput').value.trim();
-    document.getElementById('loginError').style.display = 'none';
+    var errorDiv = document.getElementById('loginError');
+    if (errorDiv) errorDiv.style.display = 'none';
     
+    // 1. التحقق من المستخدم الأساسي (Master Admin)
     if(u === "admin" && p === "@Mody6699"){
         window._0x3d2a.loginSuccess("admin", "Master Admin", -1);
         return;
     }
     
+    // 2. التأكد من تحميل قائمة المستخدمين من قاعدة البيانات
     if (authSystem.users.length === 0) {
         try {
             var loadedUsers = await localDB.users.toArray();
             if (loadedUsers && loadedUsers.length > 0) {
                 authSystem.users = loadedUsers;
             } else {
-                await localDB.users.bulkAdd(defaultUsers.map(u => ({ ...u, id: u.u })));
+                // إذا كانت قاعدة البيانات فارغة، أضف المستخدمين الافتراضيين
+                var defaultUsersList = [
+                    { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
+                    { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" },
+                    { u: "test", p: "test123", displayName: "مستخدم تجريبي", role: "user" }
+                ];
+                await localDB.users.bulkAdd(defaultUsersList.map(u => ({ ...u, id: u.u })));
                 authSystem.users = await localDB.users.toArray();
             }
         } catch(e) {
-            authSystem.users = defaultUsers;
+            console.error("Error loading users from IndexedDB", e);
+            // في حالة فشل التحميل، استخدم المستخدمين الافتراضيين مباشرة
+            authSystem.users = [
+                { u: "user1", p: "123456", displayName: "موظف عادي", role: "user" },
+                { u: "agent1", p: "agent123", displayName: "مندوب مبيعات", role: "user" },
+                { u: "test", p: "test123", displayName: "مستخدم تجريبي", role: "user" }
+            ];
         }
     }
     
+    // 3. البحث عن المستخدم في قائمة المستخدمين
     var found = authSystem.users.find(function(acc){ 
+        // تأكد من وجود acc و u و p قبل المقارنة
         return acc && acc.u && acc.u.toString().trim() === u && acc.p.toString().trim() === p; 
     });
     
     if(found){
+        // تسجيل الدخول ناجح
         window._0x3d2a.loginSuccess(found.role, found.displayName, authSystem.users.indexOf(found));
     } else {
-        document.getElementById('loginError').style.display = 'block';
+        // فشل تسجيل الدخول
+        if (errorDiv) errorDiv.style.display = 'block';
         window._0x3d2a.play('soundAlert');
+        window._0x3d2a.showToast('❌ اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
     }
 };
 
