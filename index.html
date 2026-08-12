@@ -1430,18 +1430,7 @@ var defaultUsers = [
     { u: "Utopia", p: "utopia2026", displayName: "Normal Employee", role: "user" },
 
 ];
-// بيانات تجريبية
-var demoData = {
-    clients: [
-        { name: "Al-Noor Trading Company", phone: "01234567890", email: "info@alnoor.com", gov: "Cairo", status: "VIP", notes: "Important client - large contracts", agent: "Mohamed Ali", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" },
-        { name: "Al-Salam Establishment", phone: "01122334455", email: "contact@alsalam.com", gov: "Alexandria", status: "In Progress", notes: "Negotiating prices", agent: "Ahmed Hassan", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" }
-    ],
-    tasks: [
-        { client: "Al-Noor Trading Company", operationType: "quotation", amount: 50000, text: "Submit equipment quotation", taskNotes: "Sent via email", extra: "", date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null, emailSent: false, emailDate: null },
-        { client: "Al-Salam Establishment", operationType: "followup", amount: null, text: "Quotation follow-up", taskNotes: "Call on Sunday", extra: "", date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null, emailSent: false, emailDate: null }
-    ]
 
-};
 
 // Email templates
 var emailTemplates = {
