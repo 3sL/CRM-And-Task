@@ -1779,8 +1779,10 @@ async function syncFromFirebase() {
             if (localClients.length > 0) {
                 clients = localClients;
             } else {
-                clients = demoData.clients;
-                await localDB.clients.bulkAdd(clients);
+                // ❌ إزالة تحميل البيانات التجريبية تلقائياً
+                // clients = demoData.clients;
+                // await localDB.clients.bulkAdd(clients);
+                clients = []; // ✅ يخليها فارغة
             }
         }
         
@@ -1809,8 +1811,10 @@ async function syncFromFirebase() {
             if (localTasks.length > 0) {
                 tasks = localTasks;
             } else {
-                tasks = demoData.tasks;
-                await localDB.tasks.bulkAdd(tasks);
+                // ❌ إزالة تحميل المهام التجريبية تلقائياً
+                // tasks = demoData.tasks;
+                // await localDB.tasks.bulkAdd(tasks);
+                tasks = []; // ✅ يخليها فارغة
             }
         }
         
@@ -1859,8 +1863,9 @@ async function syncFromFirebase() {
         }
         authSystem.users = usersArray;
         
-        if (clients.length === 0) clients = demoData.clients;
-        if (tasks.length === 0) tasks = demoData.tasks;
+        // ❌ إزالة تحميل البيانات التجريبية في حالة الخطأ
+        // if (clients.length === 0) clients = demoData.clients;
+        // if (tasks.length === 0) tasks = demoData.tasks;
     } finally {
         isLoadingData = false;
         updateSyncStatusUI();
