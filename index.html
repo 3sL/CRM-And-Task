@@ -1604,9 +1604,6 @@ localDB.version(3).stores({
     users: "++id, u"
 });
 
-// ========== باقي الدوال (Email, Sync, Display, Client, Task, Recycle, User, Login, Analytics) ==========
-// تم الحفاظ على جميع الدوال كما هي من الكود الأصلي
-
 // ========== دوال الإيميلات ==========
 
 window._0x3d2a.saveEmailSettings = function() {
@@ -1791,6 +1788,16 @@ async function syncFromFirebase() {
         var firebaseTasks = [];
         tasksSnapshot.forEach(function(child) {
             firebaseTasks.push({ id: child.key, ...child.val() });
+        });
+        
+        // 🔥 تنظيف المهام المرتبطة بعملاء محذوفين
+        var activeClientNames = new Set();
+        clients.forEach(function(c) { 
+            if(c.name) activeClientNames.add(c.name); 
+        });
+        
+        firebaseTasks = firebaseTasks.filter(function(task) {
+            return activeClientNames.has(task.client);
         });
         
         if (firebaseTasks.length > 0) {
@@ -2248,22 +2255,47 @@ window._0x3d2a.edit = function(i){
     window.scrollTo(0,0);
 };
 
+// ===================== دالة الحذف المعدلة =====================
 window._0x3d2a.delClient = function(i){
     if(confirm("Move this client to recycle bin?")){
         var c = clients[i];
         if(!c) return;
-        window._0x3d2a.addLog("Archived: " + c.name);
+        
+        // حذف المهام المرتبطة بالعميل
+        var clientName = c.name;
+        var tasksToRemove = [];
+        tasks.forEach(function(task, index) {
+            if(task.client === clientName) {
+                tasksToRemove.push(index);
+            }
+        });
+        
+        tasksToRemove.sort(function(a, b) { return b - a; });
+        tasksToRemove.forEach(function(index) {
+            tasks.splice(index, 1);
+        });
+        
+        window._0x3d2a.addLog("Archived: " + c.name + " with " + tasksToRemove.length + " tasks");
         deletedClients.push(c);
         clients.splice(i,1);
+        
         window._0x3d2a.saveToLocalDB('clients', clients);
         window._0x3d2a.saveToLocalDB('deletedClients', deletedClients);
+        window._0x3d2a.saveToLocalDB('tasks', tasks);
+        
         window._0x3d2a.renderCRM();
         window._0x3d2a.renderRecycle();
+        window._0x3d2a.renderTasks();
         window._0x3d2a.updateAgentList();
         window._0x3d2a.fillClients();
+        window._0x3d2a.updateTaskClientFilter();
+        window._0x3d2a.updateDash();
+        
         window._0x3d2a.play('soundSuccess');
+        window._0x3d2a.showToast('✅ Client and ' + tasksToRemove.length + ' related tasks archived', 'success');
     }
 };
+// ===============================================================
 
 window._0x3d2a.statusColor = function(s){
     var cols = { 'Interested': '#17a2b8', 'In Progress': '#ffcc00', 'Hold': '#dc3545', 'Completed': '#28a745', 'VIP': '#9b59b6' };
@@ -2621,33 +2653,70 @@ window._0x3d2a.clearAllRecycle = function(){
     }
 };
 
+// ===================== دالة الاستعادة المحسنة =====================
 window._0x3d2a.restore = function(i){
     if(confirm("Restore this client?")){
         var c = deletedClients[i];
         if(!c) return;
+        
+        // التحقق من عدم وجود العميل مسبقاً
+        var exists = clients.some(function(client) { 
+            return client.name === c.name && client.phone === c.phone; 
+        });
+        
+        if(exists) {
+            window._0x3d2a.showToast('⚠️ This client already exists', 'warning');
+            return;
+        }
+        
         clients.push(c);
         deletedClients.splice(i,1);
+        
         window._0x3d2a.saveToLocalDB('clients', clients);
         window._0x3d2a.saveToLocalDB('deletedClients', deletedClients);
         window._0x3d2a.renderCRM();
         window._0x3d2a.renderRecycle();
         window._0x3d2a.updateAgentList();
         window._0x3d2a.fillClients();
+        window._0x3d2a.updateTaskClientFilter();
         window._0x3d2a.play('soundSuccess');
+        window._0x3d2a.showToast('✅ Client restored successfully', 'success');
     }
 };
+// ===============================================================
 
+// ===================== دالة الحذف النهائي المحسنة =====================
 window._0x3d2a.hardDelete = function(i){
     if(confirm("⚠️ Warning: This action is permanent and cannot be undone! Delete this client permanently?")){
         var c = deletedClients[i];
         if(!c) return;
-        window._0x3d2a.addLog("Permanently deleted: " + c.name);
+        
+        // حذف المهام المرتبطة نهائياً
+        var clientName = c.name;
+        var tasksToRemove = [];
+        tasks.forEach(function(task, index) {
+            if(task.client === clientName) {
+                tasksToRemove.push(index);
+            }
+        });
+        
+        tasksToRemove.sort(function(a, b) { return b - a; });
+        tasksToRemove.forEach(function(index) {
+            tasks.splice(index, 1);
+        });
+        
+        window._0x3d2a.addLog("Permanently deleted: " + c.name + " with " + tasksToRemove.length + " tasks");
         deletedClients.splice(i,1);
+        
         window._0x3d2a.saveToLocalDB('deletedClients', deletedClients);
+        window._0x3d2a.saveToLocalDB('tasks', tasks);
         window._0x3d2a.renderRecycle();
+        window._0x3d2a.renderTasks();
         window._0x3d2a.play('soundAlert');
+        window._0x3d2a.showToast('🗑️ Client and related tasks permanently deleted', 'error');
     }
 };
+// ===============================================================
 
 // ========== دوال المستخدمين ==========
 
