@@ -1596,11 +1596,12 @@ try {
 
 // IndexedDB
 var localDB = new Dexie("UtopiaCRMOffline");
-localDB.version(3).stores({
+localDB.version(4).stores({
     clients: "++id, name, phone, email, status, timestamp",
     tasks: "++id, client, text, operationType, amount, taskNotes, date, completed, completedAt, emailSent, emailDate",
     deletedClients: "++id, name, phone",
-    users: "++id, u"
+    users: "++id, u",
+    logs: "++id, user, action, time"  // ✅ إضافة جدول السجلات
 });
 
 // ========== دوال الإيميلات ==========
