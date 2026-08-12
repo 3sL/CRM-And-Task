@@ -2930,15 +2930,43 @@ window._0x3d2a.out = function(){
 window._0x3d2a.updatePass = function(){ 
     var np = document.getElementById('changePassInput').value; 
     var idx = sessionStorage.getItem('userIdx'); 
-    if(!np){ alert("Please enter new password"); return; } 
-    if(idx == -1){ alert("Master password cannot be changed here"); return; } 
+    var currentUser = sessionStorage.getItem('userDisplayName');
+    
+    if(!np){ 
+        window._0x3d2a.showToast('⚠️ Please enter new password', 'warning');
+        return; 
+    } 
+    
+    if(np.length < 6){
+        window._0x3d2a.showToast('⚠️ Password must be at least 6 characters', 'warning');
+        return;
+    }
+    
+    if(idx == -1){ 
+        window._0x3d2a.showToast('⚠️ Master password cannot be changed here', 'warning');
+        return; 
+    } 
+    
     if(authSystem.users[idx]){ 
+        var userName = authSystem.users[idx].displayName || authSystem.users[idx].u;
+        
+        // تغيير الباسورد
         authSystem.users[idx].p = np; 
         window._0x3d2a.saveToLocalDB('users', authSystem.users); 
-        window._0x3d2a.notify("Password updated successfully", "success"); 
+        
+        // ✅ تسجيل التغيير في الـ Logs
+        window._0x3d2a.addLog("🔑 Password changed for user: " + userName + " (by: " + currentUser + ")");
+        
+        window._0x3d2a.showToast('✅ Password updated successfully', 'success'); 
         document.getElementById('changePassInput').value = ''; 
-    } else { alert("User not found"); } 
+        
+        // تحديث واجهة المستخدمين
+        window._0x3d2a.renderUsers();
+    } else { 
+        window._0x3d2a.showToast('❌ User not found', 'error');
+    } 
 };
+
 
 // ========== دوال التحليلات ==========
 
