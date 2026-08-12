@@ -1431,7 +1431,15 @@ var defaultUsers = [
     { u: "Utopia", p: "utopia2026", displayName: "Normal Employee", role: "user" },
 
 ];
-
+// بيانات تجريبية
+var demoData = {
+    clients: [
+        { name: "‘Utopia Trading Company", phone: "01234567890", email: "info@alnoor.com", gov: "Cairo", status: "VIP", notes: "Important client - large contracts", agent: "Utopia", date: new Date().toISOString().split('T')[0], timestamp: Date.now(), lastUpdatedBy: "System" },
+        
+    tasks: [
+        { client: "Utopia Trading Company", operationType: "quotation", amount: 50000, text: "Submit equipment quotation", taskNotes: "Sent via email", extra: "", date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0], timestamp: Date.now(), completed: false, completedAt: null, emailSent: false, emailDate: null },
+       
+    ]
 
 };
 
